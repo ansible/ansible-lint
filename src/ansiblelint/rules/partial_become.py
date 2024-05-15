@@ -83,7 +83,9 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule, TransformMixin):
         :returns: A list of errors.
         """
         data = task.normalized_task
-        errors = []
+        errors: list[MatchError] = []
+        if not data:
+            return errors
         partial = "become_user" in data and "become" not in data
         if partial:
             error = self.create_matcherror(

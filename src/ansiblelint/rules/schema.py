@@ -143,9 +143,10 @@ class ValidateSchemaRule(AnsibleLintRule):
         if file.failed():
             return results
 
-        results.extend(self._get_field_matches(file=file, data=task.raw_task))
+        if task.raw_task:
+            results.extend(self._get_field_matches(file=file, data=task.raw_task))
         for key in pre_checks["task"]:
-            if key in task.raw_task:
+            if task.raw_task and key in task.raw_task:
                 msg = pre_checks["task"][key]["msg"]
                 tag = pre_checks["task"][key]["tag"]
                 results.append(

@@ -95,6 +95,8 @@ class Transformer:
 
             try:
                 data: str = file.content
+            except FileNotFoundError:
+                continue
             except (UnicodeDecodeError, IsADirectoryError):
                 # we hit a binary file (eg a jar or tar.gz) or a directory
                 data = ""

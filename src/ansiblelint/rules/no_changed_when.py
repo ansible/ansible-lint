@@ -60,11 +60,12 @@ class CommandHasChangesCheckRule(AnsibleLintRule):
     ) -> list[MatchError]:
         result = []
         # tasks in a block are "meta" type
-        if (
+        if (  # pylint: disable=too-many-boolean-expressions
             task["__ansible_action_type__"] in ["task", "meta"]
             and task["action"]["__ansible_module__"] in self._commands
             and (
-                "changed_when" not in task.raw_task
+                task.raw_task
+                and "changed_when" not in task.raw_task
                 and "creates" not in task["action"]
                 and "removes" not in task["action"]
             )

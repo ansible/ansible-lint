@@ -492,35 +492,40 @@ class Runner:
                 logging.exception(msg)
                 # raise SystemExit(exc) from exc
                 return []
+
         results = []
         # playbook_ds can be an AnsibleUnicode string, which we consider invalid
         if isinstance(playbook_ds, str):
             raise MatchError(lintable=lintable, rule=self.rules["load-failure"])
         for item in ansiblelint.utils.playbook_items(playbook_ds):
             # if lintable.kind not in ["playbook"]:
-            for child in self.play_children(
-                lintable.path.parent,
-                item,
-                lintable.kind,
-                playbook_dir,
-            ):
-                # We avoid processing parametrized children
-                path_str = str(child.path)
-                if "$" in path_str or "{{" in path_str:
-                    continue
+            try:
+                for child in self.play_children(
+                    lintable.path.parent,
+                    item,
+                    lintable.kind,
+                    playbook_dir,
+                ):
+                    # We avoid processing parametrized children
+                    path_str = str(child.path)
+                    if "$" in path_str or "{{" in path_str:
+                        continue
 
-                # Repair incorrect paths obtained when old syntax was used, like:
-                # - include: simpletask.yml tags=nginx
-                valid_tokens = []
-                for token in split_args(path_str):
-                    if "=" in token:
-                        break
-                    valid_tokens.append(token)
-                path = " ".join(valid_tokens)
-                if path != path_str:
-                    child.path = Path(path)
-                    child.name = child.path.name
-                results.append(child)
+                    # Repair incorrect paths obtained when old syntax was used, like:
+                    # - include: simpletask.yml tags=nginx
+                    valid_tokens = []
+                    for token in split_args(path_str):
+                        if "=" in token:
+                            break
+                        valid_tokens.append(token)
+                    path = " ".join(valid_tokens)
+                    if path != path_str:
+                        child.path = Path(path)
+                        child.name = child.path.name
+                    results.append(child)
+            except Exception as exc:
+                logging.debug(exc)
+                raise
         return results
 
     def play_children(

@@ -23,12 +23,10 @@
 from __future__ import annotations
 
 import ast
-import contextlib
 import inspect
 import logging
 import os
 import re
-from collections.abc import ItemsView, Iterator, Mapping, Sequence
 from dataclasses import _MISSING_TYPE, dataclass, field
 from functools import cache, lru_cache
 from pathlib import Path
@@ -68,7 +66,6 @@ from ansiblelint.constants import (
     LINE_NUMBER_KEY,
     NESTED_TASK_KEYS,
     PLAYBOOK_TASK_KEYWORDS,
-    ROLE_IMPORT_ACTION_NAMES,
     SKIPPED_RULES_KEY,
     FileType,
 )
@@ -78,7 +75,10 @@ from ansiblelint.skip_utils import is_nested_task
 from ansiblelint.text import has_jinja, removeprefix
 
 if TYPE_CHECKING:
+    from collections.abc import ItemsView, Iterator, Sequence
+
     from ansiblelint.rules import RulesCollection
+
 # ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
 # string as the password to enable such yaml files to be opened and parsed
 # successfully.
@@ -345,31 +345,51 @@ class HandleChildren:
                 message="A malformed block was encountered while loading a block.",
                 rule=RuntimeErrorRule(),
             )
+        if not isinstance(v, list):
+            return results
         for task_handler in v:
-            # ignore empty tasks, `-`
-            if not task_handler:
-                continue
-
-            with contextlib.suppress(LookupError):
-                children = _get_task_handler_children_for_tasks_or_playbooks(
-                    task_handler,
-                    basedir,
-                    k,
-                    parent_type,
-                )
-                results.append(children)
-                continue
-
-            if any(x in task_handler for x in ROLE_IMPORT_ACTION_NAMES):
-                task_handler = normalize_task_v2(task_handler)
-                self._validate_task_handler_action_for_role(task_handler["action"])
-                name = task_handler["action"].get("name")
-                if has_jinja(name):
-                    # we cannot deal with dynamic imports
+            try:
+                task = Task(task_handler)
+                if not task.normalized_task:
                     continue
-                results.extend(
-                    self.roles_children(basedir, k, [name], parent_type),
+                normalized_action = task.normalized_task["action"]["__ansible_module__"]
+                if not normalized_action:
+                    continue
+
+                if normalized_action in (
+                    "import_tasks",
+                    "include_tasks",
+                ):
+                    if "file" in task.normalized_task["action"]:
+                        file = task.normalized_task["action"]["file"]
+                    elif isinstance(task.normalized_task["action"]["_raw_params"], str):
+                        file = task.normalized_task["action"]["_raw_params"]
+                    else:
+                        continue
+                    path = Path(basedir, file)
+                    results.append(Lintable(path, kind="tasks"))
+                    continue
+                if normalized_action in ("import_role", "include_role"):
+                    task_handler = normalize_task_v2(task_handler)
+                    self._validate_task_handler_action_for_role(
+                        task_handler["action"],
+                    )
+
+                    name = task_handler["action"].get("name")
+                    if has_jinja(name):
+                        # we cannot deal with dynamic imports
+                        continue
+                    results.extend(
+                        self.roles_children(basedir, k, [name], parent_type),
+                    )
+                    continue
+            except Exception:  # pylint: disable=broad-exception-caught
+                # failed to initialize or normalize Task
+                logging.exception(
+                    "Ignored exception while looking for children",
                 )
+                continue
+            if not task_handler:
                 continue
 
             if "block" not in task_handler:
@@ -456,37 +476,6 @@ class HandleChildren:
         return results
 
 
-def _get_task_handler_children_for_tasks_or_playbooks(
-    task_handler: dict[str, Any],
-    basedir: str,
-    k: Any,
-    parent_type: FileType,
-) -> Lintable:
-    """Try to get children of taskhandler for include/import tasks/playbooks."""
-    child_type = k if parent_type == "playbook" else parent_type
-
-    # Include the FQCN task names as this happens before normalize
-    for task_handler_key in INCLUSION_ACTION_NAMES:
-        with contextlib.suppress(KeyError):
-            # ignore empty tasks
-            if not task_handler or isinstance(task_handler, str):  # pragma: no branch
-                continue
-
-            file_name = task_handler[task_handler_key]
-            if isinstance(file_name, Mapping) and file_name.get("file", None):
-                file_name = file_name["file"]
-
-            f = path_dwim(basedir, file_name)
-            while basedir not in ["", "/"]:
-                if os.path.exists(f):
-                    break
-                basedir = os.path.dirname(basedir)
-                f = path_dwim(basedir, file_name)
-            return Lintable(f, kind=child_type)
-    msg = f'The node contains none of: {", ".join(sorted(INCLUSION_ACTION_NAMES))}'
-    raise LookupError(msg)
-
-
 def _rolepath(basedir: str, role: str) -> str | None:
     role_path = None
 
@@ -566,11 +555,18 @@ def _extract_ansible_parsed_keys_from_task(
     return result
 
 
-def normalize_task_v2(task: dict[str, Any]) -> dict[str, Any]:
+def normalize_task_v2(task: dict[str, Any] | None) -> dict[str, Any]:
     """Ensure tasks have a normalized action key and strings are converted to python objects."""
     result: dict[str, Any] = {}
     ansible_parsed_keys = ("action", "local_action", "args", "delegate_to")
 
+    if task is None:
+        result["action"] = {
+            "__ansible_module__": None,
+            "__ansible_module_original__": None,
+        }
+        result["__ansible_action_type__"] = "task"
+        return result
     if is_nested_task(task):
         _extract_ansible_parsed_keys_from_task(result, task, ansible_parsed_keys)
         # Add dummy action for block/always/rescue statements
@@ -625,11 +621,13 @@ def normalize_task_v2(task: dict[str, Any]) -> dict[str, Any]:
     return result
 
 
-def normalize_task(task: dict[str, Any], filename: str) -> dict[str, Any]:
+def normalize_task(task: dict[str, Any] | None, filename: str) -> dict[str, Any]:
     """Unify task-like object structures."""
-    ansible_action_type = task.get("__ansible_action_type__", "task")
-    if "__ansible_action_type__" in task:
-        del task["__ansible_action_type__"]
+    ansible_action_type = "task"
+    if task is not None:
+        ansible_action_type = task.get("__ansible_action_type__", "task")
+        if "__ansible_action_type__" in task:
+            del task["__ansible_action_type__"]
     task = normalize_task_v2(task)
     task[FILENAME_KEY] = filename
     task["__ansible_action_type__"] = ansible_action_type
@@ -715,16 +713,21 @@ class Task(dict[str, Any]):
     position: Any
     """
 
-    raw_task: dict[str, Any]
+    raw_task: dict[str, Any] | None
     filename: str = ""
-    _normalized_task: dict[str, Any] | _MISSING_TYPE = field(init=False, repr=False)
+    _normalized_task: dict[str, Any] | None | _MISSING_TYPE = field(
+        init=False,
+        repr=False,
+    )
     error: MatchError | None = None
     position: Any = None
 
     @property
     def name(self) -> str | None:
         """Return the name of the task."""
-        name = self.raw_task.get("name", None)
+        name = (
+            self.raw_task.get("name", None) if isinstance(self.raw_task, dict) else None
+        )
         if name is not None and not isinstance(name, str):
             msg = "Task name can only be a string."
             raise RuntimeError(msg)
@@ -733,6 +736,8 @@ class Task(dict[str, Any]):
     @property
     def action(self) -> str:
         """Return the resolved action name."""
+        if not self.normalized_task:
+            return ""
         action_name = self.normalized_task["action"]["__ansible_module_original__"]
         if not isinstance(action_name, str):
             msg = "Task actions can only be strings."
@@ -746,16 +751,20 @@ class Task(dict[str, Any]):
         While we usually expect to return a dictionary, it can also
         return a templated string when jinja is used.
         """
+        result: dict[str, Any] = {}
+        if self.raw_task is None:
+            return result
         if "args" in self.raw_task:
             return self.raw_task["args"]
-        result = {}
-        for k, v in self.normalized_task["action"].items():
-            if k not in ANNOTATION_KEYS:
-                result[k] = v
+
+        if self.normalized_task:
+            for k, v in self.normalized_task["action"].items():
+                if k not in ANNOTATION_KEYS:
+                    result[k] = v
         return result
 
     @property
-    def normalized_task(self) -> dict[str, Any]:
+    def normalized_task(self) -> dict[str, Any] | None:
         """Return the name of the task."""
         if not hasattr(self, "_normalized_task"):
             try:
@@ -776,7 +785,9 @@ class Task(dict[str, Any]):
     @property
     def skip_tags(self) -> list[str]:
         """Return the list of tags to skip."""
-        skip_tags: list[str] = self.raw_task.get(SKIPPED_RULES_KEY, [])
+        skip_tags: list[str] = (
+            self.raw_task.get(SKIPPED_RULES_KEY, []) if self.raw_task else []
+        )
         return skip_tags
 
     def is_handler(self) -> bool:
@@ -794,15 +805,20 @@ class Task(dict[str, Any]):
 
     def get(self, key: str, default: Any = None) -> Any:
         """Get a value from the task."""
-        return self.normalized_task.get(key, default)
+        if self.normalized_task:
+            return self.normalized_task.get(key, default)
+        return default
 
     def __getitem__(self, index: str) -> Any:
         """Allow access as task[...]."""
+        if not self.normalized_task:
+            raise KeyError(index)
         return self.normalized_task[index]
 
     def __iter__(self) -> Iterator[str]:
         """Provide support for 'key in task'."""
-        yield from (f for f in self.normalized_task)
+        if self.normalized_task:
+            yield from (f for f in self.normalized_task)
 
 
 def task_in_list(

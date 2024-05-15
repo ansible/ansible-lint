@@ -1,7 +1,8 @@
 ---
 - name: Demonstrate linting issue.
-  hosts: all
+  hosts: localhost
+  gather_facts: false
   tasks:
     - name: Include a role with the wrong syntax
       ansible.builtin.include_role:
-        role: foo
+        roleX: foo

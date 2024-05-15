@@ -48,7 +48,11 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
         self.prefix = re.compile(
             options.loop_var_prefix.format(role=toidentifier(file.role)),
         )
-        has_loop = "loop" in task.raw_task
+        has_loop = task.raw_task and "loop" in task.raw_task
+
+        if not task.raw_task:
+            return []
+
         for key in task.raw_task:
             if key.startswith("with_"):
                 has_loop = True

@@ -1,0 +1,9 @@
+---
+- name: Fixture
+  hosts: all
+  tasks:
+    - name: Test ability to find children 1
+      include_tasks: file=tasks/main.yml
+    - name: Test ability to find children 2
+      include_tasks:
+        file: tasks/main.yml

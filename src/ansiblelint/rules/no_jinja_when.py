@@ -68,7 +68,11 @@ class NoFormattingInWhenRule(AnsibleLintRule, TransformMixin):
         task: Task,
         file: Lintable | None = None,
     ) -> bool | str:
-        return "when" in task.raw_task and not self._is_valid(task.raw_task["when"])
+        return bool(
+            task.raw_task
+            and "when" in task.raw_task
+            and not self._is_valid(task.raw_task["when"]),
+        )
 
     def transform(
         self,

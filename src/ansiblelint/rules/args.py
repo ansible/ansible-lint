@@ -125,7 +125,8 @@ class ArgsRule(AnsibleLintRule):
         # Return if 'args' is jinja string
         # https://github.com/ansible/ansible-lint/issues/3199
         if (
-            "args" in task.raw_task
+            task.raw_task
+            and "args" in task.raw_task
             and isinstance(task.raw_task["args"], str)
             and has_jinja(task.raw_task["args"])
         ):

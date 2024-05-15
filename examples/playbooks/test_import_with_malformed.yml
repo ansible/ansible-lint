@@ -1,4 +1,5 @@
 ---
 - hosts: all
   tasks:
+    - include_tasks: file=/dev/null
     - import_tasks: tasks/malformed.yml

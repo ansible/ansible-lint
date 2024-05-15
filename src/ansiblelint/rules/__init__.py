@@ -165,14 +165,19 @@ class AnsibleLintRule(BaseRule):
                 # normalize_task converts AnsibleParserError to MatchError
                 return [task.error]
 
-            if (
-                self.id in task.skip_tags
-                or ("action" not in task.normalized_task)
-                or "skip_ansible_lint" in task.normalized_task.get("tags", [])
+            if self.id in task.skip_tags:
+                continue
+            if task.normalized_task and (
+                "action" not in task.normalized_task
+                or "skip_ansible_lint"
+                in task.normalized_task.get(
+                    "tags",
+                    [],
+                )
             ):
                 continue
 
-            if self.needs_raw_task:
+            if self.needs_raw_task and task.normalized_task:
                 task.normalized_task["__raw_task__"] = task.raw_task
 
             result = self.matchtask(task, file=file)
@@ -204,7 +209,11 @@ class AnsibleLintRule(BaseRule):
                     message = result
                 match = self.create_matcherror(
                     message=message,
-                    lineno=task.normalized_task[LINE_NUMBER_KEY],
+                    lineno=(
+                        task.normalized_task[LINE_NUMBER_KEY]
+                        if task.normalized_task
+                        else 1
+                    ),
                     filename=file,
                 )
 
