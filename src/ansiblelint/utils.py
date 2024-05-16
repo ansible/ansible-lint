@@ -785,7 +785,8 @@ class Task(dict[str, Any]):
         if isinstance(self._normalized_task, dict):
             file_name = str(self._normalized_task["action"].get(FILENAME_KEY, None))
             if file_name:
-                is_handler_file = "handlers" in str(file_name)
+                paths = file_name.split("/")
+                is_handler_file = "handlers" in paths
         return is_handler_file if is_handler_file else ".handlers[" in self.position
 
     def __repr__(self) -> str:
