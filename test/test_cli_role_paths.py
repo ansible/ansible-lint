@@ -196,3 +196,41 @@ def test_run_playbook_github(result: bool, env: dict[str, str]) -> None:
         "Package installs should not use latest"
     )
     assert (expected in result_gh.stderr) is result
+
+
+def test_run_role_identified(local_test_dir: Path) -> None:
+    """Test that role name is identified correctly."""
+    cwd = local_test_dir
+
+    env = os.environ.copy()
+    env["ANSIBLE_ROLES_PATH"] = os.path.realpath(
+        (cwd / "../examples/roles/role_detection").resolve(),
+    )
+    result = run_ansible_lint(
+        Path("roles/role_detection/foo/defaults/main.yml"),
+        cwd=cwd,
+        env=env,
+    )
+    assert result.returncode == RC.SUCCESS
+
+
+def test_run_role_identified_prefix_missing(local_test_dir: Path) -> None:
+    """Test that role name is identified correctly, with prefix violations."""
+    cwd = local_test_dir
+
+    env = os.environ.copy()
+    env["ANSIBLE_ROLES_PATH"] = os.path.realpath(
+        (cwd / "../examples/roles/role_detection/base").resolve(),
+    )
+    result = run_ansible_lint(
+        Path("roles/role_detection/base/bar/defaults/main.yml"),
+        cwd=cwd,
+        env=env,
+    )
+    assert result.returncode == RC.VIOLATIONS_FOUND
+    assert (
+        "Variables names from within roles should use bar_ as a prefix" in result.stdout
+    )
+    assert (
+        "Variables names from within roles should use bar_ as a prefix" in result.stdout
+    )
