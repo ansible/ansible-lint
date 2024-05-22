@@ -1,6 +1,6 @@
 ---
 - name: Test
-  hosts: all
+  hosts: localhost
   order: "{{ host_order | default('shuffle') }}"
   gather_facts: false
   serial: 1
@@ -8,3 +8,8 @@
     - name: ABC
       ansible.builtin.debug:
         msg: "hello"
+- name: Test 2
+  hosts: localhost
+  order: inventory
+  gather_facts: false
+  tasks: []

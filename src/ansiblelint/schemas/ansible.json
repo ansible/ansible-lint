@@ -548,11 +548,11 @@
           "oneOf": [
             {
               "enum": [
-                "default",
-                "sorted",
-                "reverse_sorted",
+                "inventory",
                 "reverse_inventory",
-                "shuffle"
+                "reverse_sorted",
+                "shuffle",
+                "sorted"
               ],
               "type": "string"
             },
@@ -560,7 +560,8 @@
               "$ref": "#/$defs/full-jinja"
             }
           ],
-          "title": "Order"
+          "title": "Order",
+          "markdownDescription": "See https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_strategies.html#ordering-execution-based-on-inventory"
         },
         "port": {
           "$ref": "#/$defs/templated-integer",

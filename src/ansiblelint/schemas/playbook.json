@@ -555,14 +555,15 @@
           "$ref": "#/$defs/templated-boolean"
         },
         "order": {
+          "markdownDescription": "See https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_strategies.html#ordering-execution-based-on-inventory",
           "oneOf": [
             {
               "enum": [
-                "default",
-                "sorted",
-                "reverse_sorted",
+                "inventory",
                 "reverse_inventory",
-                "shuffle"
+                "reverse_sorted",
+                "shuffle",
+                "sorted"
               ],
               "type": "string"
             },
