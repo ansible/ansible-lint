@@ -186,12 +186,11 @@ jobs:
         with:
           category: "/language:${{matrix.language}}"
 
-  check: # This job does nothing and is only used for the branch protection
+  check:
     if: always()
     permissions:
       id-token: write
       checks: read
-      pull-requests: write # allow codenotify to comment on pull-request
 
     needs:
       - build
@@ -214,10 +213,9 @@ jobs:
         uses: actions/upload-artifact/merge@v4
         with:
           name: logs.zip
-          pattern: logs*.zip
+          pattern: logs-*.zip
           # artifacts like py312.zip and py312-macos do have overlapping files
           separate-directories: true
-          delete-merged: true
 
       - name: Download artifacts
         uses: actions/download-artifact@v4
@@ -225,14 +223,19 @@ jobs:
           name: logs.zip
           path: .
 
-      - run: find . -name coverage.xml
+      - name: Check for expected number of coverage.xml reports
+        run: |
+          JOBS_PRODUCING_COVERAGE=8
+          if [ "$(find . -name coverage.xml | wc -l | bc)" -ne "${JOBS_PRODUCING_COVERAGE}" ]; then
+            echo "::error::Number of coverage.xml files was not the expected one (${JOBS_PRODUCING_COVERAGE}): $(find . -name coverage.xml |xargs echo)"
+            exit 1
+          fi
 
       - name: Upload coverage data
         uses: codecov/codecov-action@v4
         with:
           name: ${{ matrix.passed_name }}
-          # token: ${{ secrets.CODECOV_TOKEN }}
-          verbose: true # optional (default = false)
+          # verbose: true # optional (default = false)
           fail_ci_if_error: true
           use_oidc: true # cspell:ignore oidc
 
@@ -245,12 +248,7 @@ jobs:
         with:
           jobs: ${{ toJSON(needs) }}
 
-      - name: Check out src from Git
-        uses: actions/checkout@v4
-
-      - name: Notify repository owners about lint change affecting them
-        uses: sourcegraph/codenotify@v0.6.4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # https://github.com/sourcegraph/codenotify/issues/19
-        continue-on-error: true
+      - name: Delete Merged Artifacts
+        uses: actions/upload-artifact/merge@v4
+        with:
+          delete-merged: true
