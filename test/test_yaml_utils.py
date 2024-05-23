@@ -1,10 +1,11 @@
 """Tests for yaml-related utility functions."""
 
+# pylint: disable=too-many-lines
 from __future__ import annotations
 
 from io import StringIO
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import pytest
 from ruamel.yaml.main import YAML
@@ -997,3 +998,28 @@ def test_yamllint_incompatible_config() -> None:
     with (cwd(Path("examples/yamllint/incompatible-config")),):
         config = ansiblelint.yaml_utils.load_yamllint_config()
         assert config.incompatible
+
+
+@pytest.mark.parametrize(
+    ("yaml_version", "explicit_start"),
+    (
+        pytest.param((1, 1), True),
+        pytest.param((1, 1), False),
+    ),
+)
+def test_document_start(
+    yaml_version: tuple[int, int] | None,
+    explicit_start: bool,
+) -> None:
+    """Ensure the explicit_start config option from .yamllint is applied correctly."""
+    config = ansiblelint.yaml_utils.FormattedYAML.default_config
+    config["explicit_start"] = explicit_start
+
+    yaml = ansiblelint.yaml_utils.FormattedYAML(
+        version=yaml_version,
+        config=cast(dict[str, bool | int | str], config),
+    )
+    assert (
+        yaml.dumps(yaml.load(_SINGLE_QUOTE_WITHOUT_INDENTS)).startswith("---")
+        == explicit_start
+    )
