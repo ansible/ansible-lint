@@ -36,11 +36,14 @@ from typing import TYPE_CHECKING, Any
 
 import ruamel.yaml.parser
 import yaml
+from ansible import constants as C
 from ansible.errors import AnsibleError, AnsibleParserError
+from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.mod_args import ModuleArgsParser
 from ansible.parsing.plugin_docs import read_docstring
+from ansible.parsing.vault import get_file_vault_secret
 from ansible.parsing.yaml.constructor import AnsibleConstructor, AnsibleMapping
 from ansible.parsing.yaml.loader import AnsibleLoader
 from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject, AnsibleSequence
@@ -91,9 +94,44 @@ PLAYBOOK_DIR = os.environ.get("ANSIBLE_PLAYBOOK_DIR", None)
 _logger = logging.getLogger(__name__)
 
 
+def _init_dataloader():
+    dataloader = DataLoader()
+    if hasattr(dataloader, "set_vault_password"):
+        dataloader.set_vault_password(DEFAULT_VAULT_PASSWORD)
+    elif C.DEFAULT_VAULT_PASSWORD_FILE:
+        _logger.debug("Reading vault password file: %s", C.DEFAULT_VAULT_PASSWORD_FILE)
+        # read vault_pass from a file
+        try:
+            file_vault_secret = get_file_vault_secret(
+                filename=C.DEFAULT_VAULT_PASSWORD_FILE,
+                vault_id=C.DEFAULT_VAULT_IDENTITY,
+                loader=dataloader,
+            )
+        except AnsibleError as exc:
+            _logger.warning(
+                "Error getting vault password file (%s): %s",
+                C.DEFAULT_VAULT_PASSWORD_FILE,
+                to_text(exc),
+            )
+        else:
+            try:
+                file_vault_secret.load()
+            except AnsibleError as exc:
+                _logger.warning(
+                    "Error in vault password file loading (%s): %s",
+                    C.DEFAULT_VAULT_PASSWORD_FILE,
+                    to_text(exc),
+                )
+            else:
+                dataloader.set_vault_secrets(
+                    [(C.DEFAULT_VAULT_IDENTITY, file_vault_secret)],
+                )
+    return dataloader
+
+
 def parse_yaml_from_file(filepath: str) -> AnsibleBaseYAMLObject:
     """Extract a decrypted YAML object from file."""
-    dataloader = DataLoader()
+    dataloader = _init_dataloader()
     if hasattr(dataloader, "set_vault_password"):
         dataloader.set_vault_password(DEFAULT_VAULT_PASSWORD)
     return dataloader.load_from_file(filepath)
@@ -101,7 +139,7 @@ def parse_yaml_from_file(filepath: str) -> AnsibleBaseYAMLObject:
 
 def path_dwim(basedir: str, given: str) -> str:
     """Convert a given path do-what-I-mean style."""
-    dataloader = DataLoader()
+    dataloader = _init_dataloader()
     dataloader.set_basedir(basedir)
     return str(dataloader.path_dwim(given))
 
@@ -116,7 +154,7 @@ def ansible_templar(basedir: Path, templatevars: Any) -> Templar:
     if basedir.name == "tasks":
         basedir = basedir.parent
 
-    dataloader = DataLoader()
+    dataloader = _init_dataloader()
     dataloader.set_basedir(basedir)
     templar = Templar(dataloader, variables=templatevars)
     return templar
