@@ -4,14 +4,14 @@
 #
 #    pip-compile --no-annotate --output-file=.config/requirements-lock.txt --strip-extras --unsafe-package=resolvelib --unsafe-package=ruamel-yaml-clib pyproject.toml
 #
-ansible-compat==4.1.11
+ansible-compat==24.5.1
 ansible-core==2.16.6
 attrs==23.2.0
 black==24.4.2
 bracex==2.4
 cffi==1.16.0
 click==8.1.7
-cryptography==42.0.6
+cryptography==42.0.7
 filelock==3.14.0
 jinja2==3.1.4
 jsonschema==4.22.0
@@ -28,7 +28,7 @@ pygments==2.18.0
 pyyaml==6.0.1
 referencing==0.35.1
 rich==13.7.1
-rpds-py==0.18.0
+rpds-py==0.18.1
 ruamel-yaml==0.18.6
 subprocess-tee==0.4.1
 tomli==2.0.1

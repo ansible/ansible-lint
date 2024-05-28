@@ -1,0 +1,10 @@
+---
+- name: partial_prefix | main | This is correct
+  ansible.builtin.assert:
+    that: true
+- name: main | This prefix is incomplete
+  ansible.builtin.assert:
+    that: true
+- name: partial_prefix | This prefix is incomplete
+  ansible.builtin.assert:
+    that: true

@@ -22,3 +22,10 @@
     - 10
     - 9999
     zero: 0  # Not an octal. See #2071
+
+  - string:
+    - 0steps
+    - 9steps
+    - 0.0.0.0
+    - "0"
+    - "01234"

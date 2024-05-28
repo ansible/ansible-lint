@@ -1,0 +1,26 @@
+---
+- name: Test Playbook
+  hosts: localhost
+  tasks:
+    - name: Task that always changes
+      ansible.builtin.debug:
+        msg: foo
+      changed_when: true
+      notify: my handler
+
+    - name: Task that always changes
+      ansible.builtin.debug:
+        msg: foo
+      changed_when: true
+      notify:
+        - my handler
+        - my other handler
+
+  handlers:
+    - name: My handler
+      ansible.builtin.debug:
+        msg: bar
+
+    - name: my other handler
+      ansible.builtin.debug:
+        msg: bar

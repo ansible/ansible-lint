@@ -59,7 +59,7 @@ from ansiblelint._internal.rules import (
     AnsibleParserErrorRule,
     RuntimeErrorRule,
 )
-from ansiblelint.app import get_app
+from ansiblelint.app import App, get_app
 from ansiblelint.config import Options, options
 from ansiblelint.constants import (
     ANNOTATION_KEYS,
@@ -290,6 +290,7 @@ class HandleChildren:
     """Parse task, roles and children."""
 
     rules: RulesCollection = field(init=True, repr=False)
+    app: App
 
     def include_children(
         self,
@@ -307,9 +308,14 @@ class HandleChildren:
         if not v or "{{" in v:
             return []
 
-        if "import_playbook" in k and COLLECTION_PLAY_RE.match(v):
-            # Any import_playbooks from collections should be ignored as ansible
-            # own syntax check will handle them.
+        if k in ("import_playbook", "ansible.builtin.import_playbook"):
+            included = Path(basedir) / v
+            if self.app.runtime.has_playbook(v, basedir=Path(basedir)):
+                if included.exists():
+                    return [Lintable(included, kind=parent_type)]
+                return []
+            msg = f"Failed to find {v} playbook."
+            logging.error(msg)
             return []
 
         # handle include: filename.yml tags=blah

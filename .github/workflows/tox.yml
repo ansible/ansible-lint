@@ -54,7 +54,6 @@ jobs:
           args: .ansible-lint
   build:
     name: ${{ matrix.name }}
-    environment: test
     runs-on: ${{ matrix.os || 'ubuntu-22.04' }}
     needs:
       - prepare
@@ -73,7 +72,7 @@ jobs:
     env:
       # Number of expected test passes, safety measure for accidental skip of
       # tests. Update value if you add/remove tests.
-      PYTEST_REQPASS: 858
+      PYTEST_REQPASS: 870
     steps:
       - uses: actions/checkout@v4
         with:
@@ -131,25 +130,14 @@ jobs:
       - name: tox -e ${{ matrix.passed_name }}
         run: python3 -m tox -e ${{ matrix.passed_name }}
 
-      - name: Combine coverage data
-        if: ${{ startsWith(matrix.passed_name, 'py') }}
-        # produce a single .coverage file at repo root
-        run: tox -e coverage
-
-      - name: Upload coverage data
-        if: ${{ startsWith(matrix.passed_name, 'py') }}
-        uses: codecov/codecov-action@v4
-        with:
-          name: ${{ matrix.passed_name }}
-          token: ${{ secrets.CODECOV_TOKEN }}
-          verbose: true # optional (default = false)
-          fail_ci_if_error: true
-
       - name: Archive logs
         uses: actions/upload-artifact@v4
         with:
           name: logs-${{ matrix.name }}.zip
-          path: .tox/**/log/
+          path: |
+            .tox/**/log/
+            .tox/**/.coverage*
+            .tox/**/coverage.xml
 
       - name: Report failure if git reports dirty status
         run: |
@@ -198,10 +186,11 @@ jobs:
         with:
           category: "/language:${{matrix.language}}"
 
-  check: # This job does nothing and is only used for the branch protection
+  check:
     if: always()
     permissions:
-      pull-requests: write # allow codenotify to comment on pull-request
+      id-token: write
+      checks: read
 
     needs:
       - build
@@ -210,12 +199,45 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # checkout needed for codecov action which needs codecov.yml file
+      - uses: actions/checkout@v4
+
+      - name: Set up Python # likely needed for coverage
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip3 install 'coverage>=7.5.1'
+
       - name: Merge logs into a single archive
         uses: actions/upload-artifact/merge@v4
         with:
           name: logs.zip
-          pattern: logs*.zip
-          delete-merged: true
+          pattern: logs-*.zip
+          # artifacts like py312.zip and py312-macos do have overlapping files
+          separate-directories: true
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: logs.zip
+          path: .
+
+      - name: Check for expected number of coverage.xml reports
+        run: |
+          JOBS_PRODUCING_COVERAGE=8
+          if [ "$(find . -name coverage.xml | wc -l | bc)" -ne "${JOBS_PRODUCING_COVERAGE}" ]; then
+            echo "::error::Number of coverage.xml files was not the expected one (${JOBS_PRODUCING_COVERAGE}): $(find . -name coverage.xml |xargs echo)"
+            exit 1
+          fi
+
+      - name: Upload coverage data
+        uses: codecov/codecov-action@v4
+        with:
+          name: ${{ matrix.passed_name }}
+          # verbose: true # optional (default = false)
+          fail_ci_if_error: true
+          use_oidc: true # cspell:ignore oidc
 
       - name: Check codecov.io status
         if: github.event_name == 'pull_request'
@@ -226,12 +248,7 @@ jobs:
         with:
           jobs: ${{ toJSON(needs) }}
 
-      - name: Check out src from Git
-        uses: actions/checkout@v4
-
-      - name: Notify repository owners about lint change affecting them
-        uses: sourcegraph/codenotify@v0.6.4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # https://github.com/sourcegraph/codenotify/issues/19
-        continue-on-error: true
+      - name: Delete Merged Artifacts
+        uses: actions/upload-artifact/merge@v4
+        with:
+          delete-merged: true
