@@ -1,0 +1,7 @@
+---
+- name: Fixture 3 - not supported (invalid syntax)
+  ansible.builtin.import_playbook:
+    file: community.molecule.validate.yml
+- name: Fixture 4 - not supported (invalid syntax)
+  ansible.builtin.import_playbook:
+    other: community.molecule.validate.yml

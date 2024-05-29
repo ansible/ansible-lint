@@ -300,6 +300,13 @@ class HandleChildren:
         parent_type: FileType,
     ) -> list[Lintable]:
         """Include children."""
+        # import_playbook only accepts a string as argument (no dict syntax)
+        if k in (
+            "import_playbook",
+            "ansible.builtin.import_playbook",
+        ) and not isinstance(v, str):
+            return []
+
         # handle special case include_tasks: name=filename.yml
         if k in INCLUSION_ACTION_NAMES and isinstance(v, dict) and "file" in v:
             v = v["file"]
