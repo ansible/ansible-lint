@@ -29,3 +29,17 @@ def test_import_playbook_from_collection(
 
     assert len(runner.lintables) == 1
     assert len(results) == 0
+
+
+def test_import_playbook_invalid(
+    default_rules_collection: RulesCollection,
+) -> None:
+    """Assures import_playbook from collection."""
+    playbook_path = "examples/playbooks/test_import_playbook_invalid.yml"
+    runner = Runner(playbook_path, rules=default_rules_collection)
+    results = runner.run()
+
+    assert len(runner.lintables) == 1
+    assert len(results) == 1
+    assert results[0].tag == "syntax-check[specific]"
+    assert results[0].lineno == 2

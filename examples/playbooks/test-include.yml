@@ -1,0 +1,31 @@
+---
+- name: Fixture for testing various includes/imports
+  hosts: localhost
+  gather_facts: false
+
+  pre_tasks:
+    - name: Include 1
+      ansible.builtin.include_tasks: tasks/main.yml
+
+  roles:
+    - test_nop
+    - { role: test_nop, test_nop_arg1: true }
+
+  tasks:
+    - name: Include 2
+      ansible.builtin.include_tasks: tasks/main.yml
+    - name: Include 3
+      ansible.builtin.include_tasks: tasks/main.yml
+    - name: Include 4
+      ansible.builtin.include_tasks: file=tasks/main.yml
+    - name: Include 4
+      ansible.builtin.import_tasks: file=tasks/main.yml
+
+  handlers:
+    - name: Include 5
+      ansible.builtin.include_tasks: handlers/empty.yml
+    - name: Include 5
+      ansible.builtin.import_tasks: handlers/empty.yml
+
+- name: Include 6
+  ansible.builtin.import_playbook: valid.yml
