@@ -23,7 +23,7 @@ requires_ansible: ">=2.9"
 ```yaml
 # runtime.yml
 ---
-requires_ansible: "2.14"
+requires_ansible: "2.15"
 ```
 
 ## Correct code
@@ -31,5 +31,5 @@ requires_ansible: "2.14"
 ```yaml
 # runtime.yml
 ---
-requires_ansible: ">=2.14.0"
+requires_ansible: ">=2.15.0"
 ```
