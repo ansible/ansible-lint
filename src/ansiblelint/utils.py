@@ -23,12 +23,10 @@
 from __future__ import annotations
 
 import ast
-import contextlib
 import inspect
 import logging
 import os
 import re
-from collections.abc import ItemsView, Iterator, Mapping, Sequence
 from dataclasses import _MISSING_TYPE, dataclass, field
 from functools import cache, lru_cache
 from pathlib import Path
@@ -58,7 +56,6 @@ from yaml.representer import RepresenterError
 
 from ansiblelint._internal.rules import (
     AnsibleParserErrorRule,
-    RuntimeErrorRule,
 )
 from ansiblelint.app import App, get_app
 from ansiblelint.config import Options, options
@@ -79,7 +76,10 @@ from ansiblelint.skip_utils import is_nested_task
 from ansiblelint.text import has_jinja, removeprefix
 
 if TYPE_CHECKING:
+    from collections.abc import Generator, ItemsView, Iterator, Sequence
+
     from ansiblelint.rules import RulesCollection
+
 # ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
 # string as the password to enable such yaml files to be opened and parsed
 # successfully.
@@ -339,25 +339,23 @@ class HandleChildren:
     ) -> list[Lintable]:
         """TasksHandlers Children."""
         results: list[Lintable] = []
-        if v is None or isinstance(v, int | str):
-            raise MatchError(
-                message="A malformed block was encountered while loading a block.",
-                rule=RuntimeErrorRule(),
-            )
+        if v is None or not isinstance(v, list):
+            msg = f"A malformed block was encountered while loading '{k}:'."
+            logging.debug(msg)
+            return []
         for task_handler in v:
             # ignore empty tasks, `-`
             if not task_handler:
                 continue
 
-            with contextlib.suppress(LookupError):
-                children = _get_task_handler_children_for_tasks_or_playbooks(
-                    task_handler,
+            results.extend(
+                _get_task_handler_children_for_tasks_or_playbooks(
+                    Task(task_handler),
                     basedir,
                     k,
                     parent_type,
-                )
-                results.append(children)
-                continue
+                ),
+            )
 
             if any(x in task_handler for x in ROLE_IMPORT_ACTION_NAMES):
                 task_handler = normalize_task_v2(task_handler)
@@ -440,34 +438,32 @@ class HandleChildren:
 
 
 def _get_task_handler_children_for_tasks_or_playbooks(
-    task_handler: dict[str, Any],
+    task: Task,
     basedir: str,
     k: Any,
     parent_type: FileType,
-) -> Lintable:
-    """Try to get children of taskhandler for include/import tasks/playbooks."""
+) -> Generator[Lintable, None, None]:
+    """Try to get children of task for include/import tasks/playbooks."""
     child_type = k if parent_type == "playbook" else parent_type
+    try:
+        if task.action not in INCLUSION_ACTION_NAMES:
+            return
+    except TypeError:
+        # Invalid tasks (no action, multiple actions)
+        return
+    file_name = ""
+    if "file" in task.args:
+        file_name = task.args["file"]
+    elif task.args["_raw_params"]:
+        file_name = task.args["_raw_params"]
 
-    # Include the FQCN task names as this happens before normalize
-    for task_handler_key in INCLUSION_ACTION_NAMES:
-        with contextlib.suppress(KeyError):
-            # ignore empty tasks
-            if not task_handler or isinstance(task_handler, str):  # pragma: no branch
-                continue
-
-            file_name = task_handler[task_handler_key]
-            if isinstance(file_name, Mapping) and file_name.get("file", None):
-                file_name = file_name["file"]
-
-            f = path_dwim(basedir, file_name)
-            while basedir not in ["", "/"]:
-                if os.path.exists(f):
-                    break
-                basedir = os.path.dirname(basedir)
-                f = path_dwim(basedir, file_name)
-            return Lintable(f, kind=child_type)
-    msg = f'The node contains none of: {", ".join(sorted(INCLUSION_ACTION_NAMES))}'
-    raise LookupError(msg)
+    f = path_dwim(basedir, file_name)
+    while basedir not in ["", "/"]:
+        if os.path.exists(f):
+            break
+        basedir = os.path.dirname(basedir)
+        f = path_dwim(basedir, file_name)
+    yield Lintable(f, kind=child_type)
 
 
 def _rolepath(basedir: str, role: str) -> str | None:
@@ -576,7 +572,7 @@ def normalize_task_v2(task: dict[str, Any]) -> dict[str, Any]:
             rule=AnsibleParserErrorRule(),
             message=exc.message,
             filename=task.get(FILENAME_KEY, "Unknown"),
-            lineno=task.get(LINE_NUMBER_KEY, 0),
+            lineno=task.get(LINE_NUMBER_KEY, 1),
         ) from exc
 
     # denormalize shell -> command conversion
@@ -714,8 +710,16 @@ class Task(dict[str, Any]):
         return name
 
     @property
-    def action(self) -> str:
-        """Return the resolved action name."""
+    def action(self) -> str | None:
+        """Return the resolved action name.
+
+        Raises:
+            TypeError: When failing to identify task action.
+
+        """
+        if "action" not in self.normalized_task:
+            msg = "Unable to identify task action."
+            raise TypeError(msg)
         action_name = self.normalized_task["action"]["__ansible_module_original__"]
         if not isinstance(action_name, str):
             msg = "Task actions can only be strings."

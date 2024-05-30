@@ -530,7 +530,11 @@ class Runner:
         parent_type: FileType,
         playbook_dir: str,
     ) -> list[Lintable]:
-        """Flatten the traversed play tasks."""
+        """Flatten the traversed play tasks.
+
+        Any syntax errors are expected to be ignored as they will be detected by
+        syntax checks instead.
+        """
         # pylint: disable=unused-argument
 
         handlers = HandleChildren(self.rules, app=self.app)
