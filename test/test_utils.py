@@ -51,37 +51,38 @@ runtime = Runtime(require_module=True)
 
 
 @pytest.mark.parametrize(
-    ("string", "expected_cmd", "expected_args", "expected_kwargs"),
+    ("string", "expected_args", "expected_kwargs"),
     (
-        pytest.param("", "", [], {}, id="blank"),
-        pytest.param("vars:", "vars", [], {}, id="single_word"),
-        pytest.param("hello: a=1", "hello", [], {"a": "1"}, id="string_module_and_arg"),
-        pytest.param("action: hello a=1", "hello", [], {"a": "1"}, id="strips_action"),
+        pytest.param("", [], {}, id="a"),
+        pytest.param("a=1", [], {"a": "1"}, id="b"),
+        pytest.param("hello a=1", ["hello"], {"a": "1"}, id="c"),
         pytest.param(
-            "action: whatever bobbins x=y z=x c=3",
-            "whatever",
-            ["bobbins", "x=y", "z=x", "c=3"],
-            {},
+            "whatever bobbins x=y z=x c=3",
+            ["whatever", "bobbins"],
+            {"x": "y", "z": "x", "c": "3"},
             id="more_than_one_arg",
         ),
         pytest.param(
-            "action: command chdir=wxy creates=zyx tar xzf zyx.tgz",
-            "command",
-            ["tar", "xzf", "zyx.tgz"],
+            "command chdir=wxy creates=zyx tar xzf zyx.tgz",
+            ["command", "tar", "xzf", "zyx.tgz"],
             {"chdir": "wxy", "creates": "zyx"},
             id="command_with_args",
+        ),
+        pytest.param(
+            "{{ varset }}.yml",
+            ["{{ varset }}.yml"],
+            {},
+            id="x",
         ),
     ),
 )
 def test_tokenize(
     string: str,
-    expected_cmd: str,
     expected_args: Sequence[str],
     expected_kwargs: dict[str, Any],
 ) -> None:
     """Test that tokenize works for different input types."""
-    (cmd, args, kwargs) = utils.tokenize(string)
-    assert cmd == expected_cmd
+    (args, kwargs) = utils.tokenize(string)
     assert args == expected_args
     assert kwargs == expected_kwargs
 

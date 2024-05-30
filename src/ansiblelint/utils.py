@@ -41,6 +41,7 @@ from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.mod_args import ModuleArgsParser
 from ansible.parsing.plugin_docs import read_docstring
+from ansible.parsing.splitter import split_args
 from ansible.parsing.yaml.constructor import AnsibleConstructor, AnsibleMapping
 from ansible.parsing.yaml.loader import AnsibleLoader
 from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject, AnsibleSequence
@@ -217,26 +218,18 @@ BLOCK_NAME_TO_ACTION_TYPE_MAP = {
 }
 
 
-def tokenize(line: str) -> tuple[str, list[str], dict[str, str]]:
+def tokenize(value: str) -> tuple[list[str], dict[str, str]]:
     """Parse a string task invocation."""
-    tokens = line.lstrip().split(" ")
-    if tokens[0] == "-":
-        tokens = tokens[1:]
-    if tokens[0] == "action:" or tokens[0] == "local_action:":
-        tokens = tokens[1:]
-    command = tokens[0].replace(":", "")
-
-    args = []
-    kwargs = {}
-    non_kv_found = False
-    for arg in tokens[1:]:
-        if "=" in arg and not non_kv_found:
-            key_value = arg.split("=", 1)
-            kwargs[key_value[0]] = key_value[1]
+    parts = split_args(value)
+    args: list[str] = []
+    kwargs: dict[str, str] = {}
+    for part in parts:
+        if "=" not in part:
+            args.append(part)
         else:
-            non_kv_found = True
-            args.append(arg)
-    return (command, args, kwargs)
+            k, v = part.split("=", 1)
+            kwargs[k] = v
+    return (args, kwargs)
 
 
 def playbook_items(pb_data: AnsibleBaseYAMLObject) -> ItemsView:  # type: ignore[type-arg]
@@ -326,8 +319,7 @@ class HandleChildren:
             return []
 
         # handle include: filename.yml tags=blah
-        # pylint: disable=unused-variable
-        (command, args, kwargs) = tokenize(f"{k}: {v}")
+        (args, _) = tokenize(v)
 
         result = path_dwim(basedir, args[0])
         while basedir not in ["", "/"]:

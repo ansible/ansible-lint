@@ -36,7 +36,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/molecule.json"
   },
   "playbook": {
-    "etag": "152dbc4407b1538dc940c58159135ea608ce18c9de7832d4351782ae644a5970",
+    "etag": "4f8cbba62fcf8a1fa6e8ef5e42696aec5b0876487478df83a7ffdf8bdbb4abcf",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/playbook.json"
   },
   "requirements": {
