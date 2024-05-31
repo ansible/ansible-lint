@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - block:
+      include_role:
+        tasks_from: ghe-config-apply.yml
+      tags:
+        - github

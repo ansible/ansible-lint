@@ -287,12 +287,13 @@ class HandleChildren:
 
     def include_children(
         self,
-        basedir: str,
+        lintable: Lintable,
         k: str,
         v: Any,
         parent_type: FileType,
     ) -> list[Lintable]:
         """Include children."""
+        basedir = str(lintable.path.parent)
         # import_playbook only accepts a string as argument (no dict syntax)
         if k in (
             "import_playbook",
@@ -332,12 +333,13 @@ class HandleChildren:
 
     def taskshandlers_children(
         self,
-        basedir: str,
+        lintable: Lintable,
         k: str,
         v: None | Any,
         parent_type: FileType,
     ) -> list[Lintable]:
         """TasksHandlers Children."""
+        basedir = str(lintable.path.parent)
         results: list[Lintable] = []
         if v is None or isinstance(v, int | str):
             raise MatchError(
@@ -360,14 +362,16 @@ class HandleChildren:
                 continue
 
             if any(x in task_handler for x in ROLE_IMPORT_ACTION_NAMES):
-                task_handler = normalize_task_v2(task_handler)
+                task_handler = normalize_task_v2(
+                    Task(task_handler, filename=str(lintable.path)),
+                )
                 self._validate_task_handler_action_for_role(task_handler["action"])
                 name = task_handler["action"].get("name")
                 if has_jinja(name):
                     # we cannot deal with dynamic imports
                     continue
                 results.extend(
-                    self.roles_children(basedir, k, [name], parent_type),
+                    self.roles_children(lintable, k, [name], parent_type),
                 )
                 continue
 
@@ -378,7 +382,7 @@ class HandleChildren:
                 if elem in task_handler:
                     results.extend(
                         self.taskshandlers_children(
-                            basedir,
+                            lintable,
                             k,
                             task_handler[elem],
                             parent_type,
@@ -410,13 +414,14 @@ class HandleChildren:
 
     def roles_children(
         self,
-        basedir: str,
+        lintable: Lintable,
         k: str,
         v: Sequence[Any],
         parent_type: FileType,
     ) -> list[Lintable]:
         """Roles children."""
         # pylint: disable=unused-argument # parent_type)
+        basedir = str(lintable.path.parent)
         results: list[Lintable] = []
         if not v:
             # typing does not prevent junk from being passed in
@@ -549,13 +554,14 @@ def _extract_ansible_parsed_keys_from_task(
     return result
 
 
-def normalize_task_v2(task: dict[str, Any]) -> dict[str, Any]:
+def normalize_task_v2(task: Task) -> dict[str, Any]:
     """Ensure tasks have a normalized action key and strings are converted to python objects."""
+    raw_task = task.raw_task
     result: dict[str, Any] = {}
     ansible_parsed_keys = ("action", "local_action", "args", "delegate_to")
 
-    if is_nested_task(task):
-        _extract_ansible_parsed_keys_from_task(result, task, ansible_parsed_keys)
+    if is_nested_task(raw_task):
+        _extract_ansible_parsed_keys_from_task(result, raw_task, ansible_parsed_keys)
         # Add dummy action for block/always/rescue statements
         result["action"] = {
             "__ansible_module__": "block/always/rescue",
@@ -564,7 +570,7 @@ def normalize_task_v2(task: dict[str, Any]) -> dict[str, Any]:
 
         return result
 
-    sanitized_task = _sanitize_task(task)
+    sanitized_task = _sanitize_task(raw_task)
     mod_arg_parser = ModuleArgsParser(sanitized_task)
 
     try:
@@ -575,8 +581,8 @@ def normalize_task_v2(task: dict[str, Any]) -> dict[str, Any]:
         raise MatchError(
             rule=AnsibleParserErrorRule(),
             message=exc.message,
-            filename=task.get(FILENAME_KEY, "Unknown"),
-            lineno=task.get(LINE_NUMBER_KEY, 0),
+            filename=task.filename or "Unknown",
+            lineno=raw_task.get(LINE_NUMBER_KEY, 1),
         ) from exc
 
     # denormalize shell -> command conversion
@@ -586,7 +592,7 @@ def normalize_task_v2(task: dict[str, Any]) -> dict[str, Any]:
 
     _extract_ansible_parsed_keys_from_task(
         result,
-        task,
+        raw_task,
         (*ansible_parsed_keys, action),
     )
 
@@ -606,17 +612,6 @@ def normalize_task_v2(task: dict[str, Any]) -> dict[str, Any]:
 
     result["action"].update(arguments)
     return result
-
-
-def normalize_task(task: dict[str, Any], filename: str) -> dict[str, Any]:
-    """Unify task-like object structures."""
-    ansible_action_type = task.get("__ansible_action_type__", "task")
-    if "__ansible_action_type__" in task:
-        del task["__ansible_action_type__"]
-    task = normalize_task_v2(task)
-    task[FILENAME_KEY] = filename
-    task["__ansible_action_type__"] = ansible_action_type
-    return task
 
 
 def task_to_str(task: dict[str, Any]) -> str:
@@ -742,10 +737,7 @@ class Task(dict[str, Any]):
         """Return the name of the task."""
         if not hasattr(self, "_normalized_task"):
             try:
-                self._normalized_task = normalize_task(
-                    self.raw_task,
-                    filename=self.filename,
-                )
+                self._normalized_task = self._normalize_task()
             except MatchError as err:
                 self.error = err
                 # When we cannot normalize it, we just use the raw task instead
@@ -755,6 +747,16 @@ class Task(dict[str, Any]):
             msg = "Task was not normalized"
             raise TypeError(msg)
         return self._normalized_task
+
+    def _normalize_task(self) -> dict[str, Any]:
+        """Unify task-like object structures."""
+        ansible_action_type = self.raw_task.get("__ansible_action_type__", "task")
+        if "__ansible_action_type__" in self.raw_task:
+            del self.raw_task["__ansible_action_type__"]
+        task = normalize_task_v2(self)
+        task[FILENAME_KEY] = self.filename
+        task["__ansible_action_type__"] = ansible_action_type
+        return task
 
     @property
     def skip_tags(self) -> list[str]:

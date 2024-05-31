@@ -499,7 +499,7 @@ class Runner:
         for item in ansiblelint.utils.playbook_items(playbook_ds):
             # if lintable.kind not in ["playbook"]:
             for child in self.play_children(
-                lintable.path.parent,
+                lintable,
                 item,
                 lintable.kind,
                 playbook_dir,
@@ -525,19 +525,19 @@ class Runner:
 
     def play_children(
         self,
-        basedir: Path,
+        lintable: Lintable,
         item: tuple[str, Any],
         parent_type: FileType,
         playbook_dir: str,
     ) -> list[Lintable]:
         """Flatten the traversed play tasks."""
         # pylint: disable=unused-argument
-
+        basedir = lintable.path.parent
         handlers = HandleChildren(self.rules, app=self.app)
 
         delegate_map: dict[
             str,
-            Callable[[str, Any, Any, FileType], list[Lintable]],
+            Callable[[Lintable, Any, Any, FileType], list[Lintable]],
         ] = {
             "tasks": handlers.taskshandlers_children,
             "pre_tasks": handlers.taskshandlers_children,
@@ -565,7 +565,7 @@ class Runner:
                 {"playbook_dir": PLAYBOOK_DIR or str(basedir.resolve())},
                 fail_on_undefined=False,
             )
-            return delegate_map[k](str(basedir), k, v, parent_type)
+            return delegate_map[k](lintable, k, v, parent_type)
         return []
 
     def plugin_children(self, lintable: Lintable) -> list[Lintable]:
