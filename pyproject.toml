@@ -277,6 +277,9 @@ max-complexity = 20
   "PTH",
 ]
 
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
 [tool.setuptools.dynamic]
 dependencies = { file = [".config/requirements.in"] }
 optional-dependencies.docs = { file = [".config/requirements-docs.in"] }

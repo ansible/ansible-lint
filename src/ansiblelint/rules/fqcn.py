@@ -232,6 +232,8 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
             target_task = self.seek(match.yaml_path, data)
             # Unfortunately, a lot of data about Ansible content gets lost here, you only get a simple dict.
             # For now, just parse the error messages for the data about action names etc. and fix this later.
+            current_action = ""
+            new_action = ""
             if match.tag == "fqcn[action-core]":
                 # split at the first bracket, cut off the last bracket and dot
                 current_action = match.message.split("(")[1][:-2]

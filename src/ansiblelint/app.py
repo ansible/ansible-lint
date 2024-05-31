@@ -66,7 +66,7 @@ class App:
             sys.exit(RC.INVALID_CONFIG)
 
         # pylint: disable=import-outside-toplevel
-        from ansiblelint.yaml_utils import load_yamllint_config  # noqa: 811, I001
+        from ansiblelint.yaml_utils import load_yamllint_config
 
         self.yamllint_config = load_yamllint_config()
 

@@ -374,32 +374,16 @@ class HandleChildren:
             if "block" not in task_handler:
                 continue
 
-            results.extend(
-                self.taskshandlers_children(
-                    basedir,
-                    k,
-                    task_handler["block"],
-                    parent_type,
-                ),
-            )
-            if "rescue" in task_handler:
-                results.extend(
-                    self.taskshandlers_children(
-                        basedir,
-                        k,
-                        task_handler["rescue"],
-                        parent_type,
-                    ),
-                )
-            if "always" in task_handler:
-                results.extend(
-                    self.taskshandlers_children(
-                        basedir,
-                        k,
-                        task_handler["always"],
-                        parent_type,
-                    ),
-                )
+            for elem in ("block", "rescue", "always"):
+                if elem in task_handler:
+                    results.extend(
+                        self.taskshandlers_children(
+                            basedir,
+                            k,
+                            task_handler[elem],
+                            parent_type,
+                        ),
+                    )
 
         return results
 
