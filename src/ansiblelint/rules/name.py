@@ -205,6 +205,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
         stems = [lintable_dir.name]
         lintable_dir = lintable_dir.parent
         pathex = lintable_dir / stem
+        glob = ""
         for entry in self.options.kinds:
             for key, value in entry.items():
                 if kind == key:

@@ -424,7 +424,11 @@ class Lintable:
                         # pylint: disable=import-outside-toplevel
                         from ansiblelint.skip_utils import append_skipped_rules
 
-                    self.state = append_skipped_rules(self.state, self)
+                    # pylint: disable=possibly-used-before-assignment
+                    self.state = append_skipped_rules(
+                        self.state,
+                        self,
+                    )
                 else:
                     logging.debug(
                         "data set to None for %s due to being '%s' (%s) kind.",
