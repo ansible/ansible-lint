@@ -97,6 +97,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
         if notify:
             if isinstance(notify, str):
                 notify = [notify]
+
             results.extend(
                 [
                     self.create_matcherror(
@@ -106,9 +107,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
                         filename=file,
                     )
                     for handler in notify
-                    if handler[0].isalpha()
-                    and handler[0].islower()
-                    and not handler[0].isupper()
+                    if check_handler_case(handler)
                 ],
             )
         return results
@@ -280,6 +279,14 @@ class NameRule(AnsibleLintRule, TransformMixin):
                 match.fixed = True
 
 
+def check_handler_case(handler: str) -> bool:
+    """Check the casing of a handler."""
+    # Handlers may be prefixed with "role_name : " to indicate a handler from a specific role
+    # Strip this before checking
+    handler = handler.split(" : ", 1)[-1]
+    return handler[0].isalpha() and handler[0].islower() and not handler[0].isupper()
+
+
 if "pytest" in sys.modules:
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
@@ -379,15 +386,9 @@ if "pytest" in sys.modules:
         failure = "examples/playbooks/name_case_notify_fail.yml"
         bad_runner = Runner(failure, rules=collection)
         errs = bad_runner.run()
-        assert len(errs) == 4
-        assert errs[0].tag == "name[casing]"
-        assert errs[1].tag == "name[casing]"
-        assert errs[2].tag == "name[casing]"
-        assert errs[3].tag == "name[casing]"
-        assert errs[0].rule.id == "name"
-        assert errs[1].rule.id == "name"
-        assert errs[2].rule.id == "name"
-        assert errs[3].rule.id == "name"
+        assert len(errs) == 5
+        assert all(err.tag == "name[casing]" for err in errs)
+        assert all(err.rule.id == "name" for err in errs)
 
     def test_name_play() -> None:
         """Positive test for name[play]."""

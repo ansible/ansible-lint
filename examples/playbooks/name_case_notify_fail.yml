@@ -16,6 +16,14 @@
         - my handler
         - my other handler
 
+    - name: Only one of these is invalid
+      ansible.builtin.debug:
+        msg: foo
+      changed_when: true
+      notify:
+        - "role_name : lowercase handler"
+        - "role_name : Uppercase handler"
+
   handlers:
     - name: My handler
       ansible.builtin.debug:
