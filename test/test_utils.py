@@ -114,37 +114,42 @@ def test_normalize(
     alternate_forms: tuple[dict[str, Any]],
 ) -> None:
     """Test that tasks specified differently are normalized same way."""
-    normal_form = utils.normalize_task(reference_form, "tasks.yml")
+    task = utils.Task(reference_form, filename="tasks.yml")
+    normal_form = task._normalize_task()  # noqa: SLF001
 
     for form in alternate_forms:
-        assert normal_form == utils.normalize_task(form, "tasks.yml")
+        task2 = utils.Task(form, filename="tasks.yml")
+        assert normal_form == task2._normalize_task()  # noqa: SLF001
 
 
 def test_normalize_complex_command() -> None:
     """Test that tasks specified differently are normalized same way."""
-    task1 = {
-        "name": "hello",
-        "action": {"module": "pip", "name": "df", "editable": "false"},
-    }
-    task2 = {"name": "hello", "pip": {"name": "df", "editable": "false"}}
-    task3 = {"name": "hello", "pip": "name=df editable=false"}
-    task4 = {"name": "hello", "action": "pip name=df editable=false"}
-    assert utils.normalize_task(task1, "tasks.yml") == utils.normalize_task(
-        task2,
-        "tasks.yml",
+    task1 = utils.Task(
+        {
+            "name": "hello",
+            "action": {"module": "pip", "name": "df", "editable": "false"},
+        },
+        filename="tasks.yml",
     )
-    assert utils.normalize_task(task2, "tasks.yml") == utils.normalize_task(
-        task3,
-        "tasks.yml",
+    task2 = utils.Task(
+        {"name": "hello", "pip": {"name": "df", "editable": "false"}},
+        filename="tasks.yml",
     )
-    assert utils.normalize_task(task3, "tasks.yml") == utils.normalize_task(
-        task4,
-        "tasks.yml",
+    task3 = utils.Task(
+        {"name": "hello", "pip": "name=df editable=false"},
+        filename="tasks.yml",
     )
+    task4 = utils.Task(
+        {"name": "hello", "action": "pip name=df editable=false"},
+        filename="tasks.yml",
+    )
+    assert task1._normalize_task() == task2._normalize_task()  # noqa: SLF001
+    assert task2._normalize_task() == task3._normalize_task()  # noqa: SLF001
+    assert task3._normalize_task() == task4._normalize_task()  # noqa: SLF001
 
 
 @pytest.mark.parametrize(
-    ("task", "expected_form"),
+    ("task_raw", "expected_form"),
     (
         pytest.param(
             {
@@ -192,8 +197,12 @@ def test_normalize_complex_command() -> None:
         ),
     ),
 )
-def test_normalize_task_v2(task: dict[str, Any], expected_form: dict[str, Any]) -> None:
+def test_normalize_task_v2(
+    task_raw: dict[str, Any],
+    expected_form: dict[str, Any],
+) -> None:
     """Check that it normalizes task and returns the expected form."""
+    task = utils.Task(task_raw)
     assert utils.normalize_task_v2(task) == expected_form
 
 
@@ -263,8 +272,8 @@ def test_template(template: str, output: str) -> None:
 
 def test_task_to_str_unicode() -> None:
     """Ensure that extracting messages from tasks preserves Unicode."""
-    task = {"fail": {"msg": "unicode é ô à"}}
-    result = utils.task_to_str(utils.normalize_task(task, "filename.yml"))
+    task = utils.Task({"fail": {"msg": "unicode é ô à"}}, filename="filename.yml")
+    result = utils.task_to_str(task._normalize_task())  # noqa: SLF001
     assert result == "fail msg=unicode é ô à"
 
 
