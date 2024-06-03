@@ -174,7 +174,7 @@ class Runner:
                         match = MatchError(
                             message=warn.source.message or warn.category.__name__,
                             rule=self.rules["warning"],
-                            filename=warn.source.filename.filename,
+                            lintable=Lintable(warn.source.filename.filename),
                             tag=warn.source.tag,
                             lineno=warn.source.lineno,
                         )
@@ -185,7 +185,7 @@ class Runner:
                                 warn.message if isinstance(warn.message, str) else "?"
                             ),
                             rule=self.rules["warning"],
-                            filename=str(filename),
+                            lintable=Lintable(str(filename)),
                         )
                     matches.append(match)
                     continue

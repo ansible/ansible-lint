@@ -404,10 +404,12 @@ class HandleChildren:
             raise MatchError(
                 message=f"Failed to find required 'name' key in {module!s}",
                 rule=self.rules.rules[0],
-                filename=(
-                    self.rules.options.lintables[0]
-                    if self.rules.options.lintables
-                    else "."
+                lintable=Lintable(
+                    (
+                        self.rules.options.lintables[0]
+                        if self.rules.options.lintables
+                        else "."
+                    ),
                 ),
             )
 
@@ -586,7 +588,7 @@ def normalize_task_v2(task: Task) -> dict[str, Any]:
         raise MatchError(
             rule=AnsibleParserErrorRule(),
             message=exc.message,
-            filename=task.filename or "Unknown",
+            lintable=Lintable(task.filename or ""),
             lineno=raw_task.get(LINE_NUMBER_KEY, 1),
         ) from exc
 

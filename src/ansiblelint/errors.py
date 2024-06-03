@@ -48,7 +48,6 @@ class MatchError(ValueError):
     # order matters for these:
     message: str = field(init=True, repr=False, default="")
     lintable: Lintable = field(init=True, repr=False, default=Lintable(name=""))
-    filename: str = field(init=True, repr=False, default="")
 
     tag: str = field(init=True, repr=False, default="")
     lineno: int = 1
@@ -63,10 +62,7 @@ class MatchError(ValueError):
 
     def __post_init__(self) -> None:
         """Can be use by rules that can report multiple errors type, so we can still filter by them."""
-        if not self.lintable and self.filename:
-            self.lintable = Lintable(self.filename)
-        elif self.lintable and not self.filename:
-            self.filename = self.lintable.name
+        self.filename = self.lintable.name
 
         # We want to catch accidental MatchError() which contains no useful
         # information. When no arguments are passed, the '_message' field is
@@ -109,8 +105,12 @@ class MatchError(ValueError):
     @functools.cached_property
     def level(self) -> str:
         """Return the level of the rule: error, warning or notice."""
-        if not self.ignored and {self.tag, self.rule.id, *self.rule.tags}.isdisjoint(
-            self.rule.options.warn_list,
+        if (
+            not self.ignored
+            and self.rule.options
+            and {self.tag, self.rule.id, *self.rule.tags}.isdisjoint(
+                self.rule.options.warn_list,
+            )
         ):
             return "error"
         return "warning"
