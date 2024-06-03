@@ -220,6 +220,11 @@ BLOCK_NAME_TO_ACTION_TYPE_MAP = {
 
 def tokenize(value: str) -> tuple[list[str], dict[str, str]]:
     """Parse a string task invocation."""
+    # We do not try to tokenize something very simple because it would fail to
+    # work for a case like: task_include: path with space.yml
+    if value and "=" not in value:
+        return ([value], {})
+
     parts = split_args(value)
     args: list[str] = []
     kwargs: dict[str, str] = {}
