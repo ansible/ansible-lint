@@ -74,6 +74,12 @@ runtime = Runtime(require_module=True)
             {},
             id="x",
         ),
+        pytest.param(
+            "foo bar.yml",
+            ["foo bar.yml"],
+            {},
+            id="path-with-spaces",
+        ),
     ),
 )
 def test_tokenize(
