@@ -61,7 +61,7 @@ ignore-words-list = "indention"
 source = ["src", ".tox/*/site-packages"]
 
 [tool.coverage.report]
-exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
+exclude_also = ["pragma: no cover", "if TYPE_CHECKING:"]
 omit = ["test/*"]
 # Increase it just so it would pass on any single-python run
 fail_under = 92
