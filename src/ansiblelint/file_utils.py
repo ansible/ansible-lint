@@ -17,6 +17,7 @@ import wcmatch.pathlib
 import wcmatch.wcmatch
 from yaml.error import YAMLError
 
+from ansiblelint.app import get_app
 from ansiblelint.config import ANSIBLE_OWNED_KINDS, BASE_KINDS, Options, options
 from ansiblelint.constants import CONFIG_FILENAMES, FileType, States
 
@@ -226,7 +227,12 @@ class Lintable:
         parts = self.path.parent.parts
         if "roles" in parts:
             role = self.path
-            while role.parent.name != "roles" and role.name:
+            roles_path = get_app(cached=True).runtime.config.default_roles_path
+            while (
+                str(role.parent.absolute()) not in roles_path
+                and role.parent.name != "roles"
+                and role.name
+            ):
                 role = role.parent
             if role.exists():
                 self.role = role.name
