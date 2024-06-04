@@ -122,3 +122,7 @@ task_name_prefix: "{stem} | "
 
 # Limit the depth of the nested blocks:
 # max_block_depth: 20
+
+# Also recognize these versions of Ansible as supported:
+# supported_ansible_also:
+#   - "2.14"

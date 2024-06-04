@@ -499,6 +499,7 @@ def merge_config(file_config: dict[Any, Any], cli_config: Options) -> Options:
         "enable_list": [],
         "only_builtins_allow_collections": [],
         "only_builtins_allow_modules": [],
+        "supported_ansible_also": [],
         # do not include "write_list" here. See special logic below.
     }
 

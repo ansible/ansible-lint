@@ -294,6 +294,14 @@ if "pytest" in sys.modules:
                 id="ansible-lint-config-broken",
             ),
             pytest.param(
+                "examples/broken_supported_ansible_also/.ansible-lint",
+                "ansible-lint-config",
+                [
+                    r".*supported_ansible_also True is not of type 'array'.*https://",
+                ],
+                id="ansible-lint-config-broken",
+            ),
+            pytest.param(
                 "examples/ansible-navigator.yml",
                 "ansible-navigator-config",
                 [],

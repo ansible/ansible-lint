@@ -248,6 +248,13 @@
       "title": "Strict",
       "type": "boolean"
     },
+    "supported_ansible_also": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Add supported ansible versions",
+      "type": "array"
+    },
     "tags": {
       "items": {
         "type": "string"
