@@ -347,17 +347,6 @@ if "pytest" in sys.modules:
         assert errs[0].tag == "name[casing]"
         assert errs[0].rule.id == "name"
 
-    # def test_rule_notify_lowercase() -> None:
-    #     """Negative test for a task notify that starts with lowercase."""
-    #     collection = RulesCollection()
-    #     collection.register(NameRule())
-    #     failure = "examples/playbooks/name_case_notify_fail.yml"
-    #     bad_runner = Runner(failure, rules=collection)
-    #     errs = bad_runner.run()
-    #     assert len(errs) == 5
-    #     assert all(err.tag == "name[casing]" for err in errs)
-    #     assert all(err.rule.id == "name" for err in errs)
-
     def test_name_play() -> None:
         """Positive test for name[play]."""
         collection = RulesCollection()
