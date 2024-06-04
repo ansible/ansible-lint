@@ -12,4 +12,4 @@
       become: true
       become_user: nobody
       notify:
-        - Restart apache2
+        - restart apache2
