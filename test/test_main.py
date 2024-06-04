@@ -86,6 +86,12 @@ def test_get_version_warning(
     assert len(msg.split("\n")) == outlen
 
 
+def test_get_version_warning_no_pip(mocker: MockerFixture) -> None:
+    """Test that we do not display any message if install method is not pip."""
+    mocker.patch("ansiblelint.config.guess_install_method", return_value="")
+    assert get_version_warning() == ""
+
+
 @pytest.mark.parametrize(
     ("lintable"),
     (
