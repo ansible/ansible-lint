@@ -26,7 +26,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import convert_to_boolean, get_first_cmd_arg, get_second_cmd_arg
+from ansiblelint.utils import get_first_cmd_arg, get_second_cmd_arg
 
 if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
@@ -106,9 +106,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
         ):
             return False
 
-        if executable in self._modules and convert_to_boolean(
-            task["action"].get("warn", True),
-        ):
+        if executable in self._modules:
             message = "{0} used in place of {1} module"
             return message.format(executable, self._modules[executable])
         return False
