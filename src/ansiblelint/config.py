@@ -174,6 +174,9 @@ class Options:  # pylint: disable=too-many-instance-attributes
     ignore_file: Path | None = None
     max_tasks: int = 100
     max_block_depth: int = 20
+    # Refer to https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix
+    _default_supported = ["2.15.", "2.16.", "2.17."]
+    supported_ansible_also: list[str] = field(default_factory=list)
 
     @property
     def nodeps(self) -> bool:
@@ -185,6 +188,11 @@ class Options:  # pylint: disable=too-many-instance-attributes
         """Extra initialization logic."""
         if self.nodeps:
             self.offline = True
+
+    @property
+    def supported_ansible(self) -> list[str]:
+        """Returns list of ansible versions that are considered supported."""
+        return sorted([*self._default_supported, *self.supported_ansible_also])
 
 
 options = Options()
