@@ -93,23 +93,6 @@ class NameRule(AnsibleLintRule, TransformMixin):
                 ),
             )
 
-        notify = task.get("notify")
-        if notify:
-            if isinstance(notify, str):
-                notify = [notify]
-
-            results.extend(
-                [
-                    self.create_matcherror(
-                        message=f"Task notify '{handler}' should start with an uppercase letter.",
-                        lineno=task[LINE_NUMBER_KEY],
-                        tag="name[casing]",
-                        filename=file,
-                    )
-                    for handler in notify
-                    if check_handler_case(handler)
-                ],
-            )
         return results
 
     def _prefix_check(
@@ -268,25 +251,8 @@ class NameRule(AnsibleLintRule, TransformMixin):
                                     if orig_task_name == task["notify"][idx]:
                                         task["notify"][idx] = updated_task_name
 
-                    if isinstance(item, dict) and "handlers" in item:
-                        for task in item["handlers"]:
-                            listener_task_name = task.get("listen", None)
-                            if (
-                                listener_task_name
-                                and listener_task_name == orig_task_name
-                            ):
-                                task["listen"] = updated_task_name
-
                 target_task["name"] = updated_task_name
                 match.fixed = True
-
-
-def check_handler_case(handler: str) -> bool:
-    """Check the casing of a handler."""
-    # Handlers may be prefixed with "role_name : " to indicate a handler from a specific role
-    # Strip this before checking
-    handler = handler.split(" : ", 1)[-1]
-    return handler[0].isalpha() and handler[0].islower() and not handler[0].isupper()
 
 
 if "pytest" in sys.modules:
@@ -381,16 +347,16 @@ if "pytest" in sys.modules:
         assert errs[0].tag == "name[casing]"
         assert errs[0].rule.id == "name"
 
-    def test_rule_notify_lowercase() -> None:
-        """Negative test for a task notify that starts with lowercase."""
-        collection = RulesCollection()
-        collection.register(NameRule())
-        failure = "examples/playbooks/name_case_notify_fail.yml"
-        bad_runner = Runner(failure, rules=collection)
-        errs = bad_runner.run()
-        assert len(errs) == 5
-        assert all(err.tag == "name[casing]" for err in errs)
-        assert all(err.rule.id == "name" for err in errs)
+    # def test_rule_notify_lowercase() -> None:
+    #     """Negative test for a task notify that starts with lowercase."""
+    #     collection = RulesCollection()
+    #     collection.register(NameRule())
+    #     failure = "examples/playbooks/name_case_notify_fail.yml"
+    #     bad_runner = Runner(failure, rules=collection)
+    #     errs = bad_runner.run()
+    #     assert len(errs) == 5
+    #     assert all(err.tag == "name[casing]" for err in errs)
+    #     assert all(err.rule.id == "name" for err in errs)
 
     def test_name_play() -> None:
         """Positive test for name[play]."""
