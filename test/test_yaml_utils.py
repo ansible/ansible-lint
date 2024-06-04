@@ -768,12 +768,12 @@ def test_get_path_to_play(
         pytest.param(
             "examples/playbooks/include.yml",
             14,
-            [0, "tasks", 1],
+            [0, "tasks", 2],
             id="playbook-multi_tasks_blocks-tasks_last_task_before_handlers",
         ),
         pytest.param(
             "examples/playbooks/include.yml",
-            16,
+            17,
             [0, "handlers", 0],
             id="playbook-multi_tasks_blocks-handlers_task",
         ),
