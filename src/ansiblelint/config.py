@@ -292,6 +292,11 @@ def get_version_warning() -> str:
     # 0.1dev1 is special fallback version
     if __version__ == "0.1.dev1":  # pragma: no cover
         return ""
+    pip = guess_install_method()
+    # If we do not know how to upgrade, we do not want to show any warnings
+    # about version.
+    if not pip:
+        return ""
 
     msg = ""
     data = {}
@@ -332,9 +337,6 @@ def get_version_warning() -> str:
         msg = "[dim]You are using a pre-release version of ansible-lint.[/]"
     elif current_version < new_version:
         msg = f"""[warning]A new release of ansible-lint is available: [red]{current_version}[/] → [green][link={html_url}]{new_version}[/][/][/]"""
-
-        pip = guess_install_method()
-        if pip:
-            msg += f" Upgrade by running: [info]{pip}[/]"
+        msg += f" Upgrade by running: [info]{pip}[/]"
 
     return msg
