@@ -820,6 +820,16 @@ class FormattedEmitter(Emitter):
 class FormattedYAML(YAML):
     """A YAML loader/dumper that handles ansible content better by default."""
 
+    default_config = {
+        "explicit_start": True,
+        "explicit_end": False,
+        "width": 160,
+        "indent_sequences": True,
+        "preferred_quote": '"',
+        "min_spaces_inside": 0,
+        "max_spaces_inside": 1,
+    }
+
     def __init__(  # pylint: disable=too-many-arguments
         self,
         *,
@@ -828,6 +838,7 @@ class FormattedYAML(YAML):
         output: Any = None,
         plug_ins: list[str] | None = None,
         version: tuple[int, int] | None = None,
+        config: dict[str, bool | int | str] | None = None,
     ):
         """Return a configured ``ruamel.yaml.YAML`` instance.
 
@@ -897,7 +908,8 @@ class FormattedYAML(YAML):
 
         # NB: We ignore some mypy issues because ruamel.yaml typehints are not great.
 
-        config = self._defaults_from_yamllint_config()
+        if not config:
+            config = self._defaults_from_yamllint_config()
 
         # these settings are derived from yamllint config
         self.explicit_start: bool = config["explicit_start"]  # type: ignore[assignment]
@@ -950,15 +962,8 @@ class FormattedYAML(YAML):
     @staticmethod
     def _defaults_from_yamllint_config() -> dict[str, bool | int | str]:
         """Extract FormattedYAML-relevant settings from yamllint config if possible."""
-        config = {
-            "explicit_start": True,
-            "explicit_end": False,
-            "width": 160,
-            "indent_sequences": True,
-            "preferred_quote": '"',
-            "min_spaces_inside": 0,
-            "max_spaces_inside": 1,
-        }
+        config = FormattedYAML.default_config
+
         for rule, rule_config in load_yamllint_config().rules.items():
             if not rule_config:
                 # rule disabled
@@ -1062,6 +1067,7 @@ class FormattedYAML(YAML):
         return self._post_process_yaml(
             text,
             strip_version_directive=strip_version_directive,
+            strip_explicit_start=not self.explicit_start,
         )
 
     def _prevent_wrapping_flow_style(self, data: Any) -> None:
@@ -1150,7 +1156,12 @@ class FormattedYAML(YAML):
         return text, "".join(preamble_comments) or None
 
     @staticmethod
-    def _post_process_yaml(text: str, *, strip_version_directive: bool = False) -> str:
+    def _post_process_yaml(
+        text: str,
+        *,
+        strip_version_directive: bool = False,
+        strip_explicit_start: bool = False,
+    ) -> str:
         """Handle known issues with ruamel.yaml dumping.
 
         Make sure there's only one newline at the end of the file.
@@ -1164,6 +1175,10 @@ class FormattedYAML(YAML):
         """
         # remove YAML directive
         if strip_version_directive and text.startswith("%YAML"):
+            text = text.split("\n", 1)[1]
+
+        # remove explicit document start
+        if strip_explicit_start and text.startswith("---"):
             text = text.split("\n", 1)[1]
 
         text = text.rstrip("\n") + "\n"
