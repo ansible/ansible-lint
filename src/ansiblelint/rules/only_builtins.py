@@ -33,9 +33,11 @@ class OnlyBuiltinsRule(AnsibleLintRule):
         allowed_collections = [
             "ansible.builtin",
             "ansible.legacy",
-            *self.options.only_builtins_allow_collections,
         ]
-        allowed_modules = builtins + self.options.only_builtins_allow_modules
+        allowed_modules = builtins
+        if self.options:
+            allowed_collections += self.options.only_builtins_allow_collections
+            allowed_modules += self.options.only_builtins_allow_modules
 
         is_allowed = (
             any(module.startswith(f"{prefix}.") for prefix in allowed_collections)

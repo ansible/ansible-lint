@@ -165,19 +165,21 @@ class BaseRule:
     @property
     def rule_config(self) -> dict[str, Any]:
         """Retrieve rule specific configuration."""
-        rule_config = self.options.rules.get(self.id, {})
+        rule_config = {}
+        if self.options:
+            rule_config = self.options.rules.get(self.id, {})
         if not isinstance(rule_config, dict):  # pragma: no branch
             msg = f"Invalid rule config for {self.id}: {rule_config}"
             raise RuntimeError(msg)  # noqa: TRY004
         return rule_config
 
     @property
-    def options(self) -> Options:
+    def options(self) -> Options | None:
         """Used to access linter configuration."""
         if self._collection is None:
             msg = f"A rule ({self.id}) that is not part of a collection cannot access its configuration."
             _logger.warning(msg)
-            raise RuntimeError(msg)
+            return None
         return self._collection.options
 
 
