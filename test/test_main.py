@@ -2,6 +2,7 @@
 
 import os
 import shutil
+import site
 import subprocess
 import sys
 import tempfile
@@ -12,6 +13,7 @@ from pathlib import Path
 import pytest
 from pytest_mock import MockerFixture
 
+from ansiblelint.__main__ import path_inject
 from ansiblelint.config import get_version_warning, options
 from ansiblelint.constants import RC
 
@@ -149,3 +151,21 @@ def test_broken_ansible_cfg() -> None:
         "Invalid type for configuration option setting: CACHE_PLUGIN_TIMEOUT"
         in proc.stderr
     )
+
+
+@pytest.mark.parametrize("tested_path", ("/app/bin/", "/app/bin"))
+def test_path_inject(mocker: MockerFixture, tested_path: str) -> None:
+    """Asserts PATH is not changed when it contains paths with trailing slashes."""
+    own_location = Path(tested_path) / "ansible-lint"
+
+    # ensure inject_paths is empty before searching around "own_location"
+    userbase_bin_path = Path(site.getuserbase()) / "bin"
+    py_path = Path(sys.executable).parent
+    mocked_path = f"{userbase_bin_path}:{py_path}:{tested_path}"
+
+    mocker.patch("os.environ", {"PATH": mocked_path})
+    mocker.patch("Path.exists", return_value=True)
+
+    path_inject(str(own_location))
+
+    assert os.environ["PATH"] == mocked_path

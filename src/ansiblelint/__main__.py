@@ -427,13 +427,13 @@ def path_inject(own_location: str = "") -> None:
     #
     # This must be run before we do run any subprocesses, and loading config
     # does this as part of the ansible detection.
-    paths = [x for x in os.environ.get("PATH", "").split(os.pathsep) if x]
+    paths = [Path(x) for x in os.environ.get("PATH", "").split(os.pathsep) if x]
 
     # Expand ~ in PATH as it known to break many tools
     expanded = False
     for idx, path in enumerate(paths):
-        if path.startswith("~"):  # pragma: no cover
-            paths[idx] = str(Path(path).expanduser())
+        if str(path).startswith("~"):  # pragma: no cover
+            paths[idx] = Path(path).expanduser()
             expanded = True
     if expanded:  # pragma: no cover
         print(  # noqa: T201
@@ -446,35 +446,37 @@ def path_inject(own_location: str = "") -> None:
     userbase_bin_path = Path(site.getuserbase()) / "bin"
 
     if (
-        str(userbase_bin_path) not in paths
+        userbase_bin_path not in paths
         and (userbase_bin_path / "bin" / "ansible").exists()
     ):
-        inject_paths.append(str(userbase_bin_path))
+        inject_paths.append(userbase_bin_path)
 
     py_path = Path(sys.executable).parent
     pipx_path = os.environ.get("PIPX_HOME", "pipx")
     if (
-        str(py_path) not in paths
+        py_path not in paths
         and (py_path / "ansible").exists()
         and pipx_path not in str(py_path)
     ):
-        inject_paths.append(str(py_path))
+        inject_paths.append(py_path)
 
     # last option, if nothing else is found, just look next to ourselves...
     if own_location:
         own_location = os.path.realpath(own_location)
         parent = Path(own_location).parent
-        if (parent / "ansible").exists() and str(parent) not in paths:
-            inject_paths.append(str(parent))
+        if (parent / "ansible").exists() and parent not in paths:
+            inject_paths.append(parent)
 
-    if not os.environ.get("PYENV_VIRTUAL_ENV", None):
-        if inject_paths and not all("pipx" in p for p in inject_paths):
+    if not os.environ.get("PYENV_VIRTUAL_ENV"):
+        if inject_paths and not all("pipx" in str(p) for p in inject_paths):
             print(  # noqa: T201
-                f"WARNING: PATH altered to include {', '.join(inject_paths)} :: This is usually a sign of broken local setup, which can cause unexpected behaviors.",
+                f"WARNING: PATH altered to include {', '.join(map(str, inject_paths))} :: This is usually a sign of broken local setup, which can cause unexpected behaviors.",
                 file=sys.stderr,
             )
         if inject_paths or expanded:
-            os.environ["PATH"] = os.pathsep.join([*inject_paths, *paths])
+            os.environ["PATH"] = os.pathsep.join(
+                [*map(str, inject_paths), *map(str, paths)],
+            )
 
     # We do know that finding ansible in PATH does not guarantee that it is
     # functioning or that is in fact the same version that was installed as
