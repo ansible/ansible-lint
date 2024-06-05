@@ -8,8 +8,13 @@ After [creating your fork on GitHub], you can do:
 ```shell-session
 $ git clone --recursive git@github.com:your-name/ansible-lint
 $ cd ansible-lint
+$ # Recommended: Initialize and activate a Python virtual environment
+$ pip install --upgrade pip
+$ pip install -e .[test]       # Install testing dependencies
+$ tox run -e lint,pkg,docs,py  # Ensure subset of tox tests work in clean checkout
 $ git checkout -b your-branch-name
 # DO SOME CODING HERE
+$ tox run -e lint,pkg,docs,py  # Ensure subset of tox tests work with your changes
 $ git add your new files
 $ git commit -v
 $ git push origin your-branch-name
@@ -30,8 +35,6 @@ released.
 
 Automated tests will be run against all PRs, to run checks locally before
 pushing commits, just use [tox](https://tox.wiki/en/latest/).
-
-% DO-NOT-REMOVE-deps-snippet-PLACEHOLDER
 
 ## Talk to us
 
