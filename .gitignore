@@ -8,7 +8,6 @@ __pycache__
 
 # Packages
 .Python
-env/
 build/
 develop-eggs/
 dist/
@@ -20,7 +19,6 @@ parts/
 pip-wheel-metadata
 sdist/
 var/
-venv/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -36,6 +34,12 @@ pip-log.txt
 
 # pyenv
 .python-version
+
+# Environments
+.env
+.venv
+env/
+venv/
 
 # Coverage artifacts
 .coverage*

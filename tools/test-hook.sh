@@ -12,7 +12,7 @@ set -euo pipefail
 rm -rf .tox/x
 mkdir -p .tox/x
 cd .tox/x
-git init
+git init --initial-branch=main
 # we add a file to the repo to avoid error due to no file to to lint
 touch foo.yml
 git add foo.yml

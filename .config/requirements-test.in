@@ -13,5 +13,6 @@ pytest-plus >= 0.6 # for PYTEST_REQPASS
 pytest-xdist >= 2.1.0
 ruamel.yaml>=0.17.31
 ruamel-yaml-clib  # needed for mypy
+tox >= 4.0.0
 types-jsonschema # IDE support
 types-pyyaml # IDE support
