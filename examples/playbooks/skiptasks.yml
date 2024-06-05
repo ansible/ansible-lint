@@ -37,20 +37,16 @@
 
     - name: Test latest[git] (don't warn)
       ansible.builtin.command: git log
-      args:
-        warn: false
       changed_when: false
 
     - name: Test latest[hg] (don't warn)
       ansible.builtin.command: chmod 644 A
       args:
-        warn: false
         creates: B
 
     - name: Test latest[hg] (warn)
       ansible.builtin.command: chmod 644 A
       args:
-        warn: true
         creates: B
 
     - name: Test latest[git] (don't warn single line)

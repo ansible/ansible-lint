@@ -14,7 +14,7 @@ SUCCESS_PLAY_TASKS = """
       HELLO: hello
 
   - name: Use some key-value pairs
-    command: chdir=/tmp creates=/tmp/bobbins warn=no touch bobbins
+    command: chdir=/tmp creates=/tmp/bobbins touch bobbins
 
   - name: Commands can have flags
     command: abc --xyz=def blah
@@ -69,7 +69,7 @@ FAIL_PLAY_TASKS = """
     command: HELLO=hello echo $HELLO
 
   - name: Typo some stuff
-    command: crates=/tmp/blah warn=no touch /tmp/blah
+    command: crates=/tmp/blah touch /tmp/blah
 """
 
 

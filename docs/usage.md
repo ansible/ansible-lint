@@ -43,11 +43,11 @@ repositories.
 ## Gradual adoption
 
 For an easier gradual adoption, adopters should consider [ignore
-file][ignoring-rules-for-entire-files] feature. This allows the
-quick introduction of a linter pipeline for preventing the addition of new
-violations, while known violations are ignored. Some people can work on
-addressing these historical violations while others may continue to work on
-other maintenance tasks.
+file][ignoring-rules-for-entire-files] feature. This allows the quick
+introduction of a linter pipeline for preventing the addition of new violations,
+while known violations are ignored. Some people can work on addressing these
+historical violations while others may continue to work on other maintenance
+tasks.
 
 The deprecated `--progressive` mode was removed in v6.16.0 as it added code
 complexity and performance overhead. It also presented several corner cases
@@ -222,17 +222,11 @@ argument or add it to `skip_list` in your configuration.
 
 The least preferred method of skipping rules is to skip all task-based rules for
 a task, which does not skip line-based rules. You can use the
-`skip_ansible_lint` tag with all tasks or the `warn` parameter with the
-_command_ or _shell_ modules, for example:
+`skip_ansible_lint` tag with all tasks, for example:
 
 ```yaml
 - name: This would typically fire no-free-form
   command: warn=no chmod 644 X
-
-- name: This would typically fire command-instead-of-module
-  command: git pull --rebase
-  args:
-    warn: false
 
 - name: This would typically fire git-latest
   git: src=/path/to/git/repo dest=checkout
