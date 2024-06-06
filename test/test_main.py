@@ -1,8 +1,8 @@
 """Tests related to ansiblelint.__main__ module."""
 
 import os
-import site
 import shutil
+import site
 import subprocess
 import sys
 import time
