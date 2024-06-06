@@ -143,7 +143,7 @@ def test_path_inject(mocker: MockerFixture, tested_path) -> None:
     py_path = Path(sys.executable).parent
     mocked_path = f"{userbase_bin_path}:{py_path}:{tested_path}"
 
-    mocker.patch("os.environ", {"PATH": mocked_path}
+    mocker.patch("os.environ", {"PATH": mocked_path})
     mocker.patch("Path.exists", return_value=True)
 
     path_inject(str(own_location))
