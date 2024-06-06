@@ -472,7 +472,7 @@ def path_inject(own_location: str = "") -> None:
             )
         if inject_paths or expanded:
             os.environ["PATH"] = os.pathsep.join(
-                [*map(str, inject_paths), *map(str, paths)]
+                [*map(str, inject_paths), *map(str, paths)],
             )
 
     # We do know that finding ansible in PATH does not guarantee that it is
