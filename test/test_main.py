@@ -141,10 +141,10 @@ def test_broken_ansible_cfg() -> None:
 def test_path_inject(mocker: MockerFixture, tested_path) -> None:
     """Asserts PATH is not changed when it contains paths with trailing slashes"""
 
-        
+
     own_location = Path(tested_path) / "ansible-lint"
     ansible_location = Path(tested_path) / "ansible"
-    
+
     # ensure inject_paths is empty before searching around "own_location"
     userbase_bin_path = Path(site.getuserbase()) / "bin"
     py_path = Path(sys.executable).parent
@@ -156,4 +156,3 @@ def test_path_inject(mocker: MockerFixture, tested_path) -> None:
     path_inject(str(own_location))
 
     assert os.environ["PATH"] == mocked_path
-
