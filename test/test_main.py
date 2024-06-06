@@ -1,6 +1,7 @@
 """Tests related to ansiblelint.__main__ module."""
 
 import os
+import site
 import shutil
 import subprocess
 import sys
@@ -133,10 +134,9 @@ def test_broken_ansible_cfg() -> None:
 
 
 @pytest.mark.parametrize("tested_path", ("/app/bin/", "/app/bin"))
-def test_path_inject(mocker: MockerFixture, tested_path) -> None:
+def test_path_inject(mocker: MockerFixture, tested_path: str) -> None:
     """Asserts PATH is not changed when it contains paths with trailing slashes"""
     own_location = Path(tested_path) / "ansible-lint"
-    ansible_location = Path(tested_path) / "ansible"
 
     # ensure inject_paths is empty before searching around "own_location"
     userbase_bin_path = Path(site.getuserbase()) / "bin"
