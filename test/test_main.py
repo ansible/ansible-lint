@@ -135,7 +135,7 @@ def test_broken_ansible_cfg() -> None:
 
 @pytest.mark.parametrize("tested_path", ("/app/bin/", "/app/bin"))
 def test_path_inject(mocker: MockerFixture, tested_path: str) -> None:
-    """Asserts PATH is not changed when it contains paths with trailing slashes"""
+    """Asserts PATH is not changed when it contains paths with trailing slashes."""
     own_location = Path(tested_path) / "ansible-lint"
 
     # ensure inject_paths is empty before searching around "own_location"
