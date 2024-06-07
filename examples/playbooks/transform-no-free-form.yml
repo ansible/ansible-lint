@@ -12,3 +12,6 @@
 
     - name: Example task with usage for '=' as module params
       ansible.builtin.debug: msg='Hello there world'
+
+    - name: Task that has a non-debug string with spaces
+      ansible.builtin.set_fact: foo="String with spaces"
