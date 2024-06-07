@@ -144,7 +144,7 @@ class ArgsRule(AnsibleLintRule):
             CustomAnsibleModule,
         ):
             spec = importlib.util.spec_from_file_location(
-                name=loaded_module.resolved_fqcn,
+                name=loaded_module.plugin_resolved_name,
                 location=loaded_module.plugin_resolved_path,
             )
             if not spec:

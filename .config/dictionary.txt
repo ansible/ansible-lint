@@ -366,6 +366,7 @@ taskincludes
 taskshandlers
 templatevars
 templating
+testcollection
 testinfra
 testmon
 testns
