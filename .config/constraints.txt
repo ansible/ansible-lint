@@ -4,7 +4,7 @@
 #
 #    pip-compile --all-extras --no-annotate --output-file=.config/constraints.txt --strip-extras --unsafe-package=resolvelib --unsafe-package=ruamel-yaml-clib --unsafe-package=wcmatch pyproject.toml
 #
-ansible-compat==24.6.0
+ansible-compat==24.6.1
 ansible-core==2.17.0
 astroid==3.2.2
 attrs==23.2.0
@@ -24,7 +24,7 @@ click==8.1.7
 colorama==0.4.6
 coverage==7.5.3
 coverage-enable-subprocess==1.0
-cryptography==42.0.7
+cryptography==42.0.8
 csscompressor==0.9.5
 cssselect2==0.7.0
 defusedxml==0.7.1
@@ -63,7 +63,7 @@ mkdocs-gen-files==0.5.0
 mkdocs-get-deps==0.2.0
 mkdocs-htmlproofer-plugin==1.2.1
 mkdocs-macros-plugin==1.0.5
-mkdocs-material==9.5.25
+mkdocs-material==9.5.26
 mkdocs-material-extensions==1.3.1
 mkdocs-minify-plugin==0.8.0
 mkdocs-monorepo-plugin==1.1.0
@@ -77,16 +77,16 @@ paginate==0.5.6
 pathspec==0.12.1
 pillow==10.3.0
 pip==24.0
-pipdeptree==2.21.0
+pipdeptree==2.22.0
 platformdirs==4.2.2
 pluggy==1.5.0
 psutil==5.9.8
 pycparser==2.22
 pygments==2.18.0
-pylint==3.2.2
+pylint==3.2.3
 pymdown-extensions==10.8.1
 pyproject-api==1.6.1
-pytest==8.2.1
+pytest==8.2.2
 pytest-mock==3.14.0
 pytest-plus==0.7.0
 pytest-xdist==3.6.1
@@ -108,16 +108,16 @@ text-unidecode==1.3
 tinycss2==1.3.0
 tomli==2.0.1
 tomlkit==0.12.5
-tox==4.15.0
+tox==4.15.1
 types-jsonschema==4.22.0.20240501
 types-pyyaml==6.0.12.20240311
-typing-extensions==4.12.1
+typing-extensions==4.12.2
 urllib3==2.2.1
 virtualenv==20.26.2
 watchdog==4.0.1
 webencodings==0.5.1
 yamllint==1.35.1
-zipp==3.19.1
+zipp==3.19.2
 
 # The following packages are considered to be unsafe in a requirements file:
 # resolvelib
