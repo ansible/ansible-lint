@@ -8,6 +8,12 @@
         cmd: touch foo
       changed_when: false
 
+    - name: Create a placefolder file
+      ansible.builtin.command: # <-- command can also go first
+        chdir: /tmp
+        cmd: touch bar
+      changed_when: false
+
     - name: Use raw to echo
       ansible.builtin.raw: echo foo # <-- don't use executable=
       args:

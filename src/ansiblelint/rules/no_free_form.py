@@ -80,7 +80,7 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
                 "win_command",
                 "win_shell",
             ):
-                if self.cmd_shell_re.match(action_value):
+                if self.cmd_shell_re.search(action_value):
                     fail = True
             else:
                 fail = True
