@@ -62,12 +62,14 @@ description: "..."
 
 # Changelog Details
 
-This rule expects a `CHANGELOG.md` or `.rst` file in the collection root or a
-`changelogs/changelog.yaml` file.
+This rule expects a `CHANGELOG.md`, `CHANGELOG.rst`,
+`changelogs/changelog.yaml`, or `changelogs/changelog.yml` file in the
+collection root.
 
-If a `changelogs/changelog.yaml` file exists, the schema will be checked.
+If a `changelogs/changelog.yaml` or `changelogs/changelog.yml` file exists, the
+schema will be checked.
 
-## Minimum required changelog.yaml file
+## Minimum required changelog.yaml/changelog.yml file
 
 ```yaml
 # changelog.yaml
