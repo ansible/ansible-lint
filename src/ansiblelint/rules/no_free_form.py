@@ -80,7 +80,7 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
                 "win_command",
                 "win_shell",
             ):
-                if self.cmd_shell_re.match(action_value):
+                if self.cmd_shell_re.search(action_value):
                     fail = True
             else:
                 fail = True
@@ -107,14 +107,36 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
                 val: str,
                 filter_key: str,
                 filter_dict: dict[str, Any],
-            ) -> bool:
-                """Return True if module option is not present in the string."""
-                if filter_key not in val:
-                    return True
+            ) -> str:
+                """Pull out key=value pairs from a string and set them in filter_dict.
 
-                [k, v] = val.split(filter_key)
+                Returns unmatched strings.
+                """
+                if filter_key not in val:
+                    return val
+
+                extra = ""
+                [k, v] = val.split(filter_key, 1)
+                if " " in k:
+                    extra, k = k.rsplit(" ", 1)
+
+                if v[0] in "\"'":
+                    # Keep quoted strings together
+                    quote = v[0]
+                    _, v, remainder = v.split(quote, 2)
+                    v = f"{quote}{v}{quote}"
+                else:
+                    try:
+                        v, remainder = v.split(" ", 1)
+                    except ValueError:
+                        remainder = ""
+
                 filter_dict[k] = v
-                return False
+
+                extra = " ".join(
+                    (extra, filter_values(remainder, filter_key, filter_dict)),
+                )
+                return extra.strip()
 
             if match.tag == "no-free-form":
                 module_opts: dict[str, Any] = {}
@@ -122,18 +144,9 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
                     k, v = task.popitem(False)
                     # identify module as key and process its value
                     if len(k.split(".")) == 3 and isinstance(v, str):
-                        # if it is a message
-                        if "msg" in v:
-                            filter_values(v, "=", module_opts)
-                        else:
-                            # Filter the module options and command
-                            module_opts["cmd"] = " ".join(
-                                [
-                                    item
-                                    for item in v.split(" ")
-                                    if filter_values(item, "=", module_opts)
-                                ],
-                            )
+                        cmd = filter_values(v, "=", module_opts)
+                        if cmd:
+                            module_opts["cmd"] = cmd
 
                         sorted_module_opts = {}
                         for key in sorted(
