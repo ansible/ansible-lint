@@ -58,6 +58,7 @@ class GalaxyRule(AnsibleLintRule):
         changelog_found = 0
         changelog_paths = [
             base_path / "changelogs" / "changelog.yaml",
+            base_path / "changelogs" / "changelog.yml",
             base_path / "CHANGELOG.rst",
             base_path / "CHANGELOG.md",
         ]
