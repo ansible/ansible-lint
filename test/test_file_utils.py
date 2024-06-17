@@ -264,6 +264,7 @@ def test_discover_lintables_umlaut(monkeypatch: MonkeyPatch) -> None:
             "plugin",
             id="44",
         ),
+        pytest.param("examples/meta/changelogs/changelog.yml", "changelog", id="45"),
     ),
 )
 def test_kinds(path: str, kind: FileType) -> None:

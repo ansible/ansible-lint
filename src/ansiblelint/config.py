@@ -68,7 +68,7 @@ DEFAULT_KINDS = [
     {"requirements": "**/requirements.{yaml,yml}"},  # v2 and v1
     {"playbook": "**/molecule/*/*.{yaml,yml}"},  # molecule playbooks
     {"yaml": "**/{.ansible-lint,.yamllint}"},
-    {"changelog": "**/changelogs/changelog.yaml"},
+    {"changelog": "**/changelogs/changelog.{yaml,yml}"},
     {"yaml": "**/*.{yaml,yml}"},
     {"yaml": "**/.*.{yaml,yml}"},
     {"sanity-ignore-file": "**/tests/sanity/ignore-*.txt"},
