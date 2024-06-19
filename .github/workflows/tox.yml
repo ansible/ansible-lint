@@ -39,7 +39,7 @@ jobs:
             schemas
             eco
             pre
-            py310-devel
+            py311-devel
             py310-lower
             py312-lower
           platforms: linux,macos
