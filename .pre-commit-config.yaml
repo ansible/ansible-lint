@@ -173,6 +173,7 @@ repos:
           - wcmatch
         exclude: >
           (?x)^(
+            collections/.*|
             test/local-content/.*|
             plugins/.*
           )$

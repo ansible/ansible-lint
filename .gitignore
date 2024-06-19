@@ -72,8 +72,10 @@ src/ansiblelint/_version.py
 test/eco/CODENOTIFY.html
 test/eco
 test/schemas/node_modules
+test/local-content
 .envrc
-collections
+# collections
+# !/collections
 site
 _readthedocs
 *.tmp.*
