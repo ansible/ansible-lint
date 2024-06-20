@@ -644,7 +644,7 @@ class FormattedEmitter(Emitter):
         ):
             # We have an as-yet unquoted token that starts with "0" (but is not itself the digit 0).
             # It could be:
-            # - hexadecimal like "0xF1" or ; comes tagged as int. Should continue unquoted to continue as an int.
+            # - hexadecimal like "0xF1"; comes tagged as int. Should continue unquoted to continue as an int.
             # - octal like "0666" or "0o755"; comes tagged as str. **Should** be quoted to be cross-YAML compatible.
             # - string like "0.0.0.0" and "00-header". Should not be quoted, unless it has a quote in it.
             if (
