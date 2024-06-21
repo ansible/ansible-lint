@@ -42,14 +42,14 @@ runs:
         GH_ACTION_REF: ${{ github.action_ref || 'main' }}
       working-directory: ${{ steps.inputs.outputs.working_directory }}
       run: |
-        wget --output-document=${{ github.workspace}}/.git/ansible-lint-requirements.txt https://raw.githubusercontent.com/ansible/ansible-lint/$GH_ACTION_REF/.config/requirements-lock.txt
+        wget --output-document=${{ steps.inputs.outputs.working_directory }}/.git/ansible-lint-requirements.txt https://raw.githubusercontent.com/ansible/ansible-lint/$GH_ACTION_REF/.config/requirements-lock.txt
 
     - name: Set up Python
       if: inputs.setup_python == 'true'
       uses: actions/setup-python@v5
       with:
         cache: pip
-        cache-dependency-path: ${{ github.workspace }}/.git/ansible-lint-requirements.txt
+        cache-dependency-path: ${{ steps.inputs.outputs.working_directory }}/.git/ansible-lint-requirements.txt
         python-version: "3.11"
 
     - name: Install ansible-lint
