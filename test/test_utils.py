@@ -480,3 +480,13 @@ def test_find_children_in_module(default_rules_collection: RulesCollection) -> N
     # Child correctly looks like a YAML file
     assert child.base_kind == "text/yaml"
     assert child.content.startswith("---")
+
+
+def test_find_children_in_playbook(default_rules_collection: RulesCollection) -> None:
+    """Verify correct function of find_children() in playbooks."""
+    lintable = Lintable("examples/playbooks/bug-4095.yml")
+    children = Runner(
+        rules=default_rules_collection,
+    ).find_children(lintable)
+    assert len(children) == 1
+    assert children[0].role == "bug4095"
