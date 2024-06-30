@@ -55,3 +55,10 @@ def has_glob(value: str) -> bool:
 def is_fqcn_or_name(value: str) -> bool:
     """Return true if a string seems to be a module/filter old name or a fully qualified one."""
     return bool(isinstance(value, str) and RE_IS_FQCN_OR_NAME.search(value))
+
+
+@cache
+def is_fqcn(value: str) -> bool:
+    """Return true if a string seems to be a fully qualified collection name."""
+    match = RE_IS_FQCN_OR_NAME.search(value)
+    return bool(isinstance(value, str) and match and match.group(1))
