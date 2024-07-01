@@ -11,7 +11,7 @@ def test_package_not_latest_positive() -> None:
     collection.register(PackageIsNotLatestRule())
     success = "examples/playbooks/package-check-success.yml"
     good_runner = Runner(success, rules=collection)
-    assert [] == good_runner.run()
+    assert good_runner.run() == []
 
 
 def test_package_not_latest_negative() -> None:

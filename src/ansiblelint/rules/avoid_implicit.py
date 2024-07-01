@@ -50,7 +50,7 @@ if "pytest" in sys.modules:
         collection.register(AvoidImplicitRule())
         success = "examples/playbooks/rule-avoid-implicit-pass.yml"
         good_runner = Runner(success, rules=collection)
-        assert [] == good_runner.run()
+        assert good_runner.run() == []
 
     def test_template_instead_of_copy_negative() -> None:
         """Negative test for avoid-implicit."""

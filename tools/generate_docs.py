@@ -12,7 +12,7 @@ from ansiblelint.rules import RulesCollection, TransformMixin
 if __name__ == "__main__":
     subprocess.run(
         "ansible-lint -L --format=md",  # noqa: S607
-        shell=True,  # noqa: S602
+        shell=True,
         check=True,
         stdout=subprocess.DEVNULL,
     )

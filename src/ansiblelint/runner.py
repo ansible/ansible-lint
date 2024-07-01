@@ -358,7 +358,7 @@ class Runner:
                 cmd,
                 stdin=subprocess.PIPE,
                 capture_output=True,
-                shell=False,  # needed when command is a list # noqa: S603
+                shell=False,  # needed when command is a list
                 text=True,
                 check=False,
                 env=env,
