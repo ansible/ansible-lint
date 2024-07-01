@@ -243,7 +243,7 @@ if "pytest" in sys.modules:
         collection.register(BecomeUserWithoutBecomeRule())
         success = "examples/playbooks/rule-partial-become-without-become-pass.yml"
         good_runner = Runner(success, rules=collection)
-        assert [] == good_runner.run()
+        assert good_runner.run() == []
 
     def test_partial_become_fail() -> None:
         """Errors found for partial-become."""
