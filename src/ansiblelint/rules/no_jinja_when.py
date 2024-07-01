@@ -113,7 +113,7 @@ if "pytest" in sys.modules:
         collection.register(NoFormattingInWhenRule())
         success = "examples/playbooks/rule-no-jinja-when-pass.yml"
         good_runner = Runner(success, rules=collection)
-        assert [] == good_runner.run()
+        assert good_runner.run() == []
 
     def test_jinja_file_negative() -> None:
         """Negative test for no-jinja-when."""
