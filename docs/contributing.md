@@ -98,13 +98,12 @@ create a new rule by following the steps below:
 - If the rule is task specific, it may be best to include a test to verify its
   use inside blocks as well.
 - Optionally run only the rule specific tests with a command like:
-  {command}`tox -e py -- -k NewRule`
-- Run {command}`tox` in order to run all ansible-lint tests. Adding a new rule
-  can break some other tests. Update them if needed.
-- Run {command}`ansible-lint -L` and check that the rule description renders
-  correctly.
-- Build the docs using {command}`tox -e docs` and check that the new rule is
-  displayed correctly in them.
+  `tox -e py -- -k NewRule`
+- Run `tox` in order to run all ansible-lint tests. Adding a new rule can break
+  some other tests. Update them if needed.
+- Run `ansible-lint -L` and check that the rule description renders correctly.
+- Build the docs using `tox -e docs` and check that the new rule is displayed
+  correctly in them.
 
 [metatagvalidrule]:
   https://github.com/ansible/ansible-lint/blob/main/src/ansiblelint/rules/meta_no_tags.py
