@@ -82,6 +82,7 @@ nav:
       - rules/deprecated-module.md
       - rules/empty-string-compare.md
       - rules/fqcn.md
+      - rules/galaxy-version-incorrect.md
       - rules/galaxy.md
       - rules/ignore-errors.md
       - rules/inline-env-var.md
