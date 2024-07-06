@@ -1,0 +1,1 @@
+../../src/ansiblelint/rules/galaxy_version_incorrect.md
