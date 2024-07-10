@@ -18,6 +18,10 @@ inputs:
     description: The directory where to run ansible-lint from. Default is `github.workspace`.
     required: false
     default: ""
+  requirements_file:
+    description: Path to the requirements YAML file to install role and collection dependencies.
+    required: false
+    default: ""
 runs:
   using: composite
   steps:
@@ -64,6 +68,12 @@ runs:
         cd $GITHUB_ACTION_PATH
         pip install "ansible-lint[lock] @ git+https://github.com/ansible/ansible-lint@$GH_ACTION_REF"
         ansible-lint --version
+
+    - name: Install role and collection dependencies
+      if: inputs.requirements_file != ''
+      shell: bash
+      working-directory: ${{ steps.inputs.outputs.working_directory }}
+      run: ansible-galaxy install -r ${{ inputs.requirements_file }}
 
     - name: Run ansible-lint
       shell: bash
