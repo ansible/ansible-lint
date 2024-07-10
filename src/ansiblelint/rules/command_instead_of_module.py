@@ -88,6 +88,12 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
         task: Task,
         file: Lintable | None = None,
     ) -> bool | str:
+        """Check if a command is used instead of an appropriate module.
+
+        :param task: Task to check for shell usage
+        :param file: File to lint
+        :returns: False if command module isn't used, or a string showing the command used
+        """
         if task["action"]["__ansible_module__"] not in self._commands:
             return False
 
@@ -139,7 +145,12 @@ if "pytest" in sys.modules:
         file: str,
         expected: int,
     ) -> None:
-        """Validate that rule works as intended."""
+        """Validate that rule works as intended.
+
+        :param default_rules_collection: Default rules for testing
+        :param file: Test file to check for violations
+        :expected: Expected number of errors
+        """
         results = Runner(file, rules=default_rules_collection).run()
 
         for result in results:
