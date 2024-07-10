@@ -69,7 +69,7 @@ runs:
         pip install "ansible-lint[lock] @ git+https://github.com/ansible/ansible-lint@$GH_ACTION_REF"
         ansible-lint --version
 
-    - name: Install role and collection dependencies
+    - name: Install role and collection dependencies from requirements file
       if: inputs.requirements_file != ''
       shell: bash
       working-directory: ${{ steps.inputs.outputs.working_directory }}
