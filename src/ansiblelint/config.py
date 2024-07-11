@@ -155,6 +155,7 @@ class Options:  # pylint: disable=too-many-instance-attributes
     only_builtins_allow_modules: list[str] = field(default_factory=list)
     var_naming_pattern: str | None = None
     offline: bool = False
+    nodeps: bool | None = None
     project_dir: str = "."  # default should be valid folder (do not use None here)
     extra_vars: dict[str, Any] | None = None
     enable_list: list[str] = field(default_factory=list)
@@ -180,16 +181,10 @@ class Options:  # pylint: disable=too-many-instance-attributes
     _default_supported = ["2.15.", "2.16.", "2.17."]
     supported_ansible_also: list[str] = field(default_factory=list)
 
-    @property
-    def nodeps(self) -> bool:
-        """Returns value of nodeps feature."""
-        # We do not want this to be cached as it would affect our testings.
-        return bool(int(os.environ.get("ANSIBLE_LINT_NODEPS", "0")))
 
     def __post_init__(self) -> None:
         """Extra initialization logic."""
-        if self.nodeps:
-            self.offline = True
+        pass
 
     @property
     def supported_ansible(self) -> list[str]:
