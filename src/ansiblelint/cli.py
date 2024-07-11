@@ -464,6 +464,14 @@ def get_cli_parser() -> argparse.ArgumentParser:
         help="Disable installation of requirements.yml and schema refreshing",
     )
     parser.add_argument(
+        "--nodeps",
+        dest="nodeps",
+        action="store_const",
+        const=True,
+        default=None,
+        help="Disable external dependency checking",
+    )
+    parser.add_argument(
         "--version",
         action="store_true",
     )
@@ -486,6 +494,7 @@ def merge_config(file_config: dict[Any, Any], cli_config: Options) -> Options:
         "strict",
         "use_default_rules",
         "offline",
+        "nodeps",
     )
     # maps lists to their default config values
     lists_map = {
