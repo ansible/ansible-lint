@@ -181,10 +181,8 @@ class Options:  # pylint: disable=too-many-instance-attributes
     _default_supported = ["2.15.", "2.16.", "2.17."]
     supported_ansible_also: list[str] = field(default_factory=list)
 
-
     def __post_init__(self) -> None:
         """Extra initialization logic."""
-        pass
 
     @property
     def supported_ansible(self) -> list[str]:
