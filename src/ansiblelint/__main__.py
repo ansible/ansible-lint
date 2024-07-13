@@ -132,7 +132,7 @@ def initialize_options(arguments: list[str] | None = None) -> None | FileLock:
     for k, v in new_options.__dict__.items():
         setattr(options, k, v)
 
-    if options.nodeps is None or options.nodeps == False:
+    if options.nodeps is None or options.nodeps is False:
         options.nodeps = bool(int(os.environ.get("ANSIBLE_LINT_NODEPS", "0")))
     if options.nodeps:
         options.offline = True
