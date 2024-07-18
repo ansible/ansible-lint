@@ -123,8 +123,8 @@
           "$ref": "#/$defs/ignore_errors"
         },
         "ignore_unreachable": {
-          "title": "Ignore Unreachable",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Ignore Unreachable"
         },
         "module_defaults": {
           "title": "Module Defaults"
@@ -382,8 +382,8 @@
           "$ref": "#/$defs/ignore_errors"
         },
         "ignore_unreachable": {
-          "title": "Ignore Unreachable",
-          "type": "boolean"
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Ignore Unreachable"
         },
         "include": {
           "$ref": "#/$defs/removed-include-module"

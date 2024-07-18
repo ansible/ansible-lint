@@ -49,7 +49,6 @@ class EnvVarsInCommandRule(AnsibleLintRule):
         "executable",
         "removes",
         "stdin",
-        "warn",
         "stdin_add_newline",
         "strip_empty_ends",
         "cmd",

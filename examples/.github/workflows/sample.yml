@@ -6,4 +6,4 @@ on: # <-- ansible-lint should not complain or touch about this 'on'
 
 jobs:
   ack:
-    uses: ansible/devtools/.github/workflows/ack.yml@main
+    uses: ansible/team-devtools/.github/workflows/ack.yml@main

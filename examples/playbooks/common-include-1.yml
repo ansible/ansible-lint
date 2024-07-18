@@ -8,3 +8,5 @@
     - name: Some include_tasks with file and jinja2
       ansible.builtin.include_tasks:
         file: "{{ 'tasks/included-with-lint.yml' }}"
+    - name: Some include 3
+      ansible.builtin.include_tasks: file=tasks/included-with-lint.yml

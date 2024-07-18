@@ -23,7 +23,7 @@ from ruamel.yaml.emitter import Emitter, ScalarAnalysis
 # To make the type checkers happy, we import from ruamel.yaml.main instead.
 from ruamel.yaml.main import YAML
 from ruamel.yaml.parser import ParserError
-from ruamel.yaml.scalarint import ScalarInt
+from ruamel.yaml.scalarint import HexInt, ScalarInt
 from yamllint.config import YamlLintConfig
 
 from ansiblelint.constants import (
@@ -46,28 +46,17 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__name__)
 
 
-YAMLLINT_CONFIG = """
-extends: default
-rules:
-  comments:
-    # https://github.com/prettier/prettier/issues/6780
-    min-spaces-from-content: 1
-  # https://github.com/adrienverge/yamllint/issues/384
-  comments-indentation: false
-  document-start: disable
-  # 160 chars was the default used by old E204 rule, but
-  # you can easily change it or disable in your .yamllint file.
-  line-length:
-    max: 160
-  # We are adding an extra space inside braces as that's how prettier does it
-  # and we are trying not to fight other linters.
-  braces:
-    min-spaces-inside: 0  # yamllint defaults to 0
-    max-spaces-inside: 1  # yamllint defaults to 0
-  octal-values:
-    forbid-implicit-octal: true  # yamllint defaults to false
-    forbid-explicit-octal: true  # yamllint defaults to false
-"""
+class CustomYamlLintConfig(YamlLintConfig):  # type: ignore[misc]
+    """Extension of YamlLintConfig."""
+
+    def __init__(
+        self,
+        content: str | None = None,
+        file: str | Path | None = None,
+    ) -> None:
+        """Initialize config."""
+        super().__init__(content, file)
+        self.incompatible = ""
 
 
 def deannotate(data: Any) -> Any:
@@ -85,10 +74,10 @@ def deannotate(data: Any) -> Any:
     return data
 
 
-@functools.lru_cache(maxsize=1)
-def load_yamllint_config() -> YamlLintConfig:
+def load_yamllint_config() -> CustomYamlLintConfig:
     """Load our default yamllint config and any customized override file."""
-    config = YamlLintConfig(content=YAMLLINT_CONFIG)
+    config = CustomYamlLintConfig(file=Path(__file__).parent / "data" / ".yamllint")
+    config.incompatible = ""
     # if we detect local yamllint config we use it but raise a warning
     # as this is likely to get out of sync with our internal config.
     for path in [
@@ -105,10 +94,65 @@ def load_yamllint_config() -> YamlLintConfig:
                 "internal yamllint config.",
                 file,
             )
-            config_override = YamlLintConfig(file=str(file))
-            config_override.extend(config)
-            config = config_override
+            custom_config = CustomYamlLintConfig(file=str(file))
+            custom_config.extend(config)
+            config = custom_config
             break
+
+    # Look for settings incompatible with our reformatting
+    checks: list[tuple[str, str | int | bool]] = [
+        (
+            "comments.min-spaces-from-content",
+            1,
+        ),
+        (
+            "comments-indentation",
+            False,
+        ),
+        (
+            "braces.min-spaces-inside",
+            0,
+        ),
+        (
+            "braces.max-spaces-inside",
+            1,
+        ),
+        (
+            "octal-values.forbid-implicit-octal",
+            True,
+        ),
+        (
+            "octal-values.forbid-explicit-octal",
+            True,
+        ),
+        # (
+        #     "key-duplicates.forbid-duplicated-merge-keys", # v1.34.0+
+        #     True,
+        # ),
+        # (
+        #   "quoted-strings.quote-type", "double",
+        # ),
+        # (
+        #   "quoted-strings.required", "only-when-needed",
+        # ),
+    ]
+    errors = []
+    for setting, expected_value in checks:
+        v = config.rules
+        for key in setting.split("."):
+            if not isinstance(v, dict):  # pragma: no cover
+                break
+            if key not in v:  # pragma: no cover
+                break
+            v = v[key]
+        if v != expected_value:
+            msg = f"{setting} must be {str(expected_value).lower()}"
+            errors.append(msg)
+    if errors:
+        nl = "\n"
+        msg = f"Found incompatible custom yamllint configuration ({file}), please either remove the file or edit it to comply with:{nl}  - {(nl + '  - ').join(errors)}.{nl}{nl}Read https://ansible.readthedocs.io/projects/lint/rules/yaml/ for more details regarding why we have these requirements. Fix mode will not be available."
+        config.incompatible = msg
+
     _logger.debug("Effective yamllint rules used: %s", config.rules)
     return config
 
@@ -253,7 +297,7 @@ def get_path_to_play(
         lc = play.lc
         if not isinstance(lc.line, int):
             msg = f"expected lc.line to be an int, got {lc.line!r}"
-            raise RuntimeError(msg)
+            raise TypeError(msg)
         if lc.line == line_index:
             return [play_index]
         if play_index > 0 and prev_play_line_index < line_index < lc.line:
@@ -304,6 +348,10 @@ def _get_path_to_task_in_playbook(
             next_play_line_index = ruamel_data[next_play_index].lc.line
         else:
             next_play_line_index = None
+
+        # We clearly haven't found the right spot yet if a following play starts on an earlier line.
+        if next_play_line_index and lineno > next_play_line_index:
+            continue
 
         play_keys = list(play.keys())
         for tasks_keyword in PLAYBOOK_TASK_KEYWORDS:
@@ -386,7 +434,7 @@ def _get_path_to_task_in_tasks_block(
 
         if not isinstance(task.lc.line, int):
             msg = f"expected task.lc.line to be an int, got {task.lc.line!r}"
-            raise RuntimeError(msg)
+            raise TypeError(msg)
         if task.lc.line == line_index:
             return [task_index]
         if task_index > 0 and prev_task_line_index < line_index < task.lc.line:
@@ -504,7 +552,9 @@ class CustomConstructor(RoundTripConstructor):
             value_s = value_su.replace("_", "")
             if value_s[0] in "+-":
                 value_s = value_s[1:]
-            if value_s[0] == "0":
+            if value_s[0:2] == "0x":
+                ret = HexInt(ret, width=len(value_s) - 2)
+            elif value_s[0] == "0":
                 # got an octal in YAML 1.1
                 ret = OctalIntYAML11(
                     ret,
@@ -592,11 +642,29 @@ class FormattedEmitter(Emitter):
             and self.event.value.startswith("0")
             and len(self.event.value) > 1
         ):
-            if self.event.tag == "tag:yaml.org,2002:int" and self.event.implicit[0]:
-                # ensures that "0123" string does not lose its quoting
+            # We have an as-yet unquoted token that starts with "0" (but is not itself the digit 0).
+            # It could be:
+            # - hexadecimal like "0xF1"; comes tagged as int. Should continue unquoted to continue as an int.
+            # - octal like "0666" or "0o755"; comes tagged as str. **Should** be quoted to be cross-YAML compatible.
+            # - string like "0.0.0.0" and "00-header". Should not be quoted, unless it has a quote in it.
+            if (
+                self.event.value.startswith("0x")
+                and self.event.tag == "tag:yaml.org,2002:int"
+                and self.event.implicit[0]
+            ):
+                # hexadecimal
+                self.event.tag = "tag:yaml.org,2002:str"
+                return ""
+            try:
+                int(self.event.value, 8)
+            except ValueError:
+                pass
+                # fallthrough to string
+            else:
+                # octal
                 self.event.tag = "tag:yaml.org,2002:str"
                 self.event.implicit = (True, True, True)
-            return '"'
+                return '"'
         if style != "'":
             # block scalar, double quoted, etc.
             return style
@@ -752,6 +820,16 @@ class FormattedEmitter(Emitter):
 class FormattedYAML(YAML):
     """A YAML loader/dumper that handles ansible content better by default."""
 
+    default_config = {
+        "explicit_start": True,
+        "explicit_end": False,
+        "width": 160,
+        "indent_sequences": True,
+        "preferred_quote": '"',
+        "min_spaces_inside": 0,
+        "max_spaces_inside": 1,
+    }
+
     def __init__(  # pylint: disable=too-many-arguments
         self,
         *,
@@ -760,6 +838,7 @@ class FormattedYAML(YAML):
         output: Any = None,
         plug_ins: list[str] | None = None,
         version: tuple[int, int] | None = None,
+        config: dict[str, bool | int | str] | None = None,
     ):
         """Return a configured ``ruamel.yaml.YAML`` instance.
 
@@ -829,7 +908,8 @@ class FormattedYAML(YAML):
 
         # NB: We ignore some mypy issues because ruamel.yaml typehints are not great.
 
-        config = self._defaults_from_yamllint_config()
+        if not config:
+            config = self._defaults_from_yamllint_config()
 
         # these settings are derived from yamllint config
         self.explicit_start: bool = config["explicit_start"]  # type: ignore[assignment]
@@ -882,15 +962,8 @@ class FormattedYAML(YAML):
     @staticmethod
     def _defaults_from_yamllint_config() -> dict[str, bool | int | str]:
         """Extract FormattedYAML-relevant settings from yamllint config if possible."""
-        config = {
-            "explicit_start": True,
-            "explicit_end": False,
-            "width": 160,
-            "indent_sequences": True,
-            "preferred_quote": '"',
-            "min_spaces_inside": 0,
-            "max_spaces_inside": 1,
-        }
+        config = FormattedYAML.default_config
+
         for rule, rule_config in load_yamllint_config().rules.items():
             if not rule_config:
                 # rule disabled
@@ -968,7 +1041,9 @@ class FormattedYAML(YAML):
             data = self.load_all(stream=text)
         except ParserError:
             data = None
-            _logger.error("Invalid yaml, verify the file contents and try again.")
+            _logger.error(  # noqa: TRY400
+                "Invalid yaml, verify the file contents and try again.",
+            )
         if preamble_comment is not None and isinstance(
             data,
             CommentedMap | CommentedSeq,
@@ -992,6 +1067,7 @@ class FormattedYAML(YAML):
         return self._post_process_yaml(
             text,
             strip_version_directive=strip_version_directive,
+            strip_explicit_start=not self.explicit_start,
         )
 
     def _prevent_wrapping_flow_style(self, data: Any) -> None:
@@ -1080,7 +1156,12 @@ class FormattedYAML(YAML):
         return text, "".join(preamble_comments) or None
 
     @staticmethod
-    def _post_process_yaml(text: str, *, strip_version_directive: bool = False) -> str:
+    def _post_process_yaml(
+        text: str,
+        *,
+        strip_version_directive: bool = False,
+        strip_explicit_start: bool = False,
+    ) -> str:
         """Handle known issues with ruamel.yaml dumping.
 
         Make sure there's only one newline at the end of the file.
@@ -1094,6 +1175,10 @@ class FormattedYAML(YAML):
         """
         # remove YAML directive
         if strip_version_directive and text.startswith("%YAML"):
+            text = text.split("\n", 1)[1]
+
+        # remove explicit document start
+        if strip_explicit_start and text.startswith("---"):
             text = text.split("\n", 1)[1]
 
         text = text.rstrip("\n") + "\n"

@@ -1,0 +1,20 @@
+---
+- name: Testing multiple plays in a playbook
+  hosts: localhost
+  tasks:
+    - name: First block
+      when: true
+      block:
+        - name: Display a message
+          ansible.builtin.debug:
+            msg: Hello world!
+
+- name: A second play
+  hosts: localhost
+  tasks:
+    - name: Second block
+      when: true # <-- name key should be the second one
+      block:
+        - name: Display a message
+          ansible.builtin.debug:
+            msg: Hello world!

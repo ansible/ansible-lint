@@ -89,7 +89,7 @@ def test_runner_exclude_paths(default_rules_collection: RulesCollection) -> None
 
 @pytest.mark.parametrize(
     ("exclude_path"),
-    (pytest.param("**/playbooks/*.yml", id="1"),),
+    (pytest.param("**/playbooks_globs/*b.yml", id="1"),),
 )
 def test_runner_exclude_globs(
     default_rules_collection: RulesCollection,
@@ -97,14 +97,13 @@ def test_runner_exclude_globs(
 ) -> None:
     """Test that globs work."""
     runner = Runner(
-        "examples/playbooks",
+        "examples/playbooks_globs",
         rules=default_rules_collection,
         exclude_paths=[exclude_path],
     )
 
     matches = runner.run()
-    # we expect to find one match from the very few .yaml file we have there (most of them have .yml extension)
-    assert len(matches) == 1
+    assert len(matches) == 0
 
 
 @pytest.mark.parametrize(
@@ -177,6 +176,52 @@ def test_files_not_scanned_twice(default_rules_collection: RulesCollection) -> N
     # this second run should return 0 because the included filed was already
     # processed and added to checked_files, which acts like a bypass list.
     assert len(run2) == 0
+
+
+@pytest.mark.parametrize(
+    ("filename", "failures", "checked_files_no"),
+    (
+        pytest.param(
+            "examples/playbooks/common-include-wrong-syntax.yml",
+            1,
+            1,
+            id="1",
+        ),
+        pytest.param(
+            "examples/playbooks/common-include-wrong-syntax2.yml",
+            1,
+            1,
+            id="2",
+        ),
+        pytest.param(
+            "examples/playbooks/common-include-wrong-syntax3.yml",
+            0,
+            2,
+            id="3",
+        ),
+    ),
+)
+def test_include_wrong_syntax(
+    filename: str,
+    failures: int,
+    checked_files_no: int,
+    default_rules_collection: RulesCollection,
+) -> None:
+    """Ensure that lintables aren't double-checked."""
+    checked_files: set[Lintable] = set()
+
+    path = Path(filename).resolve()
+    runner = Runner(
+        path,
+        rules=default_rules_collection,
+        verbosity=0,
+        checked_files=checked_files,
+    )
+    result = runner.run()
+    assert len(runner.checked_files) == checked_files_no
+    assert len(result) == failures, result
+    for item in result:
+        assert item.tag == "syntax-check[no-file]"
 
 
 def test_runner_not_found(default_rules_collection: RulesCollection) -> None:

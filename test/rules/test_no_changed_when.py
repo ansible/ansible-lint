@@ -11,7 +11,7 @@ def test_command_changes_positive() -> None:
     collection.register(CommandHasChangesCheckRule())
     success = "examples/playbooks/command-check-success.yml"
     good_runner = Runner(success, rules=collection)
-    assert [] == good_runner.run()
+    assert good_runner.run() == []
 
 
 def test_command_changes_negative() -> None:

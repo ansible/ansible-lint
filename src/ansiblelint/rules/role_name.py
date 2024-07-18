@@ -103,7 +103,7 @@ class RoleNames(AnsibleLintRule):
                     role_name = role
                 else:
                     msg = "Role dependency has unexpected type."
-                    raise RuntimeError(msg)
+                    raise TypeError(msg)
                 if "/" in role_name:
                     result.append(
                         self.create_matcherror(
@@ -164,7 +164,7 @@ class RoleNames(AnsibleLintRule):
             if meta_data:
                 try:
                     return str(meta_data["galaxy_info"]["role_name"])
-                except KeyError:
+                except (KeyError, TypeError):
                     pass
         return default
 

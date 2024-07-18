@@ -368,7 +368,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                     # process expression
                     # pylint: disable=unsupported-membership-test
                     if isinstance(expr_str, str) and "\n" in expr_str:
-                        raise NotImplementedError
+                        raise NotImplementedError  # noqa: TRY301
                     leading_spaces = " " * (len(expr_str) - len(expr_str.lstrip()))
                     expr_str = leading_spaces + blacken(expr_str.lstrip())
                     if tokens[
@@ -389,6 +389,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
 
         except jinja2.exceptions.TemplateSyntaxError as exc:
             return "", str(exc.message), "invalid"
+        # pylint: disable=c-extension-no-member
         except (NotImplementedError, black.parsing.InvalidInput) as exc:
             # black is not able to recognize all valid jinja2 templates, so we
             # just ignore InvalidInput errors.
@@ -460,7 +461,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                         obj = obj[pth]
                     except (KeyError, TypeError) as exc:
                         err = f"Unable to transform {match.transform_meta}: {exc}"
-                        _logger.error(err)
+                        _logger.error(err)  # noqa: TRY400
                         return
                 try:
                     obj[path[-1]][key] = match.transform_meta.fixed
@@ -468,7 +469,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
 
                 except (KeyError, TypeError) as exc:
                     err = f"Unable to transform {match.transform_meta}: {exc}"
-                    _logger.error(err)
+                    _logger.error(err)  # noqa: TRY400
                 return
 
 
@@ -873,5 +874,5 @@ def _get_error_line(task: dict[str, Any], path: list[str | int]) -> int:
             line = ctx[LINE_NUMBER_KEY]
     if not isinstance(line, int):
         msg = "Line number is not an integer"
-        raise RuntimeError(msg)
+        raise TypeError(msg)
     return line

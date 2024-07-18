@@ -129,12 +129,16 @@ class KeyOrderRule(AnsibleLintRule, TransformMixin):
         if match.tag == f"{self.id}[play]":
             play = self.seek(match.yaml_path, data)
             for key in match.transform_meta.fixed:
-                play[key] = play.pop(key)
+                # other transformation might change the key
+                if key in play:
+                    play[key] = play.pop(key)
             match.fixed = True
         if match.tag == f"{self.id}[task]":
             task = self.seek(match.yaml_path, data)
             for key in match.transform_meta.fixed:
-                task[key] = task.pop(key)
+                # other transformation might change the key
+                if key in task:
+                    task[key] = task.pop(key)
             match.fixed = True
 
 

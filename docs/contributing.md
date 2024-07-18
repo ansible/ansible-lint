@@ -8,8 +8,13 @@ After [creating your fork on GitHub], you can do:
 ```shell-session
 $ git clone --recursive git@github.com:your-name/ansible-lint
 $ cd ansible-lint
+$ # Recommended: Initialize and activate a Python virtual environment
+$ pip install --upgrade pip
+$ pip install -e .[test]       # Install testing dependencies
+$ tox run -e lint,pkg,docs,py  # Ensure subset of tox tests work in clean checkout
 $ git checkout -b your-branch-name
 # DO SOME CODING HERE
+$ tox run -e lint,pkg,docs,py  # Ensure subset of tox tests work with your changes
 $ git add your new files
 $ git commit -v
 $ git push origin your-branch-name
@@ -30,8 +35,6 @@ released.
 
 Automated tests will be run against all PRs, to run checks locally before
 pushing commits, just use [tox](https://tox.wiki/en/latest/).
-
-% DO-NOT-REMOVE-deps-snippet-PLACEHOLDER
 
 ## Talk to us
 
@@ -95,13 +98,12 @@ create a new rule by following the steps below:
 - If the rule is task specific, it may be best to include a test to verify its
   use inside blocks as well.
 - Optionally run only the rule specific tests with a command like:
-  {command}`tox -e py -- -k NewRule`
-- Run {command}`tox` in order to run all ansible-lint tests. Adding a new rule
-  can break some other tests. Update them if needed.
-- Run {command}`ansible-lint -L` and check that the rule description renders
-  correctly.
-- Build the docs using {command}`tox -e docs` and check that the new rule is
-  displayed correctly in them.
+  `tox -e py -- -k NewRule`
+- Run `tox` in order to run all ansible-lint tests. Adding a new rule can break
+  some other tests. Update them if needed.
+- Run `ansible-lint -L` and check that the rule description renders correctly.
+- Build the docs using `tox -e docs` and check that the new rule is displayed
+  correctly in them.
 
 [metatagvalidrule]:
   https://github.com/ansible/ansible-lint/blob/main/src/ansiblelint/rules/meta_no_tags.py

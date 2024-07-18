@@ -8,7 +8,6 @@ __pycache__
 
 # Packages
 .Python
-env/
 build/
 develop-eggs/
 dist/
@@ -20,7 +19,6 @@ parts/
 pip-wheel-metadata
 sdist/
 var/
-venv/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -37,8 +35,14 @@ pip-log.txt
 # pyenv
 .python-version
 
+# Environments
+.env
+.venv
+env/
+venv/
+
 # Coverage artifacts
-.coverage
+.coverage*
 coverage*.xml
 pip-wheel-metadata
 .test-results/
@@ -68,8 +72,11 @@ src/ansiblelint/_version.py
 test/eco/CODENOTIFY.html
 test/eco
 test/schemas/node_modules
+test/local-content
 .envrc
-collections
+# collections
+# !/collections
 site
 _readthedocs
 *.tmp.*
+coverage.lcov

@@ -92,7 +92,7 @@ def load_config(config_file: str | None) -> tuple[dict[Any, Any], str | None]:
     config = clean_json(config_lintable.data)
     if not isinstance(config, dict):
         msg = "Schema failed to properly validate the config file."
-        raise RuntimeError(msg)
+        raise TypeError(msg)
     config["config_file"] = config_path
     config_dir = os.path.dirname(config_path)
     expand_to_normalized_paths(config, config_dir)
@@ -499,6 +499,7 @@ def merge_config(file_config: dict[Any, Any], cli_config: Options) -> Options:
         "enable_list": [],
         "only_builtins_allow_collections": [],
         "only_builtins_allow_modules": [],
+        "supported_ansible_also": [],
         # do not include "write_list" here. See special logic below.
     }
 
@@ -526,8 +527,8 @@ def merge_config(file_config: dict[Any, Any], cli_config: Options) -> Options:
         v = getattr(cli_config, entry) or file_value
         setattr(cli_config, entry, v)
 
-    for entry, default in scalar_map.items():
-        file_value = file_config.pop(entry, default)
+    for entry, default_scalar in scalar_map.items():
+        file_value = file_config.pop(entry, default_scalar)
         v = getattr(cli_config, entry, None) or file_value
         setattr(cli_config, entry, v)
 

@@ -17,6 +17,11 @@
         - My handler
         - my handler 2
 
+    - name: Task without notify
+      ansible.builtin.debug:
+        msg: I always change!
+      changed_when: true
+
   handlers:
     - name: My handler
       ansible.builtin.debug:

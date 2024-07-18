@@ -68,7 +68,7 @@ DEFAULT_KINDS = [
     {"requirements": "**/requirements.{yaml,yml}"},  # v2 and v1
     {"playbook": "**/molecule/*/*.{yaml,yml}"},  # molecule playbooks
     {"yaml": "**/{.ansible-lint,.yamllint}"},
-    {"changelog": "**/changelogs/changelog.yaml"},
+    {"changelog": "**/changelogs/changelog.{yaml,yml}"},
     {"yaml": "**/*.{yaml,yml}"},
     {"yaml": "**/.*.{yaml,yml}"},
     {"sanity-ignore-file": "**/tests/sanity/ignore-*.txt"},
@@ -130,7 +130,7 @@ class Options:  # pylint: disable=too-many-instance-attributes
     cache_dir: Path | None = None
     colored: bool = True
     configured: bool = False
-    cwd: Path = Path(".")
+    cwd: Path = Path()
     display_relative_path: bool = True
     exclude_paths: list[str] = field(default_factory=list)
     format: str = "brief"
@@ -174,12 +174,25 @@ class Options:  # pylint: disable=too-many-instance-attributes
     ignore_file: Path | None = None
     max_tasks: int = 100
     max_block_depth: int = 20
-    nodeps: bool = bool(int(os.environ.get("ANSIBLE_LINT_NODEPS", "0")))
+    # Refer to https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix
+    _default_supported = ["2.15.", "2.16.", "2.17."]
+    supported_ansible_also: list[str] = field(default_factory=list)
+
+    @property
+    def nodeps(self) -> bool:
+        """Returns value of nodeps feature."""
+        # We do not want this to be cached as it would affect our testings.
+        return bool(int(os.environ.get("ANSIBLE_LINT_NODEPS", "0")))
 
     def __post_init__(self) -> None:
         """Extra initialization logic."""
         if self.nodeps:
             self.offline = True
+
+    @property
+    def supported_ansible(self) -> list[str]:
+        """Returns list of ansible versions that are considered supported."""
+        return sorted([*self._default_supported, *self.supported_ansible_also])
 
 
 options = Options()
@@ -287,6 +300,11 @@ def get_version_warning() -> str:
     # 0.1dev1 is special fallback version
     if __version__ == "0.1.dev1":  # pragma: no cover
         return ""
+    pip = guess_install_method()
+    # If we do not know how to upgrade, we do not want to show any warnings
+    # about version.
+    if not pip:
+        return ""
 
     msg = ""
     data = {}
@@ -327,9 +345,6 @@ def get_version_warning() -> str:
         msg = "[dim]You are using a pre-release version of ansible-lint.[/]"
     elif current_version < new_version:
         msg = f"""[warning]A new release of ansible-lint is available: [red]{current_version}[/] → [green][link={html_url}]{new_version}[/][/][/]"""
-
-        pip = guess_install_method()
-        if pip:
-            msg += f" Upgrade by running: [info]{pip}[/]"
+        msg += f" Upgrade by running: [info]{pip}[/]"
 
     return msg

@@ -1,3 +1,4 @@
+# cspell:ignore classinfo
 """Transformer implementation."""
 
 from __future__ import annotations
@@ -32,6 +33,17 @@ class Transformer:
     of the rule matches. For now, it just reads/writes YAML files which is a
     pre-requisite for the planned rule-specific transforms.
     """
+
+    DUMP_MSG = "Rewriting yaml file:"
+    FIX_NA_MSG = "Rule specific fix not available for:"
+    FIX_NE_MSG = "Rule specific fix not enabled for:"
+    FIX_APPLY_MSG = "Applying rule specific fix for:"
+    FIX_FAILED_MSG = "Rule specific fix failed for:"
+    FIX_ISSUE_MSG = (
+        "Please file an issue for this with the task or playbook that caused the error."
+    )
+    FIX_APPLIED_MSG = "Rule specific fix applied for:"
+    FIX_NOT_APPLIED_MSG = "Rule specific fix not applied for:"
 
     def __init__(self, result: LintResult, options: Options):
         """Initialize a Transformer instance."""
@@ -113,7 +125,7 @@ class Transformer:
                 self._do_transforms(file, ruamel_data or data, file_is_yaml, matches)
 
             if file_is_yaml:
-                _logger.debug("Dumping %s using YAML (%s)", file, yaml.version)
+                _logger.debug("%s %s, version=%s", self.DUMP_MSG, file, yaml.version)
                 # noinspection PyUnboundLocalVariable
                 file.content = yaml.dumps(ruamel_data)
 
@@ -129,14 +141,16 @@ class Transformer:
     ) -> None:
         """Do Rule-Transforms handling any last-minute MatchError inspections."""
         for match in sorted(matches):
+            match_id = f"{match.tag}/{match.match_type} {match.filename}:{match.lineno}"
             if not isinstance(match.rule, TransformMixin):
+                logging.debug("%s %s", self.FIX_NA_MSG, match_id)
                 continue
             if self.write_set != {"all"}:
                 rule = cast(AnsibleLintRule, match.rule)
                 rule_definition = set(rule.tags)
                 rule_definition.add(rule.id)
                 if rule_definition.isdisjoint(self.write_set):
-                    # rule transform not requested. Skip it.
+                    logging.debug("%s %s", self.FIX_NE_MSG, match_id)
                     continue
             if file_is_yaml and not match.yaml_path:
                 data = cast(CommentedMap | CommentedSeq, data)
@@ -148,4 +162,16 @@ class Transformer:
                     "playbook",
                 ):
                     match.yaml_path = get_path_to_task(file, match.lineno, data)
-            match.rule.transform(match, file, data)
+
+            logging.debug("%s %s", self.FIX_APPLY_MSG, match_id)
+            try:
+                match.rule.transform(match, file, data)
+            except Exception as exc:  # pylint: disable=broad-except
+                _logger.error("%s %s", self.FIX_FAILED_MSG, match_id)  # noqa: TRY400
+                _logger.exception(exc)  # noqa: TRY401
+                _logger.error(self.FIX_ISSUE_MSG)  # noqa: TRY400
+                continue
+            if match.fixed:
+                _logger.debug("%s %s", self.FIX_APPLIED_MSG, match_id)
+            else:
+                _logger.error("%s %s", self.FIX_NOT_APPLIED_MSG, match_id)

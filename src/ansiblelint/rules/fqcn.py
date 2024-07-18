@@ -6,12 +6,14 @@ import logging
 import sys
 from typing import TYPE_CHECKING, Any
 
+from ruamel.yaml.comments import CommentedSeq
+
 from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.utils import load_plugin
 
 if TYPE_CHECKING:
-    from ruamel.yaml.comments import CommentedMap, CommentedSeq
+    from ruamel.yaml.comments import CommentedMap
 
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
@@ -114,11 +116,13 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
         task: Task,
         file: Lintable | None = None,
     ) -> list[MatchError]:
-        result = []
+        result: list[MatchError] = []
+        if file and file.failed():
+            return result
         module = task["action"]["__ansible_module_original__"]
         if not isinstance(module, str):
             msg = "Invalid data for module."
-            raise RuntimeError(msg)
+            raise TypeError(msg)
 
         if module not in self.module_aliases:
             loaded_module = load_plugin(module)
@@ -155,31 +159,30 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
                             tag="fqcn[action-core]",
                         ),
                     )
-            else:
-                if module.count(".") < 2:
-                    result.append(
-                        self.create_matcherror(
-                            message=f"Use FQCN for module actions, such `{self.module_aliases[module]}`.",
-                            details=f"Action `{module}` is not FQCN.",
-                            filename=file,
-                            lineno=task["__line__"],
-                            tag="fqcn[action]",
-                        ),
-                    )
-                # TODO(ssbarnea): Remove the c.g. and c.n. exceptions from here once # noqa: FIX002
-                # community team is flattening these.
-                # https://github.com/ansible-community/community-topics/issues/147
-                elif not module.startswith("community.general.") or module.startswith(
-                    "community.network.",
-                ):
-                    result.append(
-                        self.create_matcherror(
-                            message=f"You should use canonical module name `{self.module_aliases[module]}` instead of `{module}`.",
-                            filename=file,
-                            lineno=task["__line__"],
-                            tag="fqcn[canonical]",
-                        ),
-                    )
+            elif module.count(".") < 2:
+                result.append(
+                    self.create_matcherror(
+                        message=f"Use FQCN for module actions, such `{self.module_aliases[module]}`.",
+                        details=f"Action `{module}` is not FQCN.",
+                        filename=file,
+                        lineno=task["__line__"],
+                        tag="fqcn[action]",
+                    ),
+                )
+            # TODO(ssbarnea): Remove the c.g. and c.n. exceptions from here once # noqa: FIX002
+            # community team is flattening these.
+            # https://github.com/ansible-community/community-topics/issues/147
+            elif not module.startswith("community.general.") or module.startswith(
+                "community.network.",
+            ):
+                result.append(
+                    self.create_matcherror(
+                        message=f"You should use canonical module name `{self.module_aliases[module]}` instead of `{module}`.",
+                        filename=file,
+                        lineno=task["__line__"],
+                        tag="fqcn[canonical]",
+                    ),
+                )
         return result
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
@@ -229,6 +232,8 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
             target_task = self.seek(match.yaml_path, data)
             # Unfortunately, a lot of data about Ansible content gets lost here, you only get a simple dict.
             # For now, just parse the error messages for the data about action names etc. and fix this later.
+            current_action = ""
+            new_action = ""
             if match.tag == "fqcn[action-core]":
                 # split at the first bracket, cut off the last bracket and dot
                 current_action = match.message.split("(")[1][:-2]
@@ -242,6 +247,8 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
                 current_action = match.message.split("`")[3]
                 new_action = match.message.split("`")[1]
             for _ in range(len(target_task)):
+                if isinstance(target_task, CommentedSeq):
+                    continue
                 k, v = target_task.popitem(False)
                 target_task[new_action if k == current_action else k] = v
             match.fixed = True

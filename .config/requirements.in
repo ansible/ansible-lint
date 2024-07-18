@@ -1,10 +1,11 @@
 # Special order section for helping pip:
 will-not-work-on-windows-try-from-wsl-instead; platform_system=='Windows'
-ansible-core>=2.12.0 # GPLv3
-ansible-compat>=4.1.11 # GPLv3
+ansible-core>=2.13.0 # GPLv3
+ansible-compat>=24.5.0dev0 # GPLv3
 # alphabetically sorted:
-black>=22.8.0 # MIT
+black>=24.3.0 # MIT (security)
 filelock>=3.3.0 # The Unlicense
+importlib-metadata # Apache
 jsonschema>=4.10.0 # MIT, version needed for improved errors
 packaging>=21.3 # Apache-2.0,BSD-2-Clause
 pathspec>=0.10.3 # Mozilla Public License 2.0 (MPL 2.0)
@@ -13,4 +14,5 @@ rich>=12.0.0 # MIT
 ruamel.yaml>=0.18.5 # MIT
 subprocess-tee>=0.4.1 # MIT, used by ansible-compat
 yamllint >= 1.30.0 # GPLv3
-wcmatch>=8.1.2 # MIT
+wcmatch>=8.1.2; python_version < '3.12' # MIT
+wcmatch>=8.5.0; python_version >= '3.12' # MIT

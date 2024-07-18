@@ -285,8 +285,6 @@ def _get_rule_skips_from_yaml(
             for element in obj:
                 if isinstance(element, dict | list):
                     traverse_yaml(element)
-        else:
-            return
 
     if isinstance(yaml_input, dict | list):
         traverse_yaml(yaml_input)

@@ -27,7 +27,7 @@ def test_negative_with_id() -> None:
 
 def test_negative_with_tag() -> None:
     """Negative test with_tag."""
-    with_tag = "trailing-spaces"
+    with_tag = "yaml[trailing-spaces]"
     bad_runner = Runner(FILE, rules=collection, tags=frozenset([with_tag]))
     errs = bad_runner.run()
     assert len(errs) == 1
@@ -37,14 +37,21 @@ def test_positive_skip_id() -> None:
     """Positive test skip_id."""
     skip_id = "yaml"
     good_runner = Runner(FILE, rules=collection, skip_list=[skip_id])
-    assert [] == good_runner.run()
+    assert good_runner.run() == []
+
+
+def test_positive_skip_id_2() -> None:
+    """Positive test skip_id."""
+    skip_id = "key-order"
+    good_runner = Runner(FILE, rules=collection, tags=frozenset([skip_id]))
+    assert good_runner.run() == []
 
 
 def test_positive_skip_tag() -> None:
     """Positive test skip_tag."""
     skip_tag = "yaml[trailing-spaces]"
     good_runner = Runner(FILE, rules=collection, skip_list=[skip_tag])
-    assert [] == good_runner.run()
+    assert good_runner.run() == []
 
 
 def test_run_skip_rule() -> None:

@@ -1,0 +1,19 @@
+# This file is kept in a different directory than .config in order to not be
+# automatically updated by dependabot. This should be kept in sync with
+# minimal requirements configured inside .config/requirements.in
+ansible-core==2.13.0
+ansible-compat==24.5.1 # GPLv3
+black==24.3.0 # MIT (security)
+filelock==3.3.0 # The Unlicense
+jsonschema==4.10.0 # MIT, version needed for improved errors
+packaging==21.3
+pathspec==0.10.3
+pyyaml==5.4.1
+rich==12.0.0
+ruamel.yaml==0.18.5 # MIT
+subprocess-tee==0.4.1 # MIT, used by ansible-compat
+# https://packages.ubuntu.com/noble/python3-wcmatch
+# https://packages.fedoraproject.org/pkgs/python-wcmatch/python3-wcmatch/
+wcmatch==8.1.2; python_version < '3.12' # EPEL 8
+wcmatch==8.5.0; python_version >= '3.12'
+yamllint == 1.30.0

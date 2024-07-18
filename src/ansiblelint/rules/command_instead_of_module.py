@@ -26,7 +26,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import convert_to_boolean, get_first_cmd_arg, get_second_cmd_arg
+from ansiblelint.utils import get_first_cmd_arg, get_second_cmd_arg
 
 if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
@@ -72,6 +72,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
         "git": ["branch", "log", "lfs", "rev-parse"],
         "systemctl": [
             "--version",
+            "get-default",
             "kill",
             "set-default",
             "set-property",
@@ -87,6 +88,12 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
         task: Task,
         file: Lintable | None = None,
     ) -> bool | str:
+        """Check if a command is used instead of an appropriate module.
+
+        :param task: Task to check for shell usage
+        :param file: File to lint
+        :returns: False if command module isn't used, or a string showing the command used
+        """
         if task["action"]["__ansible_module__"] not in self._commands:
             return False
 
@@ -105,9 +112,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
         ):
             return False
 
-        if executable in self._modules and convert_to_boolean(
-            task["action"].get("warn", True),
-        ):
+        if executable in self._modules:
             message = "{0} used in place of {1} module"
             return message.format(executable, self._modules[executable])
         return False
@@ -140,7 +145,12 @@ if "pytest" in sys.modules:
         file: str,
         expected: int,
     ) -> None:
-        """Validate that rule works as intended."""
+        """Validate that rule works as intended.
+
+        :param default_rules_collection: Default rules for testing
+        :param file: Test file to check for violations
+        :expected: Expected number of errors
+        """
         results = Runner(file, rules=default_rules_collection).run()
 
         for result in results:

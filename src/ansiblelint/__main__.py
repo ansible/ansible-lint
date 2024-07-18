@@ -151,7 +151,7 @@ def initialize_options(arguments: list[str] | None = None) -> None | FileLock:
         try:
             cache_dir_lock.acquire(timeout=180)
         except Timeout:  # pragma: no cover
-            _logger.error(
+            _logger.error(  # noqa: TRY400
                 "Timeout waiting for another instance of ansible-lint to release the lock.",
             )
             sys.exit(RC.LOCK_TIMEOUT)
@@ -373,7 +373,15 @@ def main(argv: list[str] | None = None) -> int:
             match.ignored = True
             _logger.debug("Ignored: %s", match)
 
+    if app.yamllint_config.incompatible:
+        logging.log(
+            level=logging.ERROR if options.write_list else logging.WARNING,
+            msg=app.yamllint_config.incompatible,
+        )
+
     if options.write_list:
+        if app.yamllint_config.incompatible:
+            sys.exit(RC.INVALID_CONFIG)
         fix(runtime_options=options, result=result, rules=rules)
 
     app.render_matches(result.matches)
@@ -450,13 +458,11 @@ def path_inject(own_location: str = "") -> None:
         inject_paths.append(str(py_path))
 
     # last option, if nothing else is found, just look next to ourselves...
-    own_location = os.path.realpath(own_location)
-    if (
-        own_location
-        and (Path(own_location).parent / "ansible").exists()
-        and str(Path(own_location).parent) not in paths
-    ):
-        inject_paths.append(str(Path(own_location).parent))
+    if own_location:
+        own_location = os.path.realpath(own_location)
+        parent = Path(own_location).parent
+        if (parent / "ansible").exists() and str(parent) not in paths:
+            inject_paths.append(str(parent))
 
     if not os.environ.get("PYENV_VIRTUAL_ENV", None):
         if inject_paths and not all("pipx" in p for p in inject_paths):

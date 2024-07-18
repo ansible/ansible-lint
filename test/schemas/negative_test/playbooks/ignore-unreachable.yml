@@ -1,0 +1,13 @@
+---
+- name: Test
+  hosts: localhost
+  tasks:
+    - name: Debug
+      ansible.builtin.debug:
+        msg: ignore_unreachable should not be a string
+      ignore_unreachable: "yes"
+
+    - name: Debug
+      ansible.builtin.debug:
+        msg: jinja evaluation should not be a string
+      ignore_unreachable: 123

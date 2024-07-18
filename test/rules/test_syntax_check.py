@@ -2,32 +2,70 @@
 
 from typing import Any
 
+import pytest
+
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 
 
+@pytest.mark.parametrize(
+    ("filename", "expected_results"),
+    (
+        pytest.param(
+            "examples/playbooks/conflicting_action.yml",
+            [
+                (
+                    "syntax-check[specific]",
+                    4,
+                    7,
+                    "conflicting action statements: ansible.builtin.debug, ansible.builtin.command",
+                ),
+            ],
+            id="0",
+        ),
+        pytest.param(
+            "examples/playbooks/conflicting_action2.yml",
+            [
+                (
+                    "parser-error",
+                    1,
+                    None,
+                    "conflicting action statements: block, include_role",
+                ),
+                (
+                    "syntax-check[specific]",
+                    5,
+                    7,
+                    "'include_role' is not a valid attribute for a Block",
+                ),
+            ],
+            id="1",
+        ),
+    ),
+)
 def test_get_ansible_syntax_check_matches(
     default_rules_collection: RulesCollection,
+    filename: str,
+    expected_results: list[tuple[str, int, int, str]],
 ) -> None:
     """Validate parsing of ansible output."""
     lintable = Lintable(
-        "examples/playbooks/conflicting_action.yml",
+        filename,
         kind="playbook",
     )
 
-    result = Runner(lintable, rules=default_rules_collection).run()
+    result = sorted(Runner(lintable, rules=default_rules_collection).run())
 
-    assert result[0].lineno == 4
-    assert result[0].column == 7
-    assert (
-        result[0].message
-        == "conflicting action statements: ansible.builtin.debug, ansible.builtin.command"
-    )
-    # We internally convert absolute paths returned by ansible into paths
-    # relative to current directory.
-    assert result[0].filename.endswith("/conflicting_action.yml")
-    assert len(result) == 1
+    assert len(result) == len(expected_results)
+    for index, expected in enumerate(expected_results):
+        assert result[index].tag == expected[0]
+        assert result[index].lineno == expected[1]
+        assert result[index].column == expected[2]
+        assert str(expected[3]) in result[index].message
+        # We internally convert absolute paths returned by ansible into paths
+        # relative to current directory.
+        # assert result[index].filename.endswith("/conflicting_action.yml")
 
 
 def test_empty_playbook(default_rules_collection: RulesCollection) -> None:

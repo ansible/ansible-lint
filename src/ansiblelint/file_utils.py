@@ -17,11 +17,14 @@ import wcmatch.pathlib
 import wcmatch.wcmatch
 from yaml.error import YAMLError
 
+from ansiblelint.app import get_app
 from ansiblelint.config import ANSIBLE_OWNED_KINDS, BASE_KINDS, Options, options
 from ansiblelint.constants import CONFIG_FILENAMES, FileType, States
 
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
+
+    from ansiblelint.errors import MatchError
 
 
 _logger = logging.getLogger(__package__)
@@ -70,9 +73,9 @@ def is_relative_to(path: Path, *other: Any) -> bool:
     """Return True if the path is relative to another path or False."""
     try:
         path.resolve().absolute().relative_to(*other)
-        return True
     except ValueError:
         return False
+    return True
 
 
 def normpath_path(path: str | Path) -> Path:
@@ -201,6 +204,7 @@ class Lintable:
         self.line_offset = (
             0  # Amount to offset line numbers by to get accurate position
         )
+        self.matches: list[MatchError] = []
 
         if isinstance(name, str):
             name = Path(name)
@@ -223,7 +227,12 @@ class Lintable:
         parts = self.path.parent.parts
         if "roles" in parts:
             role = self.path
-            while role.parent.name != "roles" and role.name:
+            roles_path = get_app(cached=True).runtime.config.default_roles_path
+            while (
+                str(role.parent.absolute()) not in roles_path
+                and role.parent.name != "roles"
+                and role.name
+            ):
                 role = role.parent
             if role.exists():
                 self.role = role.name
@@ -391,6 +400,12 @@ class Lintable:
         """Return true for YAML files that are managed by Ansible."""
         return self.kind in ANSIBLE_OWNED_KINDS
 
+    def failed(self) -> bool:
+        """Return true if we already found syntax-check errors on this file."""
+        return any(
+            match.rule.id in ("syntax-check", "load-failure") for match in self.matches
+        )
+
     @property
     def data(self) -> Any:
         """Return loaded data representation for current file, if possible."""
@@ -415,7 +430,11 @@ class Lintable:
                         # pylint: disable=import-outside-toplevel
                         from ansiblelint.skip_utils import append_skipped_rules
 
-                    self.state = append_skipped_rules(self.state, self)
+                    # pylint: disable=possibly-used-before-assignment
+                    self.state = append_skipped_rules(
+                        self.state,
+                        self,
+                    )
                 else:
                     logging.debug(
                         "data set to None for %s due to being '%s' (%s) kind.",

@@ -58,6 +58,7 @@ class GalaxyRule(AnsibleLintRule):
         changelog_found = 0
         changelog_paths = [
             base_path / "changelogs" / "changelog.yaml",
+            base_path / "changelogs" / "changelog.yml",
             base_path / "CHANGELOG.rst",
             base_path / "CHANGELOG.md",
         ]
@@ -189,7 +190,7 @@ if "pytest" in sys.modules:
         collection.register(GalaxyRule())
         success = "examples/.collection/galaxy.yml"
         good_runner = Runner(success, rules=collection)
-        assert [] == good_runner.run()
+        assert good_runner.run() == []
 
     def test_galaxy_collection_version_negative() -> None:
         """Negative test for collection version in galaxy."""

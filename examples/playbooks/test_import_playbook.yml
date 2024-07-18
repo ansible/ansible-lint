@@ -1,0 +1,5 @@
+---
+- name: Fixture 1 for bug 4024
+  import_playbook: community.molecule.validate.yml
+- name: Fixture 2 for bug 4024
+  ansible.builtin.import_playbook: community.molecule.validate.yml

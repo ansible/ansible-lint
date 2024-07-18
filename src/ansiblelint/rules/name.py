@@ -6,6 +6,9 @@ import re
 import sys
 from typing import TYPE_CHECKING, Any
 
+import wcmatch.pathlib
+import wcmatch.wcmatch
+
 from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
@@ -40,9 +43,11 @@ class NameRule(AnsibleLintRule, TransformMixin):
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific play (entry in playbook)."""
-        results = []
+        results: list[MatchError] = []
         if file.kind != "playbook":
             return []
+        if file.failed():
+            return results
         if "name" not in data:
             return [
                 self.create_matcherror(
@@ -66,7 +71,9 @@ class NameRule(AnsibleLintRule, TransformMixin):
         task: Task,
         file: Lintable | None = None,
     ) -> list[MatchError]:
-        results = []
+        results: list[MatchError] = []
+        if file and file.failed():
+            return results
         name = task.get("name")
         if not name:
             results.append(
@@ -85,6 +92,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
                     lineno=task[LINE_NUMBER_KEY],
                 ),
             )
+
         return results
 
     def _prefix_check(
@@ -121,10 +129,15 @@ class NameRule(AnsibleLintRule, TransformMixin):
         # stage one check prefix
         effective_name = name
         if self._collection and lintable:
-            prefix = self._collection.options.task_name_prefix.format(
-                stem=lintable.path.stem,
-            )
-            if lintable.kind == "tasks" and lintable.path.stem != "main":
+            full_stem = self._find_full_stem(lintable)
+            stems = [
+                self._collection.options.task_name_prefix.format(stem=stem)
+                for stem in wcmatch.pathlib.PurePath(
+                    full_stem,
+                ).parts
+            ]
+            prefix = "".join(stems)
+            if lintable.kind == "tasks" and full_stem != "main":
                 if not name.startswith(prefix):
                     # For the moment in order to raise errors this rule needs to be
                     # enabled manually. Still, we do allow use of prefixes even without
@@ -166,6 +179,38 @@ class NameRule(AnsibleLintRule, TransformMixin):
             )
         return results
 
+    def _find_full_stem(self, lintable: Lintable) -> str:
+        lintable_dir = wcmatch.pathlib.PurePath(lintable.dir)
+        stem = lintable.path.stem
+        kind = str(lintable.kind)
+
+        stems = [lintable_dir.name]
+        lintable_dir = lintable_dir.parent
+        pathex = lintable_dir / stem
+        glob = ""
+
+        if self.options:
+            for entry in self.options.kinds:
+                for key, value in entry.items():
+                    if kind == key:
+                        glob = value
+
+        while pathex.globmatch(
+            glob,
+            flags=(
+                wcmatch.pathlib.GLOBSTAR
+                | wcmatch.pathlib.BRACE
+                | wcmatch.pathlib.DOTGLOB
+            ),
+        ):
+            stems.insert(0, lintable_dir.name)
+            lintable_dir = lintable_dir.parent
+            pathex = lintable_dir / stem
+
+        if stems[0].startswith(kind):
+            del stems[0]
+        return str(wcmatch.pathlib.PurePath(*stems, stem))
+
     def transform(
         self,
         match: MatchError,
@@ -191,6 +236,11 @@ class NameRule(AnsibleLintRule, TransformMixin):
                 for item in data:
                     if isinstance(item, dict) and "tasks" in item:
                         for task in item["tasks"]:
+                            # We want to rewrite task names in the notify keyword, but
+                            # if there isn't a notify section, there's nothing to do.
+                            if "notify" not in task:
+                                continue
+
                             if (
                                 isinstance(task["notify"], str)
                                 and orig_task_name == task["notify"]
@@ -200,15 +250,6 @@ class NameRule(AnsibleLintRule, TransformMixin):
                                 for idx in range(len(task["notify"])):
                                     if orig_task_name == task["notify"][idx]:
                                         task["notify"][idx] = updated_task_name
-
-                    if isinstance(item, dict) and "handlers" in item:
-                        for task in item["handlers"]:
-                            listener_task_name = task.get("listen", None)
-                            if (
-                                listener_task_name
-                                and listener_task_name == orig_task_name
-                            ):
-                                task["listen"] = updated_task_name
 
                 target_task["name"] = updated_task_name
                 match.fixed = True
@@ -224,7 +265,7 @@ if "pytest" in sys.modules:
         collection.register(NameRule())
         success = "examples/playbooks/rule-name-missing-pass.yml"
         good_runner = Runner(success, rules=collection)
-        assert [] == good_runner.run()
+        assert good_runner.run() == []
 
     def test_file_negative() -> None:
         """Negative test for name[missing]."""
@@ -234,6 +275,19 @@ if "pytest" in sys.modules:
         bad_runner = Runner(failure, rules=collection)
         errs = bad_runner.run()
         assert len(errs) == 5
+
+    def test_name_prefix_positive(config_options: Options) -> None:
+        """Positive test for name[prefix]."""
+        config_options.enable_list = ["name[prefix]"]
+        collection = RulesCollection(options=config_options)
+        collection.register(NameRule())
+        success = Lintable(
+            "examples/playbooks/tasks/main.yml",
+            kind="tasks",
+        )
+        good_runner = Runner(success, rules=collection)
+        results = good_runner.run()
+        assert len(results) == 0
 
     def test_name_prefix_negative(config_options: Options) -> None:
         """Negative test for name[missing]."""
@@ -251,6 +305,36 @@ if "pytest" in sys.modules:
         assert results[0].tag == "name[casing]"
         assert results[1].tag == "name[prefix]"
         assert results[2].tag == "name[prefix]"
+
+    def test_name_prefix_negative_2(config_options: Options) -> None:
+        """Negative test for name[prefix]."""
+        config_options.enable_list = ["name[prefix]"]
+        collection = RulesCollection(options=config_options)
+        collection.register(NameRule())
+        failure = Lintable(
+            "examples/playbooks/tasks/partial_prefix/foo.yml",
+            kind="tasks",
+        )
+        bad_runner = Runner(failure, rules=collection)
+        results = bad_runner.run()
+        assert len(results) == 2
+        assert results[0].tag == "name[prefix]"
+        assert results[1].tag == "name[prefix]"
+
+    def test_name_prefix_negative_3(config_options: Options) -> None:
+        """Negative test for name[prefix]."""
+        config_options.enable_list = ["name[prefix]"]
+        collection = RulesCollection(options=config_options)
+        collection.register(NameRule())
+        failure = Lintable(
+            "examples/playbooks/tasks/partial_prefix/main.yml",
+            kind="tasks",
+        )
+        bad_runner = Runner(failure, rules=collection)
+        results = bad_runner.run()
+        assert len(results) == 2
+        assert results[0].tag == "name[prefix]"
+        assert results[1].tag == "name[prefix]"
 
     def test_rule_name_lowercase() -> None:
         """Negative test for a task that starts with lowercase."""

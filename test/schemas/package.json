@@ -1,28 +1,29 @@
 {
   "dependencies": {
-    "ajv-formats": "^2.1.1",
+    "ajv-formats": "^3.0.1",
     "js-yaml": "^4.1.0",
     "safe-stable-stringify": "^2.4.3",
     "ts-node": "^10.9.2",
-    "vscode-json-languageservice": "^5.3.7"
+    "vscode-json-languageservice": "^5.3.11"
   },
   "scripts": {
-    "compile": "tsc -p ./src",
+    "compile": "tsc",
     "deps": "npx --yes npm-check-updates -u && npm install --ignore-scripts",
     "test": "python3 src/rebuild.py && mocha"
   },
   "devDependencies": {
-    "@types/chai": "^4.3.11",
+    "@types/chai": "^4.3.16",
     "@types/js-yaml": "^4.0.9",
     "@types/minimatch": "^5.1.2",
     "@types/mocha": "^10.0.6",
-    "@types/node": "^20.10.6",
-    "chai": "^4.3.10",
-    "minimatch": "^9.0.3",
-    "mocha": "^10.2.0",
-    "typescript": "^5.3.3"
+    "@types/node": "^20.12.13",
+    "chai": "^5.1.1",
+    "minimatch": "^9.0.4",
+    "mocha": "^10.4.0",
+    "typescript": "^5.4.5"
   },
   "directories": {
     "test": "./src"
-  }
+  },
+  "type": "module"
 }

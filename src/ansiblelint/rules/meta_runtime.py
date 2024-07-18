@@ -30,12 +30,8 @@ class CheckRequiresAnsibleVersion(AnsibleLintRule):
     tags = ["metadata"]
     version_added = "v6.11.0 (last update)"
 
-    # Refer to https://access.redhat.com/support/policy/updates/ansible-automation-platform
-    # Also add devel to this list
-    supported_ansible = ["2.14.", "2.15.", "2.16."]
-    supported_ansible_examples = [f">={x}0" for x in supported_ansible]
     _ids = {
-        "meta-runtime[unsupported-version]": f"'requires_ansible' key must refer to a currently supported version such as: {', '.join(supported_ansible_examples)}",
+        "meta-runtime[unsupported-version]": "'requires_ansible' key must refer to a currently supported version",
         "meta-runtime[invalid-version]": "'requires_ansible' is not a valid requirement specification",
     }
 
@@ -50,22 +46,26 @@ class CheckRequiresAnsibleVersion(AnsibleLintRule):
         if file.kind != "meta-runtime":
             return []
 
-        version_required = file.data.get("requires_ansible", None)
+        requires_ansible = file.data.get("requires_ansible", None)
 
-        if version_required:
-            if not any(
-                version in version_required for version in self.supported_ansible
+        if requires_ansible:
+            if self.options and not any(
+                version in requires_ansible
+                for version in self.options.supported_ansible
             ):
+                supported_ansible = [f">={x}0" for x in self.options.supported_ansible]
+                msg = f"'requires_ansible' key must refer to a currently supported version such as: {', '.join(supported_ansible)}"
+
                 results.append(
                     self.create_matcherror(
-                        message=self._ids["meta-runtime[unsupported-version]"],
+                        message=msg,
                         tag="meta-runtime[unsupported-version]",
                         filename=file,
                     ),
                 )
 
             try:
-                SpecifierSet(version_required)
+                SpecifierSet(requires_ansible)
             except ValueError:
                 results.append(
                     self.create_matcherror(
@@ -90,10 +90,10 @@ if "pytest" in sys.modules:
         ("test_file", "failures", "tags"),
         (
             pytest.param(
-                "examples/meta_runtime_version_checks/pass/meta/runtime.yml",
+                "examples/meta_runtime_version_checks/pass_0/meta/runtime.yml",
                 0,
                 "meta-runtime[unsupported-version]",
-                id="pass",
+                id="pass0",
             ),
             pytest.param(
                 "examples/meta_runtime_version_checks/fail_0/meta/runtime.yml",
@@ -115,16 +115,37 @@ if "pytest" in sys.modules:
             ),
         ),
     )
-    def test_meta_supported_version(
+    def test_default_meta_supported_version(
         default_rules_collection: RulesCollection,
         test_file: str,
         failures: int,
         tags: str,
     ) -> None:
-        """Test rule matches."""
+        """Test for default supported ansible versions."""
         default_rules_collection.register(CheckRequiresAnsibleVersion())
         results = Runner(test_file, rules=default_rules_collection).run()
         for result in results:
             assert result.rule.id == CheckRequiresAnsibleVersion().id
             assert result.tag == tags
+        assert len(results) == failures
+
+    @pytest.mark.parametrize(
+        ("test_file", "failures"),
+        (
+            pytest.param(
+                "examples/meta_runtime_version_checks/pass_1/meta/runtime.yml",
+                0,
+                id="pass1",
+            ),
+        ),
+    )
+    def test_added_meta_supported_version(
+        default_rules_collection: RulesCollection,
+        test_file: str,
+        failures: int,
+    ) -> None:
+        """Test for added supported ansible versions in the config."""
+        default_rules_collection.register(CheckRequiresAnsibleVersion())
+        default_rules_collection.options.supported_ansible_also = ["2.9"]
+        results = Runner(test_file, rules=default_rules_collection).run()
         assert len(results) == failures

@@ -11,6 +11,7 @@
   tasks:
     - ansible.builtin.include_tasks: tasks/x.yml
     - ansible.builtin.include_tasks: tasks/x.yml y=z
+    - ansible.builtin.include_tasks: file=tasks/x.yml
 
   handlers:
     - ansible.builtin.include_tasks: handlers/y.yml

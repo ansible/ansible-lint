@@ -1,17 +1,18 @@
 """Tests for yaml-related utility functions."""
 
+# pylint: disable=too-many-lines
 from __future__ import annotations
 
 from io import StringIO
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import pytest
 from ruamel.yaml.main import YAML
 from yamllint.linter import run as run_yamllint
 
 import ansiblelint.yaml_utils
-from ansiblelint.file_utils import Lintable
+from ansiblelint.file_utils import Lintable, cwd
 from ansiblelint.utils import task_in_list
 
 if TYPE_CHECKING:
@@ -260,6 +261,7 @@ def test_fmt(before: str, after: str, version: tuple[int, int] | None) -> None:
         pytest.param("fmt-3.yml", (1, 1), id="3"),
         pytest.param("fmt-4.yml", (1, 1), id="4"),
         pytest.param("fmt-5.yml", (1, 1), id="5"),
+        pytest.param("fmt-hex.yml", (1, 1), id="hex"),
     ),
 )
 def test_formatted_yaml_loader_dumper(
@@ -766,12 +768,12 @@ def test_get_path_to_play(
         pytest.param(
             "examples/playbooks/include.yml",
             14,
-            [0, "tasks", 1],
+            [0, "tasks", 2],
             id="playbook-multi_tasks_blocks-tasks_last_task_before_handlers",
         ),
         pytest.param(
             "examples/playbooks/include.yml",
-            16,
+            17,
             [0, "handlers", 0],
             id="playbook-multi_tasks_blocks-handlers_task",
         ),
@@ -989,3 +991,35 @@ def test_deannotate(
 ) -> None:
     """Ensure deannotate works as intended."""
     assert ansiblelint.yaml_utils.deannotate(before) == after
+
+
+def test_yamllint_incompatible_config() -> None:
+    """Ensure we can detect incompatible yamllint settings."""
+    with (cwd(Path("examples/yamllint/incompatible-config")),):
+        config = ansiblelint.yaml_utils.load_yamllint_config()
+        assert config.incompatible
+
+
+@pytest.mark.parametrize(
+    ("yaml_version", "explicit_start"),
+    (
+        pytest.param((1, 1), True),
+        pytest.param((1, 1), False),
+    ),
+)
+def test_document_start(
+    yaml_version: tuple[int, int] | None,
+    explicit_start: bool,
+) -> None:
+    """Ensure the explicit_start config option from .yamllint is applied correctly."""
+    config = ansiblelint.yaml_utils.FormattedYAML.default_config
+    config["explicit_start"] = explicit_start
+
+    yaml = ansiblelint.yaml_utils.FormattedYAML(
+        version=yaml_version,
+        config=cast(dict[str, bool | int | str], config),
+    )
+    assert (
+        yaml.dumps(yaml.load(_SINGLE_QUOTE_WITHOUT_INDENTS)).startswith("---")
+        == explicit_start
+    )

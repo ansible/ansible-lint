@@ -37,7 +37,7 @@ def pytest_configure(config: pytest.Config) -> None:
         # might depend on these. This approach is compatible with GHA caching.
         try:
             subprocess.check_output(
-                ["./tools/install-reqs.sh"],  # noqa: S603
+                ["./tools/install-reqs.sh"],
                 stderr=subprocess.PIPE,
                 text=True,
             )

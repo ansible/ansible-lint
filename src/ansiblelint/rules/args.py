@@ -144,14 +144,10 @@ class ArgsRule(AnsibleLintRule):
             CustomAnsibleModule,
         ):
             spec = importlib.util.spec_from_file_location(
-                name=loaded_module.resolved_fqcn,
+                name=loaded_module.plugin_resolved_name,
                 location=loaded_module.plugin_resolved_path,
             )
-            if spec:
-                assert spec.loader is not None
-                module = importlib.util.module_from_spec(spec)
-                spec.loader.exec_module(module)
-            else:
+            if not spec:
                 assert file is not None
                 _logger.warning(
                     "Unable to load module %s at %s:%s for options validation",
@@ -160,6 +156,9 @@ class ArgsRule(AnsibleLintRule):
                     task[LINE_NUMBER_KEY],
                 )
                 return []
+            assert spec.loader is not None
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
 
             try:
                 if not hasattr(module, "main"):
@@ -190,9 +189,9 @@ class ArgsRule(AnsibleLintRule):
                         )
 
                 sanitized_results = self._sanitize_results(results, module_name)
-                return sanitized_results
             except ValidationPassedError:
                 return []
+            return sanitized_results
 
     # pylint: disable=unused-argument
     def _sanitize_results(

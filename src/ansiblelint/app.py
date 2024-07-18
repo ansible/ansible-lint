@@ -6,6 +6,7 @@ import copy
 import itertools
 import logging
 import os
+import sys
 from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -21,6 +22,7 @@ from ansiblelint.config import PROFILES, Options, get_version_warning
 from ansiblelint.config import options as default_options
 from ansiblelint.constants import RC, RULE_DOC_URL
 from ansiblelint.loaders import IGNORE_FILE
+from ansiblelint.requirements import Reqs
 from ansiblelint.stats import SummarizedResults, TagStats
 
 if TYPE_CHECKING:
@@ -31,6 +33,7 @@ if TYPE_CHECKING:
 
 
 _logger = logging.getLogger(__package__)
+_CACHED_APP = None
 
 
 class App:
@@ -52,6 +55,20 @@ class App:
             require_module=True,
             verbosity=options.verbosity,
         )
+        self.reqs = Reqs("ansible-lint")
+        package = "ansible-core"
+        if not self.reqs.matches(
+            package,
+            str(self.runtime.version),
+        ):  # pragma: no cover
+            msg = f"ansible-lint requires {package}{','.join(str(x) for x in self.reqs[package])} and current version is {self.runtime.version}"
+            logging.error(msg)
+            sys.exit(RC.INVALID_CONFIG)
+
+        # pylint: disable=import-outside-toplevel
+        from ansiblelint.yaml_utils import load_yamllint_config
+
+        self.yamllint_config = load_yamllint_config()
 
     def render_matches(self, matches: list[MatchError]) -> None:
         """Display given matches (if they are not fixed)."""
@@ -386,8 +403,19 @@ def _sanitize_list_options(tag_list: list[str]) -> list[str]:
 
 
 @lru_cache
-def get_app(*, offline: bool | None = None) -> App:
+def get_app(*, offline: bool | None = None, cached: bool = False) -> App:
     """Return the application instance, caching the return value."""
+    # Avoids ever running the app initialization twice if cached argument
+    # is mentioned.
+    if cached:
+        if offline is not None:
+            msg = (
+                "get_app should never be called with other arguments when cached=True."
+            )
+            raise RuntimeError(msg)
+        if cached and _CACHED_APP is not None:
+            return _CACHED_APP
+
     if offline is None:
         offline = default_options.offline
 

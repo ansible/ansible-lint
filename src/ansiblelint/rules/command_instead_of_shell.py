@@ -53,6 +53,12 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule, TransformMixin):
         task: Task,
         file: Lintable | None = None,
     ) -> bool | str:
+        """Check if a shell module is used instead of an appropriate command.
+
+        :param task: Task to check for shell usage
+        :param file: File to lint
+        :returns: False if shell module isn't used, or string output of where it is used
+        """
         # Use unjinja so that we don't match on jinja filters
         # rather than pipes
         if task["action"]["__ansible_module__"] in ["shell", "ansible.builtin.shell"]:
@@ -72,6 +78,12 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule, TransformMixin):
         lintable: Lintable,
         data: CommentedMap | CommentedSeq | str,
     ) -> None:
+        """Transform the data.
+
+        :param match: The match to transform.
+        :param lintable: The file to transform.
+        :param data: The data to transform.
+        """
         if match.tag == "command-instead-of-shell":
             target_task = self.seek(match.yaml_path, data)
             for _ in range(len(target_task)):
@@ -108,7 +120,12 @@ if "pytest" in sys.modules:
         file: str,
         expected: int,
     ) -> None:
-        """Validate that rule works as intended."""
+        """Validate that rule works as intended.
+
+        :param default_rules_collection: Default rules for testing
+        :param file: Test file to check for violations
+        :expected: Expected number of errors
+        """
         results = Runner(file, rules=default_rules_collection).run()
         for result in results:
             assert result.rule.id == UseCommandInsteadOfShellRule.id, result

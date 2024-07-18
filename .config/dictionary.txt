@@ -1,6 +1,5 @@
 Adrián
 Autobuild
-audgirka
 CLICOLOR
 CODENOTIFY
 CODEOWNERS
@@ -10,6 +9,7 @@ Chamoulaud
 DISTRO
 DOTGLOB
 ENVVAR
+EPEL
 EPIPE # linux
 Fimport
 Jython
@@ -44,6 +44,7 @@ apport
 argparsing
 argspecs
 arxcruz
+audgirka
 auditd
 autobuild
 autoclass
@@ -365,6 +366,7 @@ taskincludes
 taskshandlers
 templatevars
 templating
+testcollection
 testinfra
 testmon
 testns
@@ -378,6 +380,7 @@ tmpfs
 toctree
 toidentifier
 tomli
+tomlsort
 toolset
 tripleo
 tuco

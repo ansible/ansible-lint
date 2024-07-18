@@ -1,0 +1,6 @@
+---
+- name: Module relative import
+  hosts: localhost
+  tasks:
+    - name: Module with relative import
+      local.testcollection.module_with_relative_import: {}
