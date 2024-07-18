@@ -61,6 +61,7 @@ enable_list:
   - no-log-password # opt-in
   - no-same-owner # opt-in
   - name[prefix] # opt-in
+  - galaxy-version-incorrect # opt-in
   # add yaml here if you want to avoid ignoring yaml checks when yamllint
   # library is missing. Normally its absence just skips using that rule.
   - yaml
