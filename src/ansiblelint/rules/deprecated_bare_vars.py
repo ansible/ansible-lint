@@ -116,7 +116,7 @@ if "pytest" in sys.modules:
         collection.register(UsingBareVariablesIsDeprecatedRule())
         success = "examples/playbooks/rule-deprecated-bare-vars-pass.yml"
         good_runner = Runner(success, rules=collection)
-        assert [] == good_runner.run()
+        assert good_runner.run() == []
 
     def test_use_bare_negative() -> None:
         """Negative test for deprecated-bare-vars."""

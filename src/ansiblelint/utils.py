@@ -754,10 +754,11 @@ class Task(dict[str, Any]):
         """
         if "args" in self.raw_task:
             return self.raw_task["args"]
-        result = {}
-        for k, v in self.normalized_task["action"].items():
-            if k not in ANNOTATION_KEYS:
-                result[k] = v
+        result = {
+            k: v
+            for k, v in self.normalized_task["action"].items()
+            if k not in ANNOTATION_KEYS
+        }
         return result
 
     @property
