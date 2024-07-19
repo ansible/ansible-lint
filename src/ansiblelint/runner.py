@@ -354,7 +354,7 @@ class Runner:
             # https://github.com/ansible/ansible-lint/issues/3650
             env["ANSIBLE_INVENTORY_ANY_UNPARSED_IS_FAILED"] = "False"
 
-            run = subprocess.run(
+            run = subprocess.run(  # noqa: S603
                 cmd,
                 stdin=subprocess.PIPE,
                 capture_output=True,

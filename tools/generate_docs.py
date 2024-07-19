@@ -10,9 +10,8 @@ from ansiblelint.config import Options
 from ansiblelint.rules import RulesCollection, TransformMixin
 
 if __name__ == "__main__":
-    subprocess.run(
-        "ansible-lint -L --format=md",  # noqa: S607
-        shell=True,
+    subprocess.run(  # noqa: S603
+        ["ansible-lint", "-L", "--format", "md"],  # noqa: S607
         check=True,
         stdout=subprocess.DEVNULL,
     )

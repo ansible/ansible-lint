@@ -14,5 +14,5 @@ def test_make_module_stub(config_options: Options) -> None:
     config_options.cache_dir = Path()  # current directory
     with pytest.raises(SystemExit) as exc:
         _make_module_stub(module_name="", options=config_options)
-    assert exc.type == SystemExit
+    assert exc.type is SystemExit
     assert exc.value.code == RC.INVALID_CONFIG

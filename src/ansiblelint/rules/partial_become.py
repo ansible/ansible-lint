@@ -150,9 +150,7 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule, TransformMixin):
         """
         if any("include" in key for key in data):
             return True
-        if "notify" in data:
-            return True
-        return False
+        return "notify" in data
 
     def _transform_plays(self, plays: CommentedSeq) -> None:
         """Transform the plays.

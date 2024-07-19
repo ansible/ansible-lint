@@ -31,14 +31,11 @@ class IgnoreErrorsRule(AnsibleLintRule):
         task: Task,
         file: Lintable | None = None,
     ) -> bool | str:
-        if (
+        return (
             task.get("ignore_errors")
             and task.get("ignore_errors") != "{{ ansible_check_mode }}"
             and not task.get("register")
-        ):
-            return True
-
-        return False
+        )
 
 
 if "pytest" in sys.modules:

@@ -44,10 +44,7 @@ class RoleRelativePath(AnsibleLintRule):
             return False
 
         path_to_check = f"../{self._module_to_path_folder[module]}"
-        if path_to_check in task["action"]["src"]:
-            return True
-
-        return False
+        return path_to_check in task["action"]["src"]
 
 
 # testing code to be loaded only with pytest or when executed the rule file
