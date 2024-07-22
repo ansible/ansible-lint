@@ -63,7 +63,7 @@ because it helps those tools better distinguish between random YAML files and
 files managed by Ansible. When you call `ansible-lint` without arguments, it
 uses internal heuristics to determine file types.
 
-**Roles** and **playbooks** that you want to lint are added as arguments.
+Pass the **roles** and **playbooks** that you want to lint as arguments to the `ansible-lint` command.
 For example, to lint `examples/playbooks/play.yml` and
 `examples/roles/bobbins`, use the following command:
 
