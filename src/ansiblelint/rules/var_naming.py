@@ -5,7 +5,7 @@ from __future__ import annotations
 import keyword
 import re
 import sys
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, NamedTuple
 
 from ansible.parsing.yaml.objects import AnsibleUnicode
 from ansible.vars.reserved import get_reserved_names
@@ -22,11 +22,18 @@ from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, RulesCollection
 from ansiblelint.runner import Runner
 from ansiblelint.skip_utils import get_rule_skips_from_line
-from ansiblelint.text import has_jinja, is_fqcn_or_name
+from ansiblelint.text import has_jinja, is_fqcn, is_fqcn_or_name
 from ansiblelint.utils import parse_yaml_from_file
 
 if TYPE_CHECKING:
     from ansiblelint.utils import Task
+
+
+class Prefix(NamedTuple):
+    """Prefix."""
+
+    value: str = ""
+    from_fqcn: bool = False
 
 
 class VariableNamingRule(AnsibleLintRule):
@@ -109,7 +116,7 @@ class VariableNamingRule(AnsibleLintRule):
         self,
         ident: str,
         *,
-        prefix: str = "",
+        prefix: Prefix | None = None,
     ) -> MatchError | None:
         """Return a MatchError if the variable name is not valid, otherwise None."""
         if not isinstance(ident, str):  # pragma: no cover
@@ -160,7 +167,9 @@ class VariableNamingRule(AnsibleLintRule):
                 rule=self,
             )
 
-        if not bool(self.re_pattern.match(ident)):
+        if not bool(self.re_pattern.match(ident)) and (
+            not prefix or not prefix.from_fqcn
+        ):
             return MatchError(
                 tag="var-naming[pattern]",
                 message=f"Variables names should match {self.re_pattern_str} regex. ({ident})",
@@ -169,13 +178,13 @@ class VariableNamingRule(AnsibleLintRule):
 
         if (
             prefix
-            and not ident.lstrip("_").startswith(f"{prefix}_")
-            and not has_jinja(prefix)
-            and is_fqcn_or_name(prefix)
+            and not ident.lstrip("_").startswith(f"{prefix.value}_")
+            and not has_jinja(prefix.value)
+            and is_fqcn_or_name(prefix.value)
         ):
             return MatchError(
                 tag="var-naming[no-role-prefix]",
-                message=f"Variables names from within roles should use {prefix}_ as a prefix.",
+                message=f"Variables names from within roles should use {prefix.value}_ as a prefix.",
                 rule=self,
             )
         return None
@@ -204,10 +213,13 @@ class VariableNamingRule(AnsibleLintRule):
             if isinstance(role, AnsibleUnicode):
                 continue
             role_fqcn = role.get("role", role.get("name"))
-            prefix = role_fqcn.split("/" if "/" in role_fqcn else ".")[-1]
+            prefix = self._parse_prefix(role_fqcn)
             for key in list(role.keys()):
                 if key not in PLAYBOOK_ROLE_KEYWORDS:
-                    match_error = self.get_var_naming_matcherror(key, prefix=prefix)
+                    match_error = self.get_var_naming_matcherror(
+                        key,
+                        prefix=prefix,
+                    )
                     if match_error:
                         match_error.filename = str(file.path)
                         match_error.message += f" (vars: {key})"
@@ -220,7 +232,10 @@ class VariableNamingRule(AnsibleLintRule):
 
             our_vars = role.get("vars", {})
             for key in our_vars:
-                match_error = self.get_var_naming_matcherror(key, prefix=prefix)
+                match_error = self.get_var_naming_matcherror(
+                    key,
+                    prefix=prefix,
+                )
                 if match_error:
                     match_error.filename = str(file.path)
                     match_error.message += f" (vars: {key})"
@@ -250,10 +265,10 @@ class VariableNamingRule(AnsibleLintRule):
     ) -> list[MatchError]:
         """Return matches for task based variables."""
         results = []
-        prefix = ""
+        prefix = Prefix()
         filename = "" if file is None else str(file.path)
         if file and file.parent and file.parent.kind == "role":
-            prefix = file.parent.path.name
+            prefix = Prefix(file.parent.path.name)
         ansible_module = task["action"]["__ansible_module__"]
         # If the task uses the 'vars' section to set variables
         our_vars = task.get("vars", {})
@@ -261,11 +276,14 @@ class VariableNamingRule(AnsibleLintRule):
             action = task["action"]
             if isinstance(action, dict):
                 role_fqcn = action.get("name", "")
-                prefix = role_fqcn.split("/" if "/" in role_fqcn else ".")[-1]
+                prefix = self._parse_prefix(role_fqcn)
         else:
-            prefix = ""
+            prefix = Prefix()
         for key in our_vars:
-            match_error = self.get_var_naming_matcherror(key, prefix=prefix)
+            match_error = self.get_var_naming_matcherror(
+                key,
+                prefix=prefix,
+            )
             if match_error:
                 match_error.filename = filename
                 match_error.lineno = our_vars[LINE_NUMBER_KEY]
@@ -290,7 +308,10 @@ class VariableNamingRule(AnsibleLintRule):
         # If the task registers a variable
         registered_var = task.get("register", None)
         if registered_var:
-            match_error = self.get_var_naming_matcherror(registered_var, prefix=prefix)
+            match_error = self.get_var_naming_matcherror(
+                registered_var,
+                prefix=prefix,
+            )
             if match_error:
                 match_error.message += f" (register: {registered_var})"
                 match_error.filename = filename
@@ -309,7 +330,7 @@ class VariableNamingRule(AnsibleLintRule):
         if str(file.kind) == "vars" and file.data:
             meta_data = parse_yaml_from_file(str(file.path))
             for key in meta_data:
-                prefix = file.role if file.role else ""
+                prefix = Prefix(file.role) if file.role else Prefix()
                 match_error = self.get_var_naming_matcherror(key, prefix=prefix)
                 if match_error:
                     match_error.filename = filename
@@ -329,6 +350,9 @@ class VariableNamingRule(AnsibleLintRule):
         else:
             results.extend(super().matchyaml(file))
         return results
+
+    def _parse_prefix(self, fqcn: str) -> Prefix:
+        return Prefix("" if "." in fqcn else fqcn.split("/")[-1], is_fqcn(fqcn))
 
 
 # testing code to be loaded only with pytest or when executed the rule file
@@ -426,6 +450,17 @@ if "pytest" in sys.modules:
     def test_var_naming_with_pattern() -> None:
         """Test rule matches."""
         role_path = "examples/roles/var_naming_pattern/tasks/main.yml"
+        conf_path = "examples/roles/var_naming_pattern/.ansible-lint"
+        result = run_ansible_lint(
+            f"--config-file={conf_path}",
+            role_path,
+        )
+        assert result.returncode == RC.SUCCESS
+        assert "var-naming" not in result.stdout
+
+    def test_var_naming_with_pattern_foreign_role() -> None:
+        """Test rule matches."""
+        role_path = "examples/playbooks/bug-4095.yml"
         conf_path = "examples/roles/var_naming_pattern/.ansible-lint"
         result = run_ansible_lint(
             f"--config-file={conf_path}",
