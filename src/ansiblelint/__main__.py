@@ -489,9 +489,7 @@ def to_bool(value: Any) -> bool:  # pragma: no cover
         return bool(value)
     if isinstance(value, str):
         value = value.lower()
-    if value in ("yes", "on", "1", "true", 1):
-        return True
-    return False
+    return value in ("yes", "on", "1", "true", 1)
 
 
 def should_do_markup(stream: TextIO = sys.stdout) -> bool:  # pragma: no cover

@@ -44,10 +44,7 @@ class TaskNoLocalAction(AnsibleLintRule, TransformMixin):
     ) -> bool | str:
         """Return matches for a task."""
         raw_task = task["__raw_task__"]
-        if "local_action" in raw_task:
-            return True
-
-        return False
+        return "local_action" in raw_task
 
     def transform(
         self,

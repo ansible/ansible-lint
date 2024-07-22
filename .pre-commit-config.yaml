@@ -70,14 +70,14 @@ repos:
           - prettier-plugin-toml@2.0.1
           - prettier-plugin-sort-json@3.1.0
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v8.8.2
+    rev: v8.10.1
     hooks:
       - id: cspell
         # entry: codespell --relative
         args: [--relative, --no-progress, --no-summary]
         name: Spell check with cspell
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.28.4
+    rev: 0.29.0
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
@@ -137,7 +137,7 @@ repos:
         types: [file, yaml]
         entry: yamllint --strict
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.4.7"
+    rev: "v0.5.3"
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -147,7 +147,7 @@ repos:
       - id: black
         language_version: python3
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.10.0
+    rev: v1.10.1
     hooks:
       - id: mypy
         # empty args needed in order to match mypy cli behavior
@@ -178,7 +178,7 @@ repos:
             plugins/.*
           )$
   - repo: https://github.com/pycqa/pylint
-    rev: v3.2.2
+    rev: v3.2.5
     hooks:
       - id: pylint
         args:

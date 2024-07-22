@@ -265,7 +265,7 @@ if "pytest" in sys.modules:
         collection.register(NameRule())
         success = "examples/playbooks/rule-name-missing-pass.yml"
         good_runner = Runner(success, rules=collection)
-        assert [] == good_runner.run()
+        assert good_runner.run() == []
 
     def test_file_negative() -> None:
         """Negative test for name[missing]."""

@@ -39,7 +39,4 @@ class TaskHasTag(AnsibleLintRule):
             return False
 
         # Task should have tags
-        if "tags" not in task:
-            return True
-
-        return False
+        return "tags" not in task

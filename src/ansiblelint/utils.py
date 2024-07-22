@@ -76,7 +76,7 @@ from ansiblelint.constants import (
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, discover_lintables
 from ansiblelint.skip_utils import is_nested_task
-from ansiblelint.text import has_jinja, removeprefix
+from ansiblelint.text import has_jinja, is_fqcn, removeprefix
 
 if TYPE_CHECKING:
     from ansiblelint.rules import RulesCollection
@@ -505,21 +505,40 @@ def _get_task_handler_children_for_tasks_or_playbooks(
 
 def _rolepath(basedir: str, role: str) -> str | None:
     role_path = None
+    namespace_name, collection_name, role_name = (
+        role.split(".") if is_fqcn(role) else ("", "", role)
+    )
 
     possible_paths = [
         # if included from a playbook
-        path_dwim(basedir, os.path.join("roles", role)),
-        path_dwim(basedir, role),
+        path_dwim(basedir, os.path.join("roles", role_name)),
+        path_dwim(basedir, role_name),
         # if included from roles/[role]/meta/main.yml
-        path_dwim(basedir, os.path.join("..", "..", "..", "roles", role)),
-        path_dwim(basedir, os.path.join("..", "..", role)),
+        path_dwim(basedir, os.path.join("..", "..", "..", "roles", role_name)),
+        path_dwim(basedir, os.path.join("..", "..", role_name)),
         # if checking a role in the current directory
-        path_dwim(basedir, os.path.join("..", role)),
+        path_dwim(basedir, os.path.join("..", role_name)),
     ]
 
     for loc in get_app(cached=True).runtime.config.default_roles_path:
         loc = os.path.expanduser(loc)
-        possible_paths.append(path_dwim(loc, role))
+        possible_paths.append(path_dwim(loc, role_name))
+
+    if namespace_name and collection_name:
+        for loc in get_app(cached=True).runtime.config.collections_paths:
+            loc = os.path.expanduser(loc)
+            possible_paths.append(
+                path_dwim(
+                    loc,
+                    os.path.join(
+                        "ansible_collections",
+                        namespace_name,
+                        collection_name,
+                        "roles",
+                        role_name,
+                    ),
+                ),
+            )
 
     possible_paths.append(path_dwim(basedir, ""))
 
@@ -754,10 +773,11 @@ class Task(dict[str, Any]):
         """
         if "args" in self.raw_task:
             return self.raw_task["args"]
-        result = {}
-        for k, v in self.normalized_task["action"].items():
-            if k not in ANNOTATION_KEYS:
-                result[k] = v
+        result = {
+            k: v
+            for k, v in self.normalized_task["action"].items()
+            if k not in ANNOTATION_KEYS
+        }
         return result
 
     @property

@@ -34,7 +34,9 @@ Each rule definition should also invoke one of the following methods:
 The following is an example rule that uses the `match` method:
 
 ```python
+from typing import Union
 from ansiblelint.rules import AnsibleLintRule
+
 
 class DeprecatedVariableRule(AnsibleLintRule):
     """Deprecated variable declarations."""
@@ -42,7 +44,7 @@ class DeprecatedVariableRule(AnsibleLintRule):
     id = 'EXAMPLE002'
     description = 'Check for lines that have old style ${var} ' + \
                   'declarations'
-    tags = { 'deprecations' }
+    tags = ['deprecations']
 
     def match(self, line: str) -> Union[bool, str]:
         return '${' in line
@@ -51,14 +53,15 @@ class DeprecatedVariableRule(AnsibleLintRule):
 The following is an example rule that uses the `matchtask` method:
 
 ```python
-from typing import TYPE_CHECKING, Any, Dict, Union
+from __future__ import annotations
+from typing import TYPE_CHECKING, Union
 
-import ansiblelint.utils
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
     from ansiblelint.utils import Task
+
 
 class TaskHasTag(AnsibleLintRule):
     """Tasks must have tag."""
@@ -67,16 +70,17 @@ class TaskHasTag(AnsibleLintRule):
     description = 'Tasks must have tag'
     tags = ['productivity']
 
-    def matchtask(self, task: Task, file: 'Lintable' | None = None) -> Union[bool,str]:
+    def matchtask(self,
+                  task: Task,
+                  file: Lintable
+                  | None = None) -> Union[bool, str]:
         # If the task include another task or make the playbook fail
         # Don't force to have a tag
-        if not set(task.keys()).isdisjoint(['include','fail']):
+        if not set(task.keys()).isdisjoint(['include', 'fail']):
             return False
 
-        # Task should have tags
-        if not task.has_key('tags'):
-              return True
-
+        if not task.get("tags"):
+            return True
         return False
 ```
 
