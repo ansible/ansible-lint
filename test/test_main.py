@@ -102,6 +102,13 @@ def test_get_version_warning_no_pip(mocker: MockerFixture) -> None:
 def test_nodeps(lintable: str) -> None:
     """Asserts ability to be called w/ or w/o venv activation."""
     env = os.environ.copy()
+    proc = subprocess.run(
+        [str(py_path / "ansible-lint"), '--nodeps=true', lintable],
+        check=False,
+        capture_output=True,
+        text=True,
+        env=env,
+    )
     env["ANSIBLE_LINT_NODEPS"] = "1"
     py_path = Path(sys.executable).parent
     proc = subprocess.run(
