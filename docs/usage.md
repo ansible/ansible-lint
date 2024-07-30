@@ -63,12 +63,12 @@ because it helps those tools better distinguish between random YAML files and
 files managed by Ansible. When you call `ansible-lint` without arguments, it
 uses internal heuristics to determine file types.
 
-You can specify the list of **roles** or **playbooks** that you want to lint
-with the `-p` argument. For example, to lint `examples/playbooks/play.yml` and
+Pass the **roles** and **playbooks** that you want to lint as arguments to the `ansible-lint` command.
+For example, to lint `examples/playbooks/play.yml` and
 `examples/roles/bobbins`, use the following command:
 
 ```console exec="1" source="console" returncode="2"
-$ ansible-lint --offline -p examples/playbooks/play.yml examples/roles/bobbins
+$ ansible-lint examples/playbooks/play.yml examples/roles/bobbins
 ```
 
 [collection structure layout]:

@@ -37,21 +37,21 @@ def test_positive_skip_id() -> None:
     """Positive test skip_id."""
     skip_id = "yaml"
     good_runner = Runner(FILE, rules=collection, skip_list=[skip_id])
-    assert [] == good_runner.run()
+    assert good_runner.run() == []
 
 
 def test_positive_skip_id_2() -> None:
     """Positive test skip_id."""
     skip_id = "key-order"
     good_runner = Runner(FILE, rules=collection, tags=frozenset([skip_id]))
-    assert [] == good_runner.run()
+    assert good_runner.run() == []
 
 
 def test_positive_skip_tag() -> None:
     """Positive test skip_tag."""
     skip_tag = "yaml[trailing-spaces]"
     good_runner = Runner(FILE, rules=collection, skip_list=[skip_tag])
-    assert [] == good_runner.run()
+    assert good_runner.run() == []
 
 
 def test_run_skip_rule() -> None:

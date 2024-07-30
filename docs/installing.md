@@ -115,7 +115,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run ansible-lint
-        uses: ansible/ansible-lint@v6
+        uses: ansible/ansible-lint@main
 ```
 
 Due to limitations on how GitHub Actions are processing arguments, we do not
