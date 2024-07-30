@@ -124,7 +124,7 @@ def test_nodeps(lintable: str) -> None:
     env = os.environ.copy()
     py_path = Path(sys.executable).parent
     proc = subprocess.run(
-        [str(py_path / "ansible-lint"), '--nodeps=true', lintable],
+        [str(py_path / "ansible-lint"), "--nodeps=true", lintable],
         check=False,
         capture_output=True,
         text=True,
