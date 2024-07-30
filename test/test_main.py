@@ -109,6 +109,7 @@ def test_nodeps(lintable: str) -> None:
         text=True,
         env=env,
     )
+    assert proc.returncode == 0, proc
     env["ANSIBLE_LINT_NODEPS"] = "1"
     py_path = Path(sys.executable).parent
     proc = subprocess.run(
