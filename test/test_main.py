@@ -122,6 +122,7 @@ def test_get_version_warning_offline(mocker: MockerFixture) -> None:
 def test_nodeps(lintable: str) -> None:
     """Asserts ability to be called w/ or w/o venv activation."""
     env = os.environ.copy()
+    py_path = Path(sys.executable).parent
     proc = subprocess.run(
         [str(py_path / "ansible-lint"), '--nodeps=true', lintable],
         check=False,
@@ -131,7 +132,6 @@ def test_nodeps(lintable: str) -> None:
     )
     assert proc.returncode == 0, proc
     env["ANSIBLE_LINT_NODEPS"] = "1"
-    py_path = Path(sys.executable).parent
     proc = subprocess.run(
         [str(py_path / "ansible-lint"), lintable],
         check=False,
