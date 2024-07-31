@@ -200,7 +200,7 @@ def fixture_runner_result(
         pytest.param(
             "examples/playbooks/4114/transform-with-missing-role-and-modules.yml",
             1,
-            True,
+            False,
             True,
             id="4114",
         ),
