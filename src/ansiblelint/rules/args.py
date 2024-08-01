@@ -225,7 +225,7 @@ class ArgsRule(AnsibleLintRule):
             error_message = failed_msg
 
         option_type_check_error = re.search(
-            r"argument '(?P<name>.*)' is of type",
+            r"(argument|option) '(?P<name>.*)' is of type",
             error_message,
         )
         if option_type_check_error:

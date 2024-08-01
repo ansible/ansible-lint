@@ -95,3 +95,14 @@
           src: "args.json"
       action: ansible.builtin.copy
       args: "{{ copy_vars }}" # since, we're unable to analyze jinja, we skip this kind of checks
+
+    - name: Variable containing list of non-strings should pass (Bug 4229)
+      community.general.mas:
+        id: "{{ item }}"
+        state: present
+      loop: "{{ mas_app_ids }}"
+      vars:
+        mas_app_ids:
+          - 409183694
+          - 409203825
+          - 409201541
