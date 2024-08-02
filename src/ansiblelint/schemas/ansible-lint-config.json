@@ -85,6 +85,11 @@
       "title": "Offline",
       "type": "boolean"
     },
+    "nodeps": {
+      "default": null,
+      "title": "Nodeps",
+      "type": ["boolean", "null"]
+    },
     "only_builtins_allow_collections": {
       "items": {
         "type": "string"
