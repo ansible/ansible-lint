@@ -1206,6 +1206,11 @@ class FormattedYAML(YAML):
 
                 full_line_comments.append((i, stripped))
             elif full_line_comments:
+                # match ident of previous non-blank line
+                if not lines[i - 1].lstrip():
+                    prev = lines[i - 2]
+                    space_length = len(prev) - len(prev.lstrip())
+
                 # end of full line comments so adjust to match indent of this line
                 spaces = " " * space_length
                 for index, comment in full_line_comments:

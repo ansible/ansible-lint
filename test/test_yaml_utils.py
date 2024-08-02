@@ -243,6 +243,12 @@ def load_yaml_formatting_fixtures(fixture_filename: str) -> tuple[str, str, str]
         pytest.param("---\nfoo: YES\n", "---\nfoo: true\n", (1, 1), id="9"),
         pytest.param("---\nfoo: YES\n", "---\nfoo: YES\n", (1, 2), id="10"),
         pytest.param("---\nfoo: YES\n", "---\nfoo: YES\n", None, id="11"),
+        pytest.param(
+            "---\n  # quoted-strings:\n  #   quote-type: double\n  #   required: only-when-needed\n\nignore:\n  - secrets.yml\n",
+            "---\n  # quoted-strings:\n  #   quote-type: double\n  #   required: only-when-needed\n\nignore:\n  - secrets.yml\n",
+            None,
+            id="12",
+        ),
     ),
 )
 def test_fmt(before: str, after: str, version: tuple[int, int] | None) -> None:
