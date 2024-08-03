@@ -322,7 +322,7 @@ def get_version_warning() -> str:
         with open(cache_file, encoding="utf-8") as f:
             data = json.load(f)
 
-    if refresh or not data:
+    if not options.offline and (refresh or not data):
         release_url = (
             "https://api.github.com/repos/ansible/ansible-lint/releases/latest"
         )
@@ -339,13 +339,14 @@ def get_version_warning() -> str:
             )
             return ""
 
-    html_url = data["html_url"]
-    new_version = Version(data["tag_name"][1:])  # removing v prefix from tag
+    if data:
+        html_url = data["html_url"]
+        new_version = Version(data["tag_name"][1:])  # removing v prefix from tag
 
-    if current_version > new_version:
-        msg = "[dim]You are using a pre-release version of ansible-lint.[/]"
-    elif current_version < new_version:
-        msg = f"""[warning]A new release of ansible-lint is available: [red]{current_version}[/] → [green][link={html_url}]{new_version}[/][/][/]"""
-        msg += f" Upgrade by running: [info]{pip}[/]"
+        if current_version > new_version:
+            msg = "[dim]You are using a pre-release version of ansible-lint.[/]"
+        elif current_version < new_version:
+            msg = f"""[warning]A new release of ansible-lint is available: [red]{current_version}[/] → [green][link={html_url}]{new_version}[/][/][/]"""
+            msg += f" Upgrade by running: [info]{pip}[/]"
 
     return msg
