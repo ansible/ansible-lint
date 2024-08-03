@@ -4,6 +4,7 @@ import os
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from http.client import RemoteDisconnected
 from pathlib import Path
@@ -11,7 +12,7 @@ from pathlib import Path
 import pytest
 from pytest_mock import MockerFixture
 
-from ansiblelint.config import get_version_warning
+from ansiblelint.config import get_version_warning, options
 from ansiblelint.constants import RC
 
 
@@ -100,6 +101,15 @@ def test_get_version_warning_remote_disconnect(mocker: MockerFixture) -> None:
         get_version_warning()
     except RemoteDisconnected:
         pytest.fail("Failed to handle a remote disconnect")
+
+
+def test_get_version_warning_offline(mocker: MockerFixture) -> None:
+    """Test that offline mode does not display any message."""
+    with tempfile.TemporaryDirectory() as temporary_directory:
+        # ensures a real cache_file is not loaded
+        mocker.patch("ansiblelint.config.CACHE_DIR", Path(temporary_directory))
+        options.offline = True
+        assert get_version_warning() == ""
 
 
 @pytest.mark.parametrize(
