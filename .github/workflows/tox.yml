@@ -26,7 +26,7 @@ jobs:
     steps:
       - name: Determine matrix
         id: generate_matrix
-        uses: coactions/dynamic-matrix@v1
+        uses: coactions/dynamic-matrix@v2
         with:
           min_python: "3.10"
           max_python: "3.12"
