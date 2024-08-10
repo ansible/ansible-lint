@@ -36,6 +36,7 @@ from ansiblelint.cli import get_rules_dirs
 from ansiblelint.constants import RC
 from ansiblelint.file_utils import Lintable, cwd
 from ansiblelint.runner import Runner
+from ansiblelint.testing import run_ansible_lint
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -490,3 +491,15 @@ def test_find_children_in_playbook(default_rules_collection: RulesCollection) ->
     ).find_children(lintable)
     assert len(children) == 1
     assert children[0].role == "bug4095"
+
+
+def test_include_children_load_playbook_failed_syntax_check() -> None:
+    """Verify include_children() logs playbook failed to load due to syntax-check."""
+    result = run_ansible_lint(
+        Path("playbooks/import-failed-syntax-check.yml"),
+        cwd=Path(__file__).resolve().parent.parent / "examples",
+    )
+    assert (
+        "Failed to load syntax-error.yml playbook due to failing syntax check."
+        in result.stderr
+    )

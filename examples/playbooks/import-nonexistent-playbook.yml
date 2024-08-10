@@ -1,0 +1,3 @@
+---
+- name: Import nonexistent playbook
+  import_playbook: i-do-not-exist.yml
