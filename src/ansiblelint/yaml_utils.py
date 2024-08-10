@@ -1217,6 +1217,10 @@ class FormattedYAML(YAML):
                     lines[index] = spaces + comment
                 full_line_comments.clear()
 
+            if line.rpartition(" ")[2] == "\n":
+                # drop any trailing spaces
+                lines[i] = line.rstrip() + "\n"
+
             cleaned = line.strip()
             if not cleaned.startswith("#") and cleaned.endswith("-"):
                 # got an empty list item. drop any trailing spaces.

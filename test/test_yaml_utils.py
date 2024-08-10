@@ -249,6 +249,12 @@ def load_yaml_formatting_fixtures(fixture_filename: str) -> tuple[str, str, str]
             None,
             id="12",
         ),
+        pytest.param(
+            "---\nWSLENV: HOSTNAME:CI:FORCE_COLOR:GITHUB_ACTION:GITHUB_ACTION_PATH/p:GITHUB_ACTION_REPOSITORY:GITHUB_WORKFLOW:GITHUB_WORKSPACE/p:GITHUB_PATH/p:GITHUB_ENV/p:VIRTUAL_ENV/p:SKIP_PODMAN:SKIP_DOCKER\n",
+            "---\nWSLENV:\n  HOSTNAME:CI:FORCE_COLOR:GITHUB_ACTION:GITHUB_ACTION_PATH/p:GITHUB_ACTION_REPOSITORY:GITHUB_WORKFLOW:GITHUB_WORKSPACE/p:GITHUB_PATH/p:GITHUB_ENV/p:VIRTUAL_ENV/p:SKIP_PODMAN:SKIP_DOCKER\n",
+            None,
+            id="13",
+        ),
     ),
 )
 def test_fmt(before: str, after: str, version: tuple[int, int] | None) -> None:
