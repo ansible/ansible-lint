@@ -10,7 +10,7 @@ $ git clone --recursive git@github.com:your-name/ansible-lint
 $ cd ansible-lint
 $ # Recommended: Initialize and activate a Python virtual environment
 $ pip install --upgrade pip
-$ pip install -e .[test]       # Install testing dependencies
+$ pip install -e '.[test]'       # Install testing dependencies
 $ tox run -e lint,pkg,docs,py  # Ensure subset of tox tests work in clean checkout
 $ git checkout -b your-branch-name
 # DO SOME CODING HERE
