@@ -88,7 +88,7 @@ if "pytest" in sys.modules:
         collection.register(GalaxyVersionIncorrectRule())
         success = "examples/.collection/galaxy.yml"
         good_runner = Runner(success, rules=collection)
-        assert [] == good_runner.run()
+        assert good_runner.run() == []
 
     def test_galaxy_collection_version_negative() -> None:
         """Negative test for collection version in galaxy."""
