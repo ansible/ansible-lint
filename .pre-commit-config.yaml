@@ -168,7 +168,6 @@ repos:
           - subprocess-tee
           - types-PyYAML
           - types-jsonschema>=4.20.0.0
-          - types-pkg_resources
           - types-setuptools
           - wcmatch
         exclude: >
