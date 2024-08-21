@@ -12,15 +12,15 @@
     "test": "python3 src/rebuild.py && mocha"
   },
   "devDependencies": {
-    "@types/chai": "^4.3.16",
+    "@types/chai": "^4.3.17",
     "@types/js-yaml": "^4.0.9",
     "@types/minimatch": "^5.1.2",
     "@types/mocha": "^10.0.7",
-    "@types/node": "^20.14.11",
+    "@types/node": "^22.4.2",
     "chai": "^5.1.1",
     "minimatch": "^10.0.1",
-    "mocha": "^10.6.0",
-    "typescript": "^5.5.3"
+    "mocha": "^10.7.3",
+    "typescript": "^5.5.4"
   },
   "directories": {
     "test": "./src"
