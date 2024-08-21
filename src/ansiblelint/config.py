@@ -11,6 +11,7 @@ import urllib.request
 import warnings
 from dataclasses import dataclass, field
 from functools import lru_cache
+from http.client import HTTPException
 from importlib.metadata import PackageNotFoundError, distribution, version
 from pathlib import Path
 from typing import Any
@@ -330,7 +331,7 @@ def get_version_warning() -> str:
                 data = json.load(url)
                 with open(cache_file, "w", encoding="utf-8") as f:
                     json.dump(data, f)
-        except (URLError, HTTPError) as exc:  # pragma: no cover
+        except (URLError, HTTPError, HTTPException) as exc:  # pragma: no cover
             _logger.debug(
                 "Unable to fetch latest version from %s due to: %s",
                 release_url,

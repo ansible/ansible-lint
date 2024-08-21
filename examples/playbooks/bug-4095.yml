@@ -1,0 +1,10 @@
+---
+- name: Test task
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Reproduce bug related bug 4095
+      ansible.builtin.include_role:
+        name: local.testcollection.bug4095
+      vars:
+        var1: val1
