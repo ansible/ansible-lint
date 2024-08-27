@@ -78,6 +78,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
             "set-property",
             "show-environment",
             "status",
+            "reset-failed",
         ],
         "yum": ["clean", "history", "info"],
         "rpm": ["--nodeps"],
