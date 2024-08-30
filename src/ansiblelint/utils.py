@@ -358,6 +358,7 @@ class HandleChildren:
             raise MatchError(
                 message="A malformed block was encountered while loading a block.",
                 rule=RuntimeErrorRule(),
+                lintable=lintable,
             )
         for task_handler in v:
             # ignore empty tasks, `-`
@@ -408,23 +409,21 @@ class HandleChildren:
         """Verify that the task handler action is valid for role include."""
         module = th_action["__ansible_module__"]
 
+        lintable = Lintable(
+            self.rules.options.lintables[0] if self.rules.options.lintables else ".",
+        )
         if "name" not in th_action:
             raise MatchError(
                 message=f"Failed to find required 'name' key in {module!s}",
                 rule=self.rules.rules[0],
-                lintable=Lintable(
-                    (
-                        self.rules.options.lintables[0]
-                        if self.rules.options.lintables
-                        else "."
-                    ),
-                ),
+                lintable=lintable,
             )
 
         if not isinstance(th_action["name"], str):
             raise MatchError(
                 message=f"Value assigned to 'name' key on '{module!s}' is not a string.",
                 rule=self.rules.rules[1],
+                lintable=lintable,
             )
 
     def roles_children(
