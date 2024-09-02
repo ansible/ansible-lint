@@ -34,9 +34,23 @@ jobs:
 
 For more details, see [ansible-lint-action].
 
+# Communication
+
+Refer to the
+[Talk to us](https://ansible.readthedocs.io/projects/lint/contributing/#talk-to-us)
+section of the Contributing guide to find out how to get in touch with us.
+
+You can also find more information in the
+[Ansible communication guide](https://docs.ansible.com/ansible/devel/community/communication.html).
+
 # Contributing
 
 Please read [Contribution guidelines] if you wish to contribute.
+
+# Code of Conduct
+
+Please see the official
+[Ansible Community Code of Conduct](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html).
 
 # Licensing
 
@@ -53,7 +67,8 @@ ansible-lint was created by [Will Thames] and is now maintained as part of the
 [Ansible] by [Red Hat] project.
 
 [ansible]: https://ansible.com
-[contribution guidelines]: https://ansible.readthedocs.io/projects/lint/contributing
+[contribution guidelines]:
+  https://ansible.readthedocs.io/projects/lint/contributing
 [gplv3]: https://github.com/ansible/ansible-lint/blob/main/COPYING
 [mit]:
   https://github.com/ansible/ansible-lint/blob/main/docs/licenses/LICENSE.mit.txt
