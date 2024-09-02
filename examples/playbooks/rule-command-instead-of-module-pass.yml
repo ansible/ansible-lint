@@ -34,6 +34,10 @@
       ansible.builtin.command: systemctl kill --signal=SIGUSR1 sshd
       changed_when: false
 
+    - name: Reset a service with systemctl reset-failed
+      ansible.builtin.command: systemctl reset-failed sshd
+      changed_when: false
+
     - name: Clear yum cache
       ansible.builtin.command: yum clean all
       changed_when: false
