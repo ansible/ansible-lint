@@ -28,7 +28,7 @@ pycparser==2.22
 pygments==2.18.0
 pyyaml==6.0.2
 referencing==0.35.1
-rich==13.7.1
+rich==13.8.0
 rpds-py==0.20.0
 ruamel-yaml==0.18.6
 subprocess-tee==0.4.2
@@ -36,7 +36,7 @@ tomli==2.0.1
 typing-extensions==4.12.2
 wcmatch==9.0 ; python_version < "3.12"
 yamllint==1.35.1
-zipp==3.20.0
+zipp==3.20.1
 
 # The following packages are considered to be unsafe in a requirements file:
 # resolvelib
