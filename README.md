@@ -49,7 +49,7 @@ Please read [Contribution guidelines] if you wish to contribute.
 
 # Code of Conduct
 
-Please see the official
+Please see the
 [Ansible Community Code of Conduct](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html).
 
 # Licensing
