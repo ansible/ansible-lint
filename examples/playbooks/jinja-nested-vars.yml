@@ -1,0 +1,11 @@
+---
+- name: Test
+  gather_facts: false
+  hosts:
+    - localhost
+  tasks:
+    - name: Test
+      ansible.builtin.debug:
+        msg: "{{ cron_hour_raw }}"
+      vars:
+        cron_hour_raw: "{{ 12 | random(seed=inventory_hostname) }}"
