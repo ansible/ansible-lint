@@ -38,13 +38,28 @@ pushing commits, just use [tox](https://tox.wiki/en/latest/).
 
 ## Talk to us
 
-Use Github [discussions] forum or for a live chat experience try
-`#ansible-devtools` IRC channel on libera.chat or Matrix room
+Connect with the Ansible community!
+
+Join the Ansible forum to ask questions, get help, and interact with the
+community.
+
+- [Get Help](https://forum.ansible.com/c/help/6): get help or help others.
+  Please add appropriate tags if you start new discussions, for example use the
+  `ansible-lint` or `devtools` tags.
+- [Social Spaces](https://forum.ansible.com/c/chat/4): meet and interact with
+  fellow enthusiasts.
+- [News & Announcements](https://forum.ansible.com/c/news/5): track project-wide
+  announcements including social events.
+
+To get release announcements and important changes from the community, see the
+[Bullhorn newsletter](https://docs.ansible.com/ansible/devel/community/communication.html#the-bullhorn).
+
+For a live chat experience try the `#ansible-devtools` IRC channel on
+libera.chat or Matrix room
 [#devtools:ansible.com](https://matrix.to/#/#devtools:ansible.com).
 
-For the full list of Ansible IRC and Mailing list, please see the [Ansible
-Communication] page. Release announcements will be made to the [Ansible
-Announce] list.
+You can find more information in the
+[Ansible communication guide](https://docs.ansible.com/ansible/devel/community/communication.html).
 
 Possible security bugs should be reported via email to
 <mailto:security@ansible.com>.

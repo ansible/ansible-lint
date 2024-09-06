@@ -77,7 +77,7 @@ repos:
         args: [--relative, --no-progress, --no-summary]
         name: Spell check with cspell
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.29.1
+    rev: 0.29.2
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
@@ -137,7 +137,7 @@ repos:
         types: [file, yaml]
         entry: yamllint --strict
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.6.1"
+    rev: "v0.6.3"
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -147,13 +147,13 @@ repos:
       - id: black
         language_version: python3
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.11.1
+    rev: v1.11.2
     hooks:
       - id: mypy
         # empty args needed in order to match mypy cli behavior
         args: [--strict]
         additional_dependencies:
-          - ansible-compat>=24.5.1
+          - ansible-compat>=24.8.0
           - black>=22.10.0
           - cryptography>=39.0.1
           - filelock>=3.12.2
@@ -177,13 +177,13 @@ repos:
             plugins/.*
           )$
   - repo: https://github.com/pycqa/pylint
-    rev: v3.2.6
+    rev: v3.2.7
     hooks:
       - id: pylint
         args:
           - --output-format=colorized
         additional_dependencies:
-          - ansible-compat>=24.5.1
+          - ansible-compat>=24.8.0
           - ansible-core>=2.14.0
           - black>=22.10.0
           - docutils
