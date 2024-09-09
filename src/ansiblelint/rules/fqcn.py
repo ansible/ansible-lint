@@ -192,7 +192,7 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
             i = file.path.resolve().parts.index("plugins")
             plugin_type = file.path.resolve().parts[i : i + 2]
             short_path = file.path.resolve().parts[i + 2 :]
-            if len(short_path) > 1:
+            if len(short_path) > 1 and "test" not in str(file.path):
                 result.append(
                     self.create_matcherror(
                         message=f"Deep plugins directory is discouraged. Move '{file.path}' directly under '{'/'.join(plugin_type)}' folder.",
