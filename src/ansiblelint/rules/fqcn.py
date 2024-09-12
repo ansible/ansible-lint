@@ -298,3 +298,11 @@ if "pytest" in sys.modules:
         success = "examples/.collection/plugins/modules/alpha.py"
         results = Runner(success, rules=collection).run()
         assert len(results) == 0
+
+    def test_fqcn_deep_test_dir_pass() -> None:
+        """Test rule does not match."""
+        collection = RulesCollection()
+        collection.register(FQCNBuiltinsRule())
+        success = "examples/.collection/plugins/modules/tests/alpha.py"
+        results = Runner(success, rules=collection).run()
+        assert len(results) == 0
