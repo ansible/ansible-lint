@@ -303,6 +303,6 @@ if "pytest" in sys.modules:
         """Test rule does not match."""
         collection = RulesCollection()
         collection.register(FQCNBuiltinsRule())
-        success = "examples/.collection/plugins/modules/tests/alpha.py"
+        success = "examples/.collection/plugins/modules/tests/gamma.py"
         results = Runner(success, rules=collection).run()
         assert len(results) == 0
