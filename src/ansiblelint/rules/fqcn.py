@@ -192,7 +192,7 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
             i = file.path.resolve().parts.index("plugins")
             plugin_type = file.path.resolve().parts[i : i + 2]
             short_path = file.path.resolve().parts[i + 2 :]
-            if len(short_path) > 1:
+            if len(short_path) > 1 and "test" not in str(file.path):
                 result.append(
                     self.create_matcherror(
                         message=f"Deep plugins directory is discouraged. Move '{file.path}' directly under '{'/'.join(plugin_type)}' folder.",
@@ -296,5 +296,13 @@ if "pytest" in sys.modules:
         collection = RulesCollection()
         collection.register(FQCNBuiltinsRule())
         success = "examples/.collection/plugins/modules/alpha.py"
+        results = Runner(success, rules=collection).run()
+        assert len(results) == 0
+
+    def test_fqcn_deep_test_dir_pass() -> None:
+        """Test rule does not match."""
+        collection = RulesCollection()
+        collection.register(FQCNBuiltinsRule())
+        success = "examples/.collection/plugins/modules/tests/gamma.py"
         results = Runner(success, rules=collection).run()
         assert len(results) == 0
