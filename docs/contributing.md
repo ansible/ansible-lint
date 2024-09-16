@@ -54,9 +54,9 @@ community.
 To get release announcements and important changes from the community, see the
 [Bullhorn newsletter](https://docs.ansible.com/ansible/devel/community/communication.html#the-bullhorn).
 
-For a live chat experience try the `#ansible-devtools` IRC channel on
-libera.chat or Matrix room
-[#devtools:ansible.com](https://matrix.to/#/#devtools:ansible.com).
+For a live chat experience join
+the [#devtools:ansible.com](https://matrix.to/#/#devtools:ansible.com)
+Matrix room.
 
 You can find more information in the
 [Ansible communication guide](https://docs.ansible.com/ansible/devel/community/communication.html).
@@ -68,7 +68,6 @@ Possible security bugs should be reported via email to
 
 As with all Ansible projects, we have a [Code of Conduct].
 
-[ansible announce]: https://groups.google.com/forum/#!forum/ansible-announce
 [ansible communication]:
   https://docs.ansible.com/ansible/latest/community/communication.html
 [code of conduct]:
