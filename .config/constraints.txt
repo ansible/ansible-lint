@@ -4,7 +4,7 @@
 #
 #    pip-compile --all-extras --no-annotate --output-file=.config/constraints.txt --strip-extras --unsafe-package=resolvelib --unsafe-package=ruamel-yaml-clib --unsafe-package=wcmatch pyproject.toml
 #
-ansible-compat==24.9.0
+ansible-compat==24.9.1
 ansible-core==2.17.4
 astroid==3.2.4
 attrs==24.2.0
