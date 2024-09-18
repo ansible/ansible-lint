@@ -407,6 +407,8 @@ def get_app(*, offline: bool | None = None, cached: bool = False) -> App:
     """Return the application instance, caching the return value."""
     # Avoids ever running the app initialization twice if cached argument
     # is mentioned.
+    # pylint: disable=global-statement
+    global _CACHED_APP
     if cached:
         if offline is not None:
             msg = (
@@ -426,6 +428,8 @@ def get_app(*, offline: bool | None = None, cached: bool = False) -> App:
         options = default_options
 
     app = App(options=options)
+    if cached:
+        _CACHED_APP = app
     # Make linter use the cache dir from compat
     options.cache_dir = app.runtime.cache_dir
 

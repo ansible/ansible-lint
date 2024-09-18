@@ -344,7 +344,10 @@ def main(argv: list[str] | None = None) -> int:
         console.print(profiles_as_rich())
         return 0
 
-    app = get_app(offline=None)  # to be sure we use the offline value from settings
+    app = get_app(
+        offline=None,
+        cached=True,
+    )  # to be sure we use the offline value from settings
     rules = RulesCollection(
         options.rulesdirs,
         profile_name=options.profile,
