@@ -26,7 +26,7 @@ jobs:
     steps:
       - name: Determine matrix
         id: generate_matrix
-        uses: coactions/dynamic-matrix@v1
+        uses: coactions/dynamic-matrix@v3
         with:
           min_python: "3.10"
           max_python: "3.12"
@@ -81,11 +81,11 @@ jobs:
 
       - name: Set pre-commit cache
         uses: actions/cache@v4
-        if: ${{ matrix.passed_name == 'lint' }}
+        if: ${{ matrix.name == 'lint' }}
         with:
           path: |
             ~/.cache/pre-commit
-          key: pre-commit-${{ matrix.name || matrix.passed_name }}-${{ hashFiles('.pre-commit-config.yaml') }}
+          key: pre-commit-${{ matrix.name }}-${{ hashFiles('.pre-commit-config.yaml') }}
 
       - name: Set ansible cache(s)
         uses: actions/cache@v4
@@ -96,7 +96,7 @@ jobs:
             ~/.cache/ansible-compat
             ~/.ansible/collections
             ~/.ansible/roles
-          key: ${{ matrix.name || matrix.passed_name }}-${{ hashFiles('tools/test-eco.sh', 'requirements.yml', 'examples/playbooks/collections/requirements.yml') }}
+          key: ${{ matrix.name }}-${{ hashFiles('tools/test-eco.sh', 'requirements.yml', 'examples/playbooks/collections/requirements.yml') }}
 
       - name: Set up Python ${{ matrix.python_version || '3.10' }}
         if: "!contains(matrix.shell, 'wsl')"
@@ -122,13 +122,19 @@ jobs:
       - name: Log installed dists
         run: python3 -m pip freeze --all
 
-      - name: Initialize tox envs ${{ matrix.passed_name }}
-        run: python3 -m tox --notest --skip-missing-interpreters false -vv -e ${{ matrix.passed_name }}
-        timeout-minutes: 5 # average is under 1, but macos can be over 3
+      - run: ${{ matrix.command }}
 
-      # sequential run improves browsing experience (almost no speed impact)
-      - name: tox -e ${{ matrix.passed_name }}
-        run: python3 -m tox -e ${{ matrix.passed_name }}
+      - run: ${{ matrix.command2 }}
+        if: ${{ matrix.command2 }}
+
+      - run: ${{ matrix.command3 }}
+        if: ${{ matrix.command3 }}
+
+      - run: ${{ matrix.command4 }}
+        if: ${{ matrix.command4 }}
+
+      - run: ${{ matrix.command5 }}
+        if: ${{ matrix.command5 }}
 
       - name: Archive logs
         uses: actions/upload-artifact@v4
@@ -236,7 +242,7 @@ jobs:
       - name: Upload coverage data
         uses: codecov/codecov-action@v4
         with:
-          name: ${{ matrix.passed_name }}
+          name: ${{ matrix.name }}
           # verbose: true # optional (default = false)
           fail_ci_if_error: true
           use_oidc: true # cspell:ignore oidc
