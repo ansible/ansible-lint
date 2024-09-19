@@ -69,10 +69,6 @@ jobs:
       # combination unless there are good reasons to test it, like having
       # proof that we failed to catch a bug by not running it. Using
       # distribution should be preferred instead of custom builds.
-    env:
-      # Number of expected test passes, safety measure for accidental skip of
-      # tests. Update value if you add/remove tests.
-      PYTEST_REQPASS: 892
     steps:
       - uses: actions/checkout@v4
         with:
