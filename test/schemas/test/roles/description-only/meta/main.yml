@@ -1,0 +1,4 @@
+---
+argument_specs:
+  main:
+    short_description: A role with only documentation and no options should be valid

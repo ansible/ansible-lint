@@ -219,7 +219,6 @@
           "type": "string"
         }
       },
-      "required": ["options"],
       "title": "Entry Point",
       "type": "object"
     },
