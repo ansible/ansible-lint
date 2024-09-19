@@ -23,7 +23,11 @@ from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.runner import get_matches
 from ansiblelint.skip_utils import get_rule_skips_from_line
 from ansiblelint.text import has_jinja
-from ansiblelint.utils import parse_yaml_from_file, template
+from ansiblelint.utils import (  # type: ignore[attr-defined]
+    Templar,
+    parse_yaml_from_file,
+    template,
+)
 from ansiblelint.yaml_utils import deannotate, nested_items_path
 
 if TYPE_CHECKING:
@@ -95,7 +99,10 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
     tags = ["formatting"]
     version_added = "v6.5.0"
     _ansible_error_re = re.compile(
-        r"^(?P<error>.*): (?P<detail>.*)\. String: (?P<string>.*)$",
+        (
+            r"^(?P<error>.*): (?P<detail>.*)\. String: (?P<string>.*)$"
+            r"|An unhandled exception occurred while templating '.*'\. Error was a .*, original message: (?P<nested_error>.*)"
+        ),
         flags=re.MULTILINE,
     )
 
@@ -160,12 +167,19 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                         ):
                             error = match.group("error")
                             detail = match.group("detail")
-                            if error.startswith(
+                            nested_error = match.group("nested_error")
+                            if error and error.startswith(
                                 "template error while templating string",
                             ):
                                 bypass = False
-                            elif detail.startswith("unable to locate collection"):
+                            elif detail and detail.startswith(
+                                "unable to locate collection",
+                            ):
                                 _logger.debug("Ignored AnsibleError: %s", exc)
+                                bypass = True
+                            elif nested_error and nested_error.startswith(
+                                "Unexpected templating type error occurred on",
+                            ):
                                 bypass = True
                             else:
                                 bypass = False
@@ -862,6 +876,26 @@ if "pytest" in sys.modules:
         assert orig_content != transformed_content
         assert expected_content == transformed_content
         playbook.with_suffix(f".tmp{playbook.suffix}").unlink()
+
+    def test_jinja_nested_var_errors() -> None:
+        """Tests our ability to handle nested var errors from jinja2 templates."""
+
+        def _do_template(*args, **kwargs):  # type: ignore[no-untyped-def] # Templar.do_template has no type hint
+            data = args[1]
+
+            if data != "{{ 12 | random(seed=inventory_hostname) }}":
+                return do_template(*args, **kwargs)
+
+            msg = "Unexpected templating type error occurred on (foo): bar"
+            raise AnsibleError(msg)
+
+        do_template = Templar.do_template
+        collection = RulesCollection()
+        collection.register(JinjaRule())
+        lintable = Lintable("examples/playbooks/jinja-nested-vars.yml")
+        with mock.patch.object(Templar, "do_template", _do_template):
+            results = Runner(lintable, rules=collection).run()
+            assert len(results) == 0
 
 
 def _get_error_line(task: dict[str, Any], path: list[str | int]) -> int:
