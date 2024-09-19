@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import sys
-from functools import total_ordering
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.constants import FILENAME_KEY, LINE_NUMBER_KEY
@@ -15,10 +14,10 @@ if TYPE_CHECKING:
 
 
 class GalaxyRule(AnsibleLintRule):
-    """Rule for checking collection version is greater than 1.0.0 and checking for changelog."""
+    """Rule for checking collections."""
 
     id = "galaxy"
-    description = "Confirm via galaxy.yml file if collection version is greater than or equal to 1.0.0 and check for changelog."
+    description = "Confirm that collection's units are valid."
     severity = "MEDIUM"
     tags = ["metadata"]
     version_added = "v6.11.0 (last update)"
@@ -26,7 +25,6 @@ class GalaxyRule(AnsibleLintRule):
         "galaxy[tags]": "galaxy.yaml must have one of the required tags",
         "galaxy[no-changelog]": "No changelog found. Please add a changelog file. Refer to the galaxy.md file for more info.",
         "galaxy[version-missing]": "galaxy.yaml should have version tag.",
-        "galaxy[version-incorrect]": "collection version should be greater than or equal to 1.0.0",
         "galaxy[no-runtime]": "meta/runtime.yml file not found.",
         "galaxy[invalid-dependency-version]": "Invalid collection metadata. Dependency version spec range is invalid",
     }
@@ -120,17 +118,6 @@ class GalaxyRule(AnsibleLintRule):
             # returning here as it does not make sense
             # to continue for version check below
 
-        version = data.get("version")
-        if Version(version) < Version("1.0.0"):
-            results.append(
-                self.create_matcherror(
-                    message="collection version should be greater than or equal to 1.0.0",
-                    lineno=version._line_number,  # noqa: SLF001
-                    tag="galaxy[version-incorrect]",
-                    filename=file,
-                ),
-            )
-
         if not (base_path / "meta" / "runtime.yml").is_file():
             results.append(
                 self.create_matcherror(
@@ -143,63 +130,11 @@ class GalaxyRule(AnsibleLintRule):
         return results
 
 
-@total_ordering
-class Version:
-    """Simple class to compare arbitrary versions."""
-
-    def __init__(self, version_string: str):
-        """Construct a Version object."""
-        self.components = version_string.split(".")
-
-    def __eq__(self, other: object) -> bool:
-        """Implement equality comparison."""
-        try:
-            other = _coerce(other)
-        except NotImplementedError:
-            return NotImplemented
-
-        return self.components == other.components
-
-    def __lt__(self, other: Version) -> bool:
-        """Implement lower-than operation."""
-        other = _coerce(other)
-
-        return self.components < other.components
-
-
-def _coerce(other: object) -> Version:
-    if isinstance(other, str):
-        other = Version(other)
-    if isinstance(other, int | float):
-        other = Version(str(other))
-    if isinstance(other, Version):
-        return other
-    msg = f"Unable to coerce object type {type(other)} to Version"
-    raise NotImplementedError(msg)
-
-
 if "pytest" in sys.modules:
     import pytest
 
     from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
     from ansiblelint.runner import Runner
-
-    def test_galaxy_collection_version_positive() -> None:
-        """Positive test for collection version in galaxy."""
-        collection = RulesCollection()
-        collection.register(GalaxyRule())
-        success = "examples/.collection/galaxy.yml"
-        good_runner = Runner(success, rules=collection)
-        assert good_runner.run() == []
-
-    def test_galaxy_collection_version_negative() -> None:
-        """Negative test for collection version in galaxy."""
-        collection = RulesCollection()
-        collection.register(GalaxyRule())
-        failure = "examples/meta/galaxy.yml"
-        bad_runner = Runner(failure, rules=collection)
-        errs = bad_runner.run()
-        assert len(errs) == 1
 
     def test_galaxy_no_collection_version() -> None:
         """Test for no collection version in galaxy."""
@@ -209,20 +144,6 @@ if "pytest" in sys.modules:
         bad_runner = Runner(failure, rules=collection)
         errs = bad_runner.run()
         assert len(errs) == 1
-
-    def test_version_class() -> None:
-        """Test for version class."""
-        v = Version("1.0.0")
-        assert v == Version("1.0.0")
-        assert v != NotImplemented
-
-    def test_coerce() -> None:
-        """Test for _coerce function."""
-        assert _coerce("1.0") == Version("1.0")
-        assert _coerce(1.0) == Version("1.0")
-        expected = "Unable to coerce object type"
-        with pytest.raises(NotImplementedError, match=expected):
-            _coerce(type(Version))
 
     @pytest.mark.parametrize(
         ("file", "expected"),

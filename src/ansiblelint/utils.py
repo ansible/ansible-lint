@@ -290,7 +290,7 @@ class HandleChildren:
     rules: RulesCollection = field(init=True, repr=False)
     app: App
 
-    def include_children(  # pylint: disable=too-many-return-statements
+    def include_children(
         self,
         lintable: Lintable,
         k: str,
@@ -316,11 +316,12 @@ class HandleChildren:
 
         if k in ("import_playbook", "ansible.builtin.import_playbook"):
             included = Path(basedir) / v
-            if self.app.runtime.has_playbook(v, basedir=Path(basedir)):
-                if included.exists():
-                    return [Lintable(included, kind=parent_type)]
-                return []
-            msg = f"Failed to find {v} playbook."
+            if not included.exists():
+                msg = f"Failed to find {v} playbook."
+            elif not self.app.runtime.has_playbook(v, basedir=Path(basedir)):
+                msg = f"Failed to load {v} playbook due to failing syntax check."
+            else:
+                return [Lintable(included, kind=parent_type)]
             logging.error(msg)
             return []
 

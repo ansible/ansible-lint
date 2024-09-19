@@ -353,6 +353,8 @@ def test_pruned_err_after_fix(monkeypatch: pytest.MonkeyPatch, tmpdir: Path) -> 
 
     monkeypatch.setattr("ansiblelint.__main__.fix", test_fix)
     monkeypatch.setattr("ansiblelint.app.App", TestApp)
+    # disable the App() caching because we cannot prevent the initial initialization from happening
+    monkeypatch.setattr("ansiblelint.app._CACHED_APP", None)
 
     main.main()
     assert fix_called

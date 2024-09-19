@@ -278,6 +278,10 @@
               "description": "Disables the check for Ansible/Runner in final image",
               "type": "boolean"
             },
+            "skip_pip_install": {
+              "description": "Disables the installation of pip in the base image",
+              "type": "boolean"
+            },
             "user": {
               "description": "Sets the username or UID",
               "type": "string"

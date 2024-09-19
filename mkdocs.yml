@@ -53,9 +53,9 @@ extra:
     - icon: simple/matrix
       link: https://matrix.to/#/#devtools:ansible.com
       name: Matrix
-    - icon: fontawesome/solid/comments
-      link: https://github.com/ansible/ansible-lint/discussions
-      name: Discussions
+    - icon: fontawesome/brands/discourse
+      link: https://forum.ansible.com/c/project/7
+      name: Ansible forum
     - icon: fontawesome/brands/github-alt
       link: https://github.com/ansible/ansible-lint
       name: GitHub
@@ -82,6 +82,7 @@ nav:
       - rules/deprecated-module.md
       - rules/empty-string-compare.md
       - rules/fqcn.md
+      - rules/galaxy-version-incorrect.md
       - rules/galaxy.md
       - rules/ignore-errors.md
       - rules/inline-env-var.md

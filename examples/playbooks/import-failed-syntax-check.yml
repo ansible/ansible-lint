@@ -1,0 +1,3 @@
+---
+- name: Import syntax-error.yml playbook
+  import_playbook: syntax-error.yml

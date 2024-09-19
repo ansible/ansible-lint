@@ -22,6 +22,10 @@ inputs:
     description: Path to the requirements YAML file to install role and collection dependencies.
     required: false
     default: ""
+  expected_return_code:
+    description: Expected return code from ansible-lint. Default is 0. Used for self-testing purposes.
+    required: false
+    default: "0"
 runs:
   using: composite
   steps:
@@ -41,19 +45,22 @@ runs:
     # https://github.com/actions/toolkit/issues/1035
     # https://github.com/actions/setup-python/issues/361
     - name: Generate .git/ansible-lint-requirements.txt
+      id: get_reqs
       shell: bash
       env:
         GH_ACTION_REF: ${{ github.action_ref || 'main' }}
       working-directory: ${{ steps.inputs.outputs.working_directory }}
       run: |
-        wget --output-document=${{ steps.inputs.outputs.working_directory }}/.git/ansible-lint-requirements.txt https://raw.githubusercontent.com/ansible/ansible-lint/$GH_ACTION_REF/.config/requirements-lock.txt
+        reqs_file=$(git rev-parse --show-toplevel)/.git/ansible-lint-requirements.txt
+        echo "reqs_file=$reqs_file\n" >> $GITHUB_OUTPUT
+        wget --output-document=$reqs_file https://raw.githubusercontent.com/ansible/ansible-lint/$GH_ACTION_REF/.config/requirements-lock.txt
 
     - name: Set up Python
       if: inputs.setup_python == 'true'
       uses: actions/setup-python@v5
       with:
         cache: pip
-        cache-dependency-path: ${{ steps.inputs.outputs.working_directory }}/.git/ansible-lint-requirements.txt
+        cache-dependency-path: ${{ steps.get_reqs.outputs.reqs_file }}
         python-version: "3.11"
 
     - name: Install ansible-lint
@@ -78,4 +85,8 @@ runs:
     - name: Run ansible-lint
       shell: bash
       working-directory: ${{ steps.inputs.outputs.working_directory }}
-      run: ansible-lint ${{ inputs.args }}
+      run: |
+        exit_code=0
+        expected_exit_code=${{ inputs.expected_return_code }}
+        ansible-lint ${{ inputs.args }} || exit_code=$?
+        if [ "$exit_code" != "$expected_exit_code" ]; then echo "Command failed: got '$exit_code', expected '$expected_exit_code'"; exit 1; fi

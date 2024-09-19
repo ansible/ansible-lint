@@ -1,6 +1,6 @@
 [![PyPI version](https://img.shields.io/pypi/v/ansible-lint.svg)](https://pypi.org/project/ansible-lint)
 [![Ansible-lint rules explanation](https://img.shields.io/badge/Ansible--lint-rules-blue.svg)](https://ansible.readthedocs.io/projects/lint/rules/)
-[![Discussions](https://img.shields.io/badge/Discussions-gray.svg)](https://github.com/ansible/ansible-lint/discussions)
+[![Discussions](https://img.shields.io/badge/Discussions-gray.svg)](https://forum.ansible.com/tag/ansible-lint)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 # Ansible-lint
@@ -29,14 +29,44 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run ansible-lint
-        uses: ansible/ansible-lint@main # or version tag instead of 'main'
+        uses: ansible/ansible-lint@main
+        # optional (see below):
+        with:
+          args: ""
+          setup_python: "true"
+          working_directory: ""
+          requirements_file: ""
 ```
 
+All the arguments are optional and most users should not need them:
+
+- `args`: Arguments to be passed to ansible-lint command.
+- `setup_python`: If python should be installed. Default is `true`.
+- `working_directory`: The directory where to run ansible-lint from. Default is
+  `github.workspace`. That might be needed if you want to lint only a subset of
+  your repository.
+- `requirements_file`: Path to the requirements.yml file to install role and
+  collection dependencies.
+
 For more details, see [ansible-lint-action].
+
+# Communication
+
+Refer to the
+[Talk to us](https://ansible.readthedocs.io/projects/lint/contributing/#talk-to-us)
+section of the Contributing guide to find out how to get in touch with us.
+
+You can also find more information in the
+[Ansible communication guide](https://docs.ansible.com/ansible/devel/community/communication.html).
 
 # Contributing
 
 Please read [Contribution guidelines] if you wish to contribute.
+
+# Code of Conduct
+
+Please see the
+[Ansible Community Code of Conduct](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html).
 
 # Licensing
 
@@ -49,11 +79,12 @@ original [MIT] license.
 
 # Authors
 
-ansible-lint was created by [Will Thames] and is now maintained as part of the
-[Ansible] by [Red Hat] project.
+ansible-lint was created by [Will Thames] and is now maintained as part of the [Ansible]
+by [Red Hat] project.
 
 [ansible]: https://ansible.com
-[contribution guidelines]: https://ansible.readthedocs.io/projects/lint/contributing
+[contribution guidelines]:
+  https://ansible.readthedocs.io/projects/lint/contributing
 [gplv3]: https://github.com/ansible/ansible-lint/blob/main/COPYING
 [mit]:
   https://github.com/ansible/ansible-lint/blob/main/docs/licenses/LICENSE.mit.txt
