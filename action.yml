@@ -52,7 +52,7 @@ runs:
       working-directory: ${{ steps.inputs.outputs.working_directory }}
       run: |
         reqs_file=$(git rev-parse --show-toplevel)/.git/ansible-lint-requirements.txt
-        echo "reqs_file=$reqs_file\n" >> $GITHUB_OUTPUT
+        echo "reqs_file=$reqs_file" >> $GITHUB_OUTPUT
         wget --output-document=$reqs_file https://raw.githubusercontent.com/ansible/ansible-lint/$GH_ACTION_REF/.config/requirements-lock.txt
 
     - name: Set up Python
