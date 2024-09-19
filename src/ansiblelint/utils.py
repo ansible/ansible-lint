@@ -290,7 +290,7 @@ class HandleChildren:
     rules: RulesCollection = field(init=True, repr=False)
     app: App
 
-    def include_children(  # pylint: disable=too-many-return-statements
+    def include_children(
         self,
         lintable: Lintable,
         k: str,
