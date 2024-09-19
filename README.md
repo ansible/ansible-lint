@@ -29,8 +29,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run ansible-lint
-        uses: ansible/ansible-lint@main # or version tag instead of 'main'
+        uses: ansible/ansible-lint@main
+        # optional (see below):
+        with:
+          args: ""
+          setup_python: "true"
+          working_directory: ""
+          requirements_file: ""
 ```
+
+All the arguments are optional and most users should not need them:
+
+- `args`: Arguments to be passed to ansible-lint command.
+- `setup_python`: If python should be installed. Default is `true`.
+- `working_directory`: The directory where to run ansible-lint from. Default is
+  `github.workspace`. That might be needed if you want to lint only a subset of
+  your repository.
+- `requirements_file`: Path to the requirements.yml file to install role and
+  collection dependencies.
 
 For more details, see [ansible-lint-action].
 
@@ -63,8 +79,8 @@ original [MIT] license.
 
 # Authors
 
-ansible-lint was created by [Will Thames] and is now maintained as part of the
-[Ansible] by [Red Hat] project.
+ansible-lint was created by [Will Thames] and is now maintained as part of the [Ansible]
+by [Red Hat] project.
 
 [ansible]: https://ansible.com
 [contribution guidelines]:

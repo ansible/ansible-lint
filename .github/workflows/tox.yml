@@ -47,11 +47,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Self test for ansible-lint@${{ github.action_ref || 'main' }}
+      - name: Self test 1
         uses: ./
         with:
           # basically we only lint linter own configuration, which should be passing.
           args: .ansible-lint
+      - name: Self test 2
+        uses: ./
+        with:
+          # basically we only lint linter own configuration, which should be passing.
+          args: .ansible-lint
+          working_directory: .
+      - name: Self test 3
+        uses: ./
+        with:
+          # basically we only lint linter own configuration, which should be passing.
+          args: .ansible-lint
+          working_directory: docs
+          expected_return_code: "2" # expected to fail because the given argument does not exist in this folder
   build:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os || 'ubuntu-22.04' }}
