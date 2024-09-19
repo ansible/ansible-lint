@@ -117,6 +117,7 @@ class VariableNamingRule(AnsibleLintRule):
         ident: str,
         *,
         prefix: Prefix | None = None,
+        file: Lintable,
     ) -> MatchError | None:
         """Return a MatchError if the variable name is not valid, otherwise None."""
         if not isinstance(ident, str):  # pragma: no cover
@@ -124,6 +125,7 @@ class VariableNamingRule(AnsibleLintRule):
                 tag="var-naming[non-string]",
                 message="Variables names must be strings.",
                 rule=self,
+                lintable=file,
             )
 
         if ident in ANNOTATION_KEYS or ident in self.allowed_special_names:
@@ -136,6 +138,7 @@ class VariableNamingRule(AnsibleLintRule):
                 tag="var-naming[non-ascii]",
                 message=f"Variables names must be ASCII. ({ident})",
                 rule=self,
+                lintable=file,
             )
 
         if keyword.iskeyword(ident):
@@ -143,6 +146,7 @@ class VariableNamingRule(AnsibleLintRule):
                 tag="var-naming[no-keyword]",
                 message=f"Variables names must not be Python keywords. ({ident})",
                 rule=self,
+                lintable=file,
             )
 
         if ident in self.reserved_names:
@@ -150,6 +154,7 @@ class VariableNamingRule(AnsibleLintRule):
                 tag="var-naming[no-reserved]",
                 message=f"Variables names must not be Ansible reserved names. ({ident})",
                 rule=self,
+                lintable=file,
             )
 
         if ident in self.read_only_names:
@@ -157,6 +162,7 @@ class VariableNamingRule(AnsibleLintRule):
                 tag="var-naming[read-only]",
                 message=f"This special variable is read-only. ({ident})",
                 rule=self,
+                lintable=file,
             )
 
         # We want to allow use of jinja2 templating for variable names
@@ -165,6 +171,7 @@ class VariableNamingRule(AnsibleLintRule):
                 tag="var-naming[no-jinja]",
                 message="Variables names must not contain jinja2 templating.",
                 rule=self,
+                lintable=file,
             )
 
         if not bool(self.re_pattern.match(ident)) and (
@@ -174,6 +181,7 @@ class VariableNamingRule(AnsibleLintRule):
                 tag="var-naming[pattern]",
                 message=f"Variables names should match {self.re_pattern_str} regex. ({ident})",
                 rule=self,
+                lintable=file,
             )
 
         if (
@@ -186,6 +194,7 @@ class VariableNamingRule(AnsibleLintRule):
                 tag="var-naming[no-role-prefix]",
                 message=f"Variables names from within roles should use {prefix.value}_ as a prefix.",
                 rule=self,
+                lintable=file,
             )
         return None
 
@@ -199,9 +208,8 @@ class VariableNamingRule(AnsibleLintRule):
         # If the Play uses the 'vars' section to set variables
         our_vars = data.get("vars", {})
         for key in our_vars:
-            match_error = self.get_var_naming_matcherror(key)
+            match_error = self.get_var_naming_matcherror(key, file=file)
             if match_error:
-                match_error.filename = str(file.path)
                 match_error.lineno = (
                     key.ansible_pos[1]
                     if isinstance(key, AnsibleUnicode)
@@ -219,9 +227,9 @@ class VariableNamingRule(AnsibleLintRule):
                     match_error = self.get_var_naming_matcherror(
                         key,
                         prefix=prefix,
+                        file=file,
                     )
                     if match_error:
-                        match_error.filename = str(file.path)
                         match_error.message += f" (vars: {key})"
                         match_error.lineno = (
                             key.ansible_pos[1]
@@ -235,9 +243,9 @@ class VariableNamingRule(AnsibleLintRule):
                 match_error = self.get_var_naming_matcherror(
                     key,
                     prefix=prefix,
+                    file=file,
                 )
                 if match_error:
-                    match_error.filename = str(file.path)
                     match_error.message += f" (vars: {key})"
                     match_error.lineno = (
                         key.ansible_pos[1]
@@ -266,7 +274,6 @@ class VariableNamingRule(AnsibleLintRule):
         """Return matches for task based variables."""
         results = []
         prefix = Prefix()
-        filename = "" if file is None else str(file.path)
         if file and file.parent and file.parent.kind == "role":
             prefix = Prefix(file.parent.path.name)
         ansible_module = task["action"]["__ansible_module__"]
@@ -283,9 +290,9 @@ class VariableNamingRule(AnsibleLintRule):
             match_error = self.get_var_naming_matcherror(
                 key,
                 prefix=prefix,
+                file=file or Lintable(""),
             )
             if match_error:
-                match_error.filename = filename
                 match_error.lineno = our_vars[LINE_NUMBER_KEY]
                 match_error.message += f" (vars: {key})"
                 results.append(match_error)
@@ -298,9 +305,12 @@ class VariableNamingRule(AnsibleLintRule):
                 and x != "cacheable",
                 task["action"].keys(),
             ):
-                match_error = self.get_var_naming_matcherror(key, prefix=prefix)
+                match_error = self.get_var_naming_matcherror(
+                    key,
+                    prefix=prefix,
+                    file=file or Lintable(""),
+                )
                 if match_error:
-                    match_error.filename = filename
                     match_error.lineno = task["action"][LINE_NUMBER_KEY]
                     match_error.message += f" (set_fact: {key})"
                     results.append(match_error)
@@ -311,10 +321,10 @@ class VariableNamingRule(AnsibleLintRule):
             match_error = self.get_var_naming_matcherror(
                 registered_var,
                 prefix=prefix,
+                file=file or Lintable(""),
             )
             if match_error:
                 match_error.message += f" (register: {registered_var})"
-                match_error.filename = filename
                 match_error.lineno = task[LINE_NUMBER_KEY]
                 results.append(match_error)
 
@@ -325,15 +335,17 @@ class VariableNamingRule(AnsibleLintRule):
         results: list[MatchError] = []
         raw_results: list[MatchError] = []
         meta_data: dict[AnsibleUnicode, Any] = {}
-        filename = "" if file is None else str(file.path)
 
         if str(file.kind) == "vars" and file.data:
             meta_data = parse_yaml_from_file(str(file.path))
             for key in meta_data:
                 prefix = Prefix(file.role) if file.role else Prefix()
-                match_error = self.get_var_naming_matcherror(key, prefix=prefix)
+                match_error = self.get_var_naming_matcherror(
+                    key,
+                    prefix=prefix,
+                    file=file,
+                )
                 if match_error:
-                    match_error.filename = filename
                     match_error.lineno = key.ansible_pos[1]
                     match_error.message += f" (vars: {key})"
                     raw_results.append(match_error)
@@ -407,6 +419,25 @@ if "pytest" in sys.modules:
             ("var-naming[non-ascii]", 10),
             ("var-naming[no-reserved]", 11),
             ("var-naming[read-only]", 12),
+        )
+        assert len(results) == len(expected_errors)
+        for idx, result in enumerate(results):
+            assert result.tag == expected_errors[idx][0]
+            assert result.lineno == expected_errors[idx][1]
+
+    def test_invalid_vars_diff_files(
+        default_rules_collection: RulesCollection,
+    ) -> None:
+        """Test rule matches."""
+        results = Runner(
+            Lintable("examples/playbooks/vars/rule_var_naming_fails_files"),
+            rules=default_rules_collection,
+        ).run()
+        expected_errors = (
+            ("var-naming[pattern]", 2),
+            ("var-naming[pattern]", 3),
+            ("var-naming[pattern]", 2),
+            ("var-naming[pattern]", 3),
         )
         assert len(results) == len(expected_errors)
         for idx, result in enumerate(results):
