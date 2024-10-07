@@ -77,11 +77,11 @@ repos:
         args: [--relative, --no-progress, --no-summary]
         name: Spell check with cspell
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.29.2
+    rev: 0.29.3
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
-    rev: v4.6.0
+    rev: v5.0.0
     hooks:
       - id: end-of-file-fixer
         # ignore formatting-prettier to have an accurate prettier comparison
@@ -137,7 +137,7 @@ repos:
         types: [file, yaml]
         entry: yamllint --strict
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.6.5"
+    rev: "v0.6.9"
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -177,7 +177,7 @@ repos:
             plugins/.*
           )$
   - repo: https://github.com/pycqa/pylint
-    rev: v3.2.7
+    rev: v3.3.1
     hooks:
       - id: pylint
         args:
