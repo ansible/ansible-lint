@@ -319,6 +319,7 @@ ruleset
 runas
 sarif
 scalarint
+scalarstring
 scancode
 schemafile
 sdist

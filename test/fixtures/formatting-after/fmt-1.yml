@@ -10,14 +10,14 @@ vegetables: # indented sequence:
   - carrot
 
 quoting:
-  - that should have double quotes
-  - that should remain in single quotes
-  - a string with " inside
+  - "that should have double quotes"
+  - "that should remain in single quotes"
+  - 'a string with " inside'
   # next line has some undesired trailing spaces:
-  - a string with ' inside
+  - "a string with ' inside"
   - can't be sure!
   # next line should be converted to use double quotes:
-  - [foo, bar]
+  - ["foo", "bar"]
 
 inline-dictionary:
   - { foo: bar } # should add some spacing between curly braces and content
