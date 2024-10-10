@@ -954,6 +954,7 @@ class FormattedYAML(YAML):
         # This will only preserve quotes for strings read from the file.
         # anything modified by the transform will use no quotes, preferred_quote,
         # or the quote that results in the least amount of escaping.
+        self.preserve_quotes = True
 
         # If needed, we can use this to change null representation to be explicit
         # (see https://stackoverflow.com/a/44314840/1134951)
