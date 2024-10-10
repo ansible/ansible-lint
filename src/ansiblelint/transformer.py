@@ -48,6 +48,7 @@ class Transformer:
     def __init__(self, result: LintResult, options: Options):
         """Initialize a Transformer instance."""
         self.write_set = self.effective_write_set(options.write_list)
+        self.write_exclude_set = set(options.write_exclude_list)
 
         self.matches: list[MatchError] = result.matches
         self.files: set[Lintable] = result.files
@@ -145,10 +146,12 @@ class Transformer:
             if not isinstance(match.rule, TransformMixin):
                 logging.debug("%s %s", self.FIX_NA_MSG, match_id)
                 continue
-            if self.write_set != {"all"}:
+            if self.write_set != {"all"} or self.write_exclude_set:
                 rule = cast(AnsibleLintRule, match.rule)
                 rule_definition = set(rule.tags)
                 rule_definition.add(rule.id)
+                if not rule_definition.isdisjoint(self.write_exclude_set):
+                    continue
                 if rule_definition.isdisjoint(self.write_set):
                     logging.debug("%s %s", self.FIX_NE_MSG, match_id)
                     continue
