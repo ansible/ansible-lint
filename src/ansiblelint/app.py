@@ -125,12 +125,10 @@ class App:
         if self.options.sarif_file:
             sarif = formatters.SarifFormatter(self.options.cwd, True)
             json = sarif.format_result(matches)
-            with Path.open(
-                self.options.sarif_file,
-                "w",
+            self.options.sarif_file.write_text(
+                json,
                 encoding="utf-8",
-            ) as sarif_file:
-                sarif_file.write(json)
+            )
 
     def count_results(self, matches: list[MatchError]) -> SummarizedResults:
         """Count failures and warnings in matches."""
