@@ -503,3 +503,19 @@ def test_include_children_load_playbook_failed_syntax_check() -> None:
         "Failed to load syntax-error.yml playbook due to failing syntax check."
         in result.stderr
     )
+
+
+def test_import_playbook_children() -> None:
+    """Verify import_playbook_children()."""
+    result = run_ansible_lint(
+        Path("playbooks/import_playbook_fqcn.yml"),
+        cwd=Path(__file__).resolve().parent.parent / "examples",
+        env={
+            "ANSIBLE_COLLECTIONS_PATH": "../collections",
+        },
+    )
+    assert "Failed to find local.testcollection.foo playbook." not in result.stderr
+    assert (
+        "Failed to load local.testcollection.foo playbook due to failing syntax check."
+        not in result.stderr
+    )
