@@ -299,12 +299,6 @@ class HandleChildren:
     ) -> list[Lintable]:
         """Include children."""
         basedir = str(lintable.path.parent)
-        # import_playbook only accepts a string as argument (no dict syntax)
-        if k in (
-            "import_playbook",
-            "ansible.builtin.import_playbook",
-        ) and not isinstance(v, str):
-            return []
 
         # handle special case include_tasks: name=filename.yml
         if k in INCLUSION_ACTION_NAMES and isinstance(v, dict) and "file" in v:
@@ -312,17 +306,6 @@ class HandleChildren:
 
         # we cannot really parse any jinja2 in includes, so we ignore them
         if not v or "{{" in v:
-            return []
-
-        if k in ("import_playbook", "ansible.builtin.import_playbook"):
-            included = Path(basedir) / v
-            if not included.exists():
-                msg = f"Failed to find {v} playbook."
-            elif not self.app.runtime.has_playbook(v, basedir=Path(basedir)):
-                msg = f"Failed to load {v} playbook due to failing syntax check."
-            else:
-                return [Lintable(included, kind=parent_type)]
-            logging.error(msg)
             return []
 
         # handle include: filename.yml tags=blah
@@ -457,6 +440,61 @@ class HandleChildren:
                 results.extend(_look_for_role_files(basedir, role))
         return results
 
+    def import_playbook_children(
+        self,
+        lintable: Lintable,
+        k: str,  # pylint: disable=unused-argument
+        v: Any,
+        parent_type: FileType,
+    ) -> list[Lintable]:
+        """Include import_playbook children."""
+
+        def append_playbook_path(loc: str, playbook_name: str) -> None:
+            possible_paths.append(
+                Path(
+                    path_dwim(
+                        os.path.expanduser(loc),
+                        os.path.join(
+                            "ansible_collections",
+                            namespace_name,
+                            collection_name,
+                            "playbooks",
+                            playbook_name,
+                        ),
+                    ),
+                ),
+            )
+
+        # import_playbook only accepts a string as argument (no dict syntax)
+        if not isinstance(v, str):
+            return []
+
+        possible_paths = []
+        namespace_name, collection_name, playbook_name = parse_fqcn(v)
+        if namespace_name and collection_name:
+            for loc in get_app(cached=True).runtime.config.collections_paths:
+                append_playbook_path(loc, f"{playbook_name}.yml")
+                append_playbook_path(loc, f"{playbook_name}.yaml")
+        else:
+            possible_paths.append(lintable.path.parent / v)
+
+        for possible_path in possible_paths:
+            if not possible_path.exists():
+                msg = f"Failed to find {v} playbook."
+            elif not self.app.runtime.has_playbook(
+                str(possible_path),
+            ):
+                msg = f"Failed to load {v} playbook due to failing syntax check."
+                break
+            elif namespace_name and collection_name:
+                # don't lint foreign playbook
+                return []
+            else:
+                return [Lintable(possible_path, kind=parent_type)]
+
+        logging.error(msg)
+        return []
+
 
 def _get_task_handler_children_for_tasks_or_playbooks(
     task_handler: dict[str, Any],
@@ -505,9 +543,7 @@ def _get_task_handler_children_for_tasks_or_playbooks(
 
 def _rolepath(basedir: str, role: str) -> str | None:
     role_path = None
-    namespace_name, collection_name, role_name = (
-        role.split(".") if is_fqcn(role) else ("", "", role)
-    )
+    namespace_name, collection_name, role_name = parse_fqcn(role)
 
     possible_paths = [
         # if included from a playbook
@@ -1135,3 +1171,8 @@ def load_plugin(name: str) -> PluginLoadContext:
             check_aliases=True,
         )
     return loaded_module
+
+
+def parse_fqcn(name: str) -> tuple[str, ...]:
+    """Parse name parameter into FQCN segments."""
+    return tuple(name.split(".")) if is_fqcn(name) else ("", "", name)
