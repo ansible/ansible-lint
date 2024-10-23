@@ -207,7 +207,7 @@ def fixture_runner_result(
     ),
 )
 @mock.patch.dict(os.environ, {"ANSIBLE_LINT_WRITE_TMP": "1"}, clear=True)
-def test_transformer(  # pylint: disable=too-many-arguments
+def test_transformer(  # pylint: disable=too-many-arguments,too-many-positional-arguments
     config_options: Options,
     playbook_str: str,
     runner_result: LintResult,

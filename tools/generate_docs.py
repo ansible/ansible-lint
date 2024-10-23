@@ -27,8 +27,7 @@ if __name__ == "__main__":
     contents: list[str] = []
     for rule in rules.alphabetical():
         if issubclass(rule.__class__, TransformMixin):
-            url = f"rules/{rule.id}.md"
-            contents.append(f"- [{rule.id}]({url})\n")
+            contents.append(f"- [{rule.id}](rules/{rule.id}.md)\n")
 
     # Write the injected contents to the file.
     with file.open(encoding="utf-8", mode="w") as fh:
