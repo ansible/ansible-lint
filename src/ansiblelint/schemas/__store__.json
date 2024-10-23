@@ -12,7 +12,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/changelog.json"
   },
   "execution-environment": {
-    "etag": "b59d0bf4fc37a9e1825e06fba278e09ba75fc9c046160ca3d27e52448b7a7ce5",
+    "etag": "075ab552988793a43ddfe9907b0e391331c54b5dbee2ad1a194e6fc9268e5df9",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/execution-environment.json"
   },
   "galaxy": {
@@ -44,11 +44,11 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/requirements.json"
   },
   "role-arg-spec": {
-    "etag": "e41a42e1ca634a9eb2edbc4a180f404bdc71e17aafa464e6651387c08152bbc5",
+    "etag": "c470f67bc8eec3937957773074d7b6549deefd83dd0c3e13db725df166a66df3",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/role-arg-spec.json"
   },
   "rulebook": {
-    "etag": "baba5774a46fcc2bc8c4a8c2f25b49df64a0856e415dbf601b0559f215e55968",
+    "etag": "8113782a066a9a7aba1f3f42aeb7f8315fa49b5bf0b158a61e44a3eba22dd22f",
     "url": "https://raw.githubusercontent.com/ansible/ansible-rulebook/main/ansible_rulebook/schema/ruleset_schema.json"
   },
   "tasks": {
