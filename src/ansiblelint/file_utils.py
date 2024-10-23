@@ -240,8 +240,9 @@ class Lintable:
         if str(self.path) in ["/dev/stdin", "-"]:
             # pylint: disable=consider-using-with
             self.file = NamedTemporaryFile(
-                mode="w+", suffix="playbook.yml"
-            )  # noqa: SIM115
+                mode="w+",
+                suffix="playbook.yml",
+            )
             self.filename = self.file.name
             self._content = sys.stdin.read()
             self.file.write(self._content)

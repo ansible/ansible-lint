@@ -327,8 +327,10 @@ class Runner:
 """
                 # pylint: disable=consider-using-with
                 fh = tempfile.NamedTemporaryFile(
-                    mode="w", suffix=".yml", prefix="play"
-                )  # noqa: SIM115
+                    mode="w",
+                    suffix=".yml",
+                    prefix="play",
+                )
                 fh.write(playbook_text)
                 fh.flush()
                 playbook_path = fh.name
