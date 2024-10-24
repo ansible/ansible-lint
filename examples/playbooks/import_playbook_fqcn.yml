@@ -1,0 +1,3 @@
+---
+- name: Import a playbook
+  ansible.builtin.import_playbook: local.testcollection.foo
