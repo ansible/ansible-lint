@@ -167,12 +167,7 @@ class VariableNamingRule(AnsibleLintRule):
 
         # We want to allow use of jinja2 templating for variable names
         if "{{" in ident:
-            return MatchError(
-                tag="var-naming[no-jinja]",
-                message="Variables names must not contain jinja2 templating.",
-                rule=self,
-                lintable=file,
-            )
+            return None
 
         if not bool(self.re_pattern.match(ident)) and (
             not prefix or not prefix.from_fqcn
@@ -414,11 +409,10 @@ if "pytest" in sys.modules:
             ("schema[vars]", 1),
             ("var-naming[pattern]", 2),
             ("var-naming[pattern]", 6),
-            ("var-naming[no-jinja]", 7),
-            ("var-naming[no-keyword]", 9),
-            ("var-naming[non-ascii]", 10),
-            ("var-naming[no-reserved]", 11),
-            ("var-naming[read-only]", 12),
+            ("var-naming[no-keyword]", 10),
+            ("var-naming[non-ascii]", 11),
+            ("var-naming[no-reserved]", 12),
+            ("var-naming[read-only]", 13),
         )
         assert len(results) == len(expected_errors)
         for idx, result in enumerate(results):

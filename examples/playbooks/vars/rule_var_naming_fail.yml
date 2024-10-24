@@ -4,6 +4,7 @@ this_is_valid: # valid because content is a dict, not a variable
   CamelCase: ...
   ALL_CAPS: ...
 ALL_CAPS_ARE_BAD_TOO: ... # invalid
+# Next line should be allowed, as we should ignore jinja in var names
 "{{ 'test_' }}var": "value" # noqa: schema
 CamelCaseButErrorIgnored: true # noqa: var-naming
 assert: true # invalid due to being Python reserved keyword
