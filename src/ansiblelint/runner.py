@@ -326,7 +326,7 @@ class Runner:
         name: {lintable.path.expanduser()!s}
 """
                 # pylint: disable=consider-using-with
-                fh = tempfile.NamedTemporaryFile(
+                fh = tempfile.NamedTemporaryFile(  # noqa: SIM115
                     mode="w",
                     suffix=".yml",
                     prefix="play",

@@ -208,7 +208,7 @@ class WriteArgAction(argparse.Action):
         if not values:
             values = previous_values
         elif previous_values != default:
-            values = previous_values + values
+            values = previous_values + values  # type: ignore[operator]
         setattr(namespace, self.dest, values)
 
     @classmethod
