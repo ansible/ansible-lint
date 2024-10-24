@@ -68,7 +68,7 @@ class AnsibleLintRule(BaseRule):
         text = re.sub(r"{#.+?#}", "JINJA_COMMENT", text)
         return text
 
-    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-arguments,too-many-positional-arguments
     def create_matcherror(
         self,
         message: str = "",
