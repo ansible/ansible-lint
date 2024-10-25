@@ -7,7 +7,12 @@ import re
 import sys
 from typing import TYPE_CHECKING, Any
 
-from ansiblelint.constants import INCLUSION_ACTION_NAMES, LINE_NUMBER_KEY
+from ruamel.yaml.scalarstring import DoubleQuotedScalarString, SingleQuotedScalarString
+
+from ansiblelint.constants import (
+    INCLUSION_ACTION_NAMES,
+    LINE_NUMBER_KEY,
+)
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.rules.key_order import task_property_sorter
 
@@ -124,7 +129,11 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
                     # Keep quoted strings together
                     quote = v[0]
                     _, v, remainder = v.split(quote, 2)
-                    v = f"{quote}{v}{quote}"
+                    v = (
+                        DoubleQuotedScalarString
+                        if quote == '"'
+                        else SingleQuotedScalarString
+                    )(v)
                 else:
                     try:
                         v, remainder = v.split(" ", 1)
