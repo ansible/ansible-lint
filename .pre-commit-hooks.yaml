@@ -11,7 +11,7 @@
   # https://github.com/ansible/ansible-lint/issues/611
   pass_filenames: false
   always_run: true
-  stages: 
+  stages:
     - pre-commit
   additional_dependencies:
     # https://github.com/pre-commit/pre-commit/issues/1526
