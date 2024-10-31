@@ -5,6 +5,7 @@ jmespath
 license-expression >= 30.3.0 # Apache 2.0
 mypy # IDE support
 netaddr # needed by ipwrap filter
+pip # tox command
 psutil # soft-dep of pytest-xdist
 pylint # IDE support
 pytest >= 7.2.2

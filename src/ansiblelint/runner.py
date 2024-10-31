@@ -326,7 +326,11 @@ class Runner:
         name: {lintable.path.expanduser()!s}
 """
                 # pylint: disable=consider-using-with
-                fh = tempfile.NamedTemporaryFile(mode="w", suffix=".yml", prefix="play")
+                fh = tempfile.NamedTemporaryFile(  # noqa: SIM115
+                    mode="w",
+                    suffix=".yml",
+                    prefix="play",
+                )
                 fh.write(playbook_text)
                 fh.flush()
                 playbook_path = fh.name
@@ -549,8 +553,8 @@ class Runner:
             "block": handlers.taskshandlers_children,
             "include": handlers.include_children,
             "ansible.builtin.include": handlers.include_children,
-            "import_playbook": handlers.include_children,
-            "ansible.builtin.import_playbook": handlers.include_children,
+            "import_playbook": handlers.import_playbook_children,
+            "ansible.builtin.import_playbook": handlers.import_playbook_children,
             "roles": handlers.roles_children,
             "dependencies": handlers.roles_children,
             "handlers": handlers.taskshandlers_children,
@@ -588,7 +592,7 @@ class Runner:
         examples.line_offset = offset
 
         # pylint: disable=consider-using-with
-        examples.file = NamedTemporaryFile(
+        examples.file = NamedTemporaryFile(  # noqa: SIM115
             mode="w+",
             suffix=f"_{lintable.path.name}.yaml",
         )
