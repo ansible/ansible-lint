@@ -289,6 +289,13 @@
             "workdir": {
               "description": "Default working directory, also often the homedir for ephemeral UIDs",
               "type": ["string", "null"]
+            },
+            "tags": {
+              "description": "A list of names to assign to the resulting image if build process completes successfully",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           "type": "object"

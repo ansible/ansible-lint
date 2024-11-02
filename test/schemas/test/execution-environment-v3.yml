@@ -17,3 +17,8 @@ additional_build_steps:
   append_base:
     - RUN echo This is a post-install command!
     - RUN ls -la /etc
+
+options:
+  package_manager_path: /usr/bin/dnf
+  tags:
+    - automation-hub.my.company.com/ee-supported-rhel9_foo:latest

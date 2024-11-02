@@ -26,7 +26,7 @@ jobs:
     steps:
       - name: Determine matrix
         id: generate_matrix
-        uses: coactions/dynamic-matrix@v3
+        uses: coactions/dynamic-matrix@v4
         with:
           min_python: "3.10"
           max_python: "3.12"
@@ -45,6 +45,10 @@ jobs:
           platforms: linux,macos
   test-action:
     runs-on: ubuntu-latest
+    env:
+      # This disables the github annotations in the output of ansible-lint action
+      # which might confuse users.
+      GITHUB_ACTIONS: false
     steps:
       - uses: actions/checkout@v4
       - name: Self test 1
@@ -126,7 +130,7 @@ jobs:
       - name: Install tox
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install --upgrade "tox>=4.0.0"
+          python3 -m pip install --upgrade "tox>=4.0.0" "tox-uv>=1.16.0" uv
 
       - name: Log installed dists
         run: python3 -m pip freeze --all
@@ -249,7 +253,7 @@ jobs:
           fi
 
       - name: Upload coverage data
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v4.5.0
         with:
           name: ${{ matrix.name }}
           # verbose: true # optional (default = false)

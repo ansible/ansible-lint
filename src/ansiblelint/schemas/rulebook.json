@@ -453,6 +453,10 @@
                         },
                         "delay": {
                             "type": "integer"
+                        },
+                        "include_events": {
+                            "type": "boolean",
+                            "default": true
                         }
                     },
                     "required": [
@@ -502,6 +506,10 @@
                         },
                         "delay": {
                             "type": "integer"
+                        },
+                        "include_events": {
+                            "type": "boolean",
+                            "default": true
                         }
                     },
                     "required": [

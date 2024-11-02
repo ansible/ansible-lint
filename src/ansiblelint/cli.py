@@ -151,7 +151,7 @@ class WriteArgAction(argparse.Action):
     _default = "__default__"
 
     # noinspection PyShadowingBuiltins
-    def __init__(  # pylint: disable=too-many-arguments,redefined-builtin
+    def __init__(  # pylint: disable=too-many-arguments,redefined-builtin,too-many-positional-arguments
         self,
         option_strings: list[str],
         dest: str,
@@ -208,7 +208,7 @@ class WriteArgAction(argparse.Action):
         if not values:
             values = previous_values
         elif previous_values != default:
-            values = previous_values + values
+            values = previous_values + values  # type: ignore[operator]
         setattr(namespace, self.dest, values)
 
     @classmethod
