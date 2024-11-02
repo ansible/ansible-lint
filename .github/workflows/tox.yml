@@ -45,6 +45,10 @@ jobs:
           platforms: linux,macos
   test-action:
     runs-on: ubuntu-latest
+    env:
+      # This disables the github annotations in the output of ansible-lint action
+      # which might confuse users.
+      GITHUB_ACTIONS: false
     steps:
       - uses: actions/checkout@v4
       - name: Self test 1
@@ -126,7 +130,7 @@ jobs:
       - name: Install tox
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install --upgrade "tox>=4.0.0"
+          python3 -m pip install --upgrade "tox>=4.0.0" "tox-uv>=1.16.0" uv
 
       - name: Log installed dists
         run: python3 -m pip freeze --all
