@@ -45,6 +45,10 @@ jobs:
           platforms: linux,macos
   test-action:
     runs-on: ubuntu-latest
+    env:
+      # This disables the github annotations in the output of ansible-lint action
+      # which might confuse users.
+      GITHUB_ACTIONS: false
     steps:
       - uses: actions/checkout@v4
       - name: Self test 1
