@@ -29,7 +29,7 @@ jobs:
         uses: coactions/dynamic-matrix@v4
         with:
           min_python: "3.10"
-          max_python: "3.12"
+          max_python: "3.13"
           default_python: "3.10"
           other_names: |
             lint
@@ -42,6 +42,7 @@ jobs:
             py311-devel
             py310-lower
             py312-lower
+            py313-devel
           platforms: linux,macos
   test-action:
     runs-on: ubuntu-latest
@@ -225,7 +226,7 @@ jobs:
       - name: Set up Python # likely needed for coverage
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.13"
 
       - run: pip3 install 'coverage>=7.5.1'
 
@@ -246,7 +247,7 @@ jobs:
 
       - name: Check for expected number of coverage.xml reports
         run: |
-          JOBS_PRODUCING_COVERAGE=8
+          JOBS_PRODUCING_COVERAGE=10
           if [ "$(find . -name coverage.xml | wc -l | bc)" -ne "${JOBS_PRODUCING_COVERAGE}" ]; then
             echo "::error::Number of coverage.xml files was not the expected one (${JOBS_PRODUCING_COVERAGE}): $(find . -name coverage.xml |xargs echo)"
             exit 1
