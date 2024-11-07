@@ -137,7 +137,7 @@ repos:
         types: [file, yaml]
         entry: yamllint --strict
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.7.0"
+    rev: "v0.7.2"
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -162,6 +162,7 @@ repos:
           - license-expression >= 30.3.0
           - pytest-mock
           - pytest>=7.2.2
+          - pip>=22.3.1
           - rich>=13.2.0
           - ruamel-yaml-clib>=0.2.8
           - ruamel-yaml>=0.18.6

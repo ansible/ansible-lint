@@ -5,7 +5,7 @@ Do not manually edit, generated from generate_docs.py
 # Profiles
 
 Ansible-lint profiles gradually increase the strictness of rules as your Ansible
-content lifecycle. To configure linter to use a specific profile, read
+content lifecycle matures. To configure linter to use a specific profile, read
 [applying-profiles][].
 
 !!! note
