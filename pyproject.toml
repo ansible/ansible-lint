@@ -300,3 +300,8 @@ git_describe_command = [
   "--match",
   "v*.*",
 ]
+
+[tool.uv.pip]
+annotation-style = "line"
+no-emit-package = ["ansible-core", "pip", "resolvelib", "typing_extensions", "uv"]
+custom-compile-command = "tox run deps"
