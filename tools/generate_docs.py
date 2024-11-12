@@ -1,5 +1,6 @@
 #!python3
 """Script that tests rule markdown documentation."""
+
 from __future__ import annotations
 
 import subprocess

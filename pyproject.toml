@@ -1,20 +1,12 @@
 [build-system]
+build-backend = "setuptools.build_meta"
 requires = [
   "setuptools >= 65.3.0", # required by pyproject+setuptools_scm integration and editable installs
-  "setuptools_scm[toml] >= 7.0.5", # required for "no-local-version" scheme
+  "setuptools_scm[toml] >= 7.0.5" # required for "no-local-version" scheme
 ]
-build-backend = "setuptools.build_meta"
 
 [project]
-# https://peps.python.org/pep-0621/#readme
-requires-python = ">=3.10"
-dynamic = ["version", "dependencies", "optional-dependencies"]
-name = "ansible-lint"
-description = "Checks playbooks for practices and behavior that could potentially be improved"
-readme = "README.md"
-authors = [{ "name" = "Will Thames", "email" = "will@thames.id.au" }]
-maintainers = [{ "name" = "Ansible by Red Hat", "email" = "info@ansible.com" }]
-license = { text = "GPLv3+" }
+authors = [{"email" = "will@thames.id.au", "name" = "Will Thames"}]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Environment :: Console",
@@ -35,26 +27,34 @@ classifiers = [
   "Topic :: System :: Systems Administration",
   "Topic :: Software Development :: Quality Assurance",
   "Topic :: Software Development :: Testing",
-  "Topic :: Utilities",
+  "Topic :: Utilities"
 ]
+description = "Checks playbooks for practices and behavior that could potentially be improved"
+dynamic = ["version", "dependencies", "optional-dependencies"]
 keywords = ["ansible", "lint"]
+license = {text = "GPLv3+"}
+maintainers = [{"email" = "info@ansible.com", "name" = "Ansible by Red Hat"}]
+name = "ansible-lint"
+readme = "README.md"
+# https://peps.python.org/pep-0621/#readme
+requires-python = ">=3.10"
 
 [project.scripts]
 ansible-lint = "ansiblelint.__main__:_run_cli_entrypoint"
 
 [project.urls]
-homepage = "https://github.com/ansible/ansible-lint"
-documentation = "https://ansible.readthedocs.io/projects/lint/"
-repository = "https://github.com/ansible/ansible-lint"
 changelog = "https://github.com/ansible/ansible-lint/releases"
+documentation = "https://ansible.readthedocs.io/projects/lint/"
+homepage = "https://github.com/ansible/ansible-lint"
+repository = "https://github.com/ansible/ansible-lint"
 
 [tool.black]
 target-version = ["py310"]
 
 [tool.codespell]
-skip = ".tox,.mypy_cache,build,.git,.eggs,pip-wheel-metadata"
 # indention is a typo in ruamel.yaml's API
 ignore-words-list = "indention"
+skip = ".tox,.mypy_cache,build,.git,.eggs,pip-wheel-metadata"
 
 # Keep this default because xml/report do not know to use load it from config file:
 # data_file = ".coverage"
@@ -63,44 +63,29 @@ source = ["src", ".tox/*/site-packages"]
 
 [tool.coverage.report]
 exclude_also = ["pragma: no cover", "if TYPE_CHECKING:"]
-omit = ["test/*"]
 # Increase it just so it would pass on any single-python run
 fail_under = 92
-skip_covered = true
-skip_empty = true
 # During development we might remove code (files) with coverage data, and we dont want to fail:
 ignore_errors = true
+omit = ["test/*"]
 show_missing = true
+skip_covered = true
+skip_empty = true
 
 [tool.coverage.run]
-source = ["src"]
+concurrency = ["multiprocessing", "thread"]
 # Do not use branch until bug is fixes:
 # https://github.com/nedbat/coveragepy/issues/605
 # branch = true
 parallel = true
-concurrency = ["multiprocessing", "thread"]
-
-[tool.isort]
-profile = "black"
-# add_imports = "from __future__ import annotations"
-known_first_party = "ansiblelint"
-known_third_party = "ansible,pytest,ruamel,setuptools,yaml"
-# https://black.readthedocs.io/en/stable/the_black_code_style.html#line-length
-multi_line_output = 3
-include_trailing_comma = true
-force_grid_wrap = 0
-use_parentheses = true
-ensure_newline_before_comments = true
-line_length = 88
+source = ["src"]
 
 [tool.mypy]
-python_version = "3.10"
-strict = true
 color_output = true
-error_summary = true
+disallow_any_generics = true
 disallow_untyped_calls = true
 disallow_untyped_defs = true
-disallow_any_generics = true
+error_summary = true
 # disallow_any_unimported = True
 # warn_redundant_casts = True
 # warn_return_any = True
@@ -109,17 +94,19 @@ disallow_any_generics = true
 exclude = "(build|dist|test/local-content|site-packages|~/.pyenv|examples/playbooks/collections|plugins/modules)"
 # https://github.com/python/mypy/issues/12664
 incremental = false
+python_version = "3.10"
+strict = true
 
 [[tool.mypy.overrides]]
+ignore_errors = true
+ignore_missing_imports = true
 module = [
   "ansible.*",
   "ansiblelint._version", # generated
   "license_expression",
   "ruamel.yaml",
-  "yamllint.*",
+  "yamllint.*"
 ]
-ignore_missing_imports = true
-ignore_errors = true
 
 [tool.pylint.IMPORTS]
 preferred-modules = ["py:pathlib", "unittest:pytest"]
@@ -131,7 +118,7 @@ extension-pkg-allow-list = ["black.parsing"]
 bad-names = [
   # spell-checker:ignore linenumber
   "linenumber", # use lineno instead
-  "line_number", # use lineno instead
+  "line_number" # use lineno instead
 ]
 # pylint defaults + f,fh,v,id
 good-names = ["i", "j", "k", "Run", "_", "f", "fh", "v", "id", "T"]
@@ -139,8 +126,6 @@ good-names = ["i", "j", "k", "Run", "_", "f", "fh", "v", "id", "T"]
 ignore-paths = "^src/ansiblelint/_version.*$"
 
 [tool.pylint."MESSAGES CONTROL"]
-# increase from default is 50 which is too aggressive
-max-statements = 60
 disable = [
   # Disabled on purpose:
   "line-too-long", # covered by black
@@ -152,11 +137,13 @@ disable = [
   # https://github.com/PyCQA/pylint/issues/850
   "cyclic-import",
   # https://github.com/PyCQA/pylint/issues/8453
-  "preferred-module",
+  "preferred-module"
 ]
 enable = [
-  "useless-suppression", # Identify unneeded pylint disable statements
+  "useless-suppression" # Identify unneeded pylint disable statements
 ]
+# increase from default is 50 which is too aggressive
+max-statements = 60
 
 [tool.pylint.REPORTING]
 output-format = "colorized"
@@ -166,9 +153,9 @@ output-format = "colorized"
 score = "n"
 
 [tool.pyright]
+include = ["src"]
 # https://github.com/microsoft/pyright/blob/main/docs/configuration.md#sample-pyprojecttoml-file
 pythonVersion = "3.10"
-include = ["src"]
 # https://github.com/microsoft/pyright/issues/777
 "stubPath" = ""
 
@@ -194,7 +181,7 @@ filterwarnings = [
   # https://github.com/ansible/ansible/issues/81906
   "ignore:'importlib.abc.TraversableResources' is deprecated and slated for removal in Python 3.14:DeprecationWarning",
   # https://github.com/ansible/ansible/pull/80968
-  "ignore:Attribute s is deprecated and will be removed in Python 3.14; use value instead:DeprecationWarning",
+  "ignore:Attribute s is deprecated and will be removed in Python 3.14; use value instead:DeprecationWarning"
 ]
 junit_duration_report = "call"
 # Our github annotation parser from .github/workflows/tox.yml requires xunit1 format. Ref:
@@ -215,7 +202,7 @@ norecursedirs = [
   "collections",
   "dist",
   "docs",
-  "src/ansible_lint.egg-info",
+  "src/ansible_lint.egg-info"
 ]
 python_files = [
   "test_*.py",
@@ -223,7 +210,7 @@ python_files = [
   # Needed to discover legacy nose test modules:
   "Test*.py",
   # Needed to discover embedded Rule tests
-  "rules/*.py",
+  "rules/*.py"
 ]
 # Using --pyargs instead of testpath as we embed some tests
 # See: https://github.com/pytest-dev/pytest/issues/6451#issuecomment-687043537
@@ -231,15 +218,21 @@ python_files = [
 xfail_strict = true
 
 [tool.ruff]
-target-version = "py310"
+cache-dir = "./.cache/.ruff"
+fix = true
 # Same as Black.
 line-length = 88
-lint.ignore = [
+target-version = "py310"
+
+[tool.ruff.lint]
+ignore = [
+  "COM812", # conflicts with ISC001 on format
   "D203", # incompatible with D211
   "D213", # incompatible with D212
   "E501", # we use black
   "ERA001", # auto-removal of commented out code affects development and vscode integration
   "INP001", # "is part of an implicit namespace package", all false positives
+  "ISC001", # conflicts with COM812 on format
   "PLW2901", # PLW2901: Redefined loop variable
   "RET504", # Unnecessary variable assignment before `return` statement
   # temporary disabled until we fix them:
@@ -252,9 +245,9 @@ lint.ignore = [
   "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
   "PERF203",
   "PD011", # We are not using pandas, any .values attributes are unrelated
-  "PLW0603", # global lock file in cache dir
+  "PLW0603" # global lock file in cache dir
 ]
-lint.select = ["ALL"]
+select = ["ALL"]
 
 [tool.ruff.lint.flake8-builtins]
 builtins-ignorelist = ["id"]
@@ -263,45 +256,50 @@ builtins-ignorelist = ["id"]
 parametrize-values-type = "tuple"
 
 [tool.ruff.lint.isort]
-known-first-party = ["ansiblelint"]
+known-first-party = ["src"]
 
 [tool.ruff.lint.mccabe]
 # Implicit 10 is too low for our codebase, even black uses 18 as default.
 max-complexity = 20
 
 [tool.ruff.lint.per-file-ignores]
-"test/**/*.py" = ["S"]
 "src/ansiblelint/rules/*.py" = ["S"]
 "src/ansiblelint/testing/*.py" = ["S"]
 # Temporary disabled until we fix them:
 "src/ansiblelint/{utils,file_utils,runner,loaders,constants,config,cli,_mockings}.py" = [
-  "PTH",
+  "PTH"
 ]
+"test/**/*.py" = ["S"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
 [tool.setuptools.dynamic]
-dependencies = { file = [".config/requirements.in"] }
-optional-dependencies.docs = { file = [".config/requirements-docs.in"] }
-optional-dependencies.test = { file = [".config/requirements-test.in"] }
+dependencies = {file = [".config/requirements.in"]}
+optional-dependencies.docs = {file = [".config/requirements-docs.in"]}
+optional-dependencies.test = {file = [".config/requirements-test.in"]}
 
 [tool.setuptools_scm]
-local_scheme = "no-local-version"
-tag_regex = "^(?P<prefix>v)?(?P<version>[0-9.]+)(?P<suffix>.*)?$"
-write_to = "src/ansiblelint/_version.py"
 # To prevent accidental pick of mobile version tags such 'v6'
 git_describe_command = [
   "git",
   "describe",
   "--dirty",
-  "--tags",
   "--long",
+  "--tags",
   "--match",
-  "v*.*",
+  "v*.*"
 ]
+local_scheme = "no-local-version"
+tag_regex = "^(?P<prefix>v)?(?P<version>[0-9.]+)(?P<suffix>.*)?$"
+write_to = "src/ansiblelint/_version.py"
+
+[tool.tomlsort]
+in_place = true
+sort_inline_tables = true
+sort_table_keys = true
 
 [tool.uv.pip]
 annotation-style = "line"
-no-emit-package = ["ansible-core", "pip", "resolvelib", "typing_extensions", "uv"]
 custom-compile-command = "tox run deps"
+no-emit-package = ["ansible-core", "pip", "resolvelib", "typing_extensions", "uv"]

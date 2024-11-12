@@ -19,6 +19,7 @@
 # THE SOFTWARE.
 
 """UseHandlerRatherThanWhenChangedRule used with ansible-lint."""
+
 from __future__ import annotations
 
 import sys

@@ -3,10 +3,7 @@ ci:
   # format compatible with commitlint
   autoupdate_commit_msg: "chore: pre-commit autoupdate"
   autoupdate_schedule: monthly
-  autofix_commit_msg: |
-    chore: auto fixes from pre-commit.com hooks
-
-    for more information, see https://pre-commit.ci
+  autofix_commit_msg: "chore: auto fixes from pre-commit.com hooks"
   skip:
     # https://github.com/pre-commit-ci/issues/issues/55
     - pip-compile
@@ -33,11 +30,6 @@ repos:
   - repo: meta
     hooks:
       - id: check-useless-excludes
-  # https://github.com/pappasam/toml-sort/issues/69
-  # - repo: https://github.com/pappasam/toml-sort
-  #   rev: v0.23.1
-  #   hooks:
-  #     - id: toml-sort-fix
   - repo: https://github.com/pre-commit/mirrors-prettier
     # keep it before yamllint
     rev: v4.0.0-alpha.8
@@ -70,7 +62,7 @@ repos:
           - prettier-plugin-toml@2.0.1
           - prettier-plugin-sort-json@3.1.0
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v8.15.3
+    rev: v8.16.0
     hooks:
       - id: cspell
         # entry: codespell --relative
@@ -136,16 +128,24 @@ repos:
         files: \.(yaml|yml)$
         types: [file, yaml]
         entry: yamllint --strict
+  - repo: https://github.com/pappasam/toml-sort
+    rev: v0.23.1
+    hooks:
+      - id: toml-sort-fix
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.7.3"
+    rev: v0.7.3
     hooks:
       - id: ruff
-        args: [--fix, --exit-non-zero-on-fix]
-  - repo: https://github.com/psf/black
+        args:
+          - --fix
+          - --exit-non-zero-on-fix
+        types_or: [python, pyi]
+      # - id: ruff-format # must be after ruff
+      #   types_or: [python, pyi]
+  - repo: https://github.com/psf/black # must be after ruff
     rev: 24.10.0
     hooks:
       - id: black
-        language_version: python3
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.13.0
     hooks:
