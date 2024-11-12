@@ -19,6 +19,7 @@
 # THE SOFTWARE.
 
 """Utils related to inline skipping of rules."""
+
 from __future__ import annotations
 
 import collections.abc

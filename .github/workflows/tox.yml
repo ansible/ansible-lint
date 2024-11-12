@@ -2,12 +2,15 @@
 name: tox
 
 on:
-  push: # only publishes pushes to the main branch to TestPyPI
-    branches: # any integration branch but not tag
+  push:
+    branches:
       - "main"
   pull_request:
     branches:
       - "main"
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_call:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}

@@ -730,7 +730,7 @@ class FormattedEmitter(Emitter):
             if "#" in string:
                 # # is \uFF03 (fullwidth number sign)
                 # ﹟ is \uFE5F (small number sign)
-                string = string.replace("#", "\uFF03#\uFE5F")
+                string = string.replace("#", "\uff03#\ufe5f")
                 # this is safe even if this sequence is present
                 # because it gets reversed in post-processing
         except (ValueError, TypeError):
@@ -742,10 +742,10 @@ class FormattedEmitter(Emitter):
     def drop_octothorpe_protection(string: str) -> str:
         """Remove string protection of "#" after full-line-comment post-processing."""
         try:
-            if "\uFF03#\uFE5F" in string:
+            if "\uff03#\ufe5f" in string:
                 # # is \uFF03 (fullwidth number sign)
                 # ﹟ is \uFE5F (small number sign)
-                string = string.replace("\uFF03#\uFE5F", "#")
+                string = string.replace("\uff03#\ufe5f", "#")
         except (ValueError, TypeError):
             # probably not really a string. Whatever.
             pass
