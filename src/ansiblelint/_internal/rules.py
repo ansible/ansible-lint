@@ -56,6 +56,8 @@ class BaseRule:
     _help: str | None = None
     # Added when a rule is registered into a collection, gives access to options
     _collection: RulesCollection | None = None
+    # Allow rules to provide a custom short description instead of using __doc__
+    _shortdesc: str = ""
 
     @property
     def help(self) -> str:
@@ -83,7 +85,7 @@ class BaseRule:
     @property
     def shortdesc(self) -> str:
         """Return the short description of the rule, basically the docstring."""
-        return self.__doc__ or ""
+        return self._shortdesc or self.__doc__ or ""
 
     def getmatches(self, file: Lintable) -> list[MatchError]:
         """Return all matches while ignoring exceptions."""
@@ -190,7 +192,7 @@ class RuntimeErrorRule(BaseRule):
     """Unexpected internal error."""
 
     id = "internal-error"
-    shortdesc = "Unexpected internal error"
+    _shortdesc = "Unexpected internal error"
     severity = "VERY_HIGH"
     tags = ["core"]
     version_added = "v5.0.0"

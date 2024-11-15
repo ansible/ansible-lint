@@ -120,11 +120,15 @@ class RoleNames(AnsibleLintRule):
                 if "roles" in play:
                     line = play["__line__"]
                     for role in play["roles"]:
+                        role_name = None
                         if isinstance(role, dict):
                             line = role["__line__"]
                             role_name = role["role"]
                         elif isinstance(role, str):
                             role_name = role
+                        if not isinstance(role_name, str):
+                            msg = "Role dependency has unexpected type."
+                            raise TypeError(msg)
                         if "/" in role_name:
                             result.append(
                                 self.create_matcherror(

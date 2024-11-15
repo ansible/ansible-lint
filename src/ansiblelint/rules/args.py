@@ -73,7 +73,7 @@ class ValidationPassedError(Exception):
 class CustomAnsibleModule(basic.AnsibleModule):  # type: ignore[misc]
     """Mock AnsibleModule class."""
 
-    def __init__(self, *args: str, **kwargs: Any) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Initialize AnsibleModule mock."""
         kwargs["no_log"] = True
         super().__init__(*args, **kwargs)

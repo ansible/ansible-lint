@@ -119,7 +119,7 @@ def ansible_templar(basedir: Path, templatevars: Any) -> Templar:
         basedir = basedir.parent
 
     dataloader = DataLoader()
-    dataloader.set_basedir(basedir)
+    dataloader.set_basedir(str(basedir))
     templar = Templar(dataloader, variables=templatevars)
     return templar
 

@@ -126,6 +126,10 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
 
         if module not in self.module_aliases:
             loaded_module = load_plugin(module)
+            if not isinstance(loaded_module.resolved_fqcn, str):
+                msg = f"Invalid value ({loaded_module.resolved_fqcn})for resolved_fqcn attribute of {module} module."
+                _logger.warning(msg)
+                return []
             target = loaded_module.resolved_fqcn
             self.module_aliases[module] = target
             if target is None:
