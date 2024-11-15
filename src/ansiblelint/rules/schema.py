@@ -7,7 +7,6 @@ import re
 import sys
 from typing import TYPE_CHECKING, Any
 
-from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.schemas.__main__ import JSON_SCHEMAS
@@ -16,6 +15,7 @@ from ansiblelint.text import has_jinja
 
 if TYPE_CHECKING:
     from ansiblelint.config import Options
+    from ansiblelint.errors import MatchError
     from ansiblelint.utils import Task
 
 
@@ -120,11 +120,10 @@ class ValidateSchemaRule(AnsibleLintRule):
                 if not has_jinja(plugin_value) and plugin_value not in values:
                     msg = f"'{key}' must be one of the currently available values: {', '.join(values)}"
                     results.append(
-                        MatchError(
+                        self.create_matcherror(
                             message=msg,
                             lineno=data.get("__line__", 1),
-                            lintable=file,
-                            rule=self,
+                            filename=file,
                             details=ValidateSchemaRule.description,
                             tag=f"schema[{file.kind}]",
                         ),
@@ -149,10 +148,9 @@ class ValidateSchemaRule(AnsibleLintRule):
                 msg = pre_checks["task"][key]["msg"]
                 tag = pre_checks["task"][key]["tag"]
                 results.append(
-                    MatchError(
+                    self.create_matcherror(
                         message=msg,
-                        lintable=file,
-                        rule=self,
+                        filename=file,
                         details=ValidateSchemaRule.description,
                         tag=f"schema[{tag}]",
                     ),
@@ -178,10 +176,9 @@ class ValidateSchemaRule(AnsibleLintRule):
                 return []
 
             result.append(
-                MatchError(
+                self.create_matcherror(
                     message=error,
-                    lintable=file,
-                    rule=self,
+                    filename=file,
                     details=ValidateSchemaRule.description,
                     tag=f"schema[{file.kind}]",
                 ),
