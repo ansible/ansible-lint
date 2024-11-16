@@ -36,7 +36,6 @@ from ansiblelint.utils import Task
 if TYPE_CHECKING:
     # noinspection PyProtectedMember
     from ruamel.yaml.comments import LineCol
-    from ruamel.yaml.compat import StreamTextType
     from ruamel.yaml.nodes import ScalarNode
     from ruamel.yaml.representer import RoundTripRepresenter
     from ruamel.yaml.tokens import CommentToken
@@ -1026,7 +1025,7 @@ class FormattedYAML(YAML):
             self._yaml_version = self._yaml_version_default
         # We do nothing if the object did not have a previous default version defined
 
-    def load(self, stream: Path | StreamTextType) -> Any:
+    def load(self, stream: Path | Any) -> Any:
         """Load YAML content from a string while avoiding known ruamel.yaml issues."""
         if not isinstance(stream, str):
             msg = f"expected a str but got {type(stream)}"

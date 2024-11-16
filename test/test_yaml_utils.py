@@ -1007,7 +1007,7 @@ def test_deannotate(
 
 def test_yamllint_incompatible_config() -> None:
     """Ensure we can detect incompatible yamllint settings."""
-    with (cwd(Path("examples/yamllint/incompatible-config")),):
+    with cwd(Path("examples/yamllint/incompatible-config")):
         config = ansiblelint.yaml_utils.load_yamllint_config()
         assert config.incompatible
 

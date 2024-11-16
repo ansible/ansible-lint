@@ -329,10 +329,12 @@ class VariableNamingRule(AnsibleLintRule):
         """Return matches for variables defined in vars files."""
         results: list[MatchError] = []
         raw_results: list[MatchError] = []
-        meta_data: dict[AnsibleUnicode, Any] = {}
 
         if str(file.kind) == "vars" and file.data:
             meta_data = parse_yaml_from_file(str(file.path))
+            if not isinstance(meta_data, dict):
+                msg = f"Content if vars file {file} is not a dictionary."
+                raise TypeError(msg)
             for key in meta_data:
                 prefix = Prefix(file.role) if file.role else Prefix()
                 match_error = self.get_var_naming_matcherror(
