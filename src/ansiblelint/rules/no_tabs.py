@@ -85,4 +85,4 @@ if "pytest" in sys.modules:
             assert len(results) >= i + 1
             assert results[i].lineno == expected[0]
             assert results[i].message == expected[1]
-        assert len(results) == len(expected), results
+        assert len(results) == len(expected_results), results

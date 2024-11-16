@@ -25,7 +25,7 @@ spdx_config_path = (
 )
 
 
-def urlopen_side_effect(*_args: Any, **kwargs: Any) -> DEFAULT:
+def urlopen_side_effect(*_args: Any, **kwargs: Any) -> Any:
     """Actual test that timeout parameter is defined."""
     assert "timeout" in kwargs
     assert kwargs["timeout"] > 0
@@ -47,7 +47,9 @@ def test_request_timeouterror_handling(
 ) -> None:
     """Test that schema refresh can handle time out errors."""
     error_msg = "Simulating handshake operation time out."
-    mock_request.urlopen.side_effect = urllib.error.URLError(TimeoutError(error_msg))
+    mock_request.urlopen.side_effect = urllib.error.URLError(
+        TimeoutError(error_msg)
+    )  # pyright: reportAttributeAccessIssue=false
     with caplog.at_level(logging.DEBUG):
         assert refresh_schemas(min_age_seconds=0) == 0
     mock_request.urlopen.assert_called()
