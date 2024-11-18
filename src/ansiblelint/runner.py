@@ -30,7 +30,12 @@ import ansiblelint.utils
 from ansiblelint.app import App, get_app
 from ansiblelint.constants import States
 from ansiblelint.errors import LintWarning, MatchError, WarnSource
-from ansiblelint.file_utils import Lintable, expand_dirs_in_lintables
+from ansiblelint.file_utils import (
+    Lintable,
+    expand_dirs_in_lintables,
+    expand_paths_vars,
+    normpath,
+)
 from ansiblelint.logger import timed_info
 from ansiblelint.rules.syntax_check import OUTPUT_PATTERNS
 from ansiblelint.text import strip_ansi_escape
@@ -111,7 +116,7 @@ class Runner:
     def _update_exclude_paths(self, exclude_paths: list[str]) -> None:
         if exclude_paths:
             # These will be (potentially) relative paths
-            paths = ansiblelint.file_utils.expand_paths_vars(exclude_paths)
+            paths = expand_paths_vars(exclude_paths)
             # Since ansiblelint.utils.find_children returns absolute paths,
             # and the list of files we create in `Runner.run` can contain both
             # relative and absolute paths, we need to cover both bases.
@@ -169,7 +174,6 @@ class Runner:
                 if warn.category is DeprecationWarning:
                     continue
                 if warn.category is LintWarning:
-                    filename: None | Lintable = None
                     if isinstance(warn.source, WarnSource):
                         match = MatchError(
                             message=warn.source.message or warn.category.__name__,
@@ -179,13 +183,12 @@ class Runner:
                             lineno=warn.source.lineno,
                         )
                     else:
-                        filename = warn.source
                         match = MatchError(
                             message=(
                                 warn.message if isinstance(warn.message, str) else "?"
                             ),
                             rule=self.rules["warning"],
-                            lintable=Lintable(str(filename)),
+                            lintable=Lintable(str(warn.source)),
                         )
                     matches.append(match)
                     continue
@@ -277,7 +280,7 @@ class Runner:
                 continue
             _logger.debug(
                 "Examining %s of type %s",
-                ansiblelint.file_utils.normpath(file.path),
+                normpath(file.path),
                 file.kind,
             )
 

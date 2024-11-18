@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
-import rich
+from rich.markup import escape
 
 from ansiblelint.config import options
 from ansiblelint.version import __version__
@@ -58,7 +58,7 @@ class BaseFormatter(Generic[T]):
     @staticmethod
     def escape(text: str) -> str:
         """Escapes a string to avoid processing it as markup."""
-        return rich.markup.escape(text)
+        return escape(text)
 
 
 class Formatter(BaseFormatter):  # type: ignore[type-arg]

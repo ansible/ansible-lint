@@ -729,6 +729,7 @@ def task_to_str(task: dict[str, Any]) -> str:
     return f"{action['__ansible_module__']} {' '.join(args)}"
 
 
+# pylint: disable=too-many-nested-blocks
 def extract_from_list(
     blocks: AnsibleBaseYAMLObject,
     candidates: list[str],
@@ -737,23 +738,24 @@ def extract_from_list(
 ) -> list[Any]:
     """Get action tasks from block structures."""
     results = []
-    for block in blocks:
-        for candidate in candidates:
-            if isinstance(block, dict) and candidate in block:
-                if isinstance(block[candidate], list):
-                    subresults = add_action_type(block[candidate], candidate)
-                    if recursive:
-                        subresults.extend(
-                            extract_from_list(
-                                subresults,
-                                candidates,
-                                recursive=recursive,
-                            ),
-                        )
-                    results.extend(subresults)
-                elif block[candidate] is not None:
-                    msg = f"Key '{candidate}' defined, but bad value: '{block[candidate]!s}'"
-                    raise RuntimeError(msg)
+    if isinstance(blocks, Iterable):
+        for block in blocks:
+            for candidate in candidates:
+                if isinstance(block, dict) and candidate in block:
+                    if isinstance(block[candidate], list):
+                        subresults = add_action_type(block[candidate], candidate)
+                        if recursive:
+                            subresults.extend(
+                                extract_from_list(
+                                    subresults,
+                                    candidates,
+                                    recursive=recursive,
+                                ),
+                            )
+                        results.extend(subresults)
+                    elif block[candidate] is not None:
+                        msg = f"Key '{candidate}' defined, but bad value: '{block[candidate]!s}'"
+                        raise RuntimeError(msg)
     return results
 
 
