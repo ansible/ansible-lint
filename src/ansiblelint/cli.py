@@ -107,6 +107,8 @@ def get_config_path(config_file: str | None = None) -> str | None:
     else:
         project_filenames = [
             ".ansible-lint",
+            ".ansible-lint.yml",
+            ".ansible-lint.yaml",
             ".config/ansible-lint.yml",
             ".config/ansible-lint.yaml",
         ]
@@ -445,7 +447,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         "-c",
         "--config-file",
         dest="config_file",
-        help="Specify configuration file to use. By default it will look for '.ansible-lint', '.config/ansible-lint.yml', or '.config/ansible-lint.yaml'",
+        help="Specify configuration file to use. By default it will look for '.ansible-lint', '.ansible-lint.yml', '.ansible-lint.yaml', '.config/ansible-lint.yml', or '.config/ansible-lint.yaml'",
     )
     parser.add_argument(
         "-i",
