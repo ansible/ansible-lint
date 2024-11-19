@@ -1,3 +1,5 @@
+# cspell: ignore FURB
+
 [build-system]
 build-backend = "setuptools.build_meta"
 requires = [
@@ -222,11 +224,13 @@ cache-dir = "./.cache/.ruff"
 fix = true
 # Same as Black.
 line-length = 88
+preview = true
 target-version = "py310"
 
 [tool.ruff.lint]
 ignore = [
   "COM812", # conflicts with ISC001 on format
+  "CPY001", # missing-copyright-notice
   "D203", # incompatible with D211
   "D213", # incompatible with D212
   "E501", # we use black
@@ -245,7 +249,21 @@ ignore = [
   "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
   "PERF203",
   "PD011", # We are not using pandas, any .values attributes are unrelated
-  "PLW0603" # global lock file in cache dir
+  "PLW0603", # global lock file in cache dir
+  # part of preview rules:
+  "B909", # raise-missing-from
+  "DOC201", # docstring-missing-returns
+  "DOC402", # docstring-missing-summary
+  "DOC501", # docstring-missing-exception
+  "FURB101",
+  "FURB103",
+  "FURB110",
+  "FURB113",
+  "FURB118",
+  "PLC0415",
+  "PLC2701",
+  "PLW1641",
+  "S404"
 ]
 select = ["ALL"]
 
@@ -269,7 +287,7 @@ max-complexity = 20
 "src/ansiblelint/{utils,file_utils,runner,loaders,constants,config,cli,_mockings}.py" = [
   "PTH"
 ]
-"test/**/*.py" = ["S"]
+"test/**/*.py" = ["DOC201", "DOC501", "PLC2701", "S"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"

@@ -333,6 +333,7 @@ class Runner:
                     mode="w",
                     suffix=".yml",
                     prefix="play",
+                    encoding="utf-8",
                 )
                 fh.write(playbook_text)
                 fh.flush()
@@ -598,6 +599,7 @@ class Runner:
         examples.file = NamedTemporaryFile(  # noqa: SIM115
             mode="w+",
             suffix=f"_{lintable.path.name}.yaml",
+            encoding="utf-8",
         )
         examples.file.write(content)
         examples.file.flush()
