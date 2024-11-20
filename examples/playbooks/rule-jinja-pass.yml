@@ -88,3 +88,18 @@
     - name: Bug https://github.com/ansible/ansible-lint/issues/3908
       ansible.builtin.debug:
         msg: "{{ foo | ansible.builtin.mandatory(msg='My message') }}"
+
+- name: Bugs https://github.com/ansible/ansible-lint/issues/4338
+  hosts: localhost
+  tasks:
+    - name: Test task
+      ansible.builtin.debug:
+        msg: "Hello, world!"
+      when: false
+      register: result
+
+    - name: Test task 2
+      vars:
+        counter: "{{ result is skipped | ternary(1, 2) }}"
+      ansible.builtin.debug:
+        msg: "Hello, world {{ counter }}!"
