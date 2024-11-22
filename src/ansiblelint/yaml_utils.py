@@ -1012,15 +1012,15 @@ class FormattedYAML(YAML):
         return None
 
     @version.setter
-    def version(self, value: tuple[int, int] | None) -> None:
+    def version(self, val: tuple[int, int] | None) -> None:
         """Ensure that yaml version uses our default value.
 
         The yaml Reader updates this value based on the ``%YAML`` directive in files.
         So, if a file does not include the directive, it sets this to None.
         But, None effectively resets the parsing version to YAML 1.2 (ruamel's default).
         """
-        if value is not None:
-            self._yaml_version = value
+        if val is not None:
+            self._yaml_version = val
         elif hasattr(self, "_yaml_version_default"):
             self._yaml_version = self._yaml_version_default
         # We do nothing if the object did not have a previous default version defined

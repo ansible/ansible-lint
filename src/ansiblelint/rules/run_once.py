@@ -35,16 +35,17 @@ class RunOnce(AnsibleLintRule):
         if not file or file.kind != "playbook" or not data:
             return []
 
-        strategy = data.get("strategy")
+        strategy: Any = data.get("strategy")
         run_once = data.get("run_once", False)
         if (not strategy and not run_once) or strategy != "free":
             return []
+        lineno = getattr(strategy, "_line_number", 1)
         return [
             self.create_matcherror(
                 message="Play uses strategy: free",
                 filename=file,
                 tag=f"{self.id}[play]",
-                lineno=strategy._line_number,  # noqa: SLF001
+                lineno=lineno,
             ),
         ]
 

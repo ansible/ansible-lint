@@ -113,9 +113,6 @@ module = [
 [tool.pylint.IMPORTS]
 preferred-modules = ["py:pathlib", "unittest:pytest"]
 
-[tool.pylint.MAIN]
-extension-pkg-allow-list = ["black.parsing"]
-
 [tool.pylint.MASTER]
 bad-names = [
   # spell-checker:ignore linenumber
@@ -133,6 +130,7 @@ disable = [
   "line-too-long", # covered by black
   "protected-access", # covered by ruff SLF001
   "too-many-branches", # covered by ruff C901
+  "wrong-import-order", # covered by ruff
   # TODO(ssbarnea): remove temporary skips adding during initial adoption:
   "duplicate-code",
   # unable to disable it inside tests
@@ -155,17 +153,20 @@ output-format = "colorized"
 score = "n"
 
 [tool.pyright]
+exclude = ["venv", ".cache"]
 include = ["src"]
+mode = "standard"
 # https://github.com/microsoft/pyright/blob/main/docs/configuration.md#sample-pyprojecttoml-file
-pythonVersion = "3.10"
-# https://github.com/microsoft/pyright/issues/777
-"stubPath" = ""
+# pythonVersion = "3.10"
+# reportMissingImports = false
+# https://github.com/microsoft/pyright/issues/9494
+reportPossiblyUnboundVariable = false
 
 # spell-checker:ignore filterwarnings norecursedirs optionflags
 [tool.pytest.ini_options]
 # do not add options here as this will likely break either console runs or IDE
 # integration like vscode or pycharm
-addopts = "-p no:pytest_cov"
+addopts = "-p no:pytest_cov --failed-first"
 # https://code.visualstudio.com/docs/python/testing
 # coverage is re-enabled in `tox.ini`. That approach is safer than
 # `--no-cov` which prevents activation from tox.ini and which also fails
