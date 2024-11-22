@@ -217,9 +217,8 @@ class App:
                 os.environ.get("ANSIBLE_LINT_IGNORE_FILE", IGNORE_FILE.default),
             )
             console_stderr.print(f"Writing ignore file to {ignore_file_path}")
-            lines = set()
-            for rule in result.matches:
-                lines.add(f"{rule.filename} {rule.tag}\n")
+            lines: set[str] = set()
+            lines.update(f"{rule.filename} {rule.tag}\n" for rule in result.matches)
             with ignore_file_path.open("w", encoding="utf-8") as ignore_file:
                 ignore_file.write(
                     "# This file contains ignores rule violations for ansible-lint\n",
@@ -330,7 +329,7 @@ class App:
             for tag, stats in summary.tag_stats.items():
                 table.add_row(
                     str(stats.count),
-                    f"[link={RULE_DOC_URL}{ tag.split('[')[0] }]{escape(tag)}[/link]",
+                    f"[link={RULE_DOC_URL}{tag.split('[')[0]}]{escape(tag)}[/link]",
                     stats.profile,
                     f"{', '.join(stats.associated_tags)}{' (warning)' if stats.warning else ''}",
                     style="yellow" if stats.warning else "red",

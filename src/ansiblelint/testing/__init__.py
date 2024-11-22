@@ -52,7 +52,9 @@ class RunFromText:
         prefix: str = "playbook",
     ) -> list[MatchError]:
         """Lints received text as a playbook."""
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", prefix=prefix) as fh:
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".yml", prefix=prefix, encoding="utf-8"
+        ) as fh:
             fh.write(playbook_text)
             fh.flush()
             results = self._call_runner(Path(fh.name))
