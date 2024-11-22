@@ -1,0 +1,15 @@
+---
+namespace: bar
+name: foo
+version: "1.0.0"
+authors:
+  - John
+readme: ../README.md
+description: "..."
+license:
+  - Apache-2.0
+repository: https://github.com/ansible-collections/community.REPO_NAME
+tags:
+  - application
+  - this_is_an_utterly_ridiculous_and_insanely_long_tag_length_eye_roll
+  - also_a_ridiculously_long_tag_but_within_the_limits

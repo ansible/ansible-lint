@@ -5,7 +5,13 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING, Any
 
-from ansiblelint.constants import FILENAME_KEY, LINE_NUMBER_KEY
+from ansiblelint.constants import (
+    FILENAME_KEY,
+    LINE_NUMBER_KEY,
+    MAX_LENGTH_TAG,
+    MAX_TAGS_COUNT,
+    TAG_NAME_REGEXP,
+)
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
@@ -23,6 +29,9 @@ class GalaxyRule(AnsibleLintRule):
     version_added = "v6.11.0 (last update)"
     _ids = {
         "galaxy[tags]": "galaxy.yaml must have one of the required tags",
+        "galaxy[tags-format]": "galaxy.yaml one or more tags are not formatted properly.",
+        "galaxy[tags-length]": "galaxy.yaml one or more tags exceed character length.",
+        "galaxy[tags-count]": "galaxy.yaml has too many tags.",
         "galaxy[no-changelog]": "No changelog found. Please add a changelog file. Refer to the galaxy.md file for more info.",
         "galaxy[version-missing]": "galaxy.yaml should have version tag.",
         "galaxy[no-runtime]": "meta/runtime.yml file not found.",
@@ -65,6 +74,13 @@ class GalaxyRule(AnsibleLintRule):
             if path.is_file():
                 changelog_found = 1
         galaxy_tag_list = data.get("tags")
+        galaxy_tag_invalid_format = [
+            tag for tag in galaxy_tag_list if not TAG_NAME_REGEXP.match(tag)
+        ]
+        galaxy_tag_invalid_length = [
+            tag for tag in galaxy_tag_list if len(tag) > MAX_LENGTH_TAG
+        ]
+
         collection_deps = data.get("dependencies")
         if collection_deps:
             for dep, ver in collection_deps.items():
@@ -101,6 +117,42 @@ class GalaxyRule(AnsibleLintRule):
                         f"galaxy.yaml must have one of the required tags: {required_tag_list}"
                     ),
                     tag="galaxy[tags]",
+                    filename=file,
+                ),
+            )
+
+        # Checking if galaxy.yml tags are formatted correctly
+        if galaxy_tag_invalid_format:
+            results.append(
+                self.create_matcherror(
+                    message=(
+                        f"galaxy.yaml must have properly formatted tags. Invalid tags: {','.join(galaxy_tag_invalid_format)}"
+                    ),
+                    tag="galaxy[tags-format]",
+                    filename=file,
+                ),
+            )
+
+        # Checking if galaxy.yml tags length are within limits
+        if galaxy_tag_invalid_length:
+            results.append(
+                self.create_matcherror(
+                    message=(
+                        f"galaxy.yaml tags must not exceed {MAX_LENGTH_TAG} characters. Invalid tags: {','.join(galaxy_tag_invalid_length)}"
+                    ),
+                    tag="galaxy[tags-length]",
+                    filename=file,
+                ),
+            )
+
+        # Checking if galaxy.yml tags does not exceed the max number
+        if len(galaxy_tag_list) > MAX_TAGS_COUNT:
+            results.append(
+                self.create_matcherror(
+                    message=(
+                        f"galaxy.yaml exceeds {MAX_TAGS_COUNT} tags. Current count: {len(galaxy_tag_list)}"
+                    ),
+                    tag="galaxy[tags-count]",
                     filename=file,
                 ),
             )
@@ -149,12 +201,27 @@ if "pytest" in sys.modules:
         ("file", "expected"),
         (
             pytest.param(
-                "examples/galaxy_no_required_tags/fail/galaxy.yml",
+                "examples/galaxy_tags/galaxy_invalid_format_tags/galaxy.yml",
+                ["galaxy[tags-format]"],
+                id="tags-format",
+            ),
+            pytest.param(
+                "examples/galaxy_tags/galaxy_invalid_length_tags/galaxy.yml",
+                ["galaxy[tags-length]"],
+                id="tags-length",
+            ),
+            pytest.param(
+                "examples/galaxy_tags/galaxy_count_tags/galaxy.yml",
+                ["galaxy[tags-count]"],
+                id="tags-count",
+            ),
+            pytest.param(
+                "examples/galaxy_tags/galaxy_no_required_tags/galaxy.yml",
                 ["galaxy[tags]"],
                 id="tags",
             ),
             pytest.param(
-                "examples/galaxy_no_required_tags/pass/galaxy.yml",
+                "examples/galaxy_tags/pass/galaxy.yml",
                 [],
                 id="pass",
             ),
