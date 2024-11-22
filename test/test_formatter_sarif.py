@@ -189,7 +189,9 @@ def test_sarif_parsable_ignored() -> None:
 )
 def test_sarif_file(file: str, return_code: int) -> None:
     """Test ability to dump sarif file (--sarif-file)."""
-    with NamedTemporaryFile(mode="w", suffix=".sarif", prefix="output") as output_file:
+    with NamedTemporaryFile(
+        mode="w", suffix=".sarif", prefix="output", encoding="utf-8"
+    ) as output_file:
         cmd = [
             sys.executable,
             "-m",

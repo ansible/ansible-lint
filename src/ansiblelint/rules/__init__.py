@@ -533,8 +533,7 @@ class RulesCollection:
         tags = set()
         for rule in self.rules:
             tags.add(rule.id)
-            for tag in rule.tags:
-                tags.add(tag)
+            tags.update(rule.tags)
         return sorted(tags)
 
     def list_tags(self) -> str:

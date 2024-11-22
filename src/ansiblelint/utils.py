@@ -859,7 +859,7 @@ class Task(dict[str, Any]):
             if file_name:
                 paths = file_name.split("/")
                 is_handler_file = "handlers" in paths
-        return is_handler_file if is_handler_file else ".handlers[" in self.position
+        return is_handler_file or ".handlers[" in self.position
 
     def __repr__(self) -> str:
         """Return a string representation of the task."""
