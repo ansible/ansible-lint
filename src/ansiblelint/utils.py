@@ -24,6 +24,7 @@
 from __future__ import annotations
 
 import ast
+import collections.abc
 import contextlib
 import inspect
 import logging
@@ -306,7 +307,7 @@ class HandleChildren:
             v = v["file"]
 
         # we cannot really parse any jinja2 in includes, so we ignore them
-        if not v or "{{" in v:
+        if not v or not isinstance(v, str) or "{{" in v:
             return []
 
         # handle include: filename.yml tags=blah
@@ -876,6 +877,31 @@ class Task(dict[str, Any]):
     def __iter__(self) -> Iterator[str]:
         """Provide support for 'key in task'."""
         yield from (f for f in self.normalized_task)
+
+    def get_error_line(self, path: list[str | int]) -> int:
+        """Return error line number."""
+        ctx = self.normalized_task
+        line = self.normalized_task[LINE_NUMBER_KEY]
+        for _ in path:
+            if (
+                isinstance(ctx, collections.abc.Container) and _ in ctx
+            ):  # isinstance(ctx, collections.abc.Container) and
+                value = ctx.get(  # pyright: ignore[reportAttributeAccessIssue]
+                    _  # pyright: ignore[reportArgumentType]
+                )
+                if isinstance(value, dict):
+                    ctx = value
+                if (
+                    isinstance(ctx, collections.abc.Container)
+                    and LINE_NUMBER_KEY in ctx
+                ):
+                    line = ctx[LINE_NUMBER_KEY]  # pyright: ignore[reportIndexIssue]
+                # else:
+                #     break
+        if not isinstance(line, int):
+            msg = "Line number is not an integer"
+            raise TypeError(msg)
+        return line
 
 
 def task_in_list(
