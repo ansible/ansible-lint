@@ -32,11 +32,11 @@ def toidentifier(text: str) -> str:
 
 
 # https://www.python.org/dev/peps/pep-0616/
-def removeprefix(self: str, prefix: str) -> str:
+def removeprefix(text: str, prefix: str) -> str:
     """Remove prefix from string."""
-    if self.startswith(prefix):
-        return self[len(prefix) :]
-    return self[:]
+    if text.startswith(prefix):
+        return text[len(prefix) :]
+    return text[:]
 
 
 @cache

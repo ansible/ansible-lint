@@ -65,6 +65,8 @@ ignored_re = re.compile(
             r"Unrecognized type <<class 'ansible.template.AnsibleUndefined'>> for (.*) filter <value>$",
             # https://github.com/ansible/ansible-lint/issues/3155
             r"^The '(.*)' test expects a dictionary$",
+            # https://github.com/ansible/ansible-lint/issues/4338
+            r"An unhandled exception occurred while templating (.*). Error was a <class 'ansible.errors.AnsibleFilterError'>, original message: The (.*) test expects a dictionary$",
         ],
     ),
     flags=re.MULTILINE | re.DOTALL,
@@ -425,7 +427,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
         return reformatted, details, "spacing"
 
     def transform(
-        self: JinjaRule,
+        self,
         match: MatchError,
         lintable: Lintable,
         data: CommentedMap | CommentedSeq | str,
@@ -440,7 +442,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
             self._transform_spacing(match, data)
 
     def _transform_spacing(
-        self: JinjaRule,
+        self,
         match: MatchError,
         data: CommentedMap | CommentedSeq | str,
     ) -> None:

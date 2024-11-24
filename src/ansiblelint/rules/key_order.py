@@ -69,7 +69,6 @@ class KeyOrderRule(AnsibleLintRule, TransformMixin):
     """Ensure specific order of keys in mappings."""
 
     id = "key-order"
-    shortdesc = __doc__
     severity = "LOW"
     tags = ["formatting"]
     version_added = "v6.6.2"

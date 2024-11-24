@@ -69,7 +69,7 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule, TransformMixin):
                 return False
 
             jinja_stripped_cmd = self.unjinja(get_cmd_args(task))
-            return not any(ch in jinja_stripped_cmd for ch in "&|<>;$\n*[]{}?`")
+            return not any(ch in jinja_stripped_cmd for ch in "&|<>;$\n*[]{}?`!")
         return False
 
     def transform(

@@ -10,49 +10,49 @@ from typing import Any
 play_keywords = list(
     filter(
         None,
-        """\
-any_errors_fatal
-become
-become_exe
-become_flags
-become_method
-become_user
-check_mode
-collections
-connection
-debugger
-diff
-environment
-fact_path
-force_handlers
-gather_facts
-gather_subset
-gather_timeout
-handlers
-hosts
-ignore_errors
-ignore_unreachable
-max_fail_percentage
-module_defaults
-name
-no_log
-order
-port
-post_tasks
-pre_tasks
-remote_user
-roles
-run_once
-serial
-strategy
-tags
-tasks
-throttle
-timeout
-vars
-vars_files
-vars_prompt
-""".split(),
+        [
+            "any_errors_fatal",
+            "become",
+            "become_exe",
+            "become_flags",
+            "become_method",
+            "become_user",
+            "check_mode",
+            "collections",
+            "connection",
+            "debugger",
+            "diff",
+            "environment",
+            "fact_path",
+            "force_handlers",
+            "gather_facts",
+            "gather_subset",
+            "gather_timeout",
+            "handlers",
+            "hosts",
+            "ignore_errors",
+            "ignore_unreachable",
+            "max_fail_percentage",
+            "module_defaults",
+            "name",
+            "no_log",
+            "order",
+            "port",
+            "post_tasks",
+            "pre_tasks",
+            "remote_user",
+            "roles",
+            "run_once",
+            "serial",
+            "strategy",
+            "tags",
+            "tasks",
+            "throttle",
+            "timeout",
+            "vars",
+            "vars_files",
+            "vars_prompt",
+        ],
     ),
 )
 

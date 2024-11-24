@@ -1,0 +1,6 @@
+[formatting]
+# compatibility with toml-sort-fix pre-commit hook
+array_trailing_comma = false
+compact_arrays = true
+compact_inline_tables = true
+inline_table_expand = false

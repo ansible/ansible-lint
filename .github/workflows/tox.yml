@@ -2,12 +2,15 @@
 name: tox
 
 on:
-  push: # only publishes pushes to the main branch to TestPyPI
-    branches: # any integration branch but not tag
+  push:
+    branches:
       - "main"
   pull_request:
     branches:
       - "main"
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_call:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
@@ -254,7 +257,7 @@ jobs:
           fi
 
       - name: Upload coverage data
-        uses: codecov/codecov-action@v4.5.0
+        uses: codecov/codecov-action@v5.0.7
         with:
           name: ${{ matrix.name }}
           # verbose: true # optional (default = false)

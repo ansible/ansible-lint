@@ -6,11 +6,11 @@ import json
 import logging
 import re
 import typing
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
-import jsonschema
 import yaml
 from jsonschema.exceptions import ValidationError
+from jsonschema.validators import validator_for
 
 from ansiblelint.loaders import yaml_load_safe
 from ansiblelint.schemas.__main__ import JSON_SCHEMAS, _schema_cache
@@ -22,13 +22,13 @@ if TYPE_CHECKING:
 
 
 def find_best_deep_match(
-    errors: jsonschema.ValidationError,
-) -> jsonschema.ValidationError:
+    errors: ValidationError,
+) -> ValidationError:
     """Return the deepest schema validation error."""
 
     def iter_validation_error(
-        err: jsonschema.ValidationError,
-    ) -> typing.Iterator[jsonschema.ValidationError]:
+        err: ValidationError,
+    ) -> typing.Iterator[ValidationError]:
         if err.context:
             for e in err.context:
                 yield e
@@ -39,7 +39,7 @@ def find_best_deep_match(
 
 def validate_file_schema(file: Lintable) -> list[str]:
     """Return list of JSON validation errors found."""
-    schema = {}
+    schema: dict[Any, Any] = {}
     if file.kind not in JSON_SCHEMAS:
         return [f"Unable to find JSON Schema '{file.kind}' for '{file.path}' file."]
     try:
@@ -48,7 +48,7 @@ def validate_file_schema(file: Lintable) -> list[str]:
         json_data = json.loads(json.dumps(yaml_data))
         schema = _schema_cache[file.kind]
 
-        validator = jsonschema.validators.validator_for(schema)
+        validator = validator_for(schema)
         v = validator(schema)
         try:
             error = next(v.iter_errors(json_data))
@@ -57,6 +57,9 @@ def validate_file_schema(file: Lintable) -> list[str]:
         if error.context:
             error = find_best_deep_match(error)
         # determine if we want to use our own messages embedded into schemas inside title/markdownDescription fields
+        if not hasattr(error, "schema") or not isinstance(error.schema, dict):
+            msg = "error object does not have schema attribute"
+            raise TypeError(msg)
         if "not" in error.schema and len(error.schema["not"]) == 0:
             message = error.schema["title"]
             schema = error.schema
@@ -106,7 +109,7 @@ def validate_file_schema(file: Lintable) -> list[str]:
     return [message]
 
 
-def _deep_match_relevance(error: jsonschema.ValidationError) -> tuple[bool | int, ...]:
+def _deep_match_relevance(error: ValidationError) -> tuple[bool | int, ...]:
     validator = error.validator
     return (
         validator not in ("anyOf", "oneOf"),  # type: ignore[comparison-overlap]

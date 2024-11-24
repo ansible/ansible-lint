@@ -16,7 +16,7 @@ EXAMPLES = r"""
 
 def main() -> None:
     """Return the module instance."""
-    return AnsibleModule(
+    AnsibleModule(
         argument_spec={
             "data": {"default": None},
             "path": {"default": None},

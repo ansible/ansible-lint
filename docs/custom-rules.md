@@ -53,35 +53,7 @@ class DeprecatedVariableRule(AnsibleLintRule):
 The following is an example rule that uses the `matchtask` method:
 
 ```python
-from __future__ import annotations
-from typing import TYPE_CHECKING, Union
-
-from ansiblelint.rules import AnsibleLintRule
-
-if TYPE_CHECKING:
-    from ansiblelint.file_utils import Lintable
-    from ansiblelint.utils import Task
-
-
-class TaskHasTag(AnsibleLintRule):
-    """Tasks must have tag."""
-
-    id = 'EXAMPLE001'
-    description = 'Tasks must have tag'
-    tags = ['productivity']
-
-    def matchtask(self,
-                  task: Task,
-                  file: Lintable
-                  | None = None) -> Union[bool, str]:
-        # If the task include another task or make the playbook fail
-        # Don't force to have a tag
-        if not set(task.keys()).isdisjoint(['include', 'fail']):
-            return False
-
-        if not task.get("tags"):
-            return True
-        return False
+{!../examples/rules/task_has_tag.py!}
 ```
 
 The task argument to `matchtask` contains a number of keys - the critical one is

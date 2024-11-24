@@ -64,7 +64,7 @@ class EnvVarsInCommandRule(AnsibleLintRule):
         task: Task,
         file: Lintable | None = None,
     ) -> bool | str:
-        if task["action"]["__ansible_module__"] in ["command"]:
+        if task["action"]["__ansible_module__"] == "command":
             first_cmd_arg = get_first_cmd_arg(task)
             if not first_cmd_arg:
                 return False

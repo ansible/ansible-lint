@@ -74,10 +74,10 @@ def load_ignore_txt(filepath: Path | None = None) -> dict[str, set[str]]:
 
 
 __all__ = [
+    "IGNORE_FILE",
+    "YAMLError",
     "load_ignore_txt",
     "yaml_from_file",
     "yaml_load",
     "yaml_load_safe",
-    "YAMLError",
-    "IGNORE_FILE",
 ]

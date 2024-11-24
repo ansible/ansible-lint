@@ -11,6 +11,7 @@ from functools import cache
 from http.client import HTTPException
 from pathlib import Path
 from typing import Any
+from urllib.error import HTTPError
 from urllib.request import Request
 
 _logger = logging.getLogger(__package__)
@@ -94,10 +95,7 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
                         if kind in _schema_cache:  # pragma: no cover
                             del _schema_cache[kind]
         except (ConnectionError, OSError, HTTPException) as exc:
-            if (
-                isinstance(exc, urllib.error.HTTPError)
-                and getattr(exc, "code", None) == 304
-            ):
+            if isinstance(exc, HTTPError) and getattr(exc, "code", None) == 304:
                 _logger.debug("Schema %s is not modified", url)
                 continue
             # In case of networking issues, we just stop and use last-known good

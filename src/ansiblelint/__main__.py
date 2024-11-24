@@ -33,7 +33,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, TextIO
 
 from ansible_compat.prerun import get_cache_dir
-from filelock import FileLock, Timeout
+from filelock import BaseFileLock, FileLock, Timeout
 from rich.markup import escape
 
 from ansiblelint.constants import RC, SKIP_SCHEMA_UPDATE
@@ -119,7 +119,7 @@ def initialize_logger(level: int = 0) -> None:
     _logger.debug("Logging initialized to level %s", logging_level)
 
 
-def initialize_options(arguments: list[str] | None = None) -> None | FileLock:
+def initialize_options(arguments: list[str] | None = None) -> None | BaseFileLock:
     """Load config options and store them inside options module."""
     cache_dir_lock = None
     new_options = cli.get_config(arguments or [])

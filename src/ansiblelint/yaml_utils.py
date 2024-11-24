@@ -36,7 +36,6 @@ from ansiblelint.utils import Task
 if TYPE_CHECKING:
     # noinspection PyProtectedMember
     from ruamel.yaml.comments import LineCol
-    from ruamel.yaml.compat import StreamTextType
     from ruamel.yaml.nodes import ScalarNode
     from ruamel.yaml.representer import RoundTripRepresenter
     from ruamel.yaml.tokens import CommentToken
@@ -638,7 +637,7 @@ class FormattedEmitter(Emitter):
         """Select how to quote scalars if needed."""
         style = super().choose_scalar_style()
         if (
-            style == ""
+            style == ""  # noqa: PLC1901
             and self.event.value.startswith("0")
             and len(self.event.value) > 1
         ):
@@ -730,7 +729,7 @@ class FormattedEmitter(Emitter):
             if "#" in string:
                 # # is \uFF03 (fullwidth number sign)
                 # ﹟ is \uFE5F (small number sign)
-                string = string.replace("#", "\uFF03#\uFE5F")
+                string = string.replace("#", "\uff03#\ufe5f")
                 # this is safe even if this sequence is present
                 # because it gets reversed in post-processing
         except (ValueError, TypeError):
@@ -742,10 +741,10 @@ class FormattedEmitter(Emitter):
     def drop_octothorpe_protection(string: str) -> str:
         """Remove string protection of "#" after full-line-comment post-processing."""
         try:
-            if "\uFF03#\uFE5F" in string:
+            if "\uff03#\ufe5f" in string:
                 # # is \uFF03 (fullwidth number sign)
                 # ﹟ is \uFE5F (small number sign)
-                string = string.replace("\uFF03#\uFE5F", "#")
+                string = string.replace("\uff03#\ufe5f", "#")
         except (ValueError, TypeError):
             # probably not really a string. Whatever.
             pass
@@ -1013,20 +1012,20 @@ class FormattedYAML(YAML):
         return None
 
     @version.setter
-    def version(self, value: tuple[int, int] | None) -> None:
+    def version(self, val: tuple[int, int] | None) -> None:
         """Ensure that yaml version uses our default value.
 
         The yaml Reader updates this value based on the ``%YAML`` directive in files.
         So, if a file does not include the directive, it sets this to None.
         But, None effectively resets the parsing version to YAML 1.2 (ruamel's default).
         """
-        if value is not None:
-            self._yaml_version = value
+        if val is not None:
+            self._yaml_version = val
         elif hasattr(self, "_yaml_version_default"):
             self._yaml_version = self._yaml_version_default
         # We do nothing if the object did not have a previous default version defined
 
-    def load(self, stream: Path | StreamTextType) -> Any:
+    def load(self, stream: Path | Any) -> Any:
         """Load YAML content from a string while avoiding known ruamel.yaml issues."""
         if not isinstance(stream, str):
             msg = f"expected a str but got {type(stream)}"

@@ -242,6 +242,7 @@ class Lintable:
             self.file = NamedTemporaryFile(  # noqa: SIM115
                 mode="w+",
                 suffix="playbook.yml",
+                encoding="utf-8",
             )
             self.filename = self.file.name
             self._content = sys.stdin.read()
@@ -479,7 +480,7 @@ def discover_lintables(options: Options) -> list[str]:
 
 def strip_dotslash_prefix(fname: str) -> str:
     """Remove ./ leading from filenames."""
-    return fname[2:] if fname.startswith("./") else fname
+    return fname.removeprefix("./")
 
 
 def find_project_root(

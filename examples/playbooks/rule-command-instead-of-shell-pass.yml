@@ -58,3 +58,8 @@
           set -x
           ls foo?
       changed_when: false
+
+    - name: Use ! for negation
+      ansible.builtin.shell:
+        cmd: "! crontab -l"
+      changed_when: false

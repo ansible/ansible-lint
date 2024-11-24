@@ -91,7 +91,7 @@ def test_get_version_warning(
 def test_get_version_warning_no_pip(mocker: MockerFixture) -> None:
     """Test that we do not display any message if install method is not pip."""
     mocker.patch("ansiblelint.config.guess_install_method", return_value="")
-    assert get_version_warning() == ""
+    assert get_version_warning() == ""  # noqa: PLC1901
 
 
 def test_get_version_warning_remote_disconnect(mocker: MockerFixture) -> None:
@@ -109,7 +109,7 @@ def test_get_version_warning_offline(mocker: MockerFixture) -> None:
         # ensures a real cache_file is not loaded
         mocker.patch("ansiblelint.config.CACHE_DIR", Path(temporary_directory))
         options.offline = True
-        assert get_version_warning() == ""
+        assert get_version_warning() == ""  # noqa: PLC1901
 
 
 @pytest.mark.parametrize(

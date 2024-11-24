@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """NoLogPasswordsRule used with ansible-lint."""
+
 from __future__ import annotations
 
 import os

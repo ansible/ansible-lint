@@ -47,7 +47,7 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule, TransformMixin):
     version_added = "historic"
 
     def matchplay(
-        self: BecomeUserWithoutBecomeRule,
+        self,
         file: Lintable,
         data: dict[str, Any],
     ) -> list[MatchError]:
@@ -72,7 +72,7 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule, TransformMixin):
         return errors
 
     def matchtask(
-        self: BecomeUserWithoutBecomeRule,
+        self,
         task: Task,
         file: Lintable | None = None,
     ) -> list[MatchError]:
@@ -95,7 +95,7 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule, TransformMixin):
             errors.append(error)
         return errors
 
-    def _dive(self: BecomeUserWithoutBecomeRule, data: CommentedSeq) -> Iterator[Any]:
+    def _dive(self, data: CommentedSeq) -> Iterator[Any]:
         """Dive into the data and yield each item.
 
         :param data: The data to dive into.
@@ -108,7 +108,7 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule, TransformMixin):
             yield item
 
     def transform(
-        self: BecomeUserWithoutBecomeRule,
+        self,
         match: MatchError,
         lintable: Lintable,
         data: CommentedMap | CommentedSeq | str,
@@ -140,7 +140,7 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule, TransformMixin):
             return
 
     def is_ineligible_for_transform(
-        self: BecomeUserWithoutBecomeRule,
+        self,
         data: CommentedMap,
     ) -> bool:
         """Check if the data is eligible for transformation.

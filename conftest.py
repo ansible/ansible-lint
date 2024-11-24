@@ -1,11 +1,11 @@
 """PyTest Fixtures."""
 
-import importlib
 import os
 import platform
 import subprocess
 import sys
 import warnings
+from importlib.util import find_spec
 from pathlib import Path
 
 import pytest
@@ -16,9 +16,7 @@ if Path.cwd() != Path(__file__).parent:
 
 # checking if user is running pytest without installing test dependencies:
 missing = [
-    module
-    for module in ["ansible", "black", "mypy", "pylint"]
-    if not importlib.util.find_spec(module)
+    module for module in ["ansible", "black", "mypy", "pylint"] if not find_spec(module)
 ]
 if missing:
     pytest.exit(
