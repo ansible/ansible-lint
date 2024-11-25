@@ -17,9 +17,6 @@
         "**/*.txt",
         "**/*.md"
     ],
-    "python.analysis.exclude": [
-        "build"
-    ],
     "python.terminal.activateEnvironment": true,
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": false,
