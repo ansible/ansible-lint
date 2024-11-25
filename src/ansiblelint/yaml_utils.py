@@ -244,15 +244,15 @@ def _nested_items_path(
     """
     # we have to cast each convert_to_tuples assignment or mypy complains
     # that both assignments (for dict and list) do not have the same type
-    convert_to_tuples_type = Callable[[], Iterator[tuple[str | int, Any]]]
+    # convert_to_tuples_type = Callable[[], Iterator[tuple[str | int, Any]]]
     if isinstance(data_collection, dict):
         convert_data_collection_to_tuples = cast(
-            convert_to_tuples_type,
+            Callable[[], Iterator[tuple[str | int, Any]]],
             functools.partial(data_collection.items),
         )
     elif isinstance(data_collection, list):
         convert_data_collection_to_tuples = cast(
-            convert_to_tuples_type,
+            Callable[[], Iterator[tuple[str | int, Any]]],
             functools.partial(enumerate, data_collection),
         )
     else:
