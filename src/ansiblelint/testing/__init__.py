@@ -76,38 +76,6 @@ class RunFromText:
         shutil.rmtree(role_path)
         return results
 
-    def run_role_meta_main(
-        self,
-        meta_main_text: str,
-        temp_path: Path,
-    ) -> list[MatchError]:
-        """Lints received text as meta."""
-        role_path = temp_path
-        meta_path = role_path / "meta"
-        meta_path.mkdir(parents=True, exist_ok=True)
-        with (meta_path / "main.yml").open("w", encoding="utf-8") as fh:
-            fh.write(meta_main_text)
-            fh.flush()
-        results = self._call_runner(role_path)
-        shutil.rmtree(role_path)
-        return results
-
-    def run_role_defaults_main(
-        self,
-        defaults_main_text: str,
-        tmp_path: Path,
-    ) -> list[MatchError]:
-        """Lints received text as vars file in defaults."""
-        role_path = tmp_path
-        defaults_path = role_path / "defaults"
-        defaults_path.mkdir(parents=True, exist_ok=True)
-        with (defaults_path / "main.yml").open("w", encoding="utf-8") as fh:
-            fh.write(defaults_main_text)
-            fh.flush()
-        results = self._call_runner(role_path)
-        shutil.rmtree(role_path)
-        return results
-
 
 def run_ansible_lint(
     *argv: str | Path,

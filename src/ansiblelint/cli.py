@@ -135,6 +135,7 @@ class AbspathArgAction(argparse.Action):
         values: str | Sequence[Any] | None,
         option_string: str | None = None,
     ) -> None:
+        logging.debug(option_string)
         if isinstance(values, str | Path):
             values = [values]
         if values:

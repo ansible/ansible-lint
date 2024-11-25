@@ -173,6 +173,7 @@ repos:
           - wcmatch
         exclude: >
           (?x)^(
+            .config/.*|
             collections/.*|
             test/local-content/.*|
             plugins/.*
@@ -227,6 +228,10 @@ repos:
           - typing_extensions
           - wcmatch
           - yamllint
+  - repo: https://github.com/jendrikseipp/vulture
+    rev: v2.13
+    hooks:
+      - id: vulture
   - # keep at bottom as these are slower
     repo: local
     hooks:

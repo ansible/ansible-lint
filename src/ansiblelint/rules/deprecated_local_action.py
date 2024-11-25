@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__name__)
 
 
-class TaskNoLocalAction(AnsibleLintRule, TransformMixin):
+class TaskNoLocalActionRule(AnsibleLintRule, TransformMixin):
     """Do not use 'local_action', use 'delegate_to: localhost'."""
 
     id = "deprecated-local-action"
