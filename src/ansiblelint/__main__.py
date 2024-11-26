@@ -119,7 +119,7 @@ def initialize_logger(level: int = 0) -> None:
     _logger.debug("Logging initialized to level %s", logging_level)
 
 
-def initialize_options(arguments: list[str] | None = None) -> None | BaseFileLock:
+def initialize_options(arguments: list[str] | None = None) -> BaseFileLock | None:
     """Load config options and store them inside options module."""
     cache_dir_lock = None
     new_options = cli.get_config(arguments or [])
@@ -377,7 +377,7 @@ def main(argv: list[str] | None = None) -> int:
             _logger.debug("Ignored: %s", match)
 
     if app.yamllint_config.incompatible:
-        logging.log(
+        _logger.log(
             level=logging.ERROR if options.write_list else logging.WARNING,
             msg=app.yamllint_config.incompatible,
         )

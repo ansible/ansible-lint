@@ -29,7 +29,7 @@ class ComparisonToLiteralBoolRule(AnsibleLintRule):
     tags = ["idiom"]
     version_added = "v4.0.0"
 
-    literal_bool_compare = re.compile("[=!]= ?(True|true|False|false)")
+    literal_bool_compare = re.compile(r"[=!]= ?(True|true|False|false)")
 
     def matchtask(
         self,

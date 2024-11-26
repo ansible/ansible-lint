@@ -281,7 +281,7 @@ class ArgsRule(AnsibleLintRule):
 
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
-    import pytest  # noqa: TCH002
+    import pytest  # noqa: TC002
 
     from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
 

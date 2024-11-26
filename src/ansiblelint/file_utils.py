@@ -440,7 +440,7 @@ class Lintable:
                         self,
                     )
                 else:
-                    logging.debug(
+                    _logger.debug(
                         "data set to None for %s due to being '%s' (%s) kind.",
                         self.path,
                         self.kind,

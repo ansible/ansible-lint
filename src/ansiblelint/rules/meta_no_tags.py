@@ -32,7 +32,7 @@ class MetaTagValidRule(AnsibleLintRule):
     tags = ["metadata"]
     version_added = "v4.0.0"
 
-    TAG_REGEXP = re.compile("^[a-z0-9]+$")
+    TAG_REGEXP = re.compile(r"^[a-z0-9]+$")
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Find violations inside meta files."""

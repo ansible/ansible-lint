@@ -89,7 +89,7 @@ class CheckSanityIgnoreFiles(AnsibleLintRule):
 
                 if entry:
                     # match up to the first "/"
-                    regex = re.match("[^/]*", entry)
+                    regex = re.match(r"[^/]*", entry)
 
                     if regex:
                         base_ignore_dir = regex.group(0)

@@ -221,7 +221,7 @@ def guess_install_method() -> str:
         if (distribution(package_name).read_text("INSTALLER") or "").strip() != "pip":
             return ""
     except PackageNotFoundError as exc:
-        logging.debug(exc)
+        _logger.debug(exc)
         return ""
 
     pip = ""
@@ -251,16 +251,16 @@ def guess_install_method() -> str:
 
             dist = get_default_environment().get_distribution(package_name)
             if dist:
-                logging.debug("Found %s dist", dist)
+                _logger.debug("Found %s dist", dist)
                 for _ in uninstallation_paths(dist):
                     use_pip = True
             else:
-                logging.debug("Skipping %s as it is not installed.", package_name)
+                _logger.debug("Skipping %s as it is not installed.", package_name)
                 use_pip = False
     except (AttributeError, ModuleNotFoundError) as exc:
         # On Fedora 36, we got a AttributeError exception from pip that we want to avoid
         # On NixOS, we got a ModuleNotFoundError exception from pip that we want to avoid
-        logging.debug(exc)
+        _logger.debug(exc)
         use_pip = False
 
     # We only want to recommend pip for upgrade if it looks safe to do so.
