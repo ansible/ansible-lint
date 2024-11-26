@@ -45,7 +45,7 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__name__)
 
 
-class CustomYamlLintConfig(YamlLintConfig):  # type: ignore[misc]
+class CustomYamlLintConfig(YamlLintConfig):  # type: ignore[misc,no-any-unimported]
     """Extension of YamlLintConfig."""
 
     def __init__(

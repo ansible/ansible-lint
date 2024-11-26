@@ -33,7 +33,7 @@ if TYPE_CHECKING:
 
 
 _logger = logging.getLogger(__package__)
-_CACHED_APP = None
+_CACHED_APP: App | None = None
 
 
 class App:

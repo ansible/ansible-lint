@@ -71,7 +71,7 @@ class ValidationPassedError(Exception):
     """Exception to be raised when validation passes."""
 
 
-class CustomAnsibleModule(basic.AnsibleModule):  # type: ignore[misc]
+class CustomAnsibleModule(basic.AnsibleModule):  # type: ignore[misc,no-any-unimported]
     """Mock AnsibleModule class."""
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -107,7 +107,7 @@ class ArgsRule(AnsibleLintRule):
         if module_name in self.module_aliases:
             return []
 
-        loaded_module: PluginLoadContext = load_plugin(module_name)
+        loaded_module: PluginLoadContext = load_plugin(module_name)  # type: ignore[no-any-unimported]
 
         # https://github.com/ansible/ansible-lint/issues/3200
         # since "ps1" modules cannot be executed on POSIX platforms, we will
