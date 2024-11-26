@@ -43,5 +43,8 @@
         "editor.defaultFormatter": "ms-python.black-formatter",
         "editor.formatOnSave": true
     },
-    "evenBetterToml.formatter.arrayTrailingComma": true
+    "evenBetterToml.formatter.arrayTrailingComma": true,
+    "[toml]": {
+        "editor.defaultFormatter": "panekj.even-betterer-toml"
+    }
 }

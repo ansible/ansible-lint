@@ -70,7 +70,6 @@ from ansiblelint.constants import (
     INCLUSION_ACTION_NAMES,
     LINE_NUMBER_KEY,
     NESTED_TASK_KEYS,
-    PLAYBOOK_TASK_KEYWORDS,
     ROLE_IMPORT_ACTION_NAMES,
     SKIPPED_RULES_KEY,
     FileType,
@@ -86,7 +85,6 @@ if TYPE_CHECKING:
 # string as the password to enable such yaml files to be opened and parsed
 # successfully.
 DEFAULT_VAULT_PASSWORD = "x"  # noqa: S105
-COLLECTION_PLAY_RE = re.compile(r"^[\w\d_]+\.[\w\d_]+\.[\w\d_]+$")
 
 PLAYBOOK_DIR = os.environ.get("ANSIBLE_PLAYBOOK_DIR", None)
 
@@ -963,20 +961,6 @@ def add_action_type(actions: AnsibleBaseYAMLObject, action_type: str) -> list[An
         action["__ansible_action_type__"] = BLOCK_NAME_TO_ACTION_TYPE_MAP[action_type]
         results.append(action)
     return results
-
-
-def get_action_tasks(data: AnsibleBaseYAMLObject, file: Lintable) -> list[Any]:
-    """Get a flattened list of action tasks from the file."""
-    tasks = []
-    if file.kind in ["tasks", "handlers"]:
-        tasks = add_action_type(data, file.kind)
-    else:
-        tasks.extend(extract_from_list(data, PLAYBOOK_TASK_KEYWORDS))
-
-    # Add sub-elements of block/rescue/always to tasks list
-    tasks.extend(extract_from_list(tasks, NESTED_TASK_KEYS, recursive=True))
-
-    return tasks
 
 
 @cache
