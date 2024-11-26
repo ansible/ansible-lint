@@ -45,9 +45,9 @@ if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
     from _pytest.logging import LogCaptureFixture
     from _pytest.monkeypatch import MonkeyPatch
+    from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject
 
     from ansiblelint.rules import RulesCollection
-
 
 runtime = Runtime(require_module=True)
 
@@ -237,7 +237,7 @@ def test_extract_from_list_recursive() -> None:
     block = {
         "block": [{"block": [{"name": "hello", "command": "whoami"}]}],
     }
-    blocks = [block]
+    blocks: AnsibleBaseYAMLObject = [block]
 
     test_list = utils.extract_from_list(blocks, ["block"])
     assert list(block["block"]) == test_list

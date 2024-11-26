@@ -26,10 +26,11 @@ from ansiblelint.utils import load_plugin
 from ansiblelint.yaml_utils import clean_json
 
 if TYPE_CHECKING:
+    from ansible.plugins.loader import PluginLoadContext
+
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
     from ansiblelint.utils import Task
-
 
 _logger = logging.getLogger(__name__)
 
@@ -73,7 +74,7 @@ class ValidationPassedError(Exception):
 class CustomAnsibleModule(basic.AnsibleModule):  # type: ignore[misc]
     """Mock AnsibleModule class."""
 
-    def __init__(self, *args: str, **kwargs: Any) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Initialize AnsibleModule mock."""
         kwargs["no_log"] = True
         super().__init__(*args, **kwargs)
@@ -106,7 +107,7 @@ class ArgsRule(AnsibleLintRule):
         if module_name in self.module_aliases:
             return []
 
-        loaded_module = load_plugin(module_name)
+        loaded_module: PluginLoadContext = load_plugin(module_name)
 
         # https://github.com/ansible/ansible-lint/issues/3200
         # since "ps1" modules cannot be executed on POSIX platforms, we will
@@ -144,6 +145,14 @@ class ArgsRule(AnsibleLintRule):
             "AnsibleModule",
             CustomAnsibleModule,
         ):
+            if not loaded_module.plugin_resolved_name:
+                _logger.warning(
+                    "Unable to load module %s at %s:%s for options validation",
+                    module_name,
+                    file.filename if file else None,
+                    task[LINE_NUMBER_KEY],
+                )
+                return []
             spec = importlib.util.spec_from_file_location(
                 name=loaded_module.plugin_resolved_name,
                 location=loaded_module.plugin_resolved_path,

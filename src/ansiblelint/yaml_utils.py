@@ -244,15 +244,15 @@ def _nested_items_path(
     """
     # we have to cast each convert_to_tuples assignment or mypy complains
     # that both assignments (for dict and list) do not have the same type
-    convert_to_tuples_type = Callable[[], Iterator[tuple[str | int, Any]]]
+    # convert_to_tuples_type = Callable[[], Iterator[tuple[str | int, Any]]]
     if isinstance(data_collection, dict):
         convert_data_collection_to_tuples = cast(
-            convert_to_tuples_type,
+            Callable[[], Iterator[tuple[str | int, Any]]],
             functools.partial(data_collection.items),
         )
     elif isinstance(data_collection, list):
         convert_data_collection_to_tuples = cast(
-            convert_to_tuples_type,
+            Callable[[], Iterator[tuple[str | int, Any]]],
             functools.partial(enumerate, data_collection),
         )
     else:
@@ -1012,15 +1012,15 @@ class FormattedYAML(YAML):
         return None
 
     @version.setter
-    def version(self, value: tuple[int, int] | None) -> None:
+    def version(self, val: tuple[int, int] | None) -> None:
         """Ensure that yaml version uses our default value.
 
         The yaml Reader updates this value based on the ``%YAML`` directive in files.
         So, if a file does not include the directive, it sets this to None.
         But, None effectively resets the parsing version to YAML 1.2 (ruamel's default).
         """
-        if value is not None:
-            self._yaml_version = value
+        if val is not None:
+            self._yaml_version = val
         elif hasattr(self, "_yaml_version_default"):
             self._yaml_version = self._yaml_version_default
         # We do nothing if the object did not have a previous default version defined

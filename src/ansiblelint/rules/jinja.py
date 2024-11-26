@@ -8,7 +8,7 @@ import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, NamedTuple
+from typing import TYPE_CHECKING, NamedTuple
 
 import black
 import jinja2
@@ -16,7 +16,6 @@ from ansible.errors import AnsibleError, AnsibleFilterError, AnsibleParserError
 from ansible.parsing.yaml.objects import AnsibleUnicode
 from jinja2.exceptions import TemplateSyntaxError
 
-from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.errors import RuleMatchTransformMeta
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
@@ -195,7 +194,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                             result.append(
                                 self.create_matcherror(
                                     message=str(exc),
-                                    lineno=_get_error_line(task, path),
+                                    lineno=task.get_error_line(path),
                                     filename=file,
                                     tag=f"{self.id}[invalid]",
                                 ),
@@ -214,7 +213,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                                     value=v,
                                     reformatted=reformatted,
                                 ),
-                                lineno=_get_error_line(task, path),
+                                lineno=task.get_error_line(path),
                                 details=details,
                                 filename=file,
                                 tag=f"{self.id}[{tag}]",
@@ -233,12 +232,13 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Return matches for variables defined in vars files."""
-        data: dict[str, Any] = {}
         raw_results: list[MatchError] = []
         results: list[MatchError] = []
 
         if str(file.kind) == "vars":
             data = parse_yaml_from_file(str(file.path))
+            if not isinstance(data, dict):
+                return results
             for key, v, _path in nested_items_path(data):
                 if isinstance(v, AnsibleUnicode):
                     reformatted, details, tag = self.check_whitespace(
@@ -406,7 +406,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
         except jinja2.exceptions.TemplateSyntaxError as exc:
             return "", str(exc.message), "invalid"
         # pylint: disable=c-extension-no-member
-        except (NotImplementedError, black.parsing.InvalidInput) as exc:
+        except (NotImplementedError, ValueError) as exc:
             # black is not able to recognize all valid jinja2 templates, so we
             # just ignore InvalidInput errors.
             # NotImplementedError is raised internally for expressions with
@@ -898,17 +898,3 @@ if "pytest" in sys.modules:
         with mock.patch.object(Templar, "do_template", _do_template):
             results = Runner(lintable, rules=collection).run()
             assert len(results) == 0
-
-
-def _get_error_line(task: dict[str, Any], path: list[str | int]) -> int:
-    """Return error line number."""
-    line = task[LINE_NUMBER_KEY]
-    ctx = task
-    for _ in path:
-        ctx = ctx[_]
-        if LINE_NUMBER_KEY in ctx:
-            line = ctx[LINE_NUMBER_KEY]
-    if not isinstance(line, int):
-        msg = "Line number is not an integer"
-        raise TypeError(msg)
-    return line

@@ -121,13 +121,17 @@ class Transformer:
                     )
                     continue
 
-            if self.write_set != {"none"}:
-                self._do_transforms(file, ruamel_data or data, file_is_yaml, matches)
+                if self.write_set != {"none"}:
+                    self._do_transforms(
+                        file, ruamel_data or data, file_is_yaml, matches
+                    )
 
-            if file_is_yaml:
                 _logger.debug("%s %s, version=%s", self.DUMP_MSG, file, yaml.version)
                 # noinspection PyUnboundLocalVariable
                 file.content = yaml.dumps(ruamel_data)
+
+            elif self.write_set != {"none"}:
+                self._do_transforms(file, ruamel_data or data, file_is_yaml, matches)
 
             if file.updated:
                 file.write()

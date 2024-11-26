@@ -17,7 +17,7 @@ chardet==5.2.0            # via tox
 charset-normalizer==3.4.0  # via requests
 click==8.1.7              # via black, mkdocs, mkdocstrings
 colorama==0.4.6           # via griffe, mkdocs-material, tox
-coverage==7.6.7           # via coverage-enable-subprocess, ansible-lint (pyproject.toml)
+coverage==7.6.8           # via coverage-enable-subprocess, ansible-lint (pyproject.toml)
 coverage-enable-subprocess==1.0  # via ansible-lint (pyproject.toml)
 cryptography==43.0.3      # via ansible-core
 csscompressor==0.9.5      # via mkdocs-minify-plugin
@@ -59,7 +59,7 @@ mkdocs-gen-files==0.5.0   # via mkdocs-ansible
 mkdocs-get-deps==0.2.0    # via mkdocs
 mkdocs-htmlproofer-plugin==1.3.0  # via mkdocs-ansible
 mkdocs-macros-plugin==1.3.7  # via mkdocs-ansible
-mkdocs-material==9.5.44   # via mkdocs-ansible
+mkdocs-material==9.5.45   # via mkdocs-ansible
 mkdocs-material-extensions==1.3.1  # via mkdocs-ansible, mkdocs-material
 mkdocs-minify-plugin==0.8.0  # via mkdocs-ansible
 mkdocs-monorepo-plugin==1.1.0  # via mkdocs-ansible
