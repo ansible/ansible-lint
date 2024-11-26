@@ -153,7 +153,16 @@ output-format = "colorized"
 score = "n"
 
 [tool.pyright]
-exclude = ["venv", ".cache"]
+exclude = [
+  ".cache",
+  ".config",
+  ".tox",
+  "ansible_collections",
+  "build",
+  "dist",
+  "site",
+  "venv"
+]
 include = ["src"]
 mode = "standard"
 # https://github.com/microsoft/pyright/blob/main/docs/configuration.md#sample-pyprojecttoml-file
@@ -339,6 +348,7 @@ exclude = [
 ]
 ignore_names = [
   "_ANSIBLE_ARGS",
+  "__line__",
   "__rich_console__",
   "fixture_*",
   "pytest_addoption",
