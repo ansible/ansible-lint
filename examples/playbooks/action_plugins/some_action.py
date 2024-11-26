@@ -3,7 +3,7 @@
 from ansible.plugins.action import ActionBase
 
 
-class ActionModule(ActionBase):  # type: ignore[misc]
+class ActionModule(ActionBase):  # type: ignore[misc,no-any-unimported]
     """Sample module."""
 
     def run(self, tmp=None, task_vars=None):  # type: ignore[no-untyped-def]

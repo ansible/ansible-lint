@@ -96,7 +96,7 @@ PLAYBOOK_DIR = os.environ.get("ANSIBLE_PLAYBOOK_DIR", None)
 _logger = logging.getLogger(__name__)
 
 
-def parse_yaml_from_file(filepath: str) -> AnsibleBaseYAMLObject:
+def parse_yaml_from_file(filepath: str) -> AnsibleBaseYAMLObject:  # type: ignore[no-any-unimported]
     """Extract a decrypted YAML object from file."""
     dataloader = DataLoader()
     if hasattr(dataloader, "set_vault_secrets"):
@@ -114,7 +114,7 @@ def path_dwim(basedir: str, given: str) -> str:
     return str(dataloader.path_dwim(given))
 
 
-def ansible_templar(basedir: Path, templatevars: Any) -> Templar:
+def ansible_templar(basedir: Path, templatevars: Any) -> Templar:  # type: ignore[no-any-unimported]
     """Create an Ansible Templar using templatevars."""
     # `basedir` is the directory containing the lintable file.
     # Therefore, for tasks in a role, `basedir` has the form
@@ -244,7 +244,7 @@ def tokenize(value: str) -> tuple[list[str], dict[str, str]]:
     return (args, kwargs)
 
 
-def playbook_items(pb_data: AnsibleBaseYAMLObject) -> ItemsView:  # type: ignore[type-arg]
+def playbook_items(pb_data: AnsibleBaseYAMLObject) -> ItemsView:  # type: ignore[type-arg,no-any-unimported]
     """Return a list of items from within the playbook."""
     if isinstance(pb_data, dict):
         return pb_data.items()
@@ -740,7 +740,7 @@ def task_to_str(task: dict[str, Any]) -> str:
 
 
 # pylint: disable=too-many-nested-blocks
-def extract_from_list(
+def extract_from_list(  # type: ignore[no-any-unimported]
     blocks: AnsibleBaseYAMLObject,
     candidates: list[str],
     *,
@@ -913,7 +913,7 @@ class Task(dict[str, Any]):
         return line
 
 
-def task_in_list(
+def task_in_list(  # type: ignore[no-any-unimported]
     data: AnsibleBaseYAMLObject,
     file: Lintable,
     kind: str,
@@ -921,7 +921,8 @@ def task_in_list(
 ) -> Iterator[Task]:
     """Get action tasks from block structures."""
 
-    def each_entry(data: AnsibleBaseYAMLObject, position: str) -> Iterator[Task]:
+    def each_entry(data: AnsibleBaseYAMLObject, position: str) -> Iterator[Task]:  # type: ignore[no-any-unimported]
+
         if not data or not isinstance(data, Iterable):
             return
         for entry_index, entry in enumerate(data):
@@ -962,7 +963,7 @@ def task_in_list(
         yield from each_entry(data, position)
 
 
-def add_action_type(
+def add_action_type(  # type: ignore[no-any-unimported]
     actions: AnsibleBaseYAMLObject, action_type: str
 ) -> AnsibleSequence:
     """Add action markers to task objects."""
@@ -980,7 +981,7 @@ def add_action_type(
 
 
 @cache
-def parse_yaml_linenumbers(
+def parse_yaml_linenumbers(  # type: ignore[no-any-unimported]
     lintable: Lintable,
 ) -> AnsibleBaseYAMLObject | None:
     """Parse yaml as ansible.utils.parse_yaml but with linenumbers.
@@ -1001,7 +1002,7 @@ def parse_yaml_linenumbers(
         return node
 
     # signature of AnsibleConstructor.construct_mapping
-    def construct_mapping(
+    def construct_mapping(  # type: ignore[no-any-unimported]
         node: yaml.MappingNode,
         deep: bool = False,  # noqa: FBT002
     ) -> AnsibleMapping:
@@ -1183,7 +1184,7 @@ def parse_examples_from_plugin(lintable: Lintable) -> tuple[int, str]:
 
 
 @lru_cache
-def load_plugin(name: str) -> PluginLoadContext:
+def load_plugin(name: str) -> PluginLoadContext:  # type: ignore[no-any-unimported]
     """Return loaded ansible plugin/module."""
     loaded_module = action_loader.find_plugin_with_context(
         name,
