@@ -62,7 +62,7 @@ class App:
             str(self.runtime.version),
         ):  # pragma: no cover
             msg = f"ansible-lint requires {package}{','.join(str(x) for x in self.reqs[package])} and current version is {self.runtime.version}"
-            logging.error(msg)
+            _logger.error(msg)
             sys.exit(RC.INVALID_CONFIG)
 
         # pylint: disable=import-outside-toplevel

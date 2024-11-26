@@ -147,14 +147,14 @@ class Transformer:
         for match in sorted(matches):
             match_id = f"{match.tag}/{match.match_type} {match.filename}:{match.lineno}"
             if not isinstance(match.rule, TransformMixin):
-                logging.debug("%s %s", self.FIX_NA_MSG, match_id)
+                _logger.debug("%s %s", self.FIX_NA_MSG, match_id)
                 continue
             if self.write_set != {"all"}:
                 rule = cast(AnsibleLintRule, match.rule)
                 rule_definition = set(rule.tags)
                 rule_definition.add(rule.id)
                 if rule_definition.isdisjoint(self.write_set):
-                    logging.debug("%s %s", self.FIX_NE_MSG, match_id)
+                    _logger.debug("%s %s", self.FIX_NE_MSG, match_id)
                     continue
             if file_is_yaml and not match.yaml_path:
                 data = cast(CommentedMap | CommentedSeq, data)
@@ -167,7 +167,7 @@ class Transformer:
                 ):
                     match.yaml_path = get_path_to_task(file, match.lineno, data)
 
-            logging.debug("%s %s", self.FIX_APPLY_MSG, match_id)
+            _logger.debug("%s %s", self.FIX_APPLY_MSG, match_id)
             try:
                 match.rule.transform(match, file, data)
             except Exception as exc:  # pylint: disable=broad-except

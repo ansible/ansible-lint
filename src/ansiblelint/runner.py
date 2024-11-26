@@ -502,7 +502,7 @@ class Runner:
                 playbook_ds = ansiblelint.utils.parse_yaml_from_file(str(lintable.path))
             except AnsibleError as exc:
                 msg = f"Loading {lintable.filename} caused an {type(exc).__name__} exception: {exc}, file was ignored."
-                logging.exception(msg)
+                _logger.exception(msg)
                 return []
         results = []
         # playbook_ds can be an AnsibleUnicode string, which we consider invalid

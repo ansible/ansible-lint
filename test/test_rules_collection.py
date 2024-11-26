@@ -159,7 +159,7 @@ def test_rich_rule_listing() -> None:
 
 def test_rules_id_format(config_options: Options) -> None:
     """Assure all our rules have consistent format."""
-    rule_id_re = re.compile("^[a-z-]{4,30}$")
+    rule_id_re = re.compile(r"^[a-z-]{4,30}$")
     rules = RulesCollection(
         [Path("./src/ansiblelint/rules").resolve()],
         options=config_options,

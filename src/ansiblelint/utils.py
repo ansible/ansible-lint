@@ -342,7 +342,7 @@ class HandleChildren:
         self,
         lintable: Lintable,
         k: str,
-        v: None | Any,
+        v: Any | None,
         parent_type: FileType,
     ) -> list[Lintable]:
         """TasksHandlers Children."""
@@ -503,7 +503,7 @@ class HandleChildren:
             else:
                 return [Lintable(possible_path, kind=parent_type)]
 
-        logging.error(msg)
+        _logger.error(msg)
         return []
 
 

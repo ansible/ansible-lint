@@ -130,11 +130,11 @@ repos:
         types: [file, yaml]
         entry: yamllint --strict
   - repo: https://github.com/pappasam/toml-sort
-    rev: v0.23.1
+    rev: v0.24.2
     hooks:
       - id: toml-sort-fix
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.7.3
+    rev: v0.8.0
     hooks:
       - id: ruff
         args:
