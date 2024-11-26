@@ -39,11 +39,13 @@ from typing import TYPE_CHECKING, Any
 import ruamel.yaml.parser
 import yaml
 from ansible.errors import AnsibleError, AnsibleParserError
+from ansible.module_utils._text import to_bytes
 from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.mod_args import ModuleArgsParser
 from ansible.parsing.plugin_docs import read_docstring
 from ansible.parsing.splitter import split_args
+from ansible.parsing.vault import PromptVaultSecret
 from ansible.parsing.yaml.constructor import AnsibleConstructor, AnsibleMapping
 from ansible.parsing.yaml.loader import AnsibleLoader
 from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject, AnsibleSequence
@@ -56,7 +58,9 @@ from ansible.plugins.loader import (
 from ansible.template import Templar
 from ansible.utils.collection_loader import AnsibleCollectionConfig
 from yaml.composer import Composer
+from yaml.parser import ParserError
 from yaml.representer import RepresenterError
+from yaml.scanner import ScannerError
 
 from ansiblelint._internal.rules import (
     AnsibleParserErrorRule,
@@ -70,7 +74,6 @@ from ansiblelint.constants import (
     INCLUSION_ACTION_NAMES,
     LINE_NUMBER_KEY,
     NESTED_TASK_KEYS,
-    PLAYBOOK_TASK_KEYWORDS,
     ROLE_IMPORT_ACTION_NAMES,
     SKIPPED_RULES_KEY,
     FileType,
@@ -86,7 +89,6 @@ if TYPE_CHECKING:
 # string as the password to enable such yaml files to be opened and parsed
 # successfully.
 DEFAULT_VAULT_PASSWORD = "x"  # noqa: S105
-COLLECTION_PLAY_RE = re.compile(r"^[\w\d_]+\.[\w\d_]+\.[\w\d_]+$")
 
 PLAYBOOK_DIR = os.environ.get("ANSIBLE_PLAYBOOK_DIR", None)
 
@@ -97,8 +99,11 @@ _logger = logging.getLogger(__name__)
 def parse_yaml_from_file(filepath: str) -> AnsibleBaseYAMLObject:
     """Extract a decrypted YAML object from file."""
     dataloader = DataLoader()
-    if hasattr(dataloader, "set_vault_password"):
-        dataloader.set_vault_password(DEFAULT_VAULT_PASSWORD)
+    if hasattr(dataloader, "set_vault_secrets"):
+        dataloader.set_vault_secrets(
+            [("default", PromptVaultSecret(_bytes=to_bytes(DEFAULT_VAULT_PASSWORD)))]
+        )
+
     return dataloader.load_from_file(filepath)
 
 
@@ -256,7 +261,11 @@ def set_collections_basedir(basedir: Path) -> None:
     """Set the playbook directory as playbook_paths for the collection loader."""
     # Ansible expects only absolute paths inside `playbook_paths` and will
     # produce weird errors if we use a relative one.
-    AnsibleCollectionConfig.playbook_paths = str(basedir.resolve())
+    # https://github.com/psf/black/issues/4519
+    # fmt: off
+    AnsibleCollectionConfig.playbook_paths = (  # pyright: ignore[reportAttributeAccessIssue]
+        str(basedir.resolve()))
+    # fmt: on
 
 
 def template(
@@ -913,7 +922,7 @@ def task_in_list(
     """Get action tasks from block structures."""
 
     def each_entry(data: AnsibleBaseYAMLObject, position: str) -> Iterator[Task]:
-        if not data:
+        if not data or not isinstance(data, Iterable):
             return
         for entry_index, entry in enumerate(data):
             if not entry:
@@ -953,43 +962,35 @@ def task_in_list(
         yield from each_entry(data, position)
 
 
-def add_action_type(actions: AnsibleBaseYAMLObject, action_type: str) -> list[Any]:
+def add_action_type(
+    actions: AnsibleBaseYAMLObject, action_type: str
+) -> AnsibleSequence:
     """Add action markers to task objects."""
-    results = []
-    for action in actions:
-        # ignore empty task
-        if not action:
-            continue
-        action["__ansible_action_type__"] = BLOCK_NAME_TO_ACTION_TYPE_MAP[action_type]
-        results.append(action)
+    results = AnsibleSequence()
+    if isinstance(actions, Iterable):
+        for action in actions:
+            # ignore empty task
+            if not action:
+                continue
+            action["__ansible_action_type__"] = BLOCK_NAME_TO_ACTION_TYPE_MAP[
+                action_type
+            ]
+            results.append(action)
     return results
-
-
-def get_action_tasks(data: AnsibleBaseYAMLObject, file: Lintable) -> list[Any]:
-    """Get a flattened list of action tasks from the file."""
-    tasks = []
-    if file.kind in ["tasks", "handlers"]:
-        tasks = add_action_type(data, file.kind)
-    else:
-        tasks.extend(extract_from_list(data, PLAYBOOK_TASK_KEYWORDS))
-
-    # Add sub-elements of block/rescue/always to tasks list
-    tasks.extend(extract_from_list(tasks, NESTED_TASK_KEYS, recursive=True))
-
-    return tasks
 
 
 @cache
 def parse_yaml_linenumbers(
     lintable: Lintable,
-) -> AnsibleBaseYAMLObject:
+) -> AnsibleBaseYAMLObject | None:
     """Parse yaml as ansible.utils.parse_yaml but with linenumbers.
 
     The line numbers are stored in each node's LINE_NUMBER_KEY key.
     """
-    result = []
+    result = AnsibleSequence()
 
-    def compose_node(parent: yaml.nodes.Node, index: int) -> yaml.nodes.Node:
+    # signature of Composer.compose_node
+    def compose_node(parent: yaml.nodes.Node | None, index: int) -> yaml.nodes.Node:
         # the line number where the previous token has ended (plus empty lines)
         line = loader.line
         node = Composer.compose_node(loader, parent, index)
@@ -999,14 +1000,15 @@ def parse_yaml_linenumbers(
         node.__line__ = line + 1  # type: ignore[attr-defined]
         return node
 
+    # signature of AnsibleConstructor.construct_mapping
     def construct_mapping(
-        node: AnsibleBaseYAMLObject,
-        *,
-        deep: bool = False,
+        node: yaml.MappingNode,
+        deep: bool = False,  # noqa: FBT002
     ) -> AnsibleMapping:
+        # pyright: ignore[reportArgumentType]
         mapping = AnsibleConstructor.construct_mapping(loader, node, deep=deep)
-        if hasattr(node, "__line__"):
-            mapping[LINE_NUMBER_KEY] = node.__line__
+        if hasattr(node, LINE_NUMBER_KEY):
+            mapping[LINE_NUMBER_KEY] = getattr(node, LINE_NUMBER_KEY)
         else:
             mapping[LINE_NUMBER_KEY] = mapping._line_number  # noqa: SLF001
         mapping[FILENAME_KEY] = lintable.path
@@ -1017,7 +1019,9 @@ def parse_yaml_linenumbers(
         if "vault_password" in inspect.getfullargspec(AnsibleLoader.__init__).args:
             kwargs["vault_password"] = DEFAULT_VAULT_PASSWORD
         loader = AnsibleLoader(lintable.content, **kwargs)
+        # redefine Composer.compose_node
         loader.compose_node = compose_node
+        # redefine AnsibleConstructor.construct_mapping
         loader.construct_mapping = construct_mapping
         # while Ansible only accepts single documents, we also need to load
         # multi-documents, as we attempt to load any YAML file, not only
@@ -1028,8 +1032,8 @@ def parse_yaml_linenumbers(
                 break
             result.append(data)
     except (
-        yaml.parser.ParserError,
-        yaml.scanner.ScannerError,
+        ParserError,
+        ScannerError,
         yaml.constructor.ConstructorError,
         ruamel.yaml.parser.ParserError,
     ) as exc:

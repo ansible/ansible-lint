@@ -478,11 +478,6 @@ def discover_lintables(options: Options) -> list[str]:
     ]
 
 
-def strip_dotslash_prefix(fname: str) -> str:
-    """Remove ./ leading from filenames."""
-    return fname.removeprefix("./")
-
-
 def find_project_root(
     srcs: Sequence[str],
     config_file: str | None = None,

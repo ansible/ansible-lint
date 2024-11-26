@@ -28,6 +28,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import pytest
+from ansible.parsing.yaml.constructor import AnsibleMapping, AnsibleSequence
 from ansible.utils.sentinel import Sentinel
 from ansible_compat.runtime import Runtime
 
@@ -45,7 +46,6 @@ if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
     from _pytest.logging import LogCaptureFixture
     from _pytest.monkeypatch import MonkeyPatch
-    from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject
 
     from ansiblelint.rules import RulesCollection
 
@@ -221,7 +221,7 @@ def test_extract_from_list() -> None:
         "test_none": None,
         "test_string": "foo",
     }
-    blocks = [block]
+    blocks = AnsibleSequence([block])
 
     test_list = utils.extract_from_list(blocks, ["block"])
     test_none = utils.extract_from_list(blocks, ["test_none"])
@@ -234,10 +234,12 @@ def test_extract_from_list() -> None:
 
 def test_extract_from_list_recursive() -> None:
     """Check that tasks get extracted from blocks if present."""
-    block = {
-        "block": [{"block": [{"name": "hello", "command": "whoami"}]}],
-    }
-    blocks: AnsibleBaseYAMLObject = [block]
+    block = AnsibleMapping(
+        {
+            "block": [{"block": [{"name": "hello", "command": "whoami"}]}],
+        }
+    )
+    blocks = AnsibleSequence([block])
 
     test_list = utils.extract_from_list(blocks, ["block"])
     assert list(block["block"]) == test_list

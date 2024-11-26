@@ -15,7 +15,7 @@ class RawTaskRule(AnsibleLintRule):
     """Test rule that inspects the raw task."""
 
     id = "raw-task"
-    shortdesc = "Test rule that inspects the raw task"
+    _shortdesc = "Test rule that inspects the raw task"
     tags = ["fake", "dummy", "test3"]
     needs_raw_task = True
 

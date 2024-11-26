@@ -7,6 +7,7 @@ ci:
   skip:
     # https://github.com/pre-commit-ci/issues/issues/55
     - pip-compile
+    - pyright
     - schemas
   submodules: true
 exclude: >
@@ -173,35 +174,36 @@ repos:
           - wcmatch
         exclude: >
           (?x)^(
+            .config/.*|
             collections/.*|
             test/local-content/.*|
             plugins/.*
           )$
-  # - repo: https://github.com/RobertCraigie/pyright-python
-  #   rev: v1.1.389
-  #   hooks:
-  #     - id: pyright
-  #       additional_dependencies:
-  #         - nodejs-wheel-binaries
-  #         - ansible-compat>=24.8.0
-  #         - black>=22.10.0
-  #         - cryptography>=39.0.1
-  #         - filelock>=3.12.2
-  #         - importlib_metadata
-  #         - jinja2
-  #         - license-expression >= 30.3.0
-  #         - pip>=22.3.1
-  #         - pytest-mock
-  #         - pytest>=7.2.2
-  #         - rich>=13.2.0
-  #         - ruamel-yaml-clib>=0.2.8
-  #         - ruamel-yaml>=0.18.6
-  #         - subprocess-tee
-  #         - types-PyYAML
-  #         - types-jsonschema>=4.20.0.0
-  #         - types-setuptools
-  #         - wcmatch
-  #         - yamllint
+  - repo: https://github.com/RobertCraigie/pyright-python
+    rev: v1.1.389
+    hooks:
+      - id: pyright
+        additional_dependencies:
+          - nodejs-wheel-binaries
+          - ansible-compat>=24.8.0
+          - black>=22.10.0
+          - cryptography>=39.0.1
+          - filelock>=3.12.2
+          - importlib_metadata
+          - jinja2
+          - license-expression >= 30.3.0
+          - pip>=22.3.1
+          - pytest-mock
+          - pytest>=7.2.2
+          - rich>=13.2.0
+          - ruamel-yaml-clib>=0.2.8
+          - ruamel-yaml>=0.18.6
+          - subprocess-tee
+          - types-PyYAML
+          - types-jsonschema>=4.20.0.0
+          - types-setuptools
+          - wcmatch
+          - yamllint
   - repo: https://github.com/pycqa/pylint
     rev: v3.3.1
     hooks:
@@ -227,6 +229,10 @@ repos:
           - typing_extensions
           - wcmatch
           - yamllint
+  - repo: https://github.com/jendrikseipp/vulture
+    rev: v2.13
+    hooks:
+      - id: vulture
   - # keep at bottom as these are slower
     repo: local
     hooks:

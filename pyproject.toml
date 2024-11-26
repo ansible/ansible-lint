@@ -93,7 +93,7 @@ error_summary = true
 # warn_return_any = True
 # warn_unused_configs = True
 # site-packages is here to help vscode mypy integration getting confused
-exclude = "(build|dist|test/local-content|site-packages|~/.pyenv|examples/playbooks/collections|plugins/modules)"
+exclude = "(.config|build|dist|test/local-content|site-packages|~/.pyenv|examples/playbooks/collections|plugins/modules)"
 # https://github.com/python/mypy/issues/12664
 incremental = false
 python_version = "3.10"
@@ -122,7 +122,7 @@ bad-names = [
 # pylint defaults + f,fh,v,id
 good-names = ["i", "j", "k", "Run", "_", "f", "fh", "v", "id", "T"]
 # Ignore as being generated:
-ignore-paths = "^src/ansiblelint/_version.*$"
+ignore-paths = "^(src/ansiblelint/_version|.config/).*$"
 
 [tool.pylint."MESSAGES CONTROL"]
 disable = [
@@ -153,7 +153,16 @@ output-format = "colorized"
 score = "n"
 
 [tool.pyright]
-exclude = ["venv", ".cache"]
+exclude = [
+  ".cache",
+  ".config",
+  ".tox",
+  "ansible_collections",
+  "build",
+  "dist",
+  "site",
+  "venv"
+]
 include = ["src"]
 mode = "standard"
 # https://github.com/microsoft/pyright/blob/main/docs/configuration.md#sample-pyprojecttoml-file
@@ -195,6 +204,7 @@ minversion = "4.6.6"
 norecursedirs = [
   "*.egg",
   ".cache",
+  ".config",
   ".eggs",
   ".git",
   ".github",
@@ -222,6 +232,7 @@ xfail_strict = true
 
 [tool.ruff]
 cache-dir = "./.cache/.ruff"
+exclude = [".config"]
 fix = true
 # Same as Black.
 line-length = 88
@@ -322,3 +333,28 @@ sort_table_keys = true
 annotation-style = "line"
 custom-compile-command = "tox run deps"
 no-emit-package = ["ansible-core", "pip", "resolvelib", "typing_extensions", "uv"]
+
+[tool.vulture]
+exclude = [
+  ".eggs",
+  ".tox",
+  "build",
+  "collections",
+  "examples",
+  "plugins",
+  "test/local-content",
+  "venv",
+  "src/ansiblelint/_version.py"
+]
+ignore_names = [
+  "_ANSIBLE_ARGS",
+  "__line__",
+  "__rich_console__",
+  "fixture_*",
+  "pytest_addoption",
+  "pytest_collection_modifyitems",
+  "pytest_configure",
+  "side_effect",
+  "test_*"
+]
+paths = ["src", "test", ".config/vulture_whitelist.py"]

@@ -10,7 +10,6 @@ import time
 import urllib.request
 import warnings
 from dataclasses import dataclass, field
-from functools import lru_cache
 from http.client import HTTPException
 from importlib.metadata import PackageNotFoundError, distribution, version
 from pathlib import Path
@@ -201,24 +200,8 @@ options = Options()
 # Used to store detected tag deprecations
 used_old_tags: dict[str, str] = {}
 
-# Used to store collection list paths (with mock paths if needed)
-collection_list: list[str] = []
-
 # Used to store log messages before logging is initialized (level, message)
 log_entries: list[tuple[int, str]] = []
-
-
-@lru_cache
-def ansible_collections_path() -> str:
-    """Return collection path variable for current version of Ansible."""
-    # respect Ansible behavior, which is to load old name if present
-    for env_var in [
-        "ANSIBLE_COLLECTIONS_PATHS",
-        "ANSIBLE_COLLECTIONS_PATH",
-    ]:  # pragma: no cover
-        if env_var in os.environ:
-            return env_var
-    return "ANSIBLE_COLLECTIONS_PATH"
 
 
 def in_venv() -> bool:

@@ -17,9 +17,6 @@
         "**/*.txt",
         "**/*.md"
     ],
-    "python.analysis.exclude": [
-        "build"
-    ],
     "python.terminal.activateEnvironment": true,
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": false,
@@ -43,5 +40,8 @@
         "editor.defaultFormatter": "ms-python.black-formatter",
         "editor.formatOnSave": true
     },
-    "evenBetterToml.formatter.arrayTrailingComma": true
+    "evenBetterToml.formatter.arrayTrailingComma": true,
+    "[toml]": {
+        "editor.defaultFormatter": "panekj.even-betterer-toml"
+    }
 }
