@@ -1366,6 +1366,9 @@
             "$ref": "#/$defs/ArchLinuxPlatformModel"
           },
           {
+            "$ref": "#/$defs/AstraLinuxPlatformModel"
+          },
+          {
             "$ref": "#/$defs/ClearLinuxPlatformModel"
           },
           {
