@@ -31,7 +31,7 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
     description = "Avoid free-form inside files as it can produce subtle bugs."
     severity = "MEDIUM"
     tags = ["syntax", "risk"]
-    version_added = "v6.8.0"
+    version_changed = "6.8.0"
     needs_raw_task = True
     cmd_shell_re = re.compile(
         r"(chdir|creates|executable|removes|stdin|stdin_add_newline|warn)=",

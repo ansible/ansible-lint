@@ -28,7 +28,7 @@ class CheckRequiresAnsibleVersion(AnsibleLintRule):
     )
     severity = "VERY_HIGH"
     tags = ["metadata"]
-    version_added = "v6.11.0 (last update)"
+    version_changed = "6.11.0"
 
     _ids = {
         "meta-runtime[unsupported-version]": "'requires_ansible' key must refer to a currently supported version",

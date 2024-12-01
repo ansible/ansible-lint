@@ -23,7 +23,7 @@ class PlaybookExtensionRule(AnsibleLintRule):
     severity = "MEDIUM"
     tags = ["formatting"]
     done: list[str] = []
-    version_added = "v4.0.0"
+    version_changed = "4.0.0"
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         result: list[MatchError] = []

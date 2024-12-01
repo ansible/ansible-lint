@@ -24,7 +24,7 @@ class IgnoreErrorsRule(AnsibleLintRule):
     )
     severity = "LOW"
     tags = ["unpredictability"]
-    version_added = "v5.0.7"
+    version_changed = "5.0.7"
 
     def matchtask(
         self,

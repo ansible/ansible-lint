@@ -22,7 +22,7 @@ class RoleRelativePath(AnsibleLintRule):
     description = "The ``copy`` and ``template`` modules should not use relative path for ``src``."
     severity = "HIGH"
     tags = ["idiom"]
-    version_added = "v4.0.0"
+    version_changed = "4.0.0"
 
     _module_to_path_folder = {
         "copy": "files",

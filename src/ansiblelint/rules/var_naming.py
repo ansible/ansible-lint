@@ -42,7 +42,7 @@ class VariableNamingRule(AnsibleLintRule):
     id = "var-naming"
     severity = "MEDIUM"
     tags = ["idiom"]
-    version_added = "v5.0.10"
+    version_changed = "5.0.10"
     needs_raw_task = True
     re_pattern_str = options.var_naming_pattern or "^[a-z_][a-z0-9_]*$"
     re_pattern = re.compile(re_pattern_str)

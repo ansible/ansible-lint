@@ -23,7 +23,7 @@ class ComplexityRule(AnsibleLintRule):
     description = "There should be limited tasks executed inside any file"
     severity = "MEDIUM"
     tags = ["experimental", "idiom"]
-    version_added = "v6.18.0 (last update)"
+    version_changed = "6.18.0"
     _re_templated_inside = re.compile(r".*\{\{.*\}\}.*\w.*$")
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:

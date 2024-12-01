@@ -22,7 +22,7 @@ class LatestRule(AnsibleLintRule):
     )
     severity = "MEDIUM"
     tags = ["idempotency"]
-    version_added = "v6.5.2"
+    version_changed = "6.5.2"
     _ids = {
         "latest[git]": "Use a commit hash or tag instead of 'latest' for git",
         "latest[hg]": "Use a commit hash or tag instead of 'latest' for hg",

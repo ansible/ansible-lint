@@ -39,7 +39,7 @@ class CommandHasChangesCheckRule(AnsibleLintRule):
     id = "no-changed-when"
     severity = "HIGH"
     tags = ["command-shell", "idempotency"]
-    version_added = "historic"
+    version_changed = "6.14.5"
 
     _commands = [
         "ansible.builtin.command",
