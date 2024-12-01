@@ -20,7 +20,7 @@ class GalaxyRule(AnsibleLintRule):
     description = "Confirm that collection's units are valid."
     severity = "MEDIUM"
     tags = ["metadata"]
-    version_added = "v6.11.0 (last update)"
+    version_changed = "6.11.0"
     _ids = {
         "galaxy[tags]": "galaxy.yaml must have one of the required tags",
         "galaxy[no-changelog]": "No changelog found. Please add a changelog file. Refer to the galaxy.md file for more info.",

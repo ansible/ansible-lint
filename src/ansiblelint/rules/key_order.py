@@ -71,7 +71,7 @@ class KeyOrderRule(AnsibleLintRule, TransformMixin):
     id = "key-order"
     severity = "LOW"
     tags = ["formatting"]
-    version_added = "v6.6.2"
+    version_changed = "6.6.2"
     needs_raw_task = True
     _ids = {
         "key-order[task]": "You can improve the task key order",

@@ -40,7 +40,7 @@ class PackageIsNotLatestRule(AnsibleLintRule):
     )
     severity = "VERY_LOW"
     tags = ["idempotency"]
-    version_added = "historic"
+    version_changed = "6.20.0"
 
     _package_managers = [
         "apk",

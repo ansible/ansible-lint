@@ -88,7 +88,7 @@ class ArgsRule(AnsibleLintRule):
     severity = "HIGH"
     description = "Check whether tasks are using correct module options."
     tags = ["syntax", "experimental"]
-    version_added = "v6.10.0"
+    version_changed = "6.10.0"
     module_aliases: dict[str, str] = {"block/always/rescue": "block/always/rescue"}
     _ids = {
         "args[module]": description,

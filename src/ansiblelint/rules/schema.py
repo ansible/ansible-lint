@@ -60,7 +60,7 @@ class ValidateSchemaRule(AnsibleLintRule):
     id = "schema"
     severity = "VERY_HIGH"
     tags = ["core"]
-    version_added = "v6.1.0"
+    version_changed = "6.1.0"
     _ids = {
         "schema[ansible-lint-config]": "",
         "schema[ansible-navigator-config]": "",

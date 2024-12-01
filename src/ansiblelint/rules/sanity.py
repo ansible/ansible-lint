@@ -25,7 +25,7 @@ class CheckSanityIgnoreFiles(AnsibleLintRule):
     )
     severity = "MEDIUM"
     tags = ["idiom"]
-    version_added = "v6.14.0"
+    version_changed = "6.14.0"
 
     # Partner Engineering defines this list. Please contact PE for changes.
 

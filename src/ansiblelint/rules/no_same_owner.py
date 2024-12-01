@@ -26,6 +26,7 @@ should not be preserved when transferring files between them.
 """
     severity = "LOW"
     tags = ["opt-in"]
+    version_changed = "6.4.0"
 
     def matchtask(
         self,

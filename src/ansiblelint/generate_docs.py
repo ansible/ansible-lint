@@ -81,8 +81,8 @@ def rules_as_rich(rules: RulesCollection) -> Iterable[Table]:
         if rule.link:
             description += f" [(more)]({rule.link})"
         table.add_row("description", Markdown(description))
-        if rule.version_added:
-            table.add_row("version_added", rule.version_added)
+        if rule.version_changed:
+            table.add_row("version_changed", rule.version_changed)
         if rule.tags:
             table.add_row("tags", ", ".join(rule.tags))
         if rule.severity:

@@ -30,7 +30,7 @@ class MetaTagValidRule(AnsibleLintRule):
     )
     severity = "HIGH"
     tags = ["metadata"]
-    version_added = "v4.0.0"
+    version_changed = "4.0.0"
 
     TAG_REGEXP = re.compile(r"^[a-z0-9]+$")
 

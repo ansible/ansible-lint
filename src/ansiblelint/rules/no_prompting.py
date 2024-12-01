@@ -25,7 +25,7 @@ class NoPromptingRule(AnsibleLintRule):
     )
     tags = ["opt-in"]
     severity = "VERY_LOW"
-    version_added = "v6.0.3"
+    version_changed = "6.0.3"
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific playbook."""

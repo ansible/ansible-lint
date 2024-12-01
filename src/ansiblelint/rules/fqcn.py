@@ -103,7 +103,7 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
         "Check whether actions are using using full qualified collection names."
     )
     tags = ["formatting"]
-    version_added = "v6.8.0"
+    version_changed = "6.8.0"
     module_aliases: dict[str, str] = {"block/always/rescue": "block/always/rescue"}
     _ids = {
         "fqcn[action-core]": "Use FQCN for builtin module actions",
