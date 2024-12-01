@@ -19,7 +19,7 @@ click==8.1.7              # via black, mkdocs, mkdocstrings
 colorama==0.4.6           # via griffe, mkdocs-material, tox
 coverage==7.6.8           # via coverage-enable-subprocess, ansible-lint (pyproject.toml)
 coverage-enable-subprocess==1.0  # via ansible-lint (pyproject.toml)
-cryptography==43.0.3      # via ansible-core
+cryptography==44.0.0      # via ansible-core
 csscompressor==0.9.5      # via mkdocs-minify-plugin
 cssselect2==0.7.0         # via cairosvg
 defusedxml==0.7.1         # via cairosvg
@@ -59,7 +59,7 @@ mkdocs-gen-files==0.5.0   # via mkdocs-ansible
 mkdocs-get-deps==0.2.0    # via mkdocs
 mkdocs-htmlproofer-plugin==1.3.0  # via mkdocs-ansible
 mkdocs-macros-plugin==1.3.7  # via mkdocs-ansible
-mkdocs-material==9.5.45   # via mkdocs-ansible
+mkdocs-material==9.5.46   # via mkdocs-ansible
 mkdocs-material-extensions==1.3.1  # via mkdocs-ansible, mkdocs-material
 mkdocs-minify-plugin==0.8.0  # via mkdocs-ansible
 mkdocs-monorepo-plugin==1.1.0  # via mkdocs-ansible
@@ -72,7 +72,7 @@ packaging==24.2           # via ansible-compat, ansible-core, black, mkdocs, mkd
 paginate==0.5.7           # via mkdocs-material
 pathspec==0.12.1          # via black, mkdocs, mkdocs-macros-plugin, yamllint, ansible-lint (pyproject.toml)
 pillow==11.0.0            # via cairosvg, mkdocs-ansible
-pipdeptree==2.23.4        # via mkdocs-ansible, ansible-lint (pyproject.toml)
+pipdeptree==2.24.0        # via mkdocs-ansible, ansible-lint (pyproject.toml)
 platformdirs==4.3.6       # via black, mkdocs-get-deps, mkdocstrings, pylint, tox, virtualenv
 pluggy==1.5.0             # via pytest, tox
 psutil==6.1.0             # via ansible-lint (pyproject.toml)
@@ -103,13 +103,13 @@ super-collections==0.5.3  # via mkdocs-macros-plugin
 termcolor==2.5.0          # via mkdocs-macros-plugin
 text-unidecode==1.3       # via python-slugify
 tinycss2==1.4.0           # via cairosvg, cssselect2
-tomli==2.1.0              # via black, coverage, mypy, pylint, pyproject-api, pytest, tox
+tomli==2.2.1              # via black, coverage, mypy, pylint, pyproject-api, pytest, tox
 tomlkit==0.13.2           # via pylint
 tox==4.23.2               # via ansible-lint (pyproject.toml)
 types-jsonschema==4.23.0.20240813  # via ansible-lint (pyproject.toml)
 types-pyyaml==6.0.12.20240917  # via ansible-lint (pyproject.toml)
 urllib3==2.2.3            # via requests
-virtualenv==20.27.1       # via tox
+virtualenv==20.28.0       # via tox
 watchdog==6.0.0           # via mkdocs
 wcmatch==10.0             # via ansible-lint (pyproject.toml)
 webencodings==0.5.1       # via cssselect2, tinycss2
