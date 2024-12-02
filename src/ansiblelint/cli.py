@@ -255,7 +255,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest="list_profiles",
         default=False,
         action="store_true",
-        help="List all profiles, no formatting options available.",
+        help="List all profiles.",
     )
     listing_group.add_argument(
         "-L",
@@ -263,16 +263,14 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest="list_rules",
         default=False,
         action="store_true",
-        help="List all the rules. For listing rules only the following formats "
-        "for argument -f are supported: {brief, full, md} with 'brief' as default.",
+        help="List all the rules.",
     )
     listing_group.add_argument(
         "-T",
         "--list-tags",
         dest="list_tags",
         action="store_true",
-        help="List all the tags and the rules they cover. Increase the verbosity level "
-        "with `-v` to include 'opt-in' tag and its rules.",
+        help="List all the tags and the rules they cover.",
     )
     parser.add_argument(
         "-f",
