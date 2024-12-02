@@ -34,6 +34,7 @@ from typing import TYPE_CHECKING, Any, TextIO
 
 from ansible_compat.prerun import get_cache_dir
 from filelock import BaseFileLock, FileLock, Timeout
+from rich.markdown import Markdown
 from rich.markup import escape
 
 from ansiblelint.constants import RC, SKIP_SCHEMA_UPDATE
@@ -71,8 +72,6 @@ from ansiblelint.version import __version__
 
 if TYPE_CHECKING:
     # RulesCollection must be imported lazily or ansible gets imported too early.
-
-    from collections.abc import Callable
 
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import LintResult
@@ -166,17 +165,11 @@ def initialize_options(arguments: list[str] | None = None) -> BaseFileLock | Non
 def _do_list(rules: RulesCollection) -> int:
     # On purpose lazy-imports to avoid pre-loading Ansible
     # pylint: disable=import-outside-toplevel
-    from ansiblelint.generate_docs import rules_as_md, rules_as_rich, rules_as_str
+    from ansiblelint.generate_docs import rules_as_str
 
     if options.list_rules:
-        _rule_format_map: dict[str, Callable[..., Any]] = {
-            "brief": rules_as_str,
-            "full": rules_as_rich,
-            "md": rules_as_md,
-        }
-
         console.print(
-            _rule_format_map.get(options.format, rules_as_str)(rules),
+            rules_as_str(rules),
             highlight=False,
         )
         return 0
@@ -339,9 +332,9 @@ def main(argv: list[str] | None = None) -> int:
     from ansiblelint.rules import RulesCollection
 
     if options.list_profiles:
-        from ansiblelint.generate_docs import profiles_as_rich
+        from ansiblelint.generate_docs import profiles_as_md
 
-        console.print(profiles_as_rich())
+        console.print(Markdown(profiles_as_md()))
         return 0
 
     app = get_app(
