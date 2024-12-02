@@ -1,4 +1,4 @@
-"""Console coloring and terminal support."""
+"""Console support: coloring and terminal code."""
 
 from __future__ import annotations
 

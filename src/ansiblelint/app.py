@@ -17,11 +17,11 @@ from rich.table import Table
 
 from ansiblelint import formatters
 from ansiblelint._mockings import _perform_mockings
-from ansiblelint.color import console, console_stderr, render_yaml
 from ansiblelint.config import PROFILES, Options, get_version_warning
 from ansiblelint.config import options as default_options
 from ansiblelint.constants import RC, RULE_DOC_URL
 from ansiblelint.loaders import IGNORE_FILE
+from ansiblelint.output import console, console_stderr, render_yaml
 from ansiblelint.requirements import Reqs
 from ansiblelint.stats import SummarizedResults, TagStats
 
