@@ -330,7 +330,7 @@ def get_version_warning() -> str:
         if current_version > new_version:
             msg = "[dim]You are using a pre-release version of ansible-lint.[/]"
         elif current_version < new_version:
-            msg = f"""[warning]A new release of ansible-lint is available: [red]{current_version}[/] → [green][link={html_url}]{new_version}[/][/][/]"""
+            msg = f"""[warning]A new release of ansible-lint is available: [warning]{current_version}[/] → [success][link={html_url}]{new_version}[/link][/][/]"""
             msg += f" Upgrade by running: [info]{pip}[/]"
 
     return msg

@@ -12,18 +12,14 @@ importlib-metadata==8.5.0  # via ansible-lint (pyproject.toml)
 jinja2==3.1.4             # via ansible-core
 jsonschema==4.23.0        # via ansible-compat, ansible-lint (pyproject.toml)
 jsonschema-specifications==2024.10.1  # via jsonschema
-markdown-it-py==3.0.0     # via rich
 markupsafe==3.0.2         # via jinja2
-mdurl==0.1.2              # via markdown-it-py
 mypy-extensions==1.0.0    # via black
 packaging==24.2           # via ansible-compat, ansible-core, black, ansible-lint (pyproject.toml)
 pathspec==0.12.1          # via black, yamllint, ansible-lint (pyproject.toml)
 platformdirs==4.3.6       # via black
 pycparser==2.22           # via cffi
-pygments==2.18.0          # via rich
 pyyaml==6.0.2             # via ansible-compat, ansible-core, yamllint, ansible-lint (pyproject.toml)
 referencing==0.35.1       # via jsonschema, jsonschema-specifications
-rich==13.9.4              # via ansible-lint (pyproject.toml)
 rpds-py==0.22.1           # via jsonschema, referencing
 ruamel-yaml==0.18.6       # via ansible-lint (pyproject.toml)
 ruamel-yaml-clib==0.2.12  # via ruamel-yaml

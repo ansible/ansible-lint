@@ -46,5 +46,9 @@
     "evenBetterToml.formatter.arrayTrailingComma": true,
     "[toml]": {
         "editor.defaultFormatter": "panekj.even-betterer-toml"
+    },
+    "sonarlint.connectedMode.project": {
+        "connectionId": "ansible",
+        "projectKey": "ansible_ansible-lint"
     }
 }

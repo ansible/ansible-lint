@@ -2,6 +2,7 @@
 
 from ansiblelint.config import PROFILES
 from ansiblelint.constants import RULE_DOC_URL
+from ansiblelint.output import Markdown
 from ansiblelint.rules import RulesCollection, TransformMixin
 
 
@@ -12,7 +13,7 @@ def rules_as_str(rules: RulesCollection) -> str:
         if issubclass(rule.__class__, TransformMixin):
             rule.tags.insert(0, "autofix")
         tag = f"{','.join(rule.tags)}" if rule.tags else ""
-        result += f"- [repr.url][link={RULE_DOC_URL}{rule.id}/]{rule.id}[/link][/] {rule.shortdesc}\n[dim]  tags:{tag}[/dim]"
+        result += f"- [link={RULE_DOC_URL}{rule.id}/]{rule.id}[/link] {rule.shortdesc}\n[dim]  tags:{tag}[/]"
 
         if rule.version_changed and rule.version_changed != "historic":
             result += f"[dim] modified:{rule.version_changed}[/]"
@@ -21,7 +22,7 @@ def rules_as_str(rules: RulesCollection) -> str:
     return result
 
 
-def profiles_as_md(*, header: bool = False, docs_url: str = RULE_DOC_URL) -> str:
+def profiles_as_md(*, header: bool = False, docs_url: str = RULE_DOC_URL) -> Markdown:
     """Return markdown representation of supported profiles."""
     result = ""
 
@@ -57,4 +58,4 @@ Ansible-lint profiles gradually increase the strictness of rules as your Ansible
                 result += f"- [{rule}]({rule_data['url']})\n"
 
         result += "\n"
-    return result
+    return Markdown(result)

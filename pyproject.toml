@@ -364,7 +364,6 @@ exclude = [
 ignore_names = [
   "_ANSIBLE_ARGS",
   "__line__",
-  "__rich_console__",
   "fixture_*",
   "pytest_addoption",
   "pytest_collection_modifyitems",
