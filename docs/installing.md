@@ -111,7 +111,7 @@ on:
 jobs:
   build:
     name: Ansible Lint # Naming the build is important to use it as a status check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Run ansible-lint
