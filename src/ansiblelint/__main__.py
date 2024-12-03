@@ -51,13 +51,6 @@ except Exception as _exc:  # pylint: disable=broad-exception-caught # noqa: BLE0
 from ansiblelint import cli
 from ansiblelint._mockings import _perform_mockings_cleanup
 from ansiblelint.app import get_app
-from ansiblelint.color import (
-    console,
-    console_options,
-    console_stderr,
-    reconfigure,
-    render_yaml,
-)
 from ansiblelint.config import (
     Options,
     get_deps_versions,
@@ -66,6 +59,13 @@ from ansiblelint.config import (
     options,
 )
 from ansiblelint.loaders import load_ignore_txt
+from ansiblelint.output import (
+    console,
+    console_options,
+    console_stderr,
+    reconfigure,
+    render_yaml,
+)
 from ansiblelint.runner import get_matches
 from ansiblelint.skip_utils import normalize_tag
 from ansiblelint.version import __version__
