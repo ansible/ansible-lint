@@ -258,7 +258,6 @@ pathspecs
 pbrun
 pfexec
 pickleable
-pipdeptree
 pipefail
 piptools
 pipx
