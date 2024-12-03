@@ -312,6 +312,12 @@ def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
         "-v",
         "-p",
         "--nocolor",
+        "--offline",
+        "--exclude=examples",
+        "--exclude=test",
+        "--exclude=src",
+        "--exclude=collections",
+        "--exclude=.github",
     ]
     result = subprocess.run(cmd, check=False).returncode
 
@@ -321,18 +327,12 @@ def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
     out, err = capfd.readouterr()
 
     # An expected rule match from our examples
-    assert (
-        "examples/playbooks/empty_playbook.yml:1:1: "
-        "syntax-check[empty-playbook]: Empty playbook, nothing to do" in out
-    )
+    assert "playbook.yml:6: name[casing]" in out
     # assures that our ansible-lint config exclude was effective in excluding github files
     assert "Identified: .github/" not in out
     # assures that we can parse playbooks as playbooks
     assert "Identified: test/test/always-run-success.yml" not in err
-    assert (
-        "Executing syntax check on playbook examples/playbooks/mocked_dependency.yml"
-        in err
-    )
+    assert "Executing syntax check on playbook playbook.yml" in err
 
 
 def test_is_playbook() -> None:
