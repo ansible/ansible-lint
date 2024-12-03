@@ -110,6 +110,7 @@ denormalize
 deps
 devel
 dharmabumstead
+direnv
 dirhtml
 dists
 distutils
