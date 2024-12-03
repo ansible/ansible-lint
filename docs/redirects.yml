@@ -32,7 +32,3 @@
 - type: page
   from_url: /en/latest/pkg/ansiblelint.rules.empty_string_compare/
   to_url: /rules/empty-string-compare/
-# Keep this last or it will match all the other rules
-- type: sphinx_htmldir
-  from_url: ""
-  to_url: ""
