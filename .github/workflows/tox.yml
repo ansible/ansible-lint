@@ -244,6 +244,7 @@ jobs:
 
       - name: Download artifacts
         uses: actions/download-artifact@v4
+        continue-on-error: true # to allow rerunning this job
         with:
           name: logs.zip
           path: .
@@ -262,11 +263,7 @@ jobs:
           name: ${{ matrix.name }}
           # verbose: true # optional (default = false)
           fail_ci_if_error: true
-          use_oidc: true # cspell:ignore oidc
-
-      - name: Check codecov.io status
-        if: github.event_name == 'pull_request'
-        uses: coactions/codecov-status@main
+          use_oidc: ${{ !(github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork) }} # cspell:ignore oidc
 
       - name: Decide whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@release/v1
@@ -278,3 +275,4 @@ jobs:
         with:
           include-hidden-files: true
           delete-merged: true
+          pattern: logs-*.zip
