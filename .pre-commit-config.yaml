@@ -205,7 +205,7 @@ repos:
           - wcmatch
           - yamllint
   - repo: https://github.com/pycqa/pylint
-    rev: v3.3.1
+    rev: v3.3.2
     hooks:
       - id: pylint
         args:

@@ -179,11 +179,7 @@ reportPossiblyUnboundVariable = false
 [tool.pytest.ini_options]
 # do not add options here as this will likely break either console runs or IDE
 # integration like vscode or pycharm
-addopts = "-p no:pytest_cov --failed-first"
-# https://code.visualstudio.com/docs/python/testing
-# coverage is re-enabled in `tox.ini`. That approach is safer than
-# `--no-cov` which prevents activation from tox.ini and which also fails
-# when plugin is effectively missing.
+addopts = "-p no:pytest_cov --durations=10 --failed-first"
 doctest_optionflags = ["ALLOW_UNICODE", "ELLIPSIS"]
 filterwarnings = [
   "error",
@@ -200,11 +196,15 @@ filterwarnings = [
   "ignore:Attribute s is deprecated and will be removed in Python 3.14; use value instead:DeprecationWarning"
 ]
 junit_duration_report = "call"
+junit_family = "xunit1"
 # Our github annotation parser from .github/workflows/tox.yml requires xunit1 format. Ref:
 # https://github.com/shyim/junit-report-annotations-action/issues/3#issuecomment-663241378
-junit_family = "xunit1"
 junit_suite_name = "ansible_lint_test_suite"
 minversion = "4.6.6"
+# https://code.visualstudio.com/docs/python/testing
+# coverage is re-enabled in `tox.ini`. That approach is safer than
+# `--no-cov` which prevents activation from tox.ini and which also fails
+# when plugin is effectively missing.
 norecursedirs = [
   "*.egg",
   ".cache",
@@ -214,12 +214,19 @@ norecursedirs = [
   ".github",
   ".mypy_cache",
   ".projects",
+  ".eggs",
   ".tox",
+  "__pycache__",
+  "ansible_collections",
   "build",
   "collections",
   "dist",
   "docs",
-  "src/ansible_lint.egg-info"
+  "examples",
+  "plugins",
+  "site",
+  "src/ansible_lint.egg-info",
+  "test/schemas"
 ]
 python_files = [
   "test_*.py",
@@ -332,6 +339,10 @@ write_to = "src/ansiblelint/_version.py"
 in_place = true
 sort_inline_tables = true
 sort_table_keys = true
+
+[tool.uv]
+# incompatible with Windows
+environments = ["platform_system != 'Windows'"]
 
 [tool.uv.pip]
 annotation-style = "line"
