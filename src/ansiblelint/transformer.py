@@ -9,12 +9,13 @@ from typing import TYPE_CHECKING, cast
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
 from ansiblelint.file_utils import Lintable
-from ansiblelint.rules import AnsibleLintRule, TransformMixin
+from ansiblelint.rules import TransformMixin
 from ansiblelint.yaml_utils import FormattedYAML, get_path_to_play, get_path_to_task
 
 if TYPE_CHECKING:
     from ansiblelint.config import Options
     from ansiblelint.errors import MatchError
+    from ansiblelint.rules import AnsibleLintRule
     from ansiblelint.runner import LintResult
 
 __all__ = ["Transformer"]
@@ -150,14 +151,14 @@ class Transformer:
                 _logger.debug("%s %s", self.FIX_NA_MSG, match_id)
                 continue
             if self.write_set != {"all"}:
-                rule = cast(AnsibleLintRule, match.rule)
+                rule = cast("AnsibleLintRule", match.rule)
                 rule_definition = set(rule.tags)
                 rule_definition.add(rule.id)
                 if rule_definition.isdisjoint(self.write_set):
                     _logger.debug("%s %s", self.FIX_NE_MSG, match_id)
                     continue
             if file_is_yaml and not match.yaml_path:
-                data = cast(CommentedMap | CommentedSeq, data)
+                data = cast("CommentedMap | CommentedSeq", data)
                 if match.match_type == "play":
                     match.yaml_path = get_path_to_play(file, match.lineno, data)
                 elif match.task or file.kind in (
