@@ -9,6 +9,7 @@ dictionaries:
   - bash
   - words
   - python
+enabled: true
 ignorePaths:
   - cspell.config.yaml
   # The requirements file

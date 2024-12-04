@@ -49,6 +49,8 @@ def test_profile_listing(capfd: CaptureFixture[str]) -> None:
     for line in strip_ansi_escape(err).splitlines():
         if "SyntaxWarning:" in line:
             continue
+        if "No know markdown renderer found" in line:
+            continue
         if (
             "Skipped installing collection dependencies due to running in offline mode."
             in line

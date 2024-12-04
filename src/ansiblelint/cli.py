@@ -612,7 +612,7 @@ def get_config(arguments: list[str]) -> Options:
         log_entries.append(
             (
                 logging.INFO,
-                f"Identified [filename]{project_dir}[/] as project root due [bold]{method}[/].",
+                f"Identified [repr.path]{project_dir}[/] as project root due [bold]{method}[/].",
             ),
         )
 

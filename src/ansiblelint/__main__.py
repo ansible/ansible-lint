@@ -30,12 +30,10 @@ import shutil
 import site
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, TextIO
+from typing import TYPE_CHECKING
 
 from ansible_compat.prerun import get_cache_dir
 from filelock import BaseFileLock, FileLock, Timeout
-from rich.markdown import Markdown
-from rich.markup import escape
 
 from ansiblelint.constants import RC, SKIP_SCHEMA_UPDATE
 
@@ -61,10 +59,10 @@ from ansiblelint.config import (
 from ansiblelint.loaders import load_ignore_txt
 from ansiblelint.output import (
     console,
-    console_options,
     console_stderr,
     reconfigure,
     render_yaml,
+    should_do_markup,
 )
 from ansiblelint.runner import get_matches
 from ansiblelint.skip_utils import normalize_tag
@@ -86,7 +84,7 @@ class LintLogHandler(logging.Handler):
     def emit(self, record: logging.LogRecord) -> None:
         try:
             msg = self.format(record)
-            console_stderr.print(f"[dim]{msg}[/dim]", highlight=False)
+            console_stderr.print(f"[dim]{msg}[/]")
         except RecursionError:  # See issue 36272
             raise
         except Exception:  # pylint: disable=broad-exception-caught # noqa: BLE001
@@ -170,7 +168,6 @@ def _do_list(rules: RulesCollection) -> int:
     if options.list_rules:
         console.print(
             rules_as_str(rules),
-            highlight=False,
         )
         return 0
 
@@ -282,16 +279,15 @@ def main(argv: list[str] | None = None) -> int:
         argv = sys.argv
     cache_dir_lock = initialize_options(argv[1:])
 
-    console_options["force_terminal"] = options.colored
-    reconfigure(console_options)
+    reconfigure(colored=options.colored)
 
     if options.version:
         deps = get_deps_versions()
         msg = f"ansible-lint [repr.number]{__version__}[/] using[dim]"
         for k, v in deps.items():
-            msg += f" {escape(k)}:[repr.number]{v}[/]"
+            msg += f" {k}:[repr.number]{v}[/]"
         msg += "[/]"
-        console.print(msg, markup=True, highlight=False)
+        console.print(msg)
         msg = get_version_warning()
         if msg:
             console.print(msg)
@@ -334,7 +330,7 @@ def main(argv: list[str] | None = None) -> int:
     if options.list_profiles:
         from ansiblelint.generate_docs import profiles_as_md
 
-        console.print(Markdown(profiles_as_md()))
+        profiles_as_md().display()
         return 0
 
     app = get_app(
@@ -476,49 +472,6 @@ def path_inject(own_location: str = "") -> None:
         if not shutil.which(cmd):
             msg = f"Failed to find runtime dependency '{cmd}' in PATH"
             raise RuntimeError(msg)
-
-
-# Based on Ansible implementation
-def to_bool(value: Any) -> bool:  # pragma: no cover
-    """Return a bool for the arg."""
-    if value is None or isinstance(value, bool):
-        return bool(value)
-    if isinstance(value, str):
-        value = value.lower()
-    return value in ("yes", "on", "1", "true", 1)
-
-
-def should_do_markup(stream: TextIO = sys.stdout) -> bool:  # pragma: no cover
-    """Decide about use of ANSI colors."""
-    py_colors = None
-
-    # https://xkcd.com/927/
-    for env_var in ["PY_COLORS", "CLICOLOR", "FORCE_COLOR", "ANSIBLE_FORCE_COLOR"]:
-        value = os.environ.get(env_var, None)
-        if value is not None:
-            py_colors = to_bool(value)
-            break
-
-    # If deliberately disabled colors
-    if os.environ.get("NO_COLOR", None):
-        return False
-
-    # User configuration requested colors
-    if py_colors is not None:
-        return to_bool(py_colors)
-
-    term = os.environ.get("TERM", "")
-    if "xterm" in term:
-        return True
-
-    if term == "dumb":
-        return False
-
-    # Use tty detection logic as last resort because there are numerous
-    # factors that can make isatty return a misleading value, including:
-    # - stdin.isatty() is the only one returning true, even on a real terminal
-    # - stderr returning false if user user uses a error stream coloring solution
-    return stream.isatty()
 
 
 if __name__ == "__main__":
