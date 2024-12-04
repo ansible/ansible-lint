@@ -326,7 +326,7 @@ class Lintable:
         """Retrieve file content, from internal cache or disk."""
         if self._content is None:
             self._populate_content_cache_from_disk()
-        return cast(str, self._content)
+        return cast("str", self._content)
 
     @content.setter
     def content(self, value: str) -> None:

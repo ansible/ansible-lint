@@ -1029,7 +1029,7 @@ def test_document_start(
 
     yaml = ansiblelint.yaml_utils.FormattedYAML(
         version=yaml_version,
-        config=cast(dict[str, bool | int | str], config),
+        config=cast("dict[str, bool | int | str]", config),
     )
     assert (
         yaml.dumps(yaml.load(_SINGLE_QUOTE_WITHOUT_INDENTS)).startswith("---")
