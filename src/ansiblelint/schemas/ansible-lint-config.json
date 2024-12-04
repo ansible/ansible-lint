@@ -20,6 +20,8 @@
   "description": "https://ansible.readthedocs.io/projects/lint/configuring/",
   "examples": [
     ".ansible-lint",
+    ".ansible-lint.yml",
+    ".ansible-lint.yaml",
     ".config/ansible-lint.yml",
     ".config/ansible-lint.yaml"
   ],

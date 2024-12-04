@@ -207,6 +207,8 @@ ROLE_IMPORT_ACTION_NAMES = {
 
 CONFIG_FILENAMES = [
     ".ansible-lint",
+    ".ansible-lint.yml",
+    ".ansible-lint.yaml",
     ".config/ansible-lint.yml",
     ".config/ansible-lint.yaml",
 ]
