@@ -173,6 +173,7 @@ class Options:  # pylint: disable=too-many-instance-attributes
     version: bool = False  # display version command
     list_profiles: bool = False  # display profiles command
     ignore_file: Path | None = None
+    inventory: list[str] | None = None
     max_tasks: int = 100
     max_block_depth: int = 20
     # Refer to https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix

@@ -458,6 +458,14 @@ def get_cli_parser() -> argparse.ArgumentParser:
         help=f"Specify ignore file to use. By default it will look for '{IGNORE_FILE.default}' or '{IGNORE_FILE.alternative}'",
     )
     parser.add_argument(
+        "-I",
+        "--inventory",
+        dest="inventory",
+        action="append",
+        type=str,
+        help="Specify inventory host path or comma separated host list",
+    )
+    parser.add_argument(
         "--offline",
         dest="offline",
         action="store_const",
