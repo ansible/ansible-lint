@@ -460,7 +460,7 @@ class HandleChildren:
     ) -> list[Lintable]:
         """Include import_playbook children."""
 
-        def append_playbook_path(loc: str, playbook_name: str) -> None:
+        def append_playbook_path(loc: str, playbook_path: list[str]) -> None:
             possible_paths.append(
                 Path(
                     path_dwim(
@@ -470,7 +470,7 @@ class HandleChildren:
                             namespace_name,
                             collection_name,
                             "playbooks",
-                            playbook_name,
+                            *playbook_path,
                         ),
                     ),
                 ),
@@ -481,11 +481,17 @@ class HandleChildren:
             return []
 
         possible_paths = []
-        namespace_name, collection_name, playbook_name = parse_fqcn(v)
+        namespace_name, collection_name, *playbook_path = parse_fqcn(v)
         if namespace_name and collection_name:
             for loc in get_app(cached=True).runtime.config.collections_paths:
-                append_playbook_path(loc, f"{playbook_name}.yml")
-                append_playbook_path(loc, f"{playbook_name}.yaml")
+                append_playbook_path(
+                    loc,
+                    playbook_path[:-1] + [f"{playbook_path[-1]}.yml"],
+                )
+                append_playbook_path(
+                    loc,
+                    playbook_path[:-1] + [f"{playbook_path[-1]}.yaml"],
+                )
         else:
             possible_paths.append(lintable.path.parent / v)
 

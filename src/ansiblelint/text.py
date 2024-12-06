@@ -7,7 +7,7 @@ from functools import cache
 
 RE_HAS_JINJA = re.compile(r"{[{%#].*[%#}]}", re.DOTALL)
 RE_HAS_GLOB = re.compile(r"[][*?]")
-RE_IS_FQCN_OR_NAME = re.compile(r"^\w+(\.\w+\.\w+)?$")
+RE_IS_FQCN_OR_NAME = re.compile(r"^\w+(\.\w+){2,100}$|^\w+$")
 
 
 def strip_ansi_escape(data: str | bytes) -> str:

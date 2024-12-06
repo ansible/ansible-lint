@@ -1,0 +1,9 @@
+---
+- name: Fixture
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Another task
+      ansible.builtin.debug:
+        msg: debug message

@@ -1,3 +1,6 @@
 ---
 - name: Import a playbook
   ansible.builtin.import_playbook: local.testcollection.foo
+
+- name: Import a playbook that is in a subdirectory
+  ansible.builtin.import_playbook: local.testcollection.test.bar.foo
