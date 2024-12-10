@@ -5,7 +5,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Literal
 
-TAG_NAME_REGEXP = re.compile(r"^(?!.*__)[a-z]+[0-9a-z_]*$")
+TAG_NAME_REGEXP = re.compile(r"^(?!.*__)[a-z][0-9a-z_]*$")
 MAX_TAGS_COUNT = 20
 MAX_LENGTH_TAG = 64
 DEFAULT_RULESDIR = Path(__file__).parent / "rules"
