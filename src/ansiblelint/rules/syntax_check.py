@@ -37,14 +37,14 @@ OUTPUT_PATTERNS = (
     KnownError(
         tag="empty-playbook",
         regex=re.compile(
-            "Empty playbook, nothing to do",
+            r"Empty playbook, nothing to do",
             re.MULTILINE | re.DOTALL | re.DOTALL,
         ),
     ),
     KnownError(
         tag="malformed",
         regex=re.compile(
-            "^ERROR! (?P<title>A malformed block was encountered while loading a block[^\n]*)",
+            r"^ERROR! (?P<title>A malformed block was encountered while loading a block[^\n]*)",
             re.MULTILINE | re.DOTALL | re.DOTALL,
         ),
     ),
@@ -79,5 +79,5 @@ class AnsibleSyntaxCheckRule(AnsibleLintRule):
     id = "syntax-check"
     severity = "VERY_HIGH"
     tags = ["core", "unskippable"]
-    version_added = "v5.0.0"
+    version_changed = "5.0.0"
     _order = 0

@@ -18,8 +18,12 @@ from functools import cache
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Any
+from unittest import mock
 
+import ansible.inventory.manager
+from ansible.config.manager import ConfigManager
 from ansible.errors import AnsibleError
+from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.splitter import split_args
 from ansible.parsing.yaml.constructor import AnsibleMapping
 from ansible.plugins.loader import add_all_plugin_dirs
@@ -340,13 +344,16 @@ class Runner:
                 playbook_path = fh.name
             else:
                 playbook_path = str(lintable.path.expanduser())
-            # To avoid noisy warnings we pass localhost as current inventory:
-            # [WARNING]: No inventory was parsed, only implicit localhost is available
-            # [WARNING]: provided hosts list is empty, only localhost is available. Note that the implicit localhost does not match 'all'
             cmd = [
                 "ansible-playbook",
-                "-i",
-                "localhost,",
+                *[
+                    inventory_opt
+                    for inventory_opts in [
+                        ("-i", inventory_file)
+                        for inventory_file in self._get_inventory_files(app)
+                    ]
+                    for inventory_opt in inventory_opts
+                ],
                 "--syntax-check",
                 playbook_path,
             ]
@@ -451,6 +458,62 @@ class Runner:
             fh.close()
         return results
 
+    def _get_inventory_files(self, app: App) -> list[str]:
+        config_mgr = ConfigManager()
+        ansible_cfg_inventory = config_mgr.get_config_value(
+            "DEFAULT_HOST_LIST",
+        )
+        if app.options.inventory or ansible_cfg_inventory != [
+            config_mgr.get_configuration_definitions()["DEFAULT_HOST_LIST"].get(
+                "default",
+            ),
+        ]:
+            inventory_files = [
+                inventory_file
+                for inventory_list in [
+                    # creates nested inventory list
+                    (inventory.split(",") if "," in inventory else [inventory])
+                    for inventory in (
+                        app.options.inventory
+                        if app.options.inventory
+                        else ansible_cfg_inventory
+                    )
+                ]
+                for inventory_file in inventory_list
+            ]
+
+            # silence noise when using parse_source
+            with mock.patch.object(
+                ansible.inventory.manager,
+                "display",
+                mock.Mock(),
+            ):
+                for inventory_file in inventory_files:
+                    if not Path(inventory_file).exists():
+                        _logger.warning(
+                            "Unable to use %s as an inventory source: no such file or directory",
+                            inventory_file,
+                        )
+                    elif os.access(
+                        inventory_file,
+                        os.R_OK,
+                    ) and not ansible.inventory.manager.InventoryManager(
+                        DataLoader(),
+                    ).parse_source(
+                        inventory_file,
+                    ):
+                        _logger.warning(
+                            "Unable to parse %s as an inventory source",
+                            inventory_file,
+                        )
+        else:
+            # To avoid noisy warnings we pass localhost as current inventory:
+            # [WARNING]: No inventory was parsed, only implicit localhost is available
+            # [WARNING]: provided hosts list is empty, only localhost is available. Note that the implicit localhost does not match 'all'
+            inventory_files = ["localhost"]
+
+        return inventory_files
+
     def _filter_excluded_matches(self, matches: list[MatchError]) -> list[MatchError]:
         return [
             match
@@ -502,7 +565,7 @@ class Runner:
                 playbook_ds = ansiblelint.utils.parse_yaml_from_file(str(lintable.path))
             except AnsibleError as exc:
                 msg = f"Loading {lintable.filename} caused an {type(exc).__name__} exception: {exc}, file was ignored."
-                logging.exception(msg)
+                _logger.exception(msg)
                 return []
         results = []
         # playbook_ds can be an AnsibleUnicode string, which we consider invalid

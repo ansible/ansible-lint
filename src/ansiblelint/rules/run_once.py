@@ -23,6 +23,7 @@ class RunOnce(AnsibleLintRule):
 
     tags = ["idiom"]
     severity = "MEDIUM"
+    version_changed = "6.12.0"
     _ids = {
         "run-once[task]": "Using run_once may behave differently if strategy is set to free.",
         "run-once[play]": "Play uses strategy: free",

@@ -31,7 +31,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
     )
     severity = "MEDIUM"
     tags = ["idiom"]
-    version_added = "v6.9.1 (last update)"
+    version_changed = "6.9.1"
     _re_templated_inside = re.compile(r".*\{\{.*\}\}.*\w.*$")
     _ids = {
         "name[play]": "All plays should be named.",

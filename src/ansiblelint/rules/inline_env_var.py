@@ -41,7 +41,7 @@ class EnvVarsInCommandRule(AnsibleLintRule):
     )
     severity = "VERY_HIGH"
     tags = ["command-shell", "idiom"]
-    version_added = "historic"
+    version_changed = "5.0.11"
 
     expected_args = [
         "chdir",

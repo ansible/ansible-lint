@@ -110,6 +110,7 @@ denormalize
 deps
 devel
 dharmabumstead
+direnv
 dirhtml
 dists
 distutils
@@ -257,7 +258,6 @@ pathspecs
 pbrun
 pfexec
 pickleable
-pipdeptree
 pipefail
 piptools
 pipx

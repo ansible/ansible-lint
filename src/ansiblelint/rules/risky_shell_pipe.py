@@ -28,7 +28,7 @@ class ShellWithoutPipefail(AnsibleLintRule):
     )
     severity = "MEDIUM"
     tags = ["command-shell"]
-    version_added = "v4.1.0"
+    version_changed = "4.1.0"
 
     _pipefail_re = re.compile(r"^\s*set.*[+-][A-Za-z]*o\s*pipefail", re.MULTILINE)
     _pipe_re = re.compile(r"(?<!\|)\|(?!\|)")

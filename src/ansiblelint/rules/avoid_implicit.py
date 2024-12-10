@@ -24,7 +24,7 @@ class AvoidImplicitRule(AnsibleLintRule):
     )
     severity = "MEDIUM"
     tags = ["unpredictability"]
-    version_added = "v6.8.0"
+    version_changed = "6.8.0"
 
     def matchtask(
         self,

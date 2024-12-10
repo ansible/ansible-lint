@@ -62,7 +62,7 @@ class RoleNames(AnsibleLintRule):
     link = "https://docs.ansible.com/ansible/devel/dev_guide/developing_collections_structure.html#roles-directory"
     severity = "HIGH"
     tags = ["deprecations", "metadata"]
-    version_added = "v6.8.5"
+    version_changed = "6.8.5"
     _ids = {
         "role-name[path]": "Avoid using paths when importing roles.",
     }

@@ -46,7 +46,7 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule, TransformMixin):
     )
     severity = "HIGH"
     tags = ["command-shell", "idiom"]
-    version_added = "historic"
+    version_changed = "6.18.0"
 
     def matchtask(
         self,

@@ -42,7 +42,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
     )
     severity = "HIGH"
     tags = ["command-shell", "idiom"]
-    version_added = "historic"
+    version_changed = "24.10.0"
 
     _commands = ["command", "shell"]
     _modules = {

@@ -107,7 +107,7 @@ def test_run_playbook(local_test_dir: Path) -> None:
             "role-name: Role name invalid-name does not match",
             id="normal",
         ),
-        pytest.param(["--skip-list", "role-name"], "", id="skipped"),
+        pytest.param(["--nocolor", "--skip-list", "role-name"], "", id="skipped"),
     ),
 )
 def test_run_role_name_invalid(
@@ -119,10 +119,11 @@ def test_run_role_name_invalid(
     cwd = local_test_dir
     role_path = "roles/invalid-name"
 
-    result = run_ansible_lint(*args, role_path, cwd=cwd)
+    env = {"NO_COLOR": "1"}
+    result = run_ansible_lint(*args, role_path, cwd=cwd, env=env)
     assert result.returncode == (2 if expected_msg else 0), result
     if expected_msg:
-        assert expected_msg in strip_ansi_escape(result.stdout)
+        assert expected_msg in result.stdout
 
 
 def test_run_role_name_with_prefix(local_test_dir: Path) -> None:
@@ -150,7 +151,7 @@ def test_run_invalid_role_name_from_meta(local_test_dir: Path) -> None:
     cwd = local_test_dir
     role_path = "roles/invalid_due_to_meta"
 
-    result = run_ansible_lint(role_path, cwd=cwd)
+    result = run_ansible_lint(role_path, cwd=cwd, env={"NO_COLOR": "1"})
     assert (
         "role-name: Role name invalid-due-to-meta does not match"
         in strip_ansi_escape(result.stdout)

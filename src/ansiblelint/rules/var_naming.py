@@ -17,7 +17,6 @@ from ansiblelint.constants import (
     PLAYBOOK_ROLE_KEYWORDS,
     RC,
 )
-from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, RulesCollection
 from ansiblelint.runner import Runner
@@ -26,6 +25,7 @@ from ansiblelint.text import has_jinja, is_fqcn, is_fqcn_or_name
 from ansiblelint.utils import parse_yaml_from_file
 
 if TYPE_CHECKING:
+    from ansiblelint.errors import MatchError
     from ansiblelint.utils import Task
 
 
@@ -42,7 +42,7 @@ class VariableNamingRule(AnsibleLintRule):
     id = "var-naming"
     severity = "MEDIUM"
     tags = ["idiom"]
-    version_added = "v5.0.10"
+    version_changed = "5.0.10"
     needs_raw_task = True
     re_pattern_str = options.var_naming_pattern or "^[a-z_][a-z0-9_]*$"
     re_pattern = re.compile(re_pattern_str)
@@ -121,11 +121,10 @@ class VariableNamingRule(AnsibleLintRule):
     ) -> MatchError | None:
         """Return a MatchError if the variable name is not valid, otherwise None."""
         if not isinstance(ident, str):  # pragma: no cover
-            return MatchError(
+            return self.create_matcherror(
                 tag="var-naming[non-string]",
                 message="Variables names must be strings.",
-                rule=self,
-                lintable=file,
+                filename=file,
             )
 
         if ident in ANNOTATION_KEYS or ident in self.allowed_special_names:
@@ -134,35 +133,31 @@ class VariableNamingRule(AnsibleLintRule):
         try:
             ident.encode("ascii")
         except UnicodeEncodeError:
-            return MatchError(
+            return self.create_matcherror(
                 tag="var-naming[non-ascii]",
                 message=f"Variables names must be ASCII. ({ident})",
-                rule=self,
-                lintable=file,
+                filename=file,
             )
 
         if keyword.iskeyword(ident):
-            return MatchError(
+            return self.create_matcherror(
                 tag="var-naming[no-keyword]",
                 message=f"Variables names must not be Python keywords. ({ident})",
-                rule=self,
-                lintable=file,
+                filename=file,
             )
 
         if ident in self.reserved_names:
-            return MatchError(
+            return self.create_matcherror(
                 tag="var-naming[no-reserved]",
                 message=f"Variables names must not be Ansible reserved names. ({ident})",
-                rule=self,
-                lintable=file,
+                filename=file,
             )
 
         if ident in self.read_only_names:
-            return MatchError(
+            return self.create_matcherror(
                 tag="var-naming[read-only]",
                 message=f"This special variable is read-only. ({ident})",
-                rule=self,
-                lintable=file,
+                filename=file,
             )
 
         # We want to allow use of jinja2 templating for variable names
@@ -172,11 +167,10 @@ class VariableNamingRule(AnsibleLintRule):
         if not bool(self.re_pattern.match(ident)) and (
             not prefix or not prefix.from_fqcn
         ):
-            return MatchError(
+            return self.create_matcherror(
                 tag="var-naming[pattern]",
                 message=f"Variables names should match {self.re_pattern_str} regex. ({ident})",
-                rule=self,
-                lintable=file,
+                filename=file,
             )
 
         if (
@@ -185,11 +179,10 @@ class VariableNamingRule(AnsibleLintRule):
             and not has_jinja(prefix.value)
             and is_fqcn_or_name(prefix.value)
         ):
-            return MatchError(
+            return self.create_matcherror(
                 tag="var-naming[no-role-prefix]",
                 message=f"Variables names from within roles should use {prefix.value}_ as a prefix.",
-                rule=self,
-                lintable=file,
+                filename=file,
             )
         return None
 

@@ -31,7 +31,7 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
     )
     severity = "HIGH"
     tags = ["metadata"]
-    version_added = "v4.0.0"
+    version_changed = "4.0.0"
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         if file.kind != "meta" or not file.data:

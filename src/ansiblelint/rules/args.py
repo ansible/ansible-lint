@@ -71,7 +71,7 @@ class ValidationPassedError(Exception):
     """Exception to be raised when validation passes."""
 
 
-class CustomAnsibleModule(basic.AnsibleModule):  # type: ignore[misc]
+class CustomAnsibleModule(basic.AnsibleModule):  # type: ignore[misc,no-any-unimported]
     """Mock AnsibleModule class."""
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -88,7 +88,7 @@ class ArgsRule(AnsibleLintRule):
     severity = "HIGH"
     description = "Check whether tasks are using correct module options."
     tags = ["syntax", "experimental"]
-    version_added = "v6.10.0"
+    version_changed = "6.10.0"
     module_aliases: dict[str, str] = {"block/always/rescue": "block/always/rescue"}
     _ids = {
         "args[module]": description,
@@ -107,7 +107,7 @@ class ArgsRule(AnsibleLintRule):
         if module_name in self.module_aliases:
             return []
 
-        loaded_module: PluginLoadContext = load_plugin(module_name)
+        loaded_module: PluginLoadContext = load_plugin(module_name)  # type: ignore[no-any-unimported]
 
         # https://github.com/ansible/ansible-lint/issues/3200
         # since "ps1" modules cannot be executed on POSIX platforms, we will
@@ -281,7 +281,7 @@ class ArgsRule(AnsibleLintRule):
 
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
-    import pytest  # noqa: TCH002
+    import pytest  # noqa: TC002
 
     from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
 

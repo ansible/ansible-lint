@@ -23,7 +23,7 @@ env:
 jobs:
   prepare:
     name: prepare
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     outputs:
       matrix: ${{ steps.generate_matrix.outputs.matrix }}
     steps:
@@ -48,7 +48,7 @@ jobs:
             py313-devel
           platforms: linux,macos
   test-action:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       # This disables the github annotations in the output of ansible-lint action
       # which might confuse users.
@@ -75,7 +75,7 @@ jobs:
           expected_return_code: "2" # expected to fail because the given argument does not exist in this folder
   build:
     name: ${{ matrix.name }}
-    runs-on: ${{ matrix.os || 'ubuntu-22.04' }}
+    runs-on: ${{ matrix.os || 'ubuntu-24.04' }}
     needs:
       - prepare
     defaults:
@@ -175,7 +175,7 @@ jobs:
         # https://github.com/actions/toolkit/issues/193
   codeql:
     name: codeql
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       actions: read
       contents: read
@@ -220,7 +220,7 @@ jobs:
       - build
       - test-action
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       # checkout needed for codecov action which needs codecov.yml file
@@ -244,6 +244,7 @@ jobs:
 
       - name: Download artifacts
         uses: actions/download-artifact@v4
+        continue-on-error: true # to allow rerunning this job
         with:
           name: logs.zip
           path: .
@@ -257,16 +258,12 @@ jobs:
           fi
 
       - name: Upload coverage data
-        uses: codecov/codecov-action@v5.0.7
+        uses: codecov/codecov-action@v5.1.1
         with:
           name: ${{ matrix.name }}
           # verbose: true # optional (default = false)
           fail_ci_if_error: true
-          use_oidc: true # cspell:ignore oidc
-
-      - name: Check codecov.io status
-        if: github.event_name == 'pull_request'
-        uses: coactions/codecov-status@main
+          use_oidc: ${{ !(github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork) }} # cspell:ignore oidc
 
       - name: Decide whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@release/v1
@@ -278,3 +275,4 @@ jobs:
         with:
           include-hidden-files: true
           delete-merged: true
+          pattern: logs-*.zip

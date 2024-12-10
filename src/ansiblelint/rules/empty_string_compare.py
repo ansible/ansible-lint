@@ -27,9 +27,9 @@ class ComparisonToEmptyStringRule(AnsibleLintRule):
     )
     severity = "HIGH"
     tags = ["idiom", "opt-in"]
-    version_added = "v4.0.0"
+    version_changed = "4.0.0"
 
-    empty_string_compare = re.compile("[=!]= ?(\"{2}|'{2})")
+    empty_string_compare = re.compile(r"[=!]= ?(\"{2}|'{2})")
 
     def matchtask(
         self,

@@ -6,7 +6,7 @@ import re
 from functools import cache
 
 RE_HAS_JINJA = re.compile(r"{[{%#].*[%#}]}", re.DOTALL)
-RE_HAS_GLOB = re.compile("[][*?]")
+RE_HAS_GLOB = re.compile(r"[][*?]")
 RE_IS_FQCN_OR_NAME = re.compile(r"^\w+(\.\w+\.\w+)?$")
 
 

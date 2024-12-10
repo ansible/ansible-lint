@@ -10,7 +10,7 @@ import tempfile
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from ansiblelint.app import get_app
+from ansiblelint.app import App, get_app
 
 if TYPE_CHECKING:
     # https://github.com/PyCQA/pylint/issues/3240
@@ -27,7 +27,7 @@ from ansiblelint.runner import Runner
 class RunFromText:
     """Use Runner on temp files created from testing text snippets."""
 
-    app = None
+    app: App | None = None
 
     def __init__(self, collection: RulesCollection) -> None:
         """Initialize a RunFromText instance with rules collection."""

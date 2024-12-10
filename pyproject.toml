@@ -83,21 +83,25 @@ parallel = true
 source = ["src"]
 
 [tool.mypy]
+check_untyped_defs = true
 color_output = true
 disallow_any_generics = true
+disallow_any_unimported = true
 disallow_untyped_calls = true
 disallow_untyped_defs = true
 error_summary = true
-# disallow_any_unimported = True
-# warn_redundant_casts = True
-# warn_return_any = True
-# warn_unused_configs = True
 # site-packages is here to help vscode mypy integration getting confused
 exclude = "(.config|build|dist|test/local-content|site-packages|~/.pyenv|examples/playbooks/collections|plugins/modules)"
 # https://github.com/python/mypy/issues/12664
 incremental = false
+no_implicit_optional = true
 python_version = "3.10"
+show_error_code_links = true
+show_error_codes = true
 strict = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unused_configs = true
 
 [[tool.mypy.overrides]]
 ignore_errors = true
@@ -175,11 +179,7 @@ reportPossiblyUnboundVariable = false
 [tool.pytest.ini_options]
 # do not add options here as this will likely break either console runs or IDE
 # integration like vscode or pycharm
-addopts = "-p no:pytest_cov --failed-first"
-# https://code.visualstudio.com/docs/python/testing
-# coverage is re-enabled in `tox.ini`. That approach is safer than
-# `--no-cov` which prevents activation from tox.ini and which also fails
-# when plugin is effectively missing.
+addopts = "-p no:pytest_cov --durations=10 --failed-first"
 doctest_optionflags = ["ALLOW_UNICODE", "ELLIPSIS"]
 filterwarnings = [
   "error",
@@ -196,11 +196,15 @@ filterwarnings = [
   "ignore:Attribute s is deprecated and will be removed in Python 3.14; use value instead:DeprecationWarning"
 ]
 junit_duration_report = "call"
+junit_family = "xunit1"
 # Our github annotation parser from .github/workflows/tox.yml requires xunit1 format. Ref:
 # https://github.com/shyim/junit-report-annotations-action/issues/3#issuecomment-663241378
-junit_family = "xunit1"
 junit_suite_name = "ansible_lint_test_suite"
 minversion = "4.6.6"
+# https://code.visualstudio.com/docs/python/testing
+# coverage is re-enabled in `tox.ini`. That approach is safer than
+# `--no-cov` which prevents activation from tox.ini and which also fails
+# when plugin is effectively missing.
 norecursedirs = [
   "*.egg",
   ".cache",
@@ -210,12 +214,19 @@ norecursedirs = [
   ".github",
   ".mypy_cache",
   ".projects",
+  ".eggs",
   ".tox",
+  "__pycache__",
+  "ansible_collections",
   "build",
   "collections",
   "dist",
   "docs",
-  "src/ansible_lint.egg-info"
+  "examples",
+  "plugins",
+  "site",
+  "src/ansible_lint.egg-info",
+  "test/schemas"
 ]
 python_files = [
   "test_*.py",
@@ -329,6 +340,10 @@ in_place = true
 sort_inline_tables = true
 sort_table_keys = true
 
+[tool.uv]
+# incompatible with Windows
+environments = ["platform_system != 'Windows'"]
+
 [tool.uv.pip]
 annotation-style = "line"
 custom-compile-command = "tox run deps"
@@ -349,7 +364,6 @@ exclude = [
 ignore_names = [
   "_ANSIBLE_ARGS",
   "__line__",
-  "__rich_console__",
   "fixture_*",
   "pytest_addoption",
   "pytest_collection_modifyitems",

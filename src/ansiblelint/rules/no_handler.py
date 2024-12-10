@@ -63,7 +63,7 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
     link = "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_handlers.html#handlers"
     severity = "MEDIUM"
     tags = ["idiom"]
-    version_added = "historic"
+    version_changed = "24.10.0"
 
     def matchtask(
         self,

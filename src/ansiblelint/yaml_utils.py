@@ -7,7 +7,6 @@ import functools
 import logging
 import os
 import re
-from collections.abc import Callable, Iterator, Sequence
 from io import StringIO
 from pathlib import Path
 from re import Pattern
@@ -35,6 +34,8 @@ from ansiblelint.utils import Task
 
 if TYPE_CHECKING:
     # noinspection PyProtectedMember
+    from collections.abc import Callable, Iterator, Sequence
+
     from ruamel.yaml.comments import LineCol
     from ruamel.yaml.nodes import ScalarNode
     from ruamel.yaml.representer import RoundTripRepresenter
@@ -45,7 +46,7 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__name__)
 
 
-class CustomYamlLintConfig(YamlLintConfig):  # type: ignore[misc]
+class CustomYamlLintConfig(YamlLintConfig):  # type: ignore[misc,no-any-unimported]
     """Extension of YamlLintConfig."""
 
     def __init__(
@@ -247,12 +248,12 @@ def _nested_items_path(
     # convert_to_tuples_type = Callable[[], Iterator[tuple[str | int, Any]]]
     if isinstance(data_collection, dict):
         convert_data_collection_to_tuples = cast(
-            Callable[[], Iterator[tuple[str | int, Any]]],
+            "Callable[[], Iterator[tuple[str | int, Any]]]",
             functools.partial(data_collection.items),
         )
     elif isinstance(data_collection, list):
         convert_data_collection_to_tuples = cast(
-            Callable[[], Iterator[tuple[str | int, Any]]],
+            "Callable[[], Iterator[tuple[str | int, Any]]]",
             functools.partial(enumerate, data_collection),
         )
     else:
@@ -914,11 +915,11 @@ class FormattedYAML(YAML):
         self.explicit_start: bool = config["explicit_start"]  # type: ignore[assignment]
         self.explicit_end: bool = config["explicit_end"]  # type: ignore[assignment]
         self.width: int = config["width"]  # type: ignore[assignment]
-        indent_sequences: bool = cast(bool, config["indent_sequences"])
-        preferred_quote: str = cast(str, config["preferred_quote"])  # either ' or "
+        indent_sequences: bool = cast("bool", config["indent_sequences"])
+        preferred_quote: str = cast("str", config["preferred_quote"])  # either ' or "
 
-        min_spaces_inside: int = cast(int, config["min_spaces_inside"])
-        max_spaces_inside: int = cast(int, config["max_spaces_inside"])
+        min_spaces_inside: int = cast("int", config["min_spaces_inside"])
+        max_spaces_inside: int = cast("int", config["max_spaces_inside"])
 
         self.default_flow_style = False
         self.compact_seq_seq = True  # type: ignore[assignment] # dash after dash
@@ -996,7 +997,7 @@ class FormattedYAML(YAML):
                 elif quote_type == "double":
                     config["preferred_quote"] = '"'
 
-        return cast(dict[str, bool | int | str], config)
+        return cast("dict[str, bool | int | str]", config)
 
     @property
     def version(self) -> tuple[int, int] | None:
@@ -1095,17 +1096,17 @@ class FormattedYAML(YAML):
                 indent += self.sequence_dash_offset
             elif isinstance(parent_key, int):
                 # next level is a sequence
-                indent += cast(int, self.sequence_indent)
+                indent += cast("int", self.sequence_indent)
             elif isinstance(parent_key, str):
                 # next level is a map
-                indent += cast(int, self.map_indent)
+                indent += cast("int", self.map_indent)
 
         if isinstance(key, int) and indent == 0:
             # flow map is an item in a root-level sequence
             indent += self.sequence_dash_offset
         elif isinstance(key, int) and indent > 0:
             # flow map is in a sequence
-            indent += cast(int, self.sequence_indent)
+            indent += cast("int", self.sequence_indent)
         elif isinstance(key, str):
             # flow map is in a map
             indent += len(key + ": ")

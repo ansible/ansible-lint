@@ -187,6 +187,7 @@ def test_playbook_noqa2(default_text_runner: RunFromText) -> None:
         ),
     ),
 )
+# type: ignore[no-any-unimported]
 def test_append_skipped_rules(
     lintable: Lintable,
     yaml: AnsibleBaseYAMLObject,

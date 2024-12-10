@@ -1,0 +1,4 @@
+{
+  "sonarCloudOrganization": "ansible",
+  "projectKey": "ansible_ansible-lint"
+}

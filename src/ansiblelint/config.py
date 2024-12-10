@@ -42,7 +42,8 @@ DEFAULT_KINDS = [
     {"text": "**/templates/**/*.*"},  # templates are likely not validable
     {"execution-environment": "**/execution-environment.yml"},
     {"ansible-lint-config": "**/.ansible-lint"},
-    {"ansible-lint-config": "**/.config/ansible-lint.yml"},
+    {"ansible-lint-config": "**/.ansible-lint.{yaml,yml}"},
+    {"ansible-lint-config": "**/.config/ansible-lint.{yaml,yml}"},
     {"ansible-navigator-config": "**/ansible-navigator.{yaml,yml}"},
     {"inventory": "**/inventory/**.{yaml,yml}"},
     {"requirements": "**/meta/requirements.{yaml,yml}"},  # v1 only
@@ -172,6 +173,7 @@ class Options:  # pylint: disable=too-many-instance-attributes
     version: bool = False  # display version command
     list_profiles: bool = False  # display profiles command
     ignore_file: Path | None = None
+    inventory: list[str] | None = None
     max_tasks: int = 100
     max_block_depth: int = 20
     # Refer to https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix
@@ -221,7 +223,7 @@ def guess_install_method() -> str:
         if (distribution(package_name).read_text("INSTALLER") or "").strip() != "pip":
             return ""
     except PackageNotFoundError as exc:
-        logging.debug(exc)
+        _logger.debug(exc)
         return ""
 
     pip = ""
@@ -251,16 +253,16 @@ def guess_install_method() -> str:
 
             dist = get_default_environment().get_distribution(package_name)
             if dist:
-                logging.debug("Found %s dist", dist)
+                _logger.debug("Found %s dist", dist)
                 for _ in uninstallation_paths(dist):
                     use_pip = True
             else:
-                logging.debug("Skipping %s as it is not installed.", package_name)
+                _logger.debug("Skipping %s as it is not installed.", package_name)
                 use_pip = False
     except (AttributeError, ModuleNotFoundError) as exc:
         # On Fedora 36, we got a AttributeError exception from pip that we want to avoid
         # On NixOS, we got a ModuleNotFoundError exception from pip that we want to avoid
-        logging.debug(exc)
+        _logger.debug(exc)
         use_pip = False
 
     # We only want to recommend pip for upgrade if it looks safe to do so.
@@ -329,7 +331,7 @@ def get_version_warning() -> str:
         if current_version > new_version:
             msg = "[dim]You are using a pre-release version of ansible-lint.[/]"
         elif current_version < new_version:
-            msg = f"""[warning]A new release of ansible-lint is available: [red]{current_version}[/] → [green][link={html_url}]{new_version}[/][/][/]"""
+            msg = f"""[warning]A new release of ansible-lint is available: [warning]{current_version}[/] → [success][link={html_url}]{new_version}[/link][/][/]"""
             msg += f" Upgrade by running: [info]{pip}[/]"
 
     return msg
