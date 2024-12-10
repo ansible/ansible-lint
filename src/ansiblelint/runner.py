@@ -246,6 +246,7 @@ class Runner:
             def worker(lintable: Lintable) -> list[MatchError]:
                 return self._get_ansible_syntax_check_matches(
                     lintable=lintable,
+                    inventory_opts=inventory_opts,
                     app=self.app,
                 )
 
@@ -256,6 +257,15 @@ class Runner:
                 ):
                     continue
                 files.append(lintable)
+
+            inventory_opts = [
+                inventory_opt
+                for inventory_opts in [
+                    ("-i", inventory_file)
+                    for inventory_file in self._get_inventory_files(self.app)
+                ]
+                for inventory_opt in inventory_opts
+            ]
 
             # avoid resource leak warning, https://github.com/python/cpython/issues/90549
             # pylint: disable=unused-variable
@@ -304,6 +314,7 @@ class Runner:
     def _get_ansible_syntax_check_matches(
         self,
         lintable: Lintable,
+        inventory_opts: list[str],
         app: App,
     ) -> list[MatchError]:
         """Run ansible syntax check and return a list of MatchError(s)."""
@@ -346,14 +357,7 @@ class Runner:
                 playbook_path = str(lintable.path.expanduser())
             cmd = [
                 "ansible-playbook",
-                *[
-                    inventory_opt
-                    for inventory_opts in [
-                        ("-i", inventory_file)
-                        for inventory_file in self._get_inventory_files(app)
-                    ]
-                    for inventory_opt in inventory_opts
-                ],
+                *inventory_opts,
                 "--syntax-check",
                 playbook_path,
             ]
