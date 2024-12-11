@@ -522,3 +522,18 @@ def test_import_playbook_children() -> None:
         "Failed to load local.testcollection.foo playbook due to failing syntax check."
         not in result.stderr
     )
+
+
+def test_import_playbook_children_subdirs() -> None:
+    """Verify import_playbook_children() when playbook is in a subdirectory."""
+    result = run_ansible_lint(
+        Path("playbooks/import_playbook_fqcn.yml"),
+        cwd=Path(__file__).resolve().parent.parent / "examples",
+        env={
+            "ANSIBLE_COLLECTIONS_PATH": "../collections",
+        },
+    )
+    assert (
+        "Failed to find local.testcollection.test.bar.foo playbook."
+        not in result.stderr
+    )
