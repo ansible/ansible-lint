@@ -45,7 +45,7 @@ jsonschema-specifications==2024.10.1  # via jsonschema
 license-expression==30.4.0  # via ansible-lint (pyproject.toml)
 linkchecker==10.5.0       # via mkdocs-ansible
 markdown==3.7             # via markdown-include, mkdocs, mkdocs-autorefs, mkdocs-htmlproofer-plugin, mkdocs-material, mkdocstrings, pymdown-extensions
-markdown-exec==1.10.0      # via mkdocs-ansible
+markdown-exec==1.10.0     # via mkdocs-ansible
 markdown-include==0.8.1   # via mkdocs-ansible
 markupsafe==3.0.2         # via jinja2, mkdocs, mkdocs-autorefs, mkdocstrings
 mccabe==0.7.0             # via pylint
