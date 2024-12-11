@@ -1,0 +1,14 @@
+---
+namespace: bar
+name: foo
+version: "1.0.0"
+authors:
+  - John
+readme: ../README.md
+description: "..."
+license:
+  - Apache-2.0
+repository: https://github.com/ansible-collections/community.REPO_NAME
+tags:
+  - application
+  - invalid-tag-format

@@ -26,6 +26,11 @@ This rule can produce messages such:
 - `galaxy[tags]` - `galaxy.yaml` must have one of the required tags:
   `application`, `cloud`, `database`, `infrastructure`, `linux`, `monitoring`,
   `networking`, `security`, `storage`, `tools`, `windows`.
+- `galaxy[tags-format]` - `galaxy.yal` tags must be formatted correctly
+  matching regex.
+- `galaxy[tags-length]` - `galaxy.yml` tags character count cannot exceed 64
+  characters in length
+- `galaxy[tags-count]` - `galaxy.yml` tag count cannot exceed 20
 - `galaxy[invalid-dependency-version]` = Invalid collection metadata. Dependency
   version spec range is invalid
 
