@@ -377,6 +377,7 @@
               "38",
               "39",
               "40",
+              "41",
               "all"
             ],
             "type": "string"
@@ -1363,6 +1364,9 @@
           },
           {
             "$ref": "#/$defs/ArchLinuxPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/AstraLinuxPlatformModel"
           },
           {
             "$ref": "#/$defs/ClearLinuxPlatformModel"

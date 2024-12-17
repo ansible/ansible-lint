@@ -10,7 +10,7 @@ import tempfile
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from ansiblelint.app import get_app
+from ansiblelint.app import App, get_app
 
 if TYPE_CHECKING:
     # https://github.com/PyCQA/pylint/issues/3240
@@ -27,7 +27,7 @@ from ansiblelint.runner import Runner
 class RunFromText:
     """Use Runner on temp files created from testing text snippets."""
 
-    app = None
+    app: App | None = None
 
     def __init__(self, collection: RulesCollection) -> None:
         """Initialize a RunFromText instance with rules collection."""
@@ -52,7 +52,9 @@ class RunFromText:
         prefix: str = "playbook",
     ) -> list[MatchError]:
         """Lints received text as a playbook."""
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", prefix=prefix) as fh:
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".yml", prefix=prefix, encoding="utf-8"
+        ) as fh:
             fh.write(playbook_text)
             fh.flush()
             results = self._call_runner(Path(fh.name))
@@ -69,38 +71,6 @@ class RunFromText:
         tasks_path.mkdir(parents=True, exist_ok=True)
         with (tasks_path / "main.yml").open("w", encoding="utf-8") as fh:
             fh.write(tasks_main_text)
-            fh.flush()
-        results = self._call_runner(role_path)
-        shutil.rmtree(role_path)
-        return results
-
-    def run_role_meta_main(
-        self,
-        meta_main_text: str,
-        temp_path: Path,
-    ) -> list[MatchError]:
-        """Lints received text as meta."""
-        role_path = temp_path
-        meta_path = role_path / "meta"
-        meta_path.mkdir(parents=True, exist_ok=True)
-        with (meta_path / "main.yml").open("w", encoding="utf-8") as fh:
-            fh.write(meta_main_text)
-            fh.flush()
-        results = self._call_runner(role_path)
-        shutil.rmtree(role_path)
-        return results
-
-    def run_role_defaults_main(
-        self,
-        defaults_main_text: str,
-        tmp_path: Path,
-    ) -> list[MatchError]:
-        """Lints received text as vars file in defaults."""
-        role_path = tmp_path
-        defaults_path = role_path / "defaults"
-        defaults_path.mkdir(parents=True, exist_ok=True)
-        with (defaults_path / "main.yml").open("w", encoding="utf-8") as fh:
-            fh.write(defaults_main_text)
             fh.flush()
         results = self._call_runner(role_path)
         shutil.rmtree(role_path)

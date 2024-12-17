@@ -23,7 +23,7 @@ class NoTabsRule(AnsibleLintRule):
     description = "Tabs can cause unexpected display issues, use spaces"
     severity = "LOW"
     tags = ["formatting"]
-    version_added = "v4.0.0"
+    version_changed = "4.0.0"
     allow_list = [
         ("lineinfile", "insertafter"),
         ("lineinfile", "insertbefore"),
@@ -85,4 +85,4 @@ if "pytest" in sys.modules:
             assert len(results) >= i + 1
             assert results[i].lineno == expected[0]
             assert results[i].message == expected[1]
-        assert len(results) == len(expected), results
+        assert len(results) == len(expected_results), results

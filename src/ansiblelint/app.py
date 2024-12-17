@@ -12,16 +12,14 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from ansible_compat.runtime import Runtime
-from rich.markup import escape
-from rich.table import Table
 
 from ansiblelint import formatters
 from ansiblelint._mockings import _perform_mockings
-from ansiblelint.color import console, console_stderr, render_yaml
 from ansiblelint.config import PROFILES, Options, get_version_warning
 from ansiblelint.config import options as default_options
 from ansiblelint.constants import RC, RULE_DOC_URL
 from ansiblelint.loaders import IGNORE_FILE
+from ansiblelint.output import console, console_stderr, render_yaml
 from ansiblelint.requirements import Reqs
 from ansiblelint.stats import SummarizedResults, TagStats
 
@@ -33,7 +31,7 @@ if TYPE_CHECKING:
 
 
 _logger = logging.getLogger(__package__)
-_CACHED_APP = None
+_CACHED_APP: App | None = None
 
 
 class App:
@@ -62,7 +60,7 @@ class App:
             str(self.runtime.version),
         ):  # pragma: no cover
             msg = f"ansible-lint requires {package}{','.join(str(x) for x in self.reqs[package])} and current version is {self.runtime.version}"
-            logging.error(msg)
+            _logger.error(msg)
             sys.exit(RC.INVALID_CONFIG)
 
         # pylint: disable=import-outside-toplevel
@@ -82,8 +80,6 @@ class App:
             # then print only the matches in JSON
             console.print(
                 self.formatter.format_result(matches),
-                markup=False,
-                highlight=False,
             )
             return
 
@@ -97,8 +93,7 @@ class App:
             )
             for match in ignored_matches:
                 if match.ignored:
-                    # highlight must be off or apostrophes may produce unexpected results
-                    console.print(self.formatter.apply(match), highlight=False)
+                    console.print(self.formatter.apply(match))
         if fatal_matches:
             _logger.warning(
                 "Listing %s violation(s) that are fatal",
@@ -106,7 +101,7 @@ class App:
             )
             for match in fatal_matches:
                 if not match.ignored:
-                    console.print(self.formatter.apply(match), highlight=False)
+                    console.print(self.formatter.apply(match))
 
         # If run under GitHub Actions we also want to emit output recognized by it.
         if os.getenv("GITHUB_ACTIONS") == "true" and os.getenv("GITHUB_WORKFLOW"):
@@ -117,8 +112,6 @@ class App:
             for match in itertools.chain(fatal_matches, ignored_matches):
                 console_stderr.print(
                     formatter.apply(match),
-                    markup=False,
-                    highlight=False,
                 )
 
         # If sarif_file is set, we also dump the results to a sarif file.
@@ -217,9 +210,8 @@ class App:
                 os.environ.get("ANSIBLE_LINT_IGNORE_FILE", IGNORE_FILE.default),
             )
             console_stderr.print(f"Writing ignore file to {ignore_file_path}")
-            lines = set()
-            for rule in result.matches:
-                lines.add(f"{rule.filename} {rule.tag}\n")
+            lines: set[str] = set()
+            lines.update(f"{rule.filename} {rule.tag}\n" for rule in result.matches)
             with ignore_file_path.open("w", encoding="utf-8") as ignore_file:
                 ignore_file.write(
                     "# This file contains ignores rule violations for ansible-lint\n",
@@ -317,33 +309,16 @@ class App:
 
         stars = ""
         if summary.tag_stats:
-            table = Table(
-                title="Rule Violation Summary",
-                collapse_padding=True,
-                box=None,
-                show_lines=False,
-            )
-            table.add_column("count", justify="right")
-            table.add_column("tag")
-            table.add_column("profile")
-            table.add_column("rule associated tags")
+            table = "# Rule Violation Summary\n\n"
             for tag, stats in summary.tag_stats.items():
-                table.add_row(
-                    str(stats.count),
-                    f"[link={RULE_DOC_URL}{ tag.split('[')[0] }]{escape(tag)}[/link]",
-                    stats.profile,
-                    f"{', '.join(stats.associated_tags)}{' (warning)' if stats.warning else ''}",
-                    style="yellow" if stats.warning else "red",
-                )
-            # rate stars for the top 5 profiles (min would not get
+                table += f"{stats.count:3} [link={RULE_DOC_URL}]{tag.split('[')[0]}[/link] [dim]profile:{profile} tags:{','.join(stats.associated_tags)}[/]\n"
             rating = 5 - (len(PROFILES.keys()) - passed_profile_count)
             if 0 < rating < 6:
                 stars = f" Rating: {rating}/5 star"
 
-            console_stderr.print(table)
-            console_stderr.print()
+            console.print(table, file=sys.stderr)
 
-        msg = "[green]Passed[/]" if is_success else "[red][bold]Failed[/][/]"
+        msg = "[success]Passed[/]" if is_success else "[failed][bold]Failed[/][/]"
 
         msg += f": {summary.failures} failure(s), {summary.warnings} warning(s)"
         if summary.fixed:

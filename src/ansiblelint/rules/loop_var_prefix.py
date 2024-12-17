@@ -29,12 +29,13 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
 """
 
     tags = ["idiom"]
-    prefix = re.compile("")
+    prefix = re.compile(r"")
     severity = "MEDIUM"
     _ids = {
         "loop-var-prefix[wrong]": "Loop variable name does not match regex.",
         "loop-var-prefix[missing]": "Replace unsafe implicit `item` loop variable.",
     }
+    version_changed = "6.7.0"
 
     def matchtask(
         self,

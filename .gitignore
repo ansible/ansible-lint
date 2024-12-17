@@ -62,21 +62,21 @@ examples/playbooks/vars/strings.transformed.yml
 examples/playbooks/vars/transform_nested_data.yml
 
 # other
-.cache
-.DS_Store
-.vscode
-.idea
-src/ansiblelint/_version.py
 *.tar.gz
-.pytest_cache
-test/eco/CODENOTIFY.html
-test/eco
-test/schemas/node_modules
-test/local-content
-.envrc
-# collections
-# !/collections
-site
-_readthedocs
 *.tmp.*
+.DS_Store
+.cache
+.envrc
+.idea
+.pytest_cache
+.vscode/launch.json
+_readthedocs
 coverage.lcov
+site
+src/ansiblelint/_version.py
+test/eco
+test/local-content
+test/schemas/node_modules
+node_modules
+.direnv
+uv.lock

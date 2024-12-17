@@ -29,7 +29,7 @@ class YamllintRule(AnsibleLintRule, TransformMixin):
     id = "yaml"
     severity = "VERY_LOW"
     tags = ["formatting", "yaml"]
-    version_added = "v5.0.0"
+    version_changed = "5.0.0"
     config = load_yamllint_config()
     has_dynamic_tags = True
     link = "https://yamllint.readthedocs.io/en/stable/rules.html"
@@ -115,8 +115,7 @@ def _combine_skip_rules(data: Any) -> set[str]:
     result = set(data.get(SKIPPED_RULES_KEY, []))
     tags = data.get("tags", [])
     if tags and (
-        isinstance(tags, Iterable)
-        and "skip_ansible_lint" in tags
+        (isinstance(tags, Iterable) and "skip_ansible_lint" in tags)
         or tags == "skip_ansible_lint"
     ):
         result.add("skip_ansible_lint")

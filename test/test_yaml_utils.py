@@ -38,7 +38,7 @@ def test_tasks_in_list_empty_file(empty_lintable: Lintable) -> None:
     assert empty_lintable.path
     res = list(
         task_in_list(
-            data=empty_lintable,
+            data=empty_lintable.data,
             file=empty_lintable,
             kind=empty_lintable.kind,
         ),
@@ -1007,7 +1007,7 @@ def test_deannotate(
 
 def test_yamllint_incompatible_config() -> None:
     """Ensure we can detect incompatible yamllint settings."""
-    with (cwd(Path("examples/yamllint/incompatible-config")),):
+    with cwd(Path("examples/yamllint/incompatible-config")):
         config = ansiblelint.yaml_utils.load_yamllint_config()
         assert config.incompatible
 
@@ -1029,7 +1029,7 @@ def test_document_start(
 
     yaml = ansiblelint.yaml_utils.FormattedYAML(
         version=yaml_version,
-        config=cast(dict[str, bool | int | str], config),
+        config=cast("dict[str, bool | int | str]", config),
     )
     assert (
         yaml.dumps(yaml.load(_SINGLE_QUOTE_WITHOUT_INDENTS)).startswith("---")

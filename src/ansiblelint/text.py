@@ -6,8 +6,8 @@ import re
 from functools import cache
 
 RE_HAS_JINJA = re.compile(r"{[{%#].*[%#}]}", re.DOTALL)
-RE_HAS_GLOB = re.compile("[][*?]")
-RE_IS_FQCN_OR_NAME = re.compile(r"^\w+(\.\w+\.\w+)?$")
+RE_HAS_GLOB = re.compile(r"[][*?]")
+RE_IS_FQCN_OR_NAME = re.compile(r"^\w+(\.\w+){2,100}$|^\w+$")
 
 
 def strip_ansi_escape(data: str | bytes) -> str:
@@ -32,11 +32,11 @@ def toidentifier(text: str) -> str:
 
 
 # https://www.python.org/dev/peps/pep-0616/
-def removeprefix(self: str, prefix: str) -> str:
+def removeprefix(text: str, prefix: str) -> str:
     """Remove prefix from string."""
-    if self.startswith(prefix):
-        return self[len(prefix) :]
-    return self[:]
+    if text.startswith(prefix):
+        return text[len(prefix) :]
+    return text[:]
 
 
 @cache

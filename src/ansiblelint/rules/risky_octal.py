@@ -44,7 +44,7 @@ class OctalPermissionsRule(AnsibleLintRule):
     link = "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html"
     severity = "VERY_HIGH"
     tags = ["formatting"]
-    version_added = "historic"
+    version_changed = "6.9.1"
 
     _modules = [
         "assemble",

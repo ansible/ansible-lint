@@ -23,7 +23,7 @@ class DeprecatedModuleRule(AnsibleLintRule):
     link = "https://docs.ansible.com/ansible/latest/collections/index_module.html"
     severity = "HIGH"
     tags = ["deprecations"]
-    version_added = "v4.0.0"
+    version_changed = "4.0.0"
 
     _modules = [
         "accelerate",

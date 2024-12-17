@@ -1,6 +1,6 @@
 {
   "ansible-lint-config": {
-    "etag": "a0bb8004fad70bab34fad94a45b2698125127142ec6b2c8900976aa2bd96a86c",
+    "etag": "8e626a1196cba4ac67956e6891090991a29aec6e8949e16a58f41773da055ca8",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible-lint-config.json"
   },
   "ansible-navigator-config": {
@@ -24,7 +24,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/inventory.json"
   },
   "meta": {
-    "etag": "57fd2147c4c70dfd7dea6b3960bb8ed910c01c693de168cc7ac2b8cf527a1166",
+    "etag": "33b882f8306af33fd7983a5a837308926d2d862903404b9eea71a73e8b37eb38",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/meta.json"
   },
   "meta-runtime": {

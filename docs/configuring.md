@@ -12,9 +12,10 @@ the one specified inside the configuration file.
 
 ## Using local configuration files
 
-Specify Ansible-lint configuration in either `.ansible-lint`,
-`.config/ansible-lint.yml`, or `.config/ansible-lint.yaml` in your current
-working directory.
+Specify Ansible-lint configuration in either
+`.ansible-lint`, `.ansible-lint.yml`, `.ansible-lint.yaml`,
+`.config/ansible-lint.yml`, or `.config/ansible-lint.yaml`
+in your current working directory.
 
 !!! note
 

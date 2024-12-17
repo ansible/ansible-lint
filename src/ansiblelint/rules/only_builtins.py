@@ -22,6 +22,7 @@ class OnlyBuiltinsRule(AnsibleLintRule):
     severity = "MEDIUM"
     description = "Check whether the playbook uses anything but ``ansible.builtin``"
     tags = ["opt-in", "experimental"]
+    version_changed = "6.14.0"
 
     def matchtask(
         self,

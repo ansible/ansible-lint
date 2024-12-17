@@ -7,6 +7,8 @@ import logging
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+from packaging.version import InvalidVersion, Version
+
 from ansiblelint.constants import RULE_DOC_URL
 
 if TYPE_CHECKING:
@@ -41,7 +43,7 @@ class BaseRule:
     id: str = ""
     tags: list[str] = []
     description: str = ""
-    version_added: str = ""
+    version_changed: str = ""
     severity: str = ""
     link: str = ""
     has_dynamic_tags: bool = False
@@ -56,6 +58,15 @@ class BaseRule:
     _help: str | None = None
     # Added when a rule is registered into a collection, gives access to options
     _collection: RulesCollection | None = None
+    # Allow rules to provide a custom short description instead of using __doc__
+    _shortdesc: str = ""
+
+    def __init__(self) -> None:
+        try:
+            Version(self.version_changed)
+        except InvalidVersion:
+            msg = f"Rule {self.__class__.__name__} has an invalid version_changed field '{self.version_changed}', is should be a 'X.Y.Z' format value."
+            _logger.warning(msg)
 
     @property
     def help(self) -> str:
@@ -83,7 +94,7 @@ class BaseRule:
     @property
     def shortdesc(self) -> str:
         """Return the short description of the rule, basically the docstring."""
-        return self.__doc__ or ""
+        return self._shortdesc or self.__doc__ or ""
 
     def getmatches(self, file: Lintable) -> list[MatchError]:
         """Return all matches while ignoring exceptions."""
@@ -190,10 +201,10 @@ class RuntimeErrorRule(BaseRule):
     """Unexpected internal error."""
 
     id = "internal-error"
-    shortdesc = "Unexpected internal error"
+    _shortdesc = "Unexpected internal error"
     severity = "VERY_HIGH"
     tags = ["core"]
-    version_added = "v5.0.0"
+    version_changed = "5.0.0"
     _order = 0
     unloadable = True
 
@@ -205,7 +216,7 @@ class AnsibleParserErrorRule(BaseRule):
     description = "Ansible parser fails; this usually indicates an invalid file."
     severity = "VERY_HIGH"
     tags = ["core"]
-    version_added = "v5.0.0"
+    version_changed = "5.0.0"
     _order = 0
     unloadable = True
 
@@ -217,7 +228,7 @@ class LoadingFailureRule(BaseRule):
     description = "Linter failed to process a file, possible invalid file."
     severity = "VERY_HIGH"
     tags = ["core", "unskippable"]
-    version_added = "v4.3.0"
+    version_changed = "4.3.0"
     _help = LOAD_FAILURE_MD
     _order = 0
     _ids = {
@@ -233,6 +244,6 @@ class WarningRule(BaseRule):
     severity = "LOW"
     # should remain experimental as that would keep it warning only
     tags = ["core", "experimental"]
-    version_added = "v6.8.0"
+    version_changed = "6.8.0"
     _order = 0
     unloadable = True

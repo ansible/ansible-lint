@@ -69,10 +69,9 @@ class KeyOrderRule(AnsibleLintRule, TransformMixin):
     """Ensure specific order of keys in mappings."""
 
     id = "key-order"
-    shortdesc = __doc__
     severity = "LOW"
     tags = ["formatting"]
-    version_added = "v6.6.2"
+    version_changed = "6.6.2"
     needs_raw_task = True
     _ids = {
         "key-order[task]": "You can improve the task key order",

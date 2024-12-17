@@ -107,6 +107,8 @@ def get_config_path(config_file: str | None = None) -> str | None:
     else:
         project_filenames = [
             ".ansible-lint",
+            ".ansible-lint.yml",
+            ".ansible-lint.yaml",
             ".config/ansible-lint.yml",
             ".config/ansible-lint.yaml",
         ]
@@ -135,6 +137,7 @@ class AbspathArgAction(argparse.Action):
         values: str | Sequence[Any] | None,
         option_string: str | None = None,
     ) -> None:
+        _logger.debug(option_string)
         if isinstance(values, str | Path):
             values = [values]
         if values:
@@ -254,7 +257,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest="list_profiles",
         default=False,
         action="store_true",
-        help="List all profiles, no formatting options available.",
+        help="List all profiles.",
     )
     listing_group.add_argument(
         "-L",
@@ -262,16 +265,14 @@ def get_cli_parser() -> argparse.ArgumentParser:
         dest="list_rules",
         default=False,
         action="store_true",
-        help="List all the rules. For listing rules only the following formats "
-        "for argument -f are supported: {brief, full, md} with 'brief' as default.",
+        help="List all the rules.",
     )
     listing_group.add_argument(
         "-T",
         "--list-tags",
         dest="list_tags",
         action="store_true",
-        help="List all the tags and the rules they cover. Increase the verbosity level "
-        "with `-v` to include 'opt-in' tag and its rules.",
+        help="List all the tags and the rules they cover.",
     )
     parser.add_argument(
         "-f",
@@ -446,7 +447,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
         "-c",
         "--config-file",
         dest="config_file",
-        help="Specify configuration file to use. By default it will look for '.ansible-lint', '.config/ansible-lint.yml', or '.config/ansible-lint.yaml'",
+        help="Specify configuration file to use. By default it will look for '.ansible-lint', '.ansible-lint.yml', '.ansible-lint.yaml', '.config/ansible-lint.yml', or '.config/ansible-lint.yaml'",
     )
     parser.add_argument(
         "-i",
@@ -611,7 +612,7 @@ def get_config(arguments: list[str]) -> Options:
         log_entries.append(
             (
                 logging.INFO,
-                f"Identified [filename]{project_dir}[/] as project root due [bold]{method}[/].",
+                f"Identified [repr.path]{project_dir}[/] as project root due [bold]{method}[/].",
             ),
         )
 

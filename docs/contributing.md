@@ -86,7 +86,7 @@ dependencies on Ansible internals is desired as these can change without any
 warning.
 
 ```bash exec="1" source="console"
-_PIP_USE_IMPORTLIB_METADATA=0 pipdeptree -p ansible-lint
+uv pip tree --package ansible-lint --show-version-specifiers --strict
 ```
 
 ## Adding a new rule

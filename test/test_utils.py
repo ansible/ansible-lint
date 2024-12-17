@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """Tests for generic utility functions."""
+
 from __future__ import annotations
 
 import logging
@@ -27,6 +28,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import pytest
+from ansible.parsing.yaml.constructor import AnsibleMapping, AnsibleSequence
 from ansible.utils.sentinel import Sentinel
 from ansible_compat.runtime import Runtime
 
@@ -46,7 +48,6 @@ if TYPE_CHECKING:
     from _pytest.monkeypatch import MonkeyPatch
 
     from ansiblelint.rules import RulesCollection
-
 
 runtime = Runtime(require_module=True)
 
@@ -220,7 +221,7 @@ def test_extract_from_list() -> None:
         "test_none": None,
         "test_string": "foo",
     }
-    blocks = [block]
+    blocks = AnsibleSequence([block])
 
     test_list = utils.extract_from_list(blocks, ["block"])
     test_none = utils.extract_from_list(blocks, ["test_none"])
@@ -233,10 +234,12 @@ def test_extract_from_list() -> None:
 
 def test_extract_from_list_recursive() -> None:
     """Check that tasks get extracted from blocks if present."""
-    block = {
-        "block": [{"block": [{"name": "hello", "command": "whoami"}]}],
-    }
-    blocks = [block]
+    block = AnsibleMapping(
+        {
+            "block": [{"block": [{"name": "hello", "command": "whoami"}]}],
+        }
+    )
+    blocks = AnsibleSequence([block])
 
     test_list = utils.extract_from_list(blocks, ["block"])
     assert list(block["block"]) == test_list
@@ -309,6 +312,12 @@ def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
         "-v",
         "-p",
         "--nocolor",
+        "--offline",
+        "--exclude=examples",
+        "--exclude=test",
+        "--exclude=src",
+        "--exclude=collections",
+        "--exclude=.github",
     ]
     result = subprocess.run(cmd, check=False).returncode
 
@@ -318,18 +327,12 @@ def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
     out, err = capfd.readouterr()
 
     # An expected rule match from our examples
-    assert (
-        "examples/playbooks/empty_playbook.yml:1:1: "
-        "syntax-check[empty-playbook]: Empty playbook, nothing to do" in out
-    )
+    assert "playbook.yml:6: name[casing]" in out
     # assures that our ansible-lint config exclude was effective in excluding github files
     assert "Identified: .github/" not in out
     # assures that we can parse playbooks as playbooks
     assert "Identified: test/test/always-run-success.yml" not in err
-    assert (
-        "Executing syntax check on playbook examples/playbooks/mocked_dependency.yml"
-        in err
-    )
+    assert "Executing syntax check on playbook playbook.yml" in err
 
 
 def test_is_playbook() -> None:
@@ -517,5 +520,20 @@ def test_import_playbook_children() -> None:
     assert "Failed to find local.testcollection.foo playbook." not in result.stderr
     assert (
         "Failed to load local.testcollection.foo playbook due to failing syntax check."
+        not in result.stderr
+    )
+
+
+def test_import_playbook_children_subdirs() -> None:
+    """Verify import_playbook_children() when playbook is in a subdirectory."""
+    result = run_ansible_lint(
+        Path("playbooks/import_playbook_fqcn.yml"),
+        cwd=Path(__file__).resolve().parent.parent / "examples",
+        env={
+            "ANSIBLE_COLLECTIONS_PATH": "../collections",
+        },
+    )
+    assert (
+        "Failed to find local.testcollection.test.bar.foo playbook."
         not in result.stderr
     )

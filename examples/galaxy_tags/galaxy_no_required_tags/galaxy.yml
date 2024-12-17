@@ -9,3 +9,4 @@ description: "..."
 license:
   - Apache-2.0
 repository: https://github.com/ansible-collections/community.REPO_NAME
+tags: [no_required_tag_here]

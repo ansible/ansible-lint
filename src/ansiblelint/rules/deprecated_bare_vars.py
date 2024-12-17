@@ -45,7 +45,7 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
     )
     severity = "VERY_HIGH"
     tags = ["deprecations"]
-    version_added = "historic"
+    version_changed = "6.19.0"
 
     def matchtask(
         self,

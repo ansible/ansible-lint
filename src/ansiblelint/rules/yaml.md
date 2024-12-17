@@ -108,7 +108,7 @@ might refuse to run if it detects that some of your options are incompatible and
 ask you to correct them. When this happens, you will see a message like the one
 below:
 
-```
+```shell
 CRITICAL Found incompatible custom yamllint configuration (.yamllint), please either remove the file or edit it to comply with:
   - comments.min-spaces-from-content must be 1
   - braces.min-spaces-inside must be 0

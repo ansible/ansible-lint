@@ -242,6 +242,7 @@ class Lintable:
             self.file = NamedTemporaryFile(  # noqa: SIM115
                 mode="w+",
                 suffix="playbook.yml",
+                encoding="utf-8",
             )
             self.filename = self.file.name
             self._content = sys.stdin.read()
@@ -325,7 +326,7 @@ class Lintable:
         """Retrieve file content, from internal cache or disk."""
         if self._content is None:
             self._populate_content_cache_from_disk()
-        return cast(str, self._content)
+        return cast("str", self._content)
 
     @content.setter
     def content(self, value: str) -> None:
@@ -439,7 +440,7 @@ class Lintable:
                         self,
                     )
                 else:
-                    logging.debug(
+                    _logger.debug(
                         "data set to None for %s due to being '%s' (%s) kind.",
                         self.path,
                         self.kind,
@@ -475,11 +476,6 @@ def discover_lintables(options: Options) -> list[str]:
             exclude_paths=options.exclude_paths,
         )
     ]
-
-
-def strip_dotslash_prefix(fname: str) -> str:
-    """Remove ./ leading from filenames."""
-    return fname[2:] if fname.startswith("./") else fname
 
 
 def find_project_root(

@@ -19,12 +19,14 @@
 # THE SOFTWARE.
 
 """Utils related to inline skipping of rules."""
+
 from __future__ import annotations
 
 import collections.abc
 import logging
 import re
 import warnings
+from collections.abc import MutableMapping, Sequence
 from functools import cache
 from itertools import product
 from typing import TYPE_CHECKING, Any
@@ -45,7 +47,7 @@ from ansiblelint.constants import (
 from ansiblelint.errors import LintWarning, WarnSource
 
 if TYPE_CHECKING:
-    from collections.abc import Generator, Sequence
+    from collections.abc import Generator
 
     from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject
 
@@ -93,7 +95,7 @@ def get_rule_skips_from_line(
     return result
 
 
-def append_skipped_rules(
+def append_skipped_rules(  # type: ignore[no-any-unimported]
     pyyaml_data: AnsibleBaseYAMLObject,
     lintable: Lintable,
 ) -> AnsibleBaseYAMLObject:
@@ -141,7 +143,7 @@ def load_data(file_text: str) -> Any:
         return yaml.load_all(file_text)
 
 
-def _append_skipped_rules(
+def _append_skipped_rules(  # type: ignore[no-any-unimported]
     pyyaml_data: AnsibleBaseYAMLObject,
     lintable: Lintable,
 ) -> AnsibleBaseYAMLObject | None:
@@ -168,7 +170,7 @@ def _append_skipped_rules(
         "galaxy",
     ]:
         # AnsibleMapping, dict
-        if hasattr(pyyaml_data, "get"):
+        if isinstance(pyyaml_data, MutableMapping):
             pyyaml_data[SKIPPED_RULES_KEY] = skipped_rules
         # AnsibleSequence, list
         elif (
@@ -181,15 +183,19 @@ def _append_skipped_rules(
         return pyyaml_data
 
     # create list of blocks of tasks or nested tasks
-    if lintable.kind in ("tasks", "handlers"):
-        ruamel_task_blocks = ruamel_data
-        pyyaml_task_blocks = pyyaml_data
-    elif lintable.kind == "playbook":
-        try:
-            pyyaml_task_blocks = _get_task_blocks_from_playbook(pyyaml_data)
-            ruamel_task_blocks = _get_task_blocks_from_playbook(ruamel_data)
-        except (AttributeError, TypeError):
+    pyyaml_task_blocks: Sequence[Any]
+    if lintable.kind in ("tasks", "handlers", "playbook"):
+        if not isinstance(pyyaml_data, Sequence):
             return pyyaml_data
+        if lintable.kind in ("tasks", "handlers"):
+            ruamel_task_blocks = ruamel_data
+            pyyaml_task_blocks = pyyaml_data
+        else:
+            try:
+                pyyaml_task_blocks = _get_task_blocks_from_playbook(pyyaml_data)
+                ruamel_task_blocks = _get_task_blocks_from_playbook(ruamel_data)
+            except (AttributeError, TypeError):
+                return pyyaml_data
     else:
         # For unsupported file types, we return empty skip lists
         return None

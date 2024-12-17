@@ -8,7 +8,7 @@ import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, NamedTuple
+from typing import TYPE_CHECKING, NamedTuple
 
 import black
 import jinja2
@@ -16,7 +16,6 @@ from ansible.errors import AnsibleError, AnsibleFilterError, AnsibleParserError
 from ansible.parsing.yaml.objects import AnsibleUnicode
 from jinja2.exceptions import TemplateSyntaxError
 
-from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.errors import RuleMatchTransformMeta
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
@@ -65,6 +64,8 @@ ignored_re = re.compile(
             r"Unrecognized type <<class 'ansible.template.AnsibleUndefined'>> for (.*) filter <value>$",
             # https://github.com/ansible/ansible-lint/issues/3155
             r"^The '(.*)' test expects a dictionary$",
+            # https://github.com/ansible/ansible-lint/issues/4338
+            r"An unhandled exception occurred while templating (.*). Error was a <class 'ansible.errors.AnsibleFilterError'>, original message: The (.*) test expects a dictionary$",
         ],
     ),
     flags=re.MULTILINE | re.DOTALL,
@@ -97,7 +98,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
     id = "jinja"
     severity = "LOW"
     tags = ["formatting"]
-    version_added = "v6.5.0"
+    version_changed = "6.5.0"
     _ansible_error_re = re.compile(
         (
             r"^(?P<error>.*): (?P<detail>.*)\. String: (?P<string>.*)$"
@@ -193,7 +194,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                             result.append(
                                 self.create_matcherror(
                                     message=str(exc),
-                                    lineno=_get_error_line(task, path),
+                                    lineno=task.get_error_line(path),
                                     filename=file,
                                     tag=f"{self.id}[invalid]",
                                 ),
@@ -212,7 +213,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                                     value=v,
                                     reformatted=reformatted,
                                 ),
-                                lineno=_get_error_line(task, path),
+                                lineno=task.get_error_line(path),
                                 details=details,
                                 filename=file,
                                 tag=f"{self.id}[{tag}]",
@@ -231,12 +232,13 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Return matches for variables defined in vars files."""
-        data: dict[str, Any] = {}
         raw_results: list[MatchError] = []
         results: list[MatchError] = []
 
         if str(file.kind) == "vars":
             data = parse_yaml_from_file(str(file.path))
+            if not isinstance(data, dict):
+                return results
             for key, v, _path in nested_items_path(data):
                 if isinstance(v, AnsibleUnicode):
                     reformatted, details, tag = self.check_whitespace(
@@ -403,8 +405,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
 
         except jinja2.exceptions.TemplateSyntaxError as exc:
             return "", str(exc.message), "invalid"
-        # pylint: disable=c-extension-no-member
-        except (NotImplementedError, black.parsing.InvalidInput) as exc:
+        except (NotImplementedError, ValueError) as exc:
             # black is not able to recognize all valid jinja2 templates, so we
             # just ignore InvalidInput errors.
             # NotImplementedError is raised internally for expressions with
@@ -425,7 +426,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
         return reformatted, details, "spacing"
 
     def transform(
-        self: JinjaRule,
+        self,
         match: MatchError,
         lintable: Lintable,
         data: CommentedMap | CommentedSeq | str,
@@ -440,7 +441,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
             self._transform_spacing(match, data)
 
     def _transform_spacing(
-        self: JinjaRule,
+        self,
         match: MatchError,
         data: CommentedMap | CommentedSeq | str,
     ) -> None:
@@ -896,17 +897,3 @@ if "pytest" in sys.modules:
         with mock.patch.object(Templar, "do_template", _do_template):
             results = Runner(lintable, rules=collection).run()
             assert len(results) == 0
-
-
-def _get_error_line(task: dict[str, Any], path: list[str | int]) -> int:
-    """Return error line number."""
-    line = task[LINE_NUMBER_KEY]
-    ctx = task
-    for _ in path:
-        ctx = ctx[_]
-        if LINE_NUMBER_KEY in ctx:
-            line = ctx[LINE_NUMBER_KEY]
-    if not isinstance(line, int):
-        msg = "Line number is not an integer"
-        raise TypeError(msg)
-    return line

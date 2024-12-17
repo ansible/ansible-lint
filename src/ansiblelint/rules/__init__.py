@@ -327,9 +327,9 @@ class TransformMixin:
             # The cast() calls tell mypy what types we expect.
             # Essentially this does:
             if isinstance(segment, str):
-                target = cast(MutableMapping[str, Any], target)[segment]
+                target = cast("MutableMapping[str, Any]", target)[segment]
             elif isinstance(segment, int):
-                target = cast(MutableSequence[Any], target)[segment]
+                target = cast("MutableSequence[Any]", target)[segment]
         return target
 
 
@@ -533,8 +533,7 @@ class RulesCollection:
         tags = set()
         for rule in self.rules:
             tags.add(rule.id)
-            for tag in rule.tags:
-                tags.add(tag)
+            tags.update(rule.tags)
         return sorted(tags)
 
     def list_tags(self) -> str:

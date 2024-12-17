@@ -30,11 +30,10 @@ import shutil
 import site
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, TextIO
+from typing import TYPE_CHECKING
 
 from ansible_compat.prerun import get_cache_dir
-from filelock import FileLock, Timeout
-from rich.markup import escape
+from filelock import BaseFileLock, FileLock, Timeout
 
 from ansiblelint.constants import RC, SKIP_SCHEMA_UPDATE
 
@@ -50,13 +49,6 @@ except Exception as _exc:  # pylint: disable=broad-exception-caught # noqa: BLE0
 from ansiblelint import cli
 from ansiblelint._mockings import _perform_mockings_cleanup
 from ansiblelint.app import get_app
-from ansiblelint.color import (
-    console,
-    console_options,
-    console_stderr,
-    reconfigure,
-    render_yaml,
-)
 from ansiblelint.config import (
     Options,
     get_deps_versions,
@@ -65,14 +57,19 @@ from ansiblelint.config import (
     options,
 )
 from ansiblelint.loaders import load_ignore_txt
+from ansiblelint.output import (
+    console,
+    console_stderr,
+    reconfigure,
+    render_yaml,
+    should_do_markup,
+)
 from ansiblelint.runner import get_matches
 from ansiblelint.skip_utils import normalize_tag
 from ansiblelint.version import __version__
 
 if TYPE_CHECKING:
     # RulesCollection must be imported lazily or ansible gets imported too early.
-
-    from collections.abc import Callable
 
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import LintResult
@@ -87,7 +84,7 @@ class LintLogHandler(logging.Handler):
     def emit(self, record: logging.LogRecord) -> None:
         try:
             msg = self.format(record)
-            console_stderr.print(f"[dim]{msg}[/dim]", highlight=False)
+            console_stderr.print(f"[dim]{msg}[/]")
         except RecursionError:  # See issue 36272
             raise
         except Exception:  # pylint: disable=broad-exception-caught # noqa: BLE001
@@ -119,7 +116,7 @@ def initialize_logger(level: int = 0) -> None:
     _logger.debug("Logging initialized to level %s", logging_level)
 
 
-def initialize_options(arguments: list[str] | None = None) -> None | FileLock:
+def initialize_options(arguments: list[str] | None = None) -> BaseFileLock | None:
     """Load config options and store them inside options module."""
     cache_dir_lock = None
     new_options = cli.get_config(arguments or [])
@@ -166,18 +163,11 @@ def initialize_options(arguments: list[str] | None = None) -> None | FileLock:
 def _do_list(rules: RulesCollection) -> int:
     # On purpose lazy-imports to avoid pre-loading Ansible
     # pylint: disable=import-outside-toplevel
-    from ansiblelint.generate_docs import rules_as_md, rules_as_rich, rules_as_str
+    from ansiblelint.generate_docs import rules_as_str
 
     if options.list_rules:
-        _rule_format_map: dict[str, Callable[..., Any]] = {
-            "brief": rules_as_str,
-            "full": rules_as_rich,
-            "md": rules_as_md,
-        }
-
         console.print(
-            _rule_format_map.get(options.format, rules_as_str)(rules),
-            highlight=False,
+            rules_as_str(rules),
         )
         return 0
 
@@ -289,16 +279,15 @@ def main(argv: list[str] | None = None) -> int:
         argv = sys.argv
     cache_dir_lock = initialize_options(argv[1:])
 
-    console_options["force_terminal"] = options.colored
-    reconfigure(console_options)
+    reconfigure(colored=options.colored)
 
     if options.version:
         deps = get_deps_versions()
         msg = f"ansible-lint [repr.number]{__version__}[/] using[dim]"
         for k, v in deps.items():
-            msg += f" {escape(k)}:[repr.number]{v}[/]"
+            msg += f" {k}:[repr.number]{v}[/]"
         msg += "[/]"
-        console.print(msg, markup=True, highlight=False)
+        console.print(msg)
         msg = get_version_warning()
         if msg:
             console.print(msg)
@@ -339,9 +328,9 @@ def main(argv: list[str] | None = None) -> int:
     from ansiblelint.rules import RulesCollection
 
     if options.list_profiles:
-        from ansiblelint.generate_docs import profiles_as_rich
+        from ansiblelint.generate_docs import profiles_as_md
 
-        console.print(profiles_as_rich())
+        profiles_as_md().display()
         return 0
 
     app = get_app(
@@ -377,7 +366,7 @@ def main(argv: list[str] | None = None) -> int:
             _logger.debug("Ignored: %s", match)
 
     if app.yamllint_config.incompatible:
-        logging.log(
+        _logger.log(
             level=logging.ERROR if options.write_list else logging.WARNING,
             msg=app.yamllint_config.incompatible,
         )
@@ -483,49 +472,6 @@ def path_inject(own_location: str = "") -> None:
         if not shutil.which(cmd):
             msg = f"Failed to find runtime dependency '{cmd}' in PATH"
             raise RuntimeError(msg)
-
-
-# Based on Ansible implementation
-def to_bool(value: Any) -> bool:  # pragma: no cover
-    """Return a bool for the arg."""
-    if value is None or isinstance(value, bool):
-        return bool(value)
-    if isinstance(value, str):
-        value = value.lower()
-    return value in ("yes", "on", "1", "true", 1)
-
-
-def should_do_markup(stream: TextIO = sys.stdout) -> bool:  # pragma: no cover
-    """Decide about use of ANSI colors."""
-    py_colors = None
-
-    # https://xkcd.com/927/
-    for env_var in ["PY_COLORS", "CLICOLOR", "FORCE_COLOR", "ANSIBLE_FORCE_COLOR"]:
-        value = os.environ.get(env_var, None)
-        if value is not None:
-            py_colors = to_bool(value)
-            break
-
-    # If deliberately disabled colors
-    if os.environ.get("NO_COLOR", None):
-        return False
-
-    # User configuration requested colors
-    if py_colors is not None:
-        return to_bool(py_colors)
-
-    term = os.environ.get("TERM", "")
-    if "xterm" in term:
-        return True
-
-    if term == "dumb":
-        return False
-
-    # Use tty detection logic as last resort because there are numerous
-    # factors that can make isatty return a misleading value, including:
-    # - stdin.isatty() is the only one returning true, even on a real terminal
-    # - stderr returning false if user user uses a error stream coloring solution
-    return stream.isatty()
 
 
 if __name__ == "__main__":

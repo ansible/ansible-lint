@@ -28,7 +28,7 @@ class MetaVideoLinksRule(AnsibleLintRule):
     )
     severity = "LOW"
     tags = ["metadata"]
-    version_added = "v4.0.0"
+    version_changed = "4.0.0"
 
     VIDEO_REGEXP = {
         "google": re.compile(r"https://drive\.google\.com.*file/d/([0-9A-Za-z-_]+)/.*"),

@@ -140,26 +140,24 @@ def test_no_duplicate_rule_ids() -> None:
     assert not any(y > 1 for y in collections.Counter(rule_ids).values())
 
 
-def test_rich_rule_listing() -> None:
+def test_rule_listing() -> None:
     """Test that rich list format output is rendered as a table.
 
     This check also offers the contract of having rule id, short and long
     descriptions in the console output.
     """
     rules_path = Path("./test/rules/fixtures").resolve()
-    result = run_ansible_lint("-r", str(rules_path), "-f", "full", "-L")
+    result = run_ansible_lint("-r", str(rules_path), "-L")
     assert result.returncode == 0
 
     for rule in RulesCollection([rules_path]):
         assert rule.id in result.stdout
         assert rule.shortdesc in result.stdout
-        # description could wrap inside table, so we do not check full length
-        assert rule.description[:30] in result.stdout
 
 
 def test_rules_id_format(config_options: Options) -> None:
     """Assure all our rules have consistent format."""
-    rule_id_re = re.compile("^[a-z-]{4,30}$")
+    rule_id_re = re.compile(r"^[a-z-]{4,30}$")
     rules = RulesCollection(
         [Path("./src/ansiblelint/rules").resolve()],
         options=config_options,

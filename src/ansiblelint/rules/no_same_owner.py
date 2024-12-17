@@ -26,6 +26,7 @@ should not be preserved when transferring files between them.
 """
     severity = "LOW"
     tags = ["opt-in"]
+    version_changed = "6.4.0"
 
     def matchtask(
         self,
@@ -62,10 +63,8 @@ should not be preserved when transferring files between them.
     def handle_unarchive(task: Any, action: dict[str, Any]) -> bool:
         """Process unarchive task."""
         delegate_to = task.get("delegate_to")
-        if (
-            delegate_to == "localhost"
-            or delegate_to != "localhost"
-            and not action.get("remote_src")
+        if delegate_to == "localhost" or (
+            delegate_to != "localhost" and not action.get("remote_src")
         ):
             src = action.get("src")
             if not isinstance(src, str):

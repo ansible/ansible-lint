@@ -17,14 +17,14 @@ class AvoidImplicitRule(AnsibleLintRule):
     """Rule that identifies use of undocumented or discouraged implicit behaviors."""
 
     id = "avoid-implicit"
-    shortdesc = "Avoid implicit behaviors"
+    _shortdesc = "Avoid implicit behaviors"
     description = (
         "Items which are templated should use ``template`` instead of "
         "``copy`` with ``content`` to ensure correctness."
     )
     severity = "MEDIUM"
     tags = ["unpredictability"]
-    version_added = "v6.8.0"
+    version_changed = "6.8.0"
 
     def matchtask(
         self,

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """NoLogPasswordsRule used with ansible-lint."""
+
 from __future__ import annotations
 
 import os
@@ -43,7 +44,7 @@ class NoLogPasswordsRule(AnsibleLintRule, TransformMixin):
     )
     severity = "LOW"
     tags = ["opt-in", "security", "experimental"]
-    version_added = "v5.0.9"
+    version_changed = "5.0.9"
 
     def matchtask(
         self,

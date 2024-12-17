@@ -17,8 +17,8 @@
         "**/*.txt",
         "**/*.md"
     ],
-    "python.analysis.exclude": [
-        "build"
+    "python.experiments.optInto": [
+        "pythonTestAdapter"
     ],
     "python.terminal.activateEnvironment": true,
     "python.testing.pytestEnabled": true,
@@ -42,5 +42,13 @@
         },
         "editor.defaultFormatter": "ms-python.black-formatter",
         "editor.formatOnSave": true
+    },
+    "evenBetterToml.formatter.arrayTrailingComma": true,
+    "[toml]": {
+        "editor.defaultFormatter": "panekj.even-betterer-toml"
+    },
+    "sonarlint.connectedMode.project": {
+        "connectionId": "ansible",
+        "projectKey": "ansible_ansible-lint"
     }
 }

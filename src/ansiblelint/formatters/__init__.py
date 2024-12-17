@@ -8,8 +8,6 @@ import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
-import rich
-
 from ansiblelint.config import options
 from ansiblelint.version import __version__
 
@@ -58,7 +56,7 @@ class BaseFormatter(Generic[T]):
     @staticmethod
     def escape(text: str) -> str:
         """Escapes a string to avoid processing it as markup."""
-        return rich.markup.escape(text)
+        return text
 
 
 class Formatter(BaseFormatter):  # type: ignore[type-arg]
@@ -66,14 +64,14 @@ class Formatter(BaseFormatter):  # type: ignore[type-arg]
 
     def apply(self, match: MatchError) -> str:
         _id = getattr(match.rule, "id", "000")
-        result = f"[{match.level}][bold][link={match.rule.url}]{self.escape(match.tag)}[/link][/][/][dim]:[/] [{match.level}]{self.escape(match.message)}[/]"
+        result = f"[{match.level}][link={match.rule.url}]{match.tag}[/link][dim]:[/] [{match.level}]{self.escape(match.message)}[/]"
         if match.level != "error":
-            result += f" [dim][{match.level}]({match.level})[/][/]"
+            result += f" [dim][{match.level}]({match.level})[/]"
         if match.ignored:
             result += " [dim]# ignored[/]"
         result += (
             "\n"
-            f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}"
+            f"[repr.path]{self._format_path(match.filename or '')}[/]:{match.position}"
         )
         if match.details:
             result += f" [dim]{self.escape(str(match.details))}[/]"
@@ -87,7 +85,7 @@ class QuietFormatter(BaseFormatter[Any]):
     def apply(self, match: MatchError) -> str:
         return (
             f"[{match.level}]{match.rule.id}[/] "
-            f"[filename]{self._format_path(match.filename or '')}[/]:{match.position}"
+            f"[repr.path]{self._format_path(match.filename or '')}[/]:{match.position}"
         )
 
 
@@ -96,8 +94,8 @@ class ParseableFormatter(BaseFormatter[Any]):
 
     def apply(self, match: MatchError) -> str:
         result = (
-            f"[filename]{self._format_path(match.filename or '')}[/][dim]:{match.position}:[/] "
-            f"[{match.level}][bold]{self.escape(match.tag)}[/bold]"
+            f"[repr.path]{self._format_path(match.filename or '')}[/][dim]:{match.position}:[/] "
+            f"[{match.level}][bold]{self.escape(match.tag)}[/]"
             f"{ f': {match.message}' if not options.quiet else '' }[/]"
         )
         if match.level != "error":

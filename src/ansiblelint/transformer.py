@@ -9,12 +9,13 @@ from typing import TYPE_CHECKING, cast
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
 from ansiblelint.file_utils import Lintable
-from ansiblelint.rules import AnsibleLintRule, TransformMixin
+from ansiblelint.rules import TransformMixin
 from ansiblelint.yaml_utils import FormattedYAML, get_path_to_play, get_path_to_task
 
 if TYPE_CHECKING:
     from ansiblelint.config import Options
     from ansiblelint.errors import MatchError
+    from ansiblelint.rules import AnsibleLintRule
     from ansiblelint.runner import LintResult
 
 __all__ = ["Transformer"]
@@ -122,13 +123,17 @@ class Transformer:
                     )
                     continue
 
-            if self.write_set != {"none"}:
-                self._do_transforms(file, ruamel_data or data, file_is_yaml, matches)
+                if self.write_set != {"none"}:
+                    self._do_transforms(
+                        file, ruamel_data or data, file_is_yaml, matches
+                    )
 
-            if file_is_yaml:
                 _logger.debug("%s %s, version=%s", self.DUMP_MSG, file, yaml.version)
                 # noinspection PyUnboundLocalVariable
                 file.content = yaml.dumps(ruamel_data)
+
+            elif self.write_set != {"none"}:
+                self._do_transforms(file, ruamel_data or data, file_is_yaml, matches)
 
             if file.updated:
                 file.write()
@@ -144,9 +149,9 @@ class Transformer:
         for match in sorted(matches):
             match_id = f"{match.tag}/{match.match_type} {match.filename}:{match.lineno}"
             if not isinstance(match.rule, TransformMixin):
-                logging.debug("%s %s", self.FIX_NA_MSG, match_id)
+                _logger.debug("%s %s", self.FIX_NA_MSG, match_id)
                 continue
-            rule = cast(AnsibleLintRule, match.rule)
+            rule = cast("AnsibleLintRule", match.rule)
             rule_definition = set(rule.tags)
             rule_definition.add(rule.id)
             if not rule_definition.isdisjoint(
@@ -154,10 +159,10 @@ class Transformer:
             ) or self.write_exclude_set == {"all"}:
                 continue
             if rule_definition.isdisjoint(self.write_set) and self.write_set != {"all"}:
-                logging.debug("%s %s", self.FIX_NE_MSG, match_id)
+                _logger.debug("%s %s", self.FIX_NE_MSG, match_id)
                 continue
             if file_is_yaml and not match.yaml_path:
-                data = cast(CommentedMap | CommentedSeq, data)
+                data = cast("CommentedMap | CommentedSeq", data)
                 if match.match_type == "play":
                     match.yaml_path = get_path_to_play(file, match.lineno, data)
                 elif match.task or file.kind in (
@@ -167,7 +172,7 @@ class Transformer:
                 ):
                     match.yaml_path = get_path_to_task(file, match.lineno, data)
 
-            logging.debug("%s %s", self.FIX_APPLY_MSG, match_id)
+            _logger.debug("%s %s", self.FIX_APPLY_MSG, match_id)
             try:
                 match.rule.transform(match, file, data)
             except Exception as exc:  # pylint: disable=broad-except
