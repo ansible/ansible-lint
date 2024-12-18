@@ -49,6 +49,7 @@ class Transformer:
     def __init__(self, result: LintResult, options: Options):
         """Initialize a Transformer instance."""
         self.write_set = self.effective_write_set(options.write_list)
+        self.write_exclude_set = self.effective_write_set(options.write_exclude_list)
 
         self.matches: list[MatchError] = result.matches
         self.files: set[Lintable] = result.files
@@ -150,13 +151,16 @@ class Transformer:
             if not isinstance(match.rule, TransformMixin):
                 _logger.debug("%s %s", self.FIX_NA_MSG, match_id)
                 continue
-            if self.write_set != {"all"}:
-                rule = cast("AnsibleLintRule", match.rule)
-                rule_definition = set(rule.tags)
-                rule_definition.add(rule.id)
-                if rule_definition.isdisjoint(self.write_set):
-                    _logger.debug("%s %s", self.FIX_NE_MSG, match_id)
-                    continue
+            rule = cast("AnsibleLintRule", match.rule)
+            rule_definition = set(rule.tags)
+            rule_definition.add(rule.id)
+            if not rule_definition.isdisjoint(
+                self.write_exclude_set,
+            ) or self.write_exclude_set == {"all"}:
+                continue
+            if rule_definition.isdisjoint(self.write_set) and self.write_set != {"all"}:
+                _logger.debug("%s %s", self.FIX_NE_MSG, match_id)
+                continue
             if file_is_yaml and not match.yaml_path:
                 data = cast("CommentedMap | CommentedSeq", data)
                 if match.match_type == "play":

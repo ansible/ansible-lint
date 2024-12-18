@@ -291,6 +291,13 @@
       "title": "Warn List",
       "type": "array"
     },
+    "write_exclude_list": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Write Exclude List",
+      "type": "array"
+    },
     "write_list": {
       "items": {
         "type": "string"
