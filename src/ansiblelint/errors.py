@@ -120,10 +120,10 @@ class MatchError(ValueError):
         formatstr = "[{0}] ({1}) matched {2}:{3} {4}"
         # note that `rule.id` can be int, str or even missing, as users
         # can defined their own custom rules.
-        _id = getattr(self.rule, "id", "000")
+        id_ = getattr(self.rule, "id", "000")
 
         return formatstr.format(
-            _id,
+            id_,
             self.message,
             self.filename,
             self.lineno,

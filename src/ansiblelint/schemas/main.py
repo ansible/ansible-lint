@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 import logging
 import re
-import typing
 from typing import TYPE_CHECKING, Any
 
 import yaml
@@ -18,6 +17,8 @@ from ansiblelint.schemas.__main__ import JSON_SCHEMAS, _schema_cache
 _logger = logging.getLogger(__package__)
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
+
     from ansiblelint.file_utils import Lintable
 
 
@@ -28,7 +29,7 @@ def find_best_deep_match(
 
     def iter_validation_error(
         err: ValidationError,
-    ) -> typing.Iterator[ValidationError]:
+    ) -> Iterator[ValidationError]:
         if err.context:
             for e in err.context:
                 yield e

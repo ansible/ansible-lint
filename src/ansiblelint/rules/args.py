@@ -137,8 +137,7 @@ class ArgsRule(AnsibleLintRule):
             module_args.update(workarounds_inject_map[loaded_module.resolved_fqcn])
         if loaded_module.resolved_fqcn in workarounds_drop_map:
             for key in workarounds_drop_map[loaded_module.resolved_fqcn]:
-                if key in module_args:
-                    del module_args[key]
+                module_args.pop(key, None)
 
         with mock.patch.object(
             mock_ansible_module,

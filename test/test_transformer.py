@@ -508,7 +508,7 @@ def test_transform_na(
     result = test_result[0]
     options = test_result[1]
 
-    _isinstance = builtins.isinstance
+    isinstance_ = builtins.isinstance
     called = False
 
     def mp_isinstance(t_object: Any, classinfo: type) -> bool:
@@ -516,7 +516,7 @@ def test_transform_na(
             nonlocal called
             called = True
             return False
-        return _isinstance(t_object, classinfo)
+        return isinstance_(t_object, classinfo)
 
     monkeypatch.setattr(builtins, "isinstance", mp_isinstance)
 

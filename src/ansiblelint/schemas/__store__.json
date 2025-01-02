@@ -1,6 +1,6 @@
 {
   "ansible-lint-config": {
-    "etag": "8e626a1196cba4ac67956e6891090991a29aec6e8949e16a58f41773da055ca8",
+    "etag": "edfce2b56aae684bf1f0b9978dcfaaaa588dbc236f6e0ce29427277f6a327ddc",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible-lint-config.json"
   },
   "ansible-navigator-config": {
