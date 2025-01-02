@@ -95,7 +95,7 @@ class RoleNames(AnsibleLintRule):
         if file.kind not in ("meta", "role", "playbook"):
             return result
 
-        if file.kind == "meta":
+        if file.kind == "meta" and file.data:
             for role in file.data.get("dependencies", []):
                 if isinstance(role, dict):
                     role_name = role["role"]
