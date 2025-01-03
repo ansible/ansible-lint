@@ -113,10 +113,10 @@ def run_ansible_lint(
         "VIRTUAL_ENV",
     ]
 
-    _env = {} if env is None else env
+    env_ = {} if env is None else env
     for v in safe_list:
-        if v in os.environ and v not in _env:
-            _env[v] = os.environ[v]
+        if v in os.environ and v not in env_:
+            env_[v] = os.environ[v]
 
     return subprocess.run(
         args,
@@ -124,7 +124,7 @@ def run_ansible_lint(
         shell=False,  # needed when command is a list
         check=False,
         cwd=cwd,
-        env=_env,
+        env=env_,
         text=True,
         encoding="utf-8",
     )

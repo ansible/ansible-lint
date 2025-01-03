@@ -735,12 +735,12 @@ def task_to_str(task: dict[str, Any]) -> str:
         ]
     ]
 
-    _raw_params = action.get("_raw_params", [])
-    if isinstance(_raw_params, list):
-        for item in _raw_params:
+    raw_params = action.get("_raw_params", [])
+    if isinstance(raw_params, list):
+        for item in raw_params:
             args.extend(str(item))
     else:
-        args.append(_raw_params)
+        args.append(raw_params)
 
     return f"{action['__ansible_module__']} {' '.join(args)}"
 
@@ -934,18 +934,18 @@ def task_in_list(  # type: ignore[no-any-unimported]
         for entry_index, entry in enumerate(data):
             if not entry:
                 continue
-            _pos = f"{position}[{entry_index}]"
+            pos_ = f"{position}[{entry_index}]"
             if isinstance(entry, dict):
                 yield Task(
                     entry,
-                    position=_pos,
+                    position=pos_,
                 )
             for block in [k for k in entry if k in NESTED_TASK_KEYS]:
                 yield from task_in_list(
                     data=entry[block],
                     file=file,
                     kind="tasks",
-                    position=f"{_pos}.{block}",
+                    position=f"{pos_}.{block}",
                 )
 
     if not isinstance(data, list):

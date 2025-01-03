@@ -234,7 +234,7 @@ def test_path_from_config_do_not_depend_on_cwd(
 )
 def test_config_failure(base_arguments: list[str], config_file: str) -> None:
     """Ensures specific config files produce error code 3."""
-    with pytest.raises(SystemExit, match="^3$"):
+    with pytest.raises(SystemExit, match=r"^3$"):
         cli.get_config([*base_arguments, "-c", config_file])
 
 
