@@ -29,6 +29,7 @@ import pathlib
 import shutil
 import site
 import sys
+import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -269,7 +270,7 @@ def fix(runtime_options: Options, result: LintResult, rules: RulesCollection) ->
         result.matches.pop(idx)
 
 
-# pylint: disable=too-many-locals
+# pylint: disable=too-many-locals,too-many-statements
 def main(argv: list[str] | None = None) -> int:
     """Linter CLI entry point."""
     # alter PATH if needed (venv support)
@@ -277,31 +278,38 @@ def main(argv: list[str] | None = None) -> int:
 
     if argv is None:  # pragma: no cover
         argv = sys.argv
-    cache_dir_lock = initialize_options(argv[1:])
 
-    reconfigure(colored=options.colored)
+    with warnings.catch_warnings(record=True) as warns:
+        warnings.simplefilter(action="ignore")
 
-    if options.version:
-        deps = get_deps_versions()
-        msg = f"ansible-lint [repr.number]{__version__}[/] using[dim]"
-        for k, v in deps.items():
-            msg += f" {k}:[repr.number]{v}[/]"
-        msg += "[/]"
-        console.print(msg)
-        msg = get_version_warning()
-        if msg:
+        cache_dir_lock = initialize_options(argv[1:])
+
+        reconfigure(colored=options.colored)
+
+        if options.version:
+            deps = get_deps_versions()
+            msg = f"ansible-lint [repr.number]{__version__}[/] using[dim]"
+            for k, v in deps.items():
+                msg += f" {k}:[repr.number]{v}[/]"
+            msg += "[/]"
             console.print(msg)
-        support_banner()
-        sys.exit(0)
-    else:
-        support_banner()
+            msg = get_version_warning()
+            if msg:
+                console.print(msg)
+            support_banner()
+            sys.exit(0)
+        else:
+            support_banner()
 
-    initialize_logger(options.verbosity)
-    for level, message in log_entries:
-        _logger.log(level, message)
-    _logger.debug("Options: %s", options)
-    _logger.debug("CWD: %s", Path.cwd())
+        initialize_logger(options.verbosity)
+        for level, message in log_entries:
+            _logger.log(level, message)
+        _logger.debug("Options: %s", options)
+        _logger.debug("CWD: %s", Path.cwd())
 
+    for warn in warns:
+        _logger.warning(str(warn.message))
+    warnings.resetwarnings()
     # checks if we have `ANSIBLE_LINT_SKIP_SCHEMA_UPDATE` set to bypass schema
     # update. Also skip if in offline mode.
     # env var set to skip schema refresh
