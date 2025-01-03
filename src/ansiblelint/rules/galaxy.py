@@ -18,6 +18,8 @@ if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
+CHANGELOG_FILE = None
+
 
 class GalaxyRule(AnsibleLintRule):
     """Rule for checking collections."""
@@ -36,12 +38,21 @@ class GalaxyRule(AnsibleLintRule):
         "galaxy[version-missing]": "galaxy.yaml should have version tag.",
         "galaxy[no-runtime]": "meta/runtime.yml file not found.",
         "galaxy[invalid-dependency-version]": "Invalid collection metadata. Dependency version spec range is invalid",
+        "galaxy[version-no-sync-changelog-latest]": "Checks if version in galaxy.yaml is in sync with latest version in changelog yaml",
     }
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific play (entry in playbook)."""
+        changelog_file_data = []
+        global CHANGELOG_FILE
+        if file.kind == "changelog":
+            CHANGELOG_FILE = list(file.data.get("releases", None).keys())
+
         if file.kind != "galaxy":  # type: ignore[comparison-overlap]
             return []
+
+        if CHANGELOG_FILE:
+            changelog_file_data = CHANGELOG_FILE
 
         # Defined by Automation Hub Team and Partner Engineering
         required_tag_list = [
@@ -106,6 +117,15 @@ class GalaxyRule(AnsibleLintRule):
                     filename=file,
                 ),
             )
+        else:
+            if Version(data.get("version")) != Version(changelog_file_data[-3]):
+                results.append(
+                    self.create_matcherror(
+                        message="Version in galaxy.yaml and the latest version in changelog should be same.",
+                        tag="galaxy[version-no-sync-changelog-latest]",
+                        filename=file,
+                    ),
+                )
 
         # Checking if galaxy.yml contains one or more required tags for certification
         if not galaxy_tag_list or not any(
