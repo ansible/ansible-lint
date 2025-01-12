@@ -91,7 +91,7 @@ referencing==0.35.1       # via jsonschema, jsonschema-specifications, types-jso
 regex==2024.11.6          # via mkdocs-material
 requests==2.32.3          # via linkchecker, mkdocs-htmlproofer-plugin, mkdocs-material
 rpds-py==0.22.3           # via jsonschema, referencing
-ruamel-yaml==0.18.10       # via ansible-lint (pyproject.toml)
+ruamel-yaml==0.18.10      # via ansible-lint (pyproject.toml)
 ruamel-yaml-clib==0.2.12  # via ruamel-yaml, ansible-lint (pyproject.toml)
 setproctitle==1.3.4       # via pytest-xdist
 six==1.17.0               # via python-dateutil
