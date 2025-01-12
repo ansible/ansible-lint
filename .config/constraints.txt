@@ -74,9 +74,9 @@ platformdirs==4.3.6       # via black, mkdocs-get-deps, mkdocstrings, pylint, to
 pluggy==1.5.0             # via pytest, tox
 psutil==6.1.1             # via pytest-xdist, ansible-lint (pyproject.toml)
 pycparser==2.22           # via cffi
-pygments==2.18.0          # via mkdocs-material
+pygments==2.19.1          # via mkdocs-material
 pylint==3.3.3             # via ansible-lint (pyproject.toml)
-pymdown-extensions==10.13  # via markdown-exec, mkdocs-ansible, mkdocs-material, mkdocstrings
+pymdown-extensions==10.14  # via markdown-exec, mkdocs-ansible, mkdocs-material, mkdocstrings
 pyproject-api==1.8.0      # via tox
 pytest==8.3.4             # via pytest-instafail, pytest-mock, pytest-plus, pytest-xdist, ansible-lint (pyproject.toml)
 pytest-instafail==0.5.0   # via ansible-lint (pyproject.toml)
@@ -91,7 +91,7 @@ referencing==0.35.1       # via jsonschema, jsonschema-specifications, types-jso
 regex==2024.11.6          # via mkdocs-material
 requests==2.32.3          # via linkchecker, mkdocs-htmlproofer-plugin, mkdocs-material
 rpds-py==0.22.3           # via jsonschema, referencing
-ruamel-yaml==0.18.6       # via ansible-lint (pyproject.toml)
+ruamel-yaml==0.18.10      # via ansible-lint (pyproject.toml)
 ruamel-yaml-clib==0.2.12  # via ruamel-yaml, ansible-lint (pyproject.toml)
 setproctitle==1.3.4       # via pytest-xdist
 six==1.17.0               # via python-dateutil
