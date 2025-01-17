@@ -179,7 +179,7 @@ repos:
             plugins/.*
           )$
   - repo: https://github.com/RobertCraigie/pyright-python
-    rev: v1.1.391
+    rev: v1.1.392
     hooks:
       - id: pyright
         additional_dependencies:
@@ -210,7 +210,7 @@ repos:
           - --output-format=colorized
         additional_dependencies:
           - ansible-compat>=24.8.0
-          - ansible-core>=2.14.0
+          - ansible-core>=2.16.0
           - black>=24.10.0
           - docutils
           - filelock>=3.12.2
