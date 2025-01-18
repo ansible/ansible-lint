@@ -44,7 +44,7 @@ runs:
         fi
 
     # If this action is imported as part of another composite action, the value of github.action_ref is the branch/commit/tag of the source action, not this one.
-    # This allows a user to override it using the input variable 
+    # This allows a user to override it using the input variable
     - name: Determine github action ref
       shell: bash
       run: |
@@ -53,7 +53,6 @@ runs:
           action_ref="${{ github.action_ref || 'main' }}"
         fi
         echo "ACTION_REF=${action_ref}" >> "$GITHUB_ENV"
-
 
     # Due to GHA limitation, caching works only for files within GITHUB_WORKSPACE
     # folder, so we are forced to stick this temporary file inside .git, so it
