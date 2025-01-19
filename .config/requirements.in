@@ -4,14 +4,14 @@ ansible-core>=2.16.0 # GPLv3
 ansible-compat>=24.10.0 # GPLv3
 # alphabetically sorted:
 black>=24.3.0 # MIT (security)
-filelock>=3.3.0 # The Unlicense
+filelock>=3.8.2 # The Unlicense
 importlib-metadata # Apache
 jsonschema>=4.10.0 # MIT, version needed for improved errors
-packaging>=21.3 # Apache-2.0,BSD-2-Clause
+packaging>=22.0 # Apache-2.0,BSD-2-Clause
 pathspec>=0.10.3 # Mozilla Public License 2.0 (MPL 2.0)
-pyyaml>=5.4.1 # MIT (centos 9 has 5.3.1)
+pyyaml>=6.0.2 # MIT (compilation probles with older versions)
 ruamel.yaml>=0.18.5,!=0.18.7,!=0.18.8 # MIT
 subprocess-tee>=0.4.1 # MIT, used by ansible-compat
-yamllint >= 1.30.0 # GPLv3
+yamllint >= 1.34.0 # GPLv3
 wcmatch>=8.1.2; python_version < '3.12' # MIT
 wcmatch>=8.5.0; python_version >= '3.12' # MIT
