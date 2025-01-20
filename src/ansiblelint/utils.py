@@ -439,7 +439,7 @@ class HandleChildren:
                 if "role" in role or "name" in role:
                     if "tags" not in role or "skip_ansible_lint" not in role["tags"]:
                         results.extend(
-                            _look_for_role_files(
+                            self._look_for_role_files(
                                 basedir,
                                 role.get("role", role.get("name")),
                             ),
@@ -448,7 +448,7 @@ class HandleChildren:
                     msg = f'role dict {role} does not contain a "role" or "name" key'
                     raise SystemExit(msg)
             else:
-                results.extend(_look_for_role_files(basedir, role))
+                results.extend(self._look_for_role_files(basedir, role))
         return results
 
     def import_playbook_children(
@@ -483,7 +483,7 @@ class HandleChildren:
         possible_paths = []
         namespace_name, collection_name, *playbook_path = parse_fqcn(v)
         if namespace_name and collection_name:
-            for loc in get_app(cached=True).runtime.config.collections_paths:
+            for loc in self.app.runtime.config.collections_paths:
                 append_playbook_path(
                     loc,
                     playbook_path[:-1] + [f"{playbook_path[-1]}.yml"],
@@ -511,6 +511,70 @@ class HandleChildren:
 
         _logger.error(msg)
         return []
+
+    def _look_for_role_files(self, basedir: str, role: str) -> list[Lintable]:
+        role_path = self._rolepath(basedir, role)
+        if not role_path:  # pragma: no branch
+            return []
+
+        results = []
+
+        for kind in ["tasks", "meta", "handlers", "vars", "defaults"]:
+            current_path = os.path.join(role_path, kind)
+            for folder, _, files in os.walk(current_path):
+                for file in files:
+                    file_ignorecase = file.lower()
+                    if file_ignorecase.endswith((".yml", ".yaml")):
+                        results.append(Lintable(os.path.join(folder, file)))
+
+        return results
+
+    def _rolepath(self, basedir: str, role: str) -> str | None:
+        role_path = None
+        namespace_name, collection_name, role_name = parse_fqcn(role)
+
+        possible_paths = [
+            # if included from a playbook
+            path_dwim(basedir, os.path.join("roles", role_name)),
+            path_dwim(basedir, role_name),
+            # if included from roles/[role]/meta/main.yml
+            path_dwim(basedir, os.path.join("..", "..", "..", "roles", role_name)),
+            path_dwim(basedir, os.path.join("..", "..", role_name)),
+            # if checking a role in the current directory
+            path_dwim(basedir, os.path.join("..", role_name)),
+        ]
+
+        for loc in self.app.runtime.config.default_roles_path:
+            loc = os.path.expanduser(loc)
+            possible_paths.append(path_dwim(loc, role_name))
+
+        if namespace_name and collection_name:
+            for loc in get_app(cached=True).runtime.config.collections_paths:
+                loc = os.path.expanduser(loc)
+                possible_paths.append(
+                    path_dwim(
+                        loc,
+                        os.path.join(
+                            "ansible_collections",
+                            namespace_name,
+                            collection_name,
+                            "roles",
+                            role_name,
+                        ),
+                    ),
+                )
+
+        possible_paths.append(path_dwim(basedir, ""))
+
+        for path_option in possible_paths:  # pragma: no branch
+            if os.path.isdir(path_option):
+                role_path = path_option
+                break
+
+        if role_path:  # pragma: no branch
+            add_all_plugin_dirs(role_path)
+
+        return role_path
 
 
 def _get_task_handler_children_for_tasks_or_playbooks(
@@ -556,72 +620,6 @@ def _get_task_handler_children_for_tasks_or_playbooks(
             return Lintable(f, kind=child_type)
     msg = f'The node contains none of: {", ".join(sorted(INCLUSION_ACTION_NAMES))}'
     raise LookupError(msg)
-
-
-def _rolepath(basedir: str, role: str) -> str | None:
-    role_path = None
-    namespace_name, collection_name, role_name = parse_fqcn(role)
-
-    possible_paths = [
-        # if included from a playbook
-        path_dwim(basedir, os.path.join("roles", role_name)),
-        path_dwim(basedir, role_name),
-        # if included from roles/[role]/meta/main.yml
-        path_dwim(basedir, os.path.join("..", "..", "..", "roles", role_name)),
-        path_dwim(basedir, os.path.join("..", "..", role_name)),
-        # if checking a role in the current directory
-        path_dwim(basedir, os.path.join("..", role_name)),
-    ]
-
-    for loc in get_app(cached=True).runtime.config.default_roles_path:
-        loc = os.path.expanduser(loc)
-        possible_paths.append(path_dwim(loc, role_name))
-
-    if namespace_name and collection_name:
-        for loc in get_app(cached=True).runtime.config.collections_paths:
-            loc = os.path.expanduser(loc)
-            possible_paths.append(
-                path_dwim(
-                    loc,
-                    os.path.join(
-                        "ansible_collections",
-                        namespace_name,
-                        collection_name,
-                        "roles",
-                        role_name,
-                    ),
-                ),
-            )
-
-    possible_paths.append(path_dwim(basedir, ""))
-
-    for path_option in possible_paths:  # pragma: no branch
-        if os.path.isdir(path_option):
-            role_path = path_option
-            break
-
-    if role_path:  # pragma: no branch
-        add_all_plugin_dirs(role_path)
-
-    return role_path
-
-
-def _look_for_role_files(basedir: str, role: str) -> list[Lintable]:
-    role_path = _rolepath(basedir, role)
-    if not role_path:  # pragma: no branch
-        return []
-
-    results = []
-
-    for kind in ["tasks", "meta", "handlers", "vars", "defaults"]:
-        current_path = os.path.join(role_path, kind)
-        for folder, _, files in os.walk(current_path):
-            for file in files:
-                file_ignorecase = file.lower()
-                if file_ignorecase.endswith((".yml", ".yaml")):
-                    results.append(Lintable(os.path.join(folder, file)))
-
-    return results
 
 
 def _sanitize_task(task: dict[str, Any]) -> dict[str, Any]:

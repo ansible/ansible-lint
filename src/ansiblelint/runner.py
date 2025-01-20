@@ -27,7 +27,6 @@ from ansible_compat.runtime import AnsibleWarning
 
 import ansiblelint.skip_utils
 import ansiblelint.utils
-from ansiblelint.app import App, get_app
 from ansiblelint.constants import States
 from ansiblelint.errors import LintWarning, MatchError, WarnSource
 from ansiblelint.file_utils import (
@@ -50,6 +49,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Generator
 
     from ansiblelint._internal.rules import BaseRule
+    from ansiblelint.app import App
     from ansiblelint.config import Options
     from ansiblelint.constants import FileType
     from ansiblelint.rules import RulesCollection
@@ -111,7 +111,7 @@ class Runner:
             checked_files = set()
         self.checked_files = checked_files
 
-        self.app = get_app(cached=True)
+        self.app = self.rules.app
 
     def _update_exclude_paths(self, exclude_paths: list[str]) -> None:
         if exclude_paths:
