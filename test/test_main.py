@@ -17,24 +17,27 @@ from ansiblelint.constants import RC
 
 
 @pytest.mark.parametrize(
-    ("expected_warning"),
+    ("in_path"),
     (False, True),
-    ids=("normal", "isolated"),
+    ids=("in", "missing"),
 )
-def test_call_from_outside_venv(expected_warning: bool) -> None:
+def test_call_from_outside_venv(in_path: bool) -> None:
     """Asserts ability to be called w/ or w/o venv activation."""
     git_location = shutil.which("git")
     if not git_location:
         pytest.fail("git not found")
     git_path = Path(git_location).parent
-    py_path = Path(sys.executable).parent.resolve()
+    py_path = Path(sys.executable).parent.resolve().as_posix()
 
-    if expected_warning:
+    env = os.environ.copy()
+    env["VIRTUAL_ENV"] = ""
+    env["NO_COLOR"] = "1"
+    if in_path:
         # VIRTUAL_ENV obliterated here to emulate call from outside a virtual environment
-        env = {"HOME": str(Path.home()), "PATH": str(git_path), "VIRTUAL_ENV": ""}
+        env["HOME"] = Path.home().as_posix()
+        env["PATH"] = git_path.as_posix()
     else:
-        env = os.environ.copy()
-        if py_path.as_posix() not in env["PATH"]:
+        if py_path not in env["PATH"]:
             env["PATH"] = f"{py_path}:{env['PATH']}"
 
     for v in ("COVERAGE_FILE", "COVERAGE_PROCESS_START"):
@@ -45,7 +48,7 @@ def test_call_from_outside_venv(expected_warning: bool) -> None:
     # environment variables from the current process, so we emulate being
     # called from outside the venv.
     proc = subprocess.run(
-        [str(py_path / "ansible-lint"), "--version"],
+        [f"{py_path}/ansible-lint", "--version"],
         check=False,
         capture_output=True,
         text=True,
@@ -53,7 +56,8 @@ def test_call_from_outside_venv(expected_warning: bool) -> None:
     )
     assert proc.returncode == 0, proc
     warning_found = "PATH altered to include" in proc.stderr
-    assert warning_found is expected_warning
+    assert warning_found is in_path
+
 
 
 @pytest.mark.parametrize(
