@@ -27,17 +27,20 @@ def test_call_from_outside_venv(expected_warning: bool) -> None:
     if not git_location:
         pytest.fail("git not found")
     git_path = Path(git_location).parent
+    py_path = Path(sys.executable).parent.resolve()
 
     if expected_warning:
-        env = {"HOME": str(Path.home()), "PATH": str(git_path)}
+        # VIRTUAL_ENV obliterated here to emulate call from outside a virtual environment
+        env = {"HOME": str(Path.home()), "PATH": str(git_path), "VIRTUAL_ENV": ""}
     else:
         env = os.environ.copy()
+        if py_path.as_posix() not in env["PATH"]:
+            env["PATH"] = f"{py_path}:{env['PATH']}"
 
     for v in ("COVERAGE_FILE", "COVERAGE_PROCESS_START"):
         if v in os.environ:
             env[v] = os.environ[v]
 
-    py_path = Path(sys.executable).parent
     # Passing custom env prevents the process from inheriting PATH or other
     # environment variables from the current process, so we emulate being
     # called from outside the venv.
