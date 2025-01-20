@@ -26,6 +26,10 @@ inputs:
     description: Expected return code from ansible-lint. Default is 0. Used for self-testing purposes.
     required: false
     default: "0"
+  gh_action_ref:
+    description: The branch, tag, or commit to use for ansible-lint.
+    default: ""
+    required: false
 runs:
   using: composite
   steps:
@@ -39,6 +43,17 @@ runs:
           echo "working_directory=${{ github.workspace }}" >> $GITHUB_OUTPUT
         fi
 
+    # If this action is imported as part of another composite action, the value of github.action_ref is the branch/commit/tag of the source action, not this one.
+    # This allows a user to override it using the input variable
+    - name: Determine github action ref
+      shell: bash
+      run: |
+        action_ref="${{ inputs.gh_action_ref }}"
+        if [[ -z "${{ inputs.gh_action_ref }}" ]]; then
+          action_ref="${{ github.action_ref || 'main' }}"
+        fi
+        echo "ACTION_REF=${action_ref}" >> "$GITHUB_ENV"
+
     # Due to GHA limitation, caching works only for files within GITHUB_WORKSPACE
     # folder, so we are forced to stick this temporary file inside .git, so it
     # will not affect the linted repository.
@@ -48,7 +63,7 @@ runs:
       id: get_reqs
       shell: bash
       env:
-        GH_ACTION_REF: ${{ github.action_ref || 'main' }}
+        GH_ACTION_REF: ${{ env.ACTION_REF }}
       working-directory: ${{ steps.inputs.outputs.working_directory }}
       run: |
         reqs_file=$(git rev-parse --show-toplevel)/.git/ansible-lint-requirements.txt
@@ -66,7 +81,7 @@ runs:
     - name: Install ansible-lint
       shell: bash
       env:
-        GH_ACTION_REF: ${{ github.action_ref || 'main' }}
+        GH_ACTION_REF: ${{ env.ACTION_REF }}
       # We need to set the version manually because $GITHUB_ACTION_PATH is not
       # a git clone and setuptools-scm would not be able to determine the version.
       # git+https://github.com/ansible/ansible-lint@${{ github.action_ref || 'main' }}
