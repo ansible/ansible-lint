@@ -446,16 +446,16 @@ def path_inject(own_location: str = "") -> None:
         str(userbase_bin_path) not in paths
         and (userbase_bin_path / "bin" / "ansible").exists()
     ):
-        inject_paths.append(str(userbase_bin_path))
+        inject_paths.append(userbase_bin_path.resolve().as_posix())
 
-    py_path = Path(sys.executable).parent
+    py_path = Path(sys.executable).parent.resolve()
     pipx_path = os.environ.get("PIPX_HOME", "pipx")
     if (
         str(py_path) not in paths
         and (py_path / "ansible").exists()
         and pipx_path not in str(py_path)
     ):
-        inject_paths.append(str(py_path))
+        inject_paths.append(py_path.as_posix())
 
     # last option, if nothing else is found, just look next to ourselves...
     if own_location:
