@@ -19,7 +19,7 @@ pathspec==0.12.1          # via black, yamllint, ansible-lint (pyproject.toml)
 platformdirs==4.3.6       # via black
 pycparser==2.22           # via cffi
 pyyaml==6.0.2             # via ansible-compat, ansible-core, yamllint, ansible-lint (pyproject.toml)
-referencing==0.35.1       # via jsonschema, jsonschema-specifications
+referencing==0.36.1       # via jsonschema, jsonschema-specifications
 rpds-py==0.22.3           # via jsonschema, referencing
 ruamel-yaml==0.18.10       # via ansible-lint (pyproject.toml)
 ruamel-yaml-clib==0.2.12  # via ruamel-yaml

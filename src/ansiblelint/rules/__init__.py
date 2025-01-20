@@ -396,7 +396,10 @@ class RulesCollection:
         else:
             self.options = options
         self.profile = []
-        self.app = app or get_app(cached=True)
+        # app should be defined on normal run logic, but for testing we might
+        # not pass it, and in this case we assume offline mode for performance
+        # reasons.
+        self.app = app or get_app(offline=True)
 
         if profile_name:
             self.profile = PROFILES[profile_name]

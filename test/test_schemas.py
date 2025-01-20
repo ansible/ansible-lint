@@ -96,17 +96,17 @@ def test_spdx() -> None:
         schema = json.load(f)
         spx_enum = schema["$defs"]["SPDXLicenseEnum"]["enum"]
     if set(spx_enum) != license_ids:
-        # In absence of a
-        if os.environ.get("PIP_CONSTRAINT", "/dev/null") == "/dev/null":
+        constraints = os.environ.get("PIP_CONSTRAINT", "/dev/null")
+        if constraints.endswith(".config/constraints.txt"):
             with galaxy_json.open("w", encoding="utf-8") as f:
                 schema["$defs"]["SPDXLicenseEnum"]["enum"] = sorted(license_ids)
                 json.dump(schema, f, indent=2)
             pytest.fail(
-                "SPDX license list inside galaxy.json JSON Schema file was updated.",
+                f"SPDX license list inside galaxy.json JSON Schema file was updated. {constraints}",
             )
         else:
             warnings.warn(
-                "test_spdx failure was ignored because constraints were not pinned (PIP_CONSTRAINTS). This is expected for py310 and py-devel jobs.",
+                f"test_spdx failure was ignored because constraints were not pinned (PIP_CONSTRAINT={constraints}). This is expected for py310 and py-devel, lower jobs.",
                 category=pytest.PytestWarning,
                 stacklevel=1,
             )

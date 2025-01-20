@@ -21,12 +21,13 @@
 # THE SOFTWARE.
 import pathlib
 
+from ansiblelint.app import get_app
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.formatters import Formatter
 from ansiblelint.rules import AnsibleLintRule, RulesCollection
 
-collection = RulesCollection()
+collection = RulesCollection(app=get_app(offline=True))
 rule = AnsibleLintRule()
 rule.id = "TCF0001"
 collection.register(rule)
