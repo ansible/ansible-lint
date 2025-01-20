@@ -126,4 +126,4 @@ task_name_prefix: "{stem} | "
 
 # Also recognize these versions of Ansible as supported:
 # supported_ansible_also:
-#   - "2.14"
+#   - "2.18"

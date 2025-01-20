@@ -11,6 +11,7 @@ from tempfile import NamedTemporaryFile
 
 import pytest
 
+from ansiblelint.app import get_app
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.formatters import SarifFormatter
@@ -24,7 +25,7 @@ class TestSarifFormatter:
     rule2 = AnsibleLintRule()
     matches: list[MatchError] = []
     formatter: SarifFormatter | None = None
-    collection = RulesCollection()
+    collection = RulesCollection(app=get_app(offline=True))
     collection.register(rule1)
     collection.register(rule2)
 
