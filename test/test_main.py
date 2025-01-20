@@ -59,7 +59,6 @@ def test_call_from_outside_venv(in_path: bool) -> None:
     assert warning_found is in_path
 
 
-
 @pytest.mark.parametrize(
     ("ver_diff", "found", "check", "outlen"),
     (
