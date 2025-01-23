@@ -183,7 +183,7 @@ class AnsiStyle(PlainStyle):
         END = "\033[0m"
         # more complex
         BOLD = "\033[1m"
-        DIM = "\033[1;30m"
+        DIM = "\033[2m"
         BOLD_CYAN = "\033[1;36m"
 
     warning = "\033[33m"  # yellow
