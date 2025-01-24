@@ -140,6 +140,7 @@ create an
 then add it as a
 [deploy secret](https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions#creating-secrets-for-a-repository)
 and add the following step before the ansible-lint step.
+<!-- {% raw %} -->
 ```yaml
 - name: Prepare Git for Github
   shell: bash
@@ -147,6 +148,7 @@ and add the following step before the ansible-lint step.
     git config --global url."https://${{ secrets.ANSIBLE_LINT_TOKEN }}@github.com".insteadOf "https://github.com"
 
 ```
+<!-- {% endraw %} -->
 
 Due to limitations on how GitHub Actions are processing arguments, we do not
 plan to provide extra options. You will have to make use of
