@@ -134,12 +134,10 @@ All the arguments are optional and most users should not need them:
 - `requirements_file`: Path to the requirements.yml file to install role and
   collection dependencies.
 
-In order to install roles and collections from private repositories, you can
-create an
-[access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#about-personal-access-tokens),
-then add it as a
-[deploy secret](https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions#creating-secrets-for-a-repository)
-and add the following step before the ansible-lint step.
+To install roles and collections from private repositories, you can:
+1. Create an [access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#about-personal-access-tokens)
+1. Add the token as an [deploy secret](https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions#creating-secrets-for-a-repository)
+1. Add the following step before the ansible-lint step.
 <!-- {% raw %} -->
 ```yaml
 - name: Prepare Git for Github
