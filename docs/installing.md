@@ -134,6 +134,20 @@ All the arguments are optional and most users should not need them:
 - `requirements_file`: Path to the requirements.yml file to install role and
   collection dependencies.
 
+In order to install roles and collections from private repositories, you can
+create an
+[access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#about-personal-access-tokens),
+then add it as a
+[deploy secret](https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions#creating-secrets-for-a-repository)
+and add the following step before the ansible-lint step.
+```yaml
+- name: Prepare Git for Github
+  shell: bash
+  run: |
+    git config --global url."https://${{ secrets.ANSIBLE_LINT_TOKEN }}@github.com".insteadOf "https://github.com"
+
+```
+
 Due to limitations on how GitHub Actions are processing arguments, we do not
 plan to provide extra options. You will have to make use of
 [ansible-lint own configuration file](https://ansible.readthedocs.io/projects/lint/configuring/)
