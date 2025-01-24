@@ -148,7 +148,9 @@ and add the following step before the ansible-lint step.
     git config --global url."https://${{ secrets.ANSIBLE_LINT_TOKEN }}@github.com".insteadOf "https://github.com"
 
 ```
-<!-- {% endraw %} -->
+<!--
+# spell-checker:ignore endraw
+{% endraw %} -->
 
 Due to limitations on how GitHub Actions are processing arguments, we do not
 plan to provide extra options. You will have to make use of
