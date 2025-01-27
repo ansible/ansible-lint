@@ -16,11 +16,11 @@
     "@types/js-yaml": "^4.0.9",
     "@types/minimatch": "^5.1.2",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^22.10.5",
+    "@types/node": "^22.10.10",
     "chai": "^5.1.2",
     "minimatch": "^10.0.1",
-    "mocha": "^11.0.1",
-    "typescript": "^5.7.2"
+    "mocha": "^11.1.0",
+    "typescript": "^5.7.3"
   },
   "directories": {
     "test": "./src"
