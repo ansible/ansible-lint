@@ -134,7 +134,23 @@ All the arguments are optional and most users should not need them:
 - `requirements_file`: Path to the requirements.yml file to install role and
   collection dependencies.
 
+Due to limitations on how GitHub Actions are processing arguments, we do not
+plan to provide extra options. You will have to make use of
+[ansible-lint own configuration file](https://ansible.readthedocs.io/projects/lint/configuring/)
+to alter its behavior.
+
+To also enable [dependabot][dependabot] automatic updates, the newer versions of
+ansible-lint action you should create a file similar to
+[.github/dependabot.yml][.github/dependabot.yml]
+
+[dependabot]: https://docs.github.com/en/code-security/dependabot
+[.github/dependabot.yml]:
+  https://github.com/ansible/ansible-lint/blob/main/.github/dependabot.yml#L13-L19
+
+### Installing roles and collections from private repositories
+
 To install roles and collections from private repositories, you can:
+
 1. Create an [access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#about-personal-access-tokens)
 1. Add the token as an [deploy secret](https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions#creating-secrets-for-a-repository)
 1. Add the following step before the ansible-lint step.
@@ -149,16 +165,3 @@ To install roles and collections from private repositories, you can:
 <!--
 # spell-checker:ignore endraw
 {% endraw %} -->
-
-Due to limitations on how GitHub Actions are processing arguments, we do not
-plan to provide extra options. You will have to make use of
-[ansible-lint own configuration file](https://ansible.readthedocs.io/projects/lint/configuring/)
-to alter its behavior.
-
-To also enable [dependabot][dependabot] automatic updates, the newer versions of
-ansible-lint action you should create a file similar to
-[.github/dependabot.yml][.github/dependabot.yml]
-
-[dependabot]: https://docs.github.com/en/code-security/dependabot
-[.github/dependabot.yml]:
-  https://github.com/ansible/ansible-lint/blob/main/.github/dependabot.yml#L13-L19
