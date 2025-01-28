@@ -16,7 +16,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/execution-environment.json"
   },
   "galaxy": {
-    "etag": "375cc008961f341f5165fc43977a4f4e7c0aedfa3cb08965fc95b6d5e5dad0bf",
+    "etag": "99546ef979c934ab40d88261957fcce1ee7970d958c4bbe197ad5ca3f67ccc73",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/galaxy.json"
   },
   "inventory": {
