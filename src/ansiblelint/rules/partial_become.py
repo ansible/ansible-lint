@@ -38,10 +38,10 @@ if TYPE_CHECKING:
 
 
 class BecomeUserWithoutBecomeRule(AnsibleLintRule, TransformMixin):
-    """``become_user`` should have a corresponding ``become`` at the play or task level."""
+    """``become_user`` should have a corresponding ``become`` at the same level as itself."""
 
     id = "partial-become"
-    description = "``become_user`` should have a corresponding ``become`` at the play or task level."
+    description = "``become_user`` should have a corresponding ``become`` at the same level as itself."
     severity = "VERY_HIGH"
     tags = ["unpredictability"]
     version_changed = "6.20.0"
