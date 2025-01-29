@@ -101,7 +101,7 @@ repos:
       - id: debug-statements
         language_version: python3
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.0
+    rev: v2.4.1
     hooks:
       - id: codespell
         exclude: >
@@ -144,7 +144,7 @@ repos:
       # - id: ruff-format # must be after ruff
       #   types_or: [python, pyi]
   - repo: https://github.com/psf/black # must be after ruff
-    rev: 24.10.0
+    rev: 25.1.0
     hooks:
       - id: black
   - repo: https://github.com/pre-commit/mirrors-mypy
@@ -179,7 +179,7 @@ repos:
             plugins/.*
           )$
   - repo: https://github.com/RobertCraigie/pyright-python
-    rev: v1.1.392.post0
+    rev: v1.1.393
     hooks:
       - id: pyright
         additional_dependencies:
@@ -203,7 +203,7 @@ repos:
           - wcmatch
           - yamllint
   - repo: https://github.com/pycqa/pylint
-    rev: v3.3.3
+    rev: v3.3.4
     hooks:
       - id: pylint
         args:
