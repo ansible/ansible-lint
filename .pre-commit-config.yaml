@@ -14,8 +14,6 @@ exclude: >
   (?x)^(
     .config/constraints.txt|
     .config/.*requirements.*|
-    .vscode/extensions.json|
-    .vscode/settings.json|
     examples/broken/encoding.yml|
     examples/broken/encoding.j2|
     examples/broken/yaml-with-tabs/invalid-due-tabs.yaml|
@@ -31,9 +29,9 @@ repos:
   - repo: meta
     hooks:
       - id: check-useless-excludes
-  - repo: https://github.com/pre-commit/mirrors-prettier
+  - repo: https://github.com/rbubley/mirrors-prettier
     # keep it before yamllint
-    rev: v4.0.0-alpha.8
+    rev: v3.4.2
     hooks:
       - id: prettier
         # Temporary excludes so we can gradually normalize the formatting
@@ -60,10 +58,9 @@ repos:
         always_run: true
         additional_dependencies:
           - prettier@3.2.4
-          - prettier-plugin-toml@2.0.1
           - prettier-plugin-sort-json@3.1.0
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v8.17.1
+    rev: v8.17.2
     hooks:
       - id: cspell
         # entry: codespell --relative
@@ -76,6 +73,11 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
     rev: v5.0.0
     hooks:
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: debug-statements
+      - id: detect-private-key
       - id: end-of-file-fixer
         # ignore formatting-prettier to have an accurate prettier comparison
         exclude: >
@@ -129,12 +131,20 @@ repos:
         files: \.(yaml|yml)$
         types: [file, yaml]
         entry: yamllint --strict
+
   - repo: https://github.com/pappasam/toml-sort
     rev: v0.24.2
     hooks:
       - id: toml-sort-fix
+        alias: toml
+
+  - repo: https://github.com/tox-dev/tox-ini-fmt
+    rev: 1.5.0
+    hooks:
+      - id: tox-ini-fmt
+
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.3
+    rev: v0.9.4
     hooks:
       - id: ruff
         args:
@@ -143,10 +153,6 @@ repos:
         types_or: [python, pyi]
       # - id: ruff-format # must be after ruff
       #   types_or: [python, pyi]
-  - repo: https://github.com/psf/black # must be after ruff
-    rev: 25.1.0
-    hooks:
-      - id: black
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.14.1
     hooks:
@@ -242,7 +248,8 @@ repos:
         # stages: [manual]
       - id: deps
         name: Upgrade constraints files and requirements
-        files: ^(pyproject\.toml|requirements\.txt)$
+        files: ^(pyproject\.toml|.config/.*)$
+        always_run: true
         language: python
         language_version: "3.10" # minimal we support officially
         entry: python3 -m uv pip compile -q --all-extras --output-file=.config/constraints.txt pyproject.toml --upgrade
@@ -250,25 +257,25 @@ repos:
         stages:
           - manual
         additional_dependencies:
-          - uv>=0.4.3
+          - uv>=0.5.21
       - id: pip-compile
         name: Check constraints files and requirements
-        files: ^(pyproject\.toml|requirements\.txt)$
+        files: ^(pyproject\.toml|\.config/.*)$
         language: python
         language_version: "3.10" # minimal we support officially
         entry: python3 -m uv pip compile -q --all-extras --output-file=.config/constraints.txt pyproject.toml
         pass_filenames: false
         additional_dependencies:
-          - uv>=0.4.3
+          - uv>=0.5.21
       - id: lock
         name: Update requirements-lock.txt
         alias: lock
         always_run: true
         entry: python3 -m uv pip compile -q --upgrade --output-file=.config/requirements-lock.txt pyproject.toml --strip-extras
-        files: ^.config\/.*requirements.*$
+        files: ^(pyproject\.toml|\.config/.*)$
         language: python
         language_version: "3.10" # minimal we support officially
         pass_filenames: false
         stages: [manual]
         additional_dependencies:
-          - uv>=0.4.3
+          - uv>=0.5.21

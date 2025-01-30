@@ -1,22 +1,21 @@
 {
-    "recommendations": [
-        "Tyriar.sort-lines",
-        "charliermarsh.ruff",
-        "esbenp.prettier-vscode",
-        "hbenl.vscode-test-explorer",
-        "ms-python.black-formatter",
-        "ms-python.isort",
-        "ms-python.mypy-type-checker",
-        "ms-python.pylint",
-        "ms-python.python",
-        "ms-python.vscode-pylance",
-        "ms-vscode.live-server",
-        "redhat.ansible",
-        "redhat.vscode-yaml",
-        "ryanluker.vscode-coverage-gutters",
-        "shardulm94.trailing-spaces",
-        "tamasfe.even-better-toml",
-        "timonwong.shellcheck",
-        "znck.grammarly",
-    ]
+  "recommendations": [
+    "Tyriar.sort-lines",
+    "charliermarsh.ruff",
+    "esbenp.prettier-vscode",
+    "hbenl.vscode-test-explorer",
+    "ms-python.isort",
+    "ms-python.mypy-type-checker",
+    "ms-python.pylint",
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-vscode.live-server",
+    "redhat.ansible",
+    "redhat.vscode-yaml",
+    "ryanluker.vscode-coverage-gutters",
+    "shardulm94.trailing-spaces",
+    "tamasfe.even-better-toml",
+    "timonwong.shellcheck",
+    "znck.grammarly"
+  ]
 }

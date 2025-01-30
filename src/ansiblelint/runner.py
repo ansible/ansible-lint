@@ -328,7 +328,6 @@ class Runner:
     - ansible.builtin.import_role:
         name: {lintable.path.expanduser()!s}
 """
-                # pylint: disable=consider-using-with
                 fh = tempfile.NamedTemporaryFile(  # noqa: SIM115
                     mode="w",
                     suffix=".yml",

@@ -1,6 +1,10 @@
 [formatting]
-# compatibility with toml-sort-fix pre-commit hook
+# cspell: disable-next-line
+# compatibility between toml-sort-fix pre-commit hook and panekj.even-betterer-toml extension
+align_comments = false
 array_trailing_comma = false
 compact_arrays = true
+compact_entries = false
 compact_inline_tables = true
 inline_table_expand = false
+reorder_keys = true
