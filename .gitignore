@@ -80,3 +80,4 @@ test/schemas/node_modules
 node_modules
 .direnv
 uv.lock
+.ansible

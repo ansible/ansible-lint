@@ -273,6 +273,7 @@ def fix(runtime_options: Options, result: LintResult, rules: RulesCollection) ->
 # pylint: disable=too-many-locals,too-many-statements
 def main(argv: list[str] | None = None) -> int:
     """Linter CLI entry point."""
+    must_exit = False
     # alter PATH if needed (venv support)
     path_inject(argv[0] if argv and argv[0] else "")
 
@@ -280,7 +281,8 @@ def main(argv: list[str] | None = None) -> int:
         argv = sys.argv
 
     with warnings.catch_warnings(record=True) as warns:
-        warnings.simplefilter(action="ignore")
+        # no not use "ignore" as we will miss to collect them
+        warnings.simplefilter(action="default")
 
         cache_dir_lock = initialize_options(argv[1:])
 
@@ -297,7 +299,7 @@ def main(argv: list[str] | None = None) -> int:
             if msg:
                 console.print(msg)
             support_banner()
-            sys.exit(0)
+            must_exit = True
         else:
             support_banner()
 
@@ -310,6 +312,9 @@ def main(argv: list[str] | None = None) -> int:
     for warn in warns:
         _logger.warning(str(warn.message))
     warnings.resetwarnings()
+
+    if must_exit:
+        sys.exit(0)
     # checks if we have `ANSIBLE_LINT_SKIP_SCHEMA_UPDATE` set to bypass schema
     # update. Also skip if in offline mode.
     # env var set to skip schema refresh
