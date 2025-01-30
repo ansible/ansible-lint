@@ -21,3 +21,4 @@ ignorePaths:
   - src/ansiblelint/schemas/*.json
   # Other
   - "*.svg"
+  - ".vscode/**"
