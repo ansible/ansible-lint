@@ -241,8 +241,8 @@ class AnsibleLintRule(BaseRule):
             yaml = [yaml]
 
         for play in yaml:
-            # Bug #849
-            if play is None:
+            # Bug #849 and #4492
+            if play is None or not hasattr(play, "get"):
                 continue
 
             if self.id in play.get(SKIPPED_RULES_KEY, ()):
