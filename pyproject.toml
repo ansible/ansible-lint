@@ -347,7 +347,7 @@ environments = ["platform_system != 'Windows'"]
 [tool.uv.pip]
 annotation-style = "line"
 custom-compile-command = "tox run deps"
-no-emit-package = ["ansible-core", "pip", "resolvelib", "typing_extensions", "uv"]
+no-emit-package = ["ansible-core", "pip", "resolvelib", "uv"]
 
 [tool.vulture]
 exclude = [

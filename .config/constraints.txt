@@ -30,7 +30,7 @@ exceptiongroup==1.2.2     # via pytest
 execnet==2.1.1            # via pytest-xdist
 filelock==3.17.0          # via tox, virtualenv, ansible-lint (pyproject.toml)
 ghp-import==2.1.0         # via mkdocs
-griffe==1.5.5             # via mkdocstrings-python
+griffe==1.5.6             # via mkdocstrings-python
 hjson==3.1.0              # via mkdocs-macros-plugin, super-collections
 htmlmin2==0.1.13          # via mkdocs-minify-plugin
 idna==3.10                # via requests
@@ -87,7 +87,7 @@ python-dateutil==2.9.0.post0  # via ghp-import, mkdocs-macros-plugin
 python-slugify==8.0.4     # via mkdocs-monorepo-plugin
 pyyaml==6.0.2             # via ansible-compat, ansible-core, mkdocs, mkdocs-get-deps, mkdocs-macros-plugin, pymdown-extensions, pyyaml-env-tag, yamllint, ansible-lint (pyproject.toml)
 pyyaml-env-tag==0.1       # via mkdocs
-referencing==0.36.2       # via jsonschema, jsonschema-specifications, types-jsonschema
+referencing==0.36.2       # via jsonschema, jsonschema-specifications, types-jsonschema, ansible-lint (pyproject.toml)
 regex==2024.11.6          # via mkdocs-material
 requests==2.32.3          # via linkchecker, mkdocs-htmlproofer-plugin, mkdocs-material
 rpds-py==0.22.3           # via jsonschema, referencing
@@ -106,6 +106,7 @@ tomlkit==0.13.2           # via pylint
 tox==4.24.1               # via ansible-lint (pyproject.toml)
 types-jsonschema==4.23.0.20241208  # via ansible-lint (pyproject.toml)
 types-pyyaml==6.0.12.20241230  # via ansible-lint (pyproject.toml)
+typing-extensions==4.12.2  # via astroid, black, mypy, referencing, tox
 urllib3==2.3.0            # via requests
 virtualenv==20.29.1       # via tox
 watchdog==6.0.0           # via mkdocs
@@ -118,5 +119,4 @@ zipp==3.21.0              # via importlib-metadata
 # ansible-core
 # pip
 # resolvelib
-# typing-extensions
 # uv
