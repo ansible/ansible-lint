@@ -281,7 +281,7 @@ def main(argv: list[str] | None = None) -> int:
         argv = sys.argv
 
     with warnings.catch_warnings(record=True) as warns:
-        # no not use "ignore" as we will miss to collect them
+        # do not use "ignore" as we will miss to collect them
         warnings.simplefilter(action="default")
 
         cache_dir_lock = initialize_options(argv[1:])
