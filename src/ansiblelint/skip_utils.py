@@ -316,5 +316,8 @@ def is_nested_task(task: dict[str, Any]) -> bool:
     # Cannot really trust the input
     if isinstance(task, str):
         return False
+    # https://github.com/ansible/ansible-lint/issues/4492
+    if not hasattr(task, "get"):
+        return False
 
     return any(task.get(key) for key in NESTED_TASK_KEYS)
