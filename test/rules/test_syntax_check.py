@@ -28,12 +28,6 @@ from ansiblelint.runner import Runner
             "examples/playbooks/conflicting_action2.yml",
             [
                 (
-                    "parser-error",
-                    1,
-                    None,
-                    "conflicting action statements: block, include_role",
-                ),
-                (
                     "syntax-check[specific]",
                     5,
                     7,

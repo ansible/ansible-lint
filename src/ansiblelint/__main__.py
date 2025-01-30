@@ -280,6 +280,9 @@ def main(argv: list[str] | None = None) -> int:
     if argv is None:  # pragma: no cover
         argv = sys.argv
 
+    warnings.simplefilter(
+        "ignore", ResourceWarning
+    )  # suppress "enable tracemalloc to get the object allocation traceback"
     with warnings.catch_warnings(record=True) as warns:
         # do not use "ignore" as we will miss to collect them
         warnings.simplefilter(action="default")
