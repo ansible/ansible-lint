@@ -134,7 +134,7 @@ jobs:
       - name: Install tox
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install --upgrade "tox>=4.0.0" "tox-uv>=1.16.0" uv
+          python3 -m pip install --upgrade "tox>=4.0.0" "tox-uv>=1.20.2" uv
 
       - name: Log installed dists
         run: python3 -m pip freeze --all
