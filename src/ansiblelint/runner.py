@@ -270,10 +270,12 @@ class Runner:
         # do our processing only when ansible syntax check passed in order
         # to avoid causing runtime exceptions. Our processing is not as
         # resilient to be able process garbage.
-        matches.extend(self._emit_matches(files))
+        matches.extend(
+            self._emit_matches([file for file in files if not file.failed()])
+        )
 
         # remove duplicates from files list
-        files = [value for n, value in enumerate(files) if value not in files[:n]]
+        files = list(dict.fromkeys(files))
 
         for file in self.lintables:
             if file in self.checked_files or not file.kind or file.failed():
@@ -296,7 +298,7 @@ class Runner:
 
         return sorted(set(matches))
 
-    # pylint: disable=too-many-locals
+    # pylint: disable=too-many-locals,too-many-statements
     def _get_ansible_syntax_check_matches(
         self,
         lintable: Lintable,
@@ -432,6 +434,7 @@ class Runner:
                     f"Unexpected error code {run.returncode} from "
                     f"execution of: {' '.join(cmd)}"
                 )
+                filename.failed()
                 results.append(
                     MatchError(
                         message=message,
@@ -461,6 +464,8 @@ class Runner:
         while visited != self.lintables:
             for lintable in self.lintables - visited:
                 visited.add(lintable)
+                if lintable.failed():
+                    continue
                 if not lintable.path.exists():
                     continue
                 try:
@@ -498,9 +503,9 @@ class Runner:
             try:
                 playbook_ds = ansiblelint.utils.parse_yaml_from_file(str(lintable.path))
             except AnsibleError as exc:
-                msg = f"Loading {lintable.filename} caused an {type(exc).__name__} exception: {exc}, file was ignored."
-                _logger.exception(msg)
-                return []
+                raise MatchError(
+                    lintable=lintable, rule=self.rules["load-failure"]
+                ) from exc
         results = []
         # playbook_ds can be an AnsibleUnicode string, which we consider invalid
         if isinstance(playbook_ds, str):

@@ -407,7 +407,8 @@ class Lintable:
     def failed(self) -> bool:
         """Return true if we already found syntax-check errors on this file."""
         return any(
-            match.rule.id in ("syntax-check", "load-failure") for match in self.matches
+            match.rule.id in ("syntax-check", "load-failure", "internal-error")
+            for match in self.matches
         )
 
     @property
