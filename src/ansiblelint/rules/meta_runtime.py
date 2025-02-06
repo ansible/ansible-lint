@@ -46,7 +46,9 @@ class CheckRequiresAnsibleVersion(AnsibleLintRule):
         if file.kind != "meta-runtime":
             return []
 
-        requires_ansible = file.data.get("requires_ansible", None)
+        requires_ansible = None
+        if file.data and isinstance(file.data, dict):
+            requires_ansible = file.data.get("requires_ansible", None)
 
         if requires_ansible:
             if self.options and not any(
