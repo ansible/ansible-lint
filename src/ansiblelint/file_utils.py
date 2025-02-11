@@ -585,6 +585,7 @@ def get_all_files(
         pathspecs = [
             pathspec.GitIgnoreSpec.from_lines(
                 [
+                    ".ansible",
                     ".git",
                     ".tox",
                     ".mypy_cache",
@@ -611,7 +612,7 @@ def get_all_files(
         else:
             for item in sorted(path.iterdir()):
                 if is_excluded(item):
-                    _logger.info("Excluded: %s", item)
+                    _logger.debug("Excluded: %s", item)
                     continue
                 if item.is_file():
                     all_files.append(item)
