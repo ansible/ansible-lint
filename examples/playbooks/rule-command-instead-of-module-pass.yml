@@ -14,6 +14,10 @@
       ansible.builtin.command: git lfs install
       changed_when: false
 
+    - name: Clean git repo (dry run)
+      ansible.builtin.command: git clean -n -d
+      changed_when: false
+
     - name: Show systemctl service status
       ansible.builtin.command: systemctl status systemd-timesyncd
       changed_when: false
