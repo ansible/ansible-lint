@@ -19,7 +19,7 @@ click==8.1.8              # via black, mkdocs
 colorama==0.4.6           # via griffe, mkdocs-material, tox
 coverage==7.6.11          # via coverage-enable-subprocess, ansible-lint (pyproject.toml)
 coverage-enable-subprocess==1.0  # via ansible-lint (pyproject.toml)
-cryptography==44.0.0      # via ansible-core
+cryptography==44.0.1      # via ansible-core
 csscompressor==0.9.5      # via mkdocs-minify-plugin
 cssselect2==0.7.0         # via cairosvg
 defusedxml==0.7.1         # via cairosvg
