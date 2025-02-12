@@ -5,7 +5,7 @@ actions:
   create-archive:
     # packit.dev service does have these module pre-installed:
     - python3 -m build --sdist --outdir dist
-    - sh -c "ls dist/ansible-lint-*.tar.gz"
+    - sh -c "ls dist/ansible_lint-*.tar.gz"
   get-current-version:
     - ./tools/get-version.sh
   post-upstream-clone:
