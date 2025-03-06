@@ -9,7 +9,7 @@ click==8.1.8              # via black
 cryptography==44.0.1      # via ansible-core
 filelock==3.17.0          # via ansible-lint (pyproject.toml)
 importlib-metadata==8.6.1  # via ansible-lint (pyproject.toml)
-jinja2==3.1.5             # via ansible-core
+jinja2==3.1.6             # via ansible-core
 jsonschema==4.23.0        # via ansible-compat, ansible-lint (pyproject.toml)
 jsonschema-specifications==2024.10.1  # via jsonschema
 markupsafe==3.0.2         # via jinja2
