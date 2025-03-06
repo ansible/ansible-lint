@@ -37,7 +37,7 @@ idna==3.10                # via requests
 importlib-metadata==8.6.1  # via ansible-lint (pyproject.toml)
 iniconfig==2.0.0          # via pytest
 isort==6.0.0              # via pylint
-jinja2==3.1.5             # via ansible-core, mkdocs, mkdocs-macros-plugin, mkdocs-material, mkdocstrings
+jinja2==3.1.6             # via ansible-core, mkdocs, mkdocs-macros-plugin, mkdocs-material, mkdocstrings
 jmespath==1.0.1           # via ansible-lint (pyproject.toml)
 jsmin==3.0.1              # via mkdocs-minify-plugin
 jsonschema==4.23.0        # via ansible-compat, ansible-lint (pyproject.toml)
