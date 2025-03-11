@@ -46,7 +46,16 @@ from ansible.parsing.mod_args import ModuleArgsParser
 from ansible.parsing.plugin_docs import read_docstring
 from ansible.parsing.splitter import split_args
 from ansible.parsing.vault import PromptVaultSecret
-from ansible.parsing.yaml.constructor import AnsibleConstructor, AnsibleMapping
+
+try:
+    from ansible.parsing.yaml.constructor import AnsibleMapping
+except ImportError:  # core 2.19+
+    from ansible.parsing.yaml.objects import AnsibleMapping
+try:
+    from ansible.parsing.yaml.constructor import AnsibleConstructor
+except ImportError:  # core 2.19+
+    from ansible._internal._yaml import AnsibleConstructor
+
 from ansible.parsing.yaml.loader import AnsibleLoader
 from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject, AnsibleSequence
 from ansible.plugins.loader import (
@@ -100,9 +109,9 @@ def parse_yaml_from_file(filepath: str) -> AnsibleBaseYAMLObject:  # type: ignor
     """Extract a decrypted YAML object from file."""
     dataloader = DataLoader()
     if hasattr(dataloader, "set_vault_secrets"):
-        dataloader.set_vault_secrets(
-            [("default", PromptVaultSecret(_bytes=to_bytes(DEFAULT_VAULT_PASSWORD)))]
-        )
+        dataloader.set_vault_secrets([
+            ("default", PromptVaultSecret(_bytes=to_bytes(DEFAULT_VAULT_PASSWORD)))
+        ])
 
     return dataloader.load_from_file(filepath)
 
@@ -618,7 +627,7 @@ def _get_task_handler_children_for_tasks_or_playbooks(
                 basedir = os.path.dirname(basedir)
                 f = path_dwim(basedir, file_name)
             return Lintable(f, kind=child_type)
-    msg = f'The node contains none of: {", ".join(sorted(INCLUSION_ACTION_NAMES))}'
+    msg = f"The node contains none of: {', '.join(sorted(INCLUSION_ACTION_NAMES))}"
     raise LookupError(msg)
 
 
@@ -926,7 +935,6 @@ def task_in_list(  # type: ignore[no-any-unimported]
     """Get action tasks from block structures."""
 
     def each_entry(data: AnsibleBaseYAMLObject, position: str) -> Iterator[Task]:  # type: ignore[no-any-unimported]
-
         if not data or not isinstance(data, Iterable):
             return
         for entry_index, entry in enumerate(data):
@@ -958,7 +966,7 @@ def task_in_list(  # type: ignore[no-any-unimported]
                     if isinstance(item[attribute], list):
                         yield from each_entry(
                             item[attribute],
-                            f"{position }[{item_index}].{attribute}",
+                            f"{position}[{item_index}].{attribute}",
                         )
                     elif item[attribute] is not None:
                         msg = f"Key '{attribute}' defined, but bad value: '{item[attribute]!s}'"

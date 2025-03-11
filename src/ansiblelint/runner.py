@@ -21,7 +21,11 @@ from typing import TYPE_CHECKING, Any
 
 from ansible.errors import AnsibleError
 from ansible.parsing.splitter import split_args
-from ansible.parsing.yaml.constructor import AnsibleMapping
+
+try:
+    from ansible.parsing.yaml.constructor import AnsibleMapping
+except ImportError:  # core 2.19+
+    from ansible.parsing.yaml.objects import AnsibleMapping
 from ansible.plugins.loader import add_all_plugin_dirs
 from ansible_compat.runtime import AnsibleWarning
 
