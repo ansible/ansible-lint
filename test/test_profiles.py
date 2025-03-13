@@ -21,9 +21,9 @@ def test_profile_min() -> None:
     assert len(collection.rules) == 5, "Failed to register new rule."
 
     filter_rules_with_profile(collection.rules, "min")
-    assert (
-        len(collection.rules) == 4
-    ), "Failed to unload rule that is not part of 'min' profile."
+    assert len(collection.rules) == 4, (
+        "Failed to unload rule that is not part of 'min' profile."
+    )
 
 
 def test_profile_listing(capfd: CaptureFixture[str]) -> None:
@@ -58,6 +58,6 @@ def test_profile_listing(capfd: CaptureFixture[str]) -> None:
             continue
         err_lines.append(line)
     if all(word not in platform_name for word in ["wsl", "microsoft"]) and err_lines:
-        assert (
-            not err_lines
-        ), f"Unexpected stderr output found while running on {platform_name} platform:\n{err_lines}"
+        assert not err_lines, (
+            f"Unexpected stderr output found while running on {platform_name} platform:\n{err_lines}"
+        )

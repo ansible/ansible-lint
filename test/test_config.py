@@ -12,6 +12,6 @@ def test_profiles(default_rules_collection: RulesCollection) -> None:
             for rule in default_rules_collection.rules:
                 if profile_rule_id == rule.id:
                     forbidden_tags = profile_banned_tags & set(rule.tags)
-                    assert (
-                        not forbidden_tags
-                    ), f"Rule {profile_rule_id} from {name} profile cannot use {profile_banned_tags & set(rule.tags)} tag."
+                    assert not forbidden_tags, (
+                        f"Rule {profile_rule_id} from {name} profile cannot use {profile_banned_tags & set(rule.tags)} tag."
+                    )

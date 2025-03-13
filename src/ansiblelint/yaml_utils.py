@@ -34,7 +34,7 @@ from ansiblelint.utils import Task
 
 if TYPE_CHECKING:
     # noinspection PyProtectedMember
-    from collections.abc import Callable, Iterator, Sequence
+    from collections.abc import Callable, Iterator, MutableMapping, Sequence
 
     from ruamel.yaml.comments import LineCol
     from ruamel.yaml.nodes import ScalarNode
@@ -158,7 +158,7 @@ def load_yamllint_config() -> CustomYamlLintConfig:
 
 
 def nested_items_path(
-    data_collection: dict[Any, Any] | list[Any],
+    data_collection: MutableMapping[Any, Any] | list[Any],
     ignored_keys: Sequence[str] = (),
 ) -> Iterator[tuple[Any, Any, list[str | int]]]:
     """Iterate a nested data structure, yielding key/index, value, and parent_path.
@@ -220,7 +220,7 @@ def nested_items_path(
     # valid data, we better ignore NoneType
     if data_collection is None:
         return
-    data: dict[Any, Any] | list[Any]
+    data: MutableMapping[Any, Any] | list[Any]
     if isinstance(data_collection, Task):
         data = data_collection.normalized_task
     else:
@@ -233,7 +233,7 @@ def nested_items_path(
 
 
 def _nested_items_path(
-    data_collection: dict[Any, Any] | list[Any],
+    data_collection: MutableMapping[Any, Any] | list[Any],
     parent_path: list[str | int],
     ignored_keys: Sequence[str] = (),
 ) -> Iterator[tuple[Any, Any, list[str | int]]]:
@@ -519,7 +519,7 @@ class OctalIntYAML11(ScalarInt):
         return representer.insert_underscore(
             "0",
             v,
-            data._underscore,  # noqa: SLF001
+            data._underscore,
             anchor=anchor,
         )
 

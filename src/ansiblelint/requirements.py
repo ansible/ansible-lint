@@ -1,18 +1,21 @@
 """Utilities for checking python packages requirements."""
 
+from collections import UserDict
+
 import importlib_metadata
 from packaging.requirements import Requirement
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
 
 
-class Reqs(dict[str, SpecifierSet]):
+class Reqs(UserDict[str, SpecifierSet]):
     """Utility class for working with package dependencies."""
 
     reqs: dict[str, SpecifierSet]
 
     def __init__(self, name: str = "ansible-lint") -> None:
         """Load linter metadata requirements."""
+        super().__init__()
         for req_str in importlib_metadata.metadata(name).json["requires_dist"]:
             req = Requirement(req_str)
             if req.name:
