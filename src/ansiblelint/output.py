@@ -132,23 +132,23 @@ def should_do_markup(stream: TextIO = sys.stdout) -> bool:  # pragma: no cover
 class PlainStyle:
     """Theme."""
 
-    failed = ""
-    success = ""
-    normal = ""
-    dim = ""
-    bold = ""
+    failed: str = ""
+    success: str = ""
+    normal: str = ""
+    dim: str = ""
+    bold: str = ""
     # logging
-    notset = ""
-    debug = ""
-    info = ""
-    warning = ""
-    error = ""
-    critical = ""
+    notset: str = ""
+    debug: str = ""
+    info: str = ""
+    warning: str = ""
+    error: str = ""
+    critical: str = ""
 
     # data types
-    number = ""
-    path = ""
-    link = ""
+    number: str = ""
+    path: str = ""
+    link: str = ""
 
     @classmethod
     def render_link(cls, uri: str, label: str | None = None) -> str:
@@ -164,44 +164,44 @@ class AnsiStyle(PlainStyle):
     class ANSI:
         """Color constants."""
 
-        BLACK = "\033[30m"
-        RED = "\033[31m"
-        GREEN = "\033[32m"
-        YELLOW = "\033[33m"
-        BLUE = "\033[34m"
-        MAGENTA = "\033[35m"
-        CYAN = "\033[36m"
-        WHITE = "\033[37m"
-        GREY = "\033[90m"  # Bright black?
-        BRIGHT_RED = "\033[91m"
-        BRIGHT_GREEN = "\033[92m"
-        BRIGHT_YELLOW = "\033[93m"
-        BRIGHT_BLUE = "\033[94m"
-        BRIGHT_MAGENTA = "\033[95m"
-        BRIGHT_CYAN = "\033[96m"
-        BRIGHT_WHITE = "\033[97m"
-        END = "\033[0m"
+        BLACK: str = "\033[30m"
+        RED: str = "\033[31m"
+        GREEN: str = "\033[32m"
+        YELLOW: str = "\033[33m"
+        BLUE: str = "\033[34m"
+        MAGENTA: str = "\033[35m"
+        CYAN: str = "\033[36m"
+        WHITE: str = "\033[37m"
+        GREY: str = "\033[90m"  # Bright black?
+        BRIGHT_RED: str = "\033[91m"
+        BRIGHT_GREEN: str = "\033[92m"
+        BRIGHT_YELLOW: str = "\033[93m"
+        BRIGHT_BLUE: str = "\033[94m"
+        BRIGHT_MAGENTA: str = "\033[95m"
+        BRIGHT_CYAN: str = "\033[96m"
+        BRIGHT_WHITE: str = "\033[97m"
+        END: str = "\033[0m"
         # more complex
-        BOLD = "\033[1m"
-        DIM = "\033[2m"
-        BOLD_CYAN = "\033[1;36m"
+        BOLD: str = "\033[1m"
+        DIM: str = "\033[2m"
+        BOLD_CYAN: str = "\033[1;36m"
 
-    warning = "\033[33m"  # yellow
-    error = ANSI.RED  # "\033[31m"  # red
-    info = ANSI.BLUE
-    debug = ANSI.BLUE
-    notset = ANSI.BLUE
+    warning: str = "\033[33m"  # yellow
+    error: str = ANSI.RED  # "\033[31m"  # red
+    info: str = ANSI.BLUE
+    debug: str = ANSI.BLUE
+    notset: str = ANSI.BLUE
 
-    failed = ANSI.RED
-    success = ANSI.GREEN
+    failed: str = ANSI.RED
+    success: str = ANSI.GREEN
 
-    normal = ANSI.END
-    dim = ANSI.DIM
-    bold = ANSI.BOLD
+    normal: str = ANSI.END
+    dim: str = ANSI.DIM
+    bold: str = ANSI.BOLD
     # data types
-    number = ANSI.BOLD_CYAN
-    path = ANSI.MAGENTA  # do not use same color as link
-    link = ANSI.BLUE
+    number: str = ANSI.BOLD_CYAN
+    path: str = ANSI.MAGENTA  # do not use same color as link
+    link: str = ANSI.BLUE
 
     @classmethod
     def render_link(cls, uri: str, label: str | None = None) -> str:

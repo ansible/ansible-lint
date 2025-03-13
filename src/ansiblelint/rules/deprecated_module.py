@@ -9,6 +9,8 @@ from typing import TYPE_CHECKING, Any
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from ansiblelint.file_utils import Lintable
 
 
@@ -69,7 +71,7 @@ class DeprecatedModuleRule(AnsibleLintRule):
 
     def matchtask(
         self,
-        task: dict[str, Any],
+        task: Mapping[str, Any],
         file: Lintable | None = None,
     ) -> bool | str:
         module = task["action"]["__ansible_module__"]

@@ -26,6 +26,8 @@ from ansiblelint.utils import load_plugin
 from ansiblelint.yaml_utils import clean_json
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from ansible.plugins.loader import PluginLoadContext
 
     from ansiblelint.errors import MatchError
@@ -221,7 +223,7 @@ class ArgsRule(AnsibleLintRule):
     def _parse_failed_msg(
         self,
         failed_msg: str,
-        task: dict[str, Any],
+        task: Mapping[str, Any],
         module_name: str,
         file: Lintable | None = None,
     ) -> list[MatchError]:

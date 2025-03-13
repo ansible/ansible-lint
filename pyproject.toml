@@ -451,6 +451,7 @@ fix = true
 line-length = 88
 preview = true
 target-version = "py310"
+unsafe-fixes = true
 
 [tool.ruff.lint]
 ignore = [

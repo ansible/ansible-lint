@@ -26,7 +26,6 @@ defusedxml==0.7.1         # via cairosvg
 dill==0.3.9               # via pylint
 distlib==0.3.9            # via virtualenv
 dnspython==2.7.0          # via linkchecker
-exceptiongroup==1.2.2     # via pytest
 execnet==2.1.1            # via pytest-xdist
 filelock==3.17.0          # via tox, virtualenv, ansible-lint (pyproject.toml)
 ghp-import==2.1.0         # via mkdocs
@@ -100,12 +99,11 @@ super-collections==0.5.3  # via mkdocs-macros-plugin
 termcolor==2.5.0          # via mkdocs-macros-plugin
 text-unidecode==1.3       # via python-slugify
 tinycss2==1.4.0           # via cairosvg, cssselect2
-tomli==2.2.1              # via black, coverage, mypy, pylint, pyproject-api, pytest, tox
 tomlkit==0.13.2           # via pylint
 tox==4.24.1               # via ansible-lint (pyproject.toml)
 types-jsonschema==4.23.0.20241208  # via ansible-lint (pyproject.toml)
 types-pyyaml==6.0.12.20241230  # via ansible-lint (pyproject.toml)
-typing-extensions==4.12.2  # via astroid, beautifulsoup4, black, mkdocstrings-python, mypy, referencing, tox
+typing-extensions==4.12.2  # via beautifulsoup4, mypy
 urllib3==2.3.0            # via requests
 virtualenv==20.29.2       # via tox
 watchdog==6.0.0           # via mkdocs

@@ -26,7 +26,7 @@ import collections.abc
 import logging
 import re
 import warnings
-from collections.abc import MutableMapping, Sequence
+from collections.abc import Mapping, MutableMapping, Sequence
 from functools import cache
 from itertools import product
 from typing import TYPE_CHECKING, Any
@@ -311,7 +311,7 @@ def normalize_tag(tag: str) -> str:
     return tag
 
 
-def is_nested_task(task: dict[str, Any]) -> bool:
+def is_nested_task(task: Mapping[str, Any]) -> bool:
     """Check if task includes block/always/rescue."""
     # Cannot really trust the input
     if isinstance(task, str):
