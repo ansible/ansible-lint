@@ -21,7 +21,6 @@ from typing import TYPE_CHECKING, Any
 
 from ansible.errors import AnsibleError
 from ansible.parsing.splitter import split_args
-from ansible.parsing.yaml.constructor import AnsibleMapping
 from ansible.plugins.loader import add_all_plugin_dirs
 from ansible_compat.runtime import AnsibleWarning
 
@@ -38,6 +37,7 @@ from ansiblelint.file_utils import (
 from ansiblelint.logger import timed_info
 from ansiblelint.rules.syntax_check import OUTPUT_PATTERNS
 from ansiblelint.text import strip_ansi_escape
+from ansiblelint.types import AnsibleMapping
 from ansiblelint.utils import (
     PLAYBOOK_DIR,
     HandleChildren,

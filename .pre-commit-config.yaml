@@ -185,7 +185,7 @@ repos:
             plugins/.*
           )$
   - repo: https://github.com/RobertCraigie/pyright-python
-    rev: v1.1.394
+    rev: v1.1.396
     hooks:
       - id: pyright
         additional_dependencies:
