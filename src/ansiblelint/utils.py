@@ -30,7 +30,14 @@ import inspect
 import logging
 import os
 import re
-from collections.abc import ItemsView, Iterable, Iterator, Mapping, Sequence
+from collections.abc import (
+    ItemsView,
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    Sequence,
+)
 from dataclasses import _MISSING_TYPE, dataclass, field
 from functools import cache, lru_cache
 from pathlib import Path
@@ -46,9 +53,7 @@ from ansible.parsing.mod_args import ModuleArgsParser
 from ansible.parsing.plugin_docs import read_docstring
 from ansible.parsing.splitter import split_args
 from ansible.parsing.vault import PromptVaultSecret
-from ansible.parsing.yaml.constructor import AnsibleConstructor, AnsibleMapping
 from ansible.parsing.yaml.loader import AnsibleLoader
-from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject, AnsibleSequence
 from ansible.plugins.loader import (
     PluginLoadContext,
     action_loader,
@@ -82,6 +87,12 @@ from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, discover_lintables
 from ansiblelint.skip_utils import is_nested_task
 from ansiblelint.text import has_jinja, is_fqcn, removeprefix
+from ansiblelint.types import (
+    AnsibleBaseYAMLObject,
+    AnsibleConstructor,
+    AnsibleMapping,
+    AnsibleSequence,
+)
 
 if TYPE_CHECKING:
     from ansiblelint.rules import RulesCollection
@@ -930,21 +941,22 @@ def task_in_list(  # type: ignore[no-any-unimported]
         if not data or not isinstance(data, Iterable):
             return
         for entry_index, entry in enumerate(data):
-            if not entry:
+            if not entry or isinstance(entry, str):
                 continue
             pos_ = f"{position}[{entry_index}]"
-            if isinstance(entry, dict):
+            if isinstance(entry, Mapping):
                 yield Task(
                     entry,
                     position=pos_,
                 )
-            for block in [k for k in entry if k in NESTED_TASK_KEYS]:
-                yield from task_in_list(
-                    data=entry[block],
-                    file=file,
-                    kind="tasks",
-                    position=f"{pos_}.{block}",
-                )
+                for key in entry.keys():
+                    if key in NESTED_TASK_KEYS:
+                        yield from task_in_list(
+                                data=entry[key],
+                                file=file,
+                                kind="tasks",
+                                position=f"{pos_}.{key}",
+                            )
 
     if not isinstance(data, list):
         return
@@ -975,7 +987,7 @@ def add_action_type(  # type: ignore[no-any-unimported]
     if isinstance(actions, Iterable):
         for action in actions:
             # ignore empty task
-            if not action:
+            if not action or not isinstance(action, MutableMapping):
                 continue
             action["__ansible_action_type__"] = BLOCK_NAME_TO_ACTION_TYPE_MAP[
                 action_type

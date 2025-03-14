@@ -49,9 +49,8 @@ from ansiblelint.errors import LintWarning, WarnSource
 if TYPE_CHECKING:
     from collections.abc import Generator
 
-    from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject
-
     from ansiblelint.file_utils import Lintable
+    from ansiblelint.types import AnsibleBaseYAMLObject
 
 
 _logger = logging.getLogger(__name__)
@@ -95,7 +94,7 @@ def get_rule_skips_from_line(
     return result
 
 
-def append_skipped_rules(  # type: ignore[no-any-unimported]
+def append_skipped_rules(
     pyyaml_data: AnsibleBaseYAMLObject,
     lintable: Lintable,
 ) -> AnsibleBaseYAMLObject:
@@ -143,7 +142,7 @@ def load_data(file_text: str) -> Any:
         return yaml.load_all(file_text)
 
 
-def _append_skipped_rules(  # type: ignore[no-any-unimported]
+def _append_skipped_rules(
     pyyaml_data: AnsibleBaseYAMLObject,
     lintable: Lintable,
 ) -> AnsibleBaseYAMLObject | None:
