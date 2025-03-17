@@ -122,7 +122,7 @@ bad-names = [
 # pylint defaults + f,fh,v,id
 good-names = ["i", "j", "k", "Run", "_", "f", "fh", "v", "id", "T"]
 # Ignore as being generated:
-ignore-paths = "^(src/ansiblelint/_version|.config/).*$"
+ignore-paths = "^(examples|build|test/schemas/node_modules|.eggs|.cache|.direnv|.tox|src/ansiblelint/_version|.config/).*$"
 
 [tool.pylint.REPORTING]
 output-format = "colorized"
@@ -360,6 +360,7 @@ max-statements = 60
 
 [tool.pyright]
 exclude = [
+  ".ansible",
   ".cache",
   ".config",
   ".tox",
@@ -367,7 +368,8 @@ exclude = [
   "build",
   "dist",
   "site",
-  "venv"
+  "venv",
+  "examples/playbooks/collections"
 ]
 include = ["src"]
 mode = "standard"
@@ -470,11 +472,13 @@ ignore = [
   "D102", # Missing docstring in public method (currently in too many places)
   "FBT001",
   "FBT003",
-  "PLR",
-  "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
-  "PERF203",
+  "FURB189", # Subclassing `dict` can be error prone, use `collections.UserDict` instead
   "PD011", # We are not using pandas, any .values attributes are unrelated
+  "PERF203",
+  "PLR",
   "PLW0603", # global lock file in cache dir
+  "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
+  "RUF045", # Assignment without annotation found in dataclass body
   # part of preview rules:
   "B909", # raise-missing-from
   "DOC201", # docstring-missing-returns
@@ -545,7 +549,16 @@ sort_table_keys = true
 [tool.uv.pip]
 annotation-style = "line"
 custom-compile-command = "tox run -e deps"
-no-emit-package = ["ansible-core", "pip", "resolvelib", "ruamel-yaml-clib", "uv"]
+no-emit-package = [
+  "ansible-core",
+  "exceptiongroup", # <py311
+  "pip",
+  "resolvelib",
+  "ruamel-yaml-clib",
+  "tomli", # <py311
+  "typing-extensions",
+  "uv"
+]
 
 [tool.vulture]
 exclude = [

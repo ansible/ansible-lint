@@ -9,6 +9,7 @@ dictionaries:
   - bash
   - words
   - python
+  - python-common
 enabled: true
 ignorePaths:
   - cspell.config.yaml
