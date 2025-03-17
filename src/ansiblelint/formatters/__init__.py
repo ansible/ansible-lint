@@ -96,7 +96,7 @@ class ParseableFormatter(BaseFormatter[Any]):
         result = (
             f"[repr.path]{self._format_path(match.filename or '')}[/][dim]:{match.position}:[/] "
             f"[{match.level}][bold]{self.escape(match.tag)}[/]"
-            f"{ f': {match.message}' if not options.quiet else '' }[/]"
+            f"{f': {match.message}' if not options.quiet else ''}[/]"
         )
         if match.level != "error":
             result += f" [dim][{match.level}]({match.level})[/][/]"
@@ -307,9 +307,9 @@ class SarifFormatter(BaseFormatter[Any]):
             ],
         }
         if match.column:
-            result["locations"][0]["physicalLocation"]["region"][
-                "startColumn"
-            ] = match.column
+            result["locations"][0]["physicalLocation"]["region"]["startColumn"] = (
+                match.column
+            )
         return result
 
     @staticmethod

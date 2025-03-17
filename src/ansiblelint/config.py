@@ -34,7 +34,7 @@ DEFAULT_WARN_LIST = [
     "fqcn[deep]",  # 2023-05-31 added
 ]
 
-DEFAULT_KINDS = [
+DEFAULT_KINDS: list[dict[str, str]] = [
     # Do not sort this list, order matters.
     {"jinja2": "**/*.j2"},  # jinja2 templates are not always parsable as something else
     {"jinja2": "**/*.j2.*"},
@@ -147,7 +147,7 @@ class Options:  # pylint: disable=too-many-instance-attributes
     tags: list[str] = field(default_factory=list)
     verbosity: int = 0
     warn_list: list[str] = field(default_factory=list)
-    kinds = DEFAULT_KINDS
+    kinds: list[dict[str, str]] = DEFAULT_KINDS
     mock_filters: list[str] = field(default_factory=list)
     mock_modules: list[str] = field(default_factory=list)
     mock_roles: list[str] = field(default_factory=list)

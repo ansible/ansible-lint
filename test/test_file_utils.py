@@ -98,13 +98,13 @@ def test_discover_lintables_silent(
     my_options.lintables = [str(lint_path)]
     files = file_utils.discover_lintables(my_options)
     stderr = capsys.readouterr().err
-    assert (
-        not stderr
-    ), f"No stderr output is expected when the verbosity is off, got: {stderr}"
-    assert (
-        len(files) == yaml_count
-    ), "Expected to find {yaml_count} yaml files in {lint_path}".format_map(
-        locals(),
+    assert not stderr, (
+        f"No stderr output is expected when the verbosity is off, got: {stderr}"
+    )
+    assert len(files) == yaml_count, (
+        "Expected to find {yaml_count} yaml files in {lint_path}".format_map(
+            locals(),
+        )
     )
 
 

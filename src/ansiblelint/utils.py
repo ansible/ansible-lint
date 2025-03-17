@@ -26,11 +26,19 @@ from __future__ import annotations
 import ast
 import collections.abc
 import contextlib
+import copy
 import inspect
 import logging
 import os
 import re
-from collections.abc import ItemsView, Iterable, Iterator, Mapping, Sequence
+from collections.abc import (
+    ItemsView,
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    Sequence,
+)
 from dataclasses import _MISSING_TYPE, dataclass, field
 from functools import cache, lru_cache
 from pathlib import Path
@@ -100,9 +108,9 @@ def parse_yaml_from_file(filepath: str) -> AnsibleBaseYAMLObject:  # type: ignor
     """Extract a decrypted YAML object from file."""
     dataloader = DataLoader()
     if hasattr(dataloader, "set_vault_secrets"):
-        dataloader.set_vault_secrets(
-            [("default", PromptVaultSecret(_bytes=to_bytes(DEFAULT_VAULT_PASSWORD)))]
-        )
+        dataloader.set_vault_secrets([
+            ("default", PromptVaultSecret(_bytes=to_bytes(DEFAULT_VAULT_PASSWORD)))
+        ])
 
     return dataloader.load_from_file(filepath)
 
@@ -618,17 +626,17 @@ def _get_task_handler_children_for_tasks_or_playbooks(
                 basedir = os.path.dirname(basedir)
                 f = path_dwim(basedir, file_name)
             return Lintable(f, kind=child_type)
-    msg = f'The node contains none of: {", ".join(sorted(INCLUSION_ACTION_NAMES))}'
+    msg = f"The node contains none of: {', '.join(sorted(INCLUSION_ACTION_NAMES))}"
     raise LookupError(msg)
 
 
-def _sanitize_task(task: dict[str, Any]) -> dict[str, Any]:
+def _sanitize_task(task: MutableMapping[str, Any]) -> MutableMapping[str, Any]:
     """Return a stripped-off task structure compatible with new Ansible.
 
     This helper takes a copy of the incoming task and drops
     any internally used keys from it.
     """
-    result = task.copy()
+    result = copy.deepcopy(task)
     # task is an AnsibleMapping which inherits from OrderedDict, so we need
     # to use `del` to remove unwanted keys.
     for k in [SKIPPED_RULES_KEY, FILENAME_KEY, LINE_NUMBER_KEY]:
@@ -638,10 +646,10 @@ def _sanitize_task(task: dict[str, Any]) -> dict[str, Any]:
 
 
 def _extract_ansible_parsed_keys_from_task(
-    result: dict[str, Any],
-    task: dict[str, Any],
+    result: MutableMapping[str, Any],
+    task: Mapping[str, Any],
     keys: tuple[str, ...],
-) -> dict[str, Any]:
+) -> Mapping[str, Any]:
     """Return a dict with existing key in task."""
     for k, v in list(task.items()):
         if k in keys:
@@ -652,10 +660,10 @@ def _extract_ansible_parsed_keys_from_task(
     return result
 
 
-def normalize_task_v2(task: Task) -> dict[str, Any]:
+def normalize_task_v2(task: Task) -> MutableMapping[str, Any]:
     """Ensure tasks have a normalized action key and strings are converted to python objects."""
     raw_task = task.raw_task
-    result: dict[str, Any] = {}
+    result: MutableMapping[str, Any] = {}
     ansible_parsed_keys = ("action", "local_action", "args", "delegate_to")
 
     if is_nested_task(raw_task):
@@ -712,13 +720,13 @@ def normalize_task_v2(task: Task) -> dict[str, Any]:
     return result
 
 
-def task_to_str(task: dict[str, Any]) -> str:
+def task_to_str(task: Mapping[str, Any]) -> str:
     """Make a string identifier for the given task."""
     name = task.get("name")
     if name:
         return str(name)
     action = task.get("action")
-    if isinstance(action, str) or not isinstance(action, dict):
+    if isinstance(action, str) or not isinstance(action, Mapping):
         return str(action)
     args = [
         f"{k}={v}"
@@ -774,7 +782,7 @@ def extract_from_list(  # type: ignore[no-any-unimported]
 
 
 @dataclass
-class Task(dict[str, Any]):
+class Task(collections.UserDict[str, Any]):
     """Class that represents a task from linter point of view.
 
     raw_task:
@@ -793,9 +801,11 @@ class Task(dict[str, Any]):
     position: Any
     """
 
-    raw_task: dict[str, Any]
+    raw_task: MutableMapping[str, Any]
     filename: str = ""
-    _normalized_task: dict[str, Any] | _MISSING_TYPE = field(init=False, repr=False)
+    _normalized_task: MutableMapping[str, Any] | _MISSING_TYPE = field(
+        init=False, repr=False
+    )
     error: MatchError | None = None
     position: Any = None
 
@@ -834,7 +844,7 @@ class Task(dict[str, Any]):
         return result
 
     @property
-    def normalized_task(self) -> dict[str, Any]:
+    def normalized_task(self) -> MutableMapping[str, Any]:
         """Return the name of the task."""
         if not hasattr(self, "_normalized_task"):
             try:
@@ -849,7 +859,7 @@ class Task(dict[str, Any]):
             raise TypeError(msg)
         return self._normalized_task
 
-    def _normalize_task(self) -> dict[str, Any]:
+    def _normalize_task(self) -> MutableMapping[str, Any]:
         """Unify task-like object structures."""
         ansible_action_type = self.raw_task.get("__ansible_action_type__", "task")
         if "__ansible_action_type__" in self.raw_task:
@@ -926,7 +936,6 @@ def task_in_list(  # type: ignore[no-any-unimported]
     """Get action tasks from block structures."""
 
     def each_entry(data: AnsibleBaseYAMLObject, position: str) -> Iterator[Task]:  # type: ignore[no-any-unimported]
-
         if not data or not isinstance(data, Iterable):
             return
         for entry_index, entry in enumerate(data):
@@ -958,7 +967,7 @@ def task_in_list(  # type: ignore[no-any-unimported]
                     if isinstance(item[attribute], list):
                         yield from each_entry(
                             item[attribute],
-                            f"{position }[{item_index}].{attribute}",
+                            f"{position}[{item_index}].{attribute}",
                         )
                     elif item[attribute] is not None:
                         msg = f"Key '{attribute}' defined, but bad value: '{item[attribute]!s}'"
@@ -1052,7 +1061,7 @@ def parse_yaml_linenumbers(  # type: ignore[no-any-unimported]
     return result
 
 
-def get_cmd_args(task: dict[str, Any]) -> str:
+def get_cmd_args(task: Mapping[str, Any]) -> str:
     """Extract the args from a cmd task as a string."""
     if "cmd" in task["action"]:
         args = task["action"]["cmd"]
@@ -1063,7 +1072,7 @@ def get_cmd_args(task: dict[str, Any]) -> str:
     return args
 
 
-def get_first_cmd_arg(task: dict[str, Any]) -> Any:
+def get_first_cmd_arg(task: Mapping[str, Any]) -> Any:
     """Extract the first arg from a cmd task."""
     try:
         first_cmd_arg = get_cmd_args(task).split()[0]
@@ -1072,7 +1081,7 @@ def get_first_cmd_arg(task: dict[str, Any]) -> Any:
     return first_cmd_arg
 
 
-def get_second_cmd_arg(task: dict[str, Any]) -> Any:
+def get_second_cmd_arg(task: Mapping[str, Any]) -> Any:
     """Extract the second arg from a cmd task."""
     try:
         second_cmd_arg = get_cmd_args(task).split()[1]
