@@ -4,7 +4,6 @@
     "charliermarsh.ruff",
     "esbenp.prettier-vscode",
     "hbenl.vscode-test-explorer",
-    "ms-python.isort",
     "ms-python.mypy-type-checker",
     "ms-python.pylint",
     "ms-python.python",

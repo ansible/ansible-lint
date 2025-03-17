@@ -52,7 +52,7 @@ jobs:
     env:
       # This disables the github annotations in the output of ansible-lint action
       # which might confuse users.
-      GITHUB_ACTIONS: false
+      GITHUB_ACTIONS_TEST: "true"
     steps:
       - uses: actions/checkout@v4
       - name: Self test 1
@@ -106,6 +106,7 @@ jobs:
 
       - name: Set ansible cache(s)
         uses: actions/cache@v4
+        if: ${{ matrix.name != 'pkg' &&  matrix.name != 'schemas' }}
         with:
           path: |
             .cache/eco
@@ -134,7 +135,7 @@ jobs:
       - name: Install tox
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install --upgrade "tox>=4.0.0" "tox-uv>=1.20.2" uv
+          python3 -m pip install --upgrade "tox>=4.0.0" "tox-uv>=1.25.0" "uv>=0.6.6"
 
       - name: Log installed dists
         run: python3 -m pip freeze --all

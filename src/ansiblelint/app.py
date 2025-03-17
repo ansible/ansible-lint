@@ -104,7 +104,11 @@ class App:
                     console.print(self.formatter.apply(match))
 
         # If run under GitHub Actions we also want to emit output recognized by it.
-        if os.getenv("GITHUB_ACTIONS") == "true" and os.getenv("GITHUB_WORKFLOW"):
+        if (
+            os.getenv("GITHUB_ACTIONS") == "true"
+            and os.getenv("GITHUB_WORKFLOW")
+            and os.getenv("GITHUB_ACTIONS_TEST", "false") == "false"
+        ):
             _logger.info(
                 "GitHub Actions environment detected, adding annotations output...",
             )

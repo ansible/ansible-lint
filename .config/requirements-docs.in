@@ -1,2 +1,1 @@
 mkdocs-ansible>=24.12.0  # do not use lock extra because it would break dependabot updates
-uv>=0.5.5 # uv pip tree

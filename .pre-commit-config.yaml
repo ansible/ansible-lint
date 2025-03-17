@@ -31,7 +31,7 @@ repos:
       - id: check-useless-excludes
   - repo: https://github.com/rbubley/mirrors-prettier
     # keep it before yamllint
-    rev: v3.5.1
+    rev: v3.5.3
     hooks:
       - id: prettier
         # Temporary excludes so we can gradually normalize the formatting
@@ -60,14 +60,14 @@ repos:
           - prettier@3.2.4
           - prettier-plugin-sort-json@3.1.0
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v8.17.2
+    rev: v8.17.3
     hooks:
       - id: cspell
         # entry: codespell --relative
         args: [--relative, --no-progress, --no-summary]
         name: Spell check with cspell
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.31.1
+    rev: 0.31.3
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
@@ -117,7 +117,7 @@ repos:
         additional_dependencies:
           - tomli
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.35.1
+    rev: v1.36.2
     hooks:
       - id: yamllint
         exclude: >
@@ -144,7 +144,7 @@ repos:
       - id: tox-ini-fmt
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.6
+    rev: v0.11.0
     hooks:
       - id: ruff
         args:
@@ -185,7 +185,7 @@ repos:
             plugins/.*
           )$
   - repo: https://github.com/RobertCraigie/pyright-python
-    rev: v1.1.394
+    rev: v1.1.396
     hooks:
       - id: pyright
         additional_dependencies:
@@ -209,7 +209,7 @@ repos:
           - wcmatch
           - yamllint
   - repo: https://github.com/pycqa/pylint
-    rev: v3.3.4
+    rev: v3.3.5
     hooks:
       - id: pylint
         args:
@@ -251,31 +251,28 @@ repos:
         files: ^(pyproject\.toml|.config/.*)$
         always_run: true
         language: python
-        language_version: "3.10" # minimal we support officially
-        entry: python3 -m uv pip compile -q --all-extras --output-file=.config/constraints.txt pyproject.toml --upgrade
+        entry: python3 -m uv pip compile -q --all-extras --python-version=3.10 --output-file=.config/constraints.txt pyproject.toml --upgrade
         pass_filenames: false
         stages:
           - manual
         additional_dependencies:
-          - uv>=0.5.21
+          - uv>=0.6.6
       - id: pip-compile
         name: Check constraints files and requirements
         files: ^(pyproject\.toml|\.config/.*)$
         language: python
-        language_version: "3.10" # minimal we support officially
-        entry: uv pip compile -q --all-extras --output-file=.config/constraints.txt pyproject.toml
+        entry: uv pip compile -q --all-extras --python-version=3.10 --output-file=.config/constraints.txt pyproject.toml
         pass_filenames: false
         additional_dependencies:
-          - uv>=0.5.21
+          - uv>=0.6.6
       - id: lock
         name: Update requirements-lock.txt
         alias: lock
         always_run: true
-        entry: python3 -m uv pip compile -q --upgrade --output-file=.config/requirements-lock.txt pyproject.toml --strip-extras
+        entry: python3 -m uv pip compile -q --python-version=3.10 --upgrade --output-file=.config/requirements-lock.txt pyproject.toml --strip-extras
         files: ^(pyproject\.toml|\.config/.*)$
         language: python
-        language_version: "3.10" # minimal we support officially
         pass_filenames: false
         stages: [manual]
         additional_dependencies:
-          - uv>=0.5.21
+          - uv>=0.6.6

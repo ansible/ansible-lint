@@ -234,11 +234,9 @@ def test_extract_from_list() -> None:
 
 def test_extract_from_list_recursive() -> None:
     """Check that tasks get extracted from blocks if present."""
-    block = AnsibleMapping(
-        {
-            "block": [{"block": [{"name": "hello", "command": "whoami"}]}],
-        }
-    )
+    block = AnsibleMapping({
+        "block": [{"block": [{"name": "hello", "command": "whoami"}]}],
+    })
     blocks = AnsibleSequence([block])
 
     test_list = utils.extract_from_list(blocks, ["block"])

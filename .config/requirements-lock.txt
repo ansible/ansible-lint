@@ -23,13 +23,13 @@ referencing==0.36.2       # via jsonschema, jsonschema-specifications, ansible-l
 rpds-py==0.23.1           # via jsonschema, referencing
 ruamel-yaml==0.18.10      # via ansible-lint (pyproject.toml)
 subprocess-tee==0.4.2     # via ansible-compat, ansible-lint (pyproject.toml)
-tomli==2.2.1              # via black
-typing-extensions==4.12.2  # via black, referencing
 wcmatch==10.0             # via ansible-lint (pyproject.toml)
-yamllint==1.36.1          # via ansible-lint (pyproject.toml)
+yamllint==1.36.2          # via ansible-lint (pyproject.toml)
 zipp==3.21.0              # via importlib-metadata
 
 # The following packages were excluded from the output:
 # ansible-core
 # resolvelib
 # ruamel-yaml-clib
+# tomli
+# typing-extensions

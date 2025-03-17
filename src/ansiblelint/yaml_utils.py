@@ -519,7 +519,7 @@ class OctalIntYAML11(ScalarInt):
         return representer.insert_underscore(
             "0",
             v,
-            data._underscore,  # noqa: SLF001
+            data._underscore,
             anchor=anchor,
         )
 
