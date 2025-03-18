@@ -79,7 +79,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
             results.append(
                 self.create_matcherror(
                     message="All tasks should be named.",
-                    lineno=task[LINE_NUMBER_KEY],
+                    lineno=task.line,
                     tag="name[missing]",
                     filename=file,
                 ),
@@ -89,7 +89,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
                 self._prefix_check(
                     name,
                     lintable=file,
-                    lineno=task[LINE_NUMBER_KEY],
+                    lineno=task.line,
                 ),
             )
 

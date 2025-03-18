@@ -896,6 +896,16 @@ class Task(dict[str, Any]):
         """Provide support for 'key in task'."""
         yield from (f for f in self.normalized_task)
 
+    @property
+    def line(self) -> int:
+        """Return the line number of the task."""
+        result: int = 0
+        result = int(self.get(LINE_NUMBER_KEY, 0))
+        if not result:  # pragma: no cover
+            x = self.get("action", {})
+            result = int(x.get(LINE_NUMBER_KEY, 0))
+        return result or 1
+
     def get_error_line(self, path: list[str | int]) -> int:
         """Return error line number."""
         ctx = self.normalized_task
@@ -914,9 +924,7 @@ class Task(dict[str, Any]):
                     and LINE_NUMBER_KEY in ctx
                 ):
                     line = ctx[LINE_NUMBER_KEY]  # pyright: ignore[reportIndexIssue]
-                # else:
-                #     break
-        if not isinstance(line, int):
+        if not isinstance(line, int):  # pragma: no cover
             msg = "Line number is not an integer"
             raise TypeError(msg)
         return line

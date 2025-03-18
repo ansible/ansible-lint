@@ -299,7 +299,7 @@ class VariableNamingRule(AnsibleLintRule):
                     file=file or Lintable(""),
                 )
                 if match_error:
-                    match_error.lineno = task["action"][LINE_NUMBER_KEY]
+                    match_error.lineno = task.line
                     match_error.message += f" (set_fact: {key})"
                     results.append(match_error)
 
@@ -313,7 +313,7 @@ class VariableNamingRule(AnsibleLintRule):
             )
             if match_error:
                 match_error.message += f" (register: {registered_var})"
-                match_error.lineno = task[LINE_NUMBER_KEY]
+                match_error.lineno = task.line
                 results.append(match_error)
 
         return results

@@ -19,7 +19,6 @@ from unittest.mock import patch
 import ansible.module_utils.basic as mock_ansible_module
 from ansible.module_utils import basic
 
-from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.rules import AnsibleLintRule, RulesCollection
 from ansiblelint.text import has_jinja
 from ansiblelint.utils import load_plugin
@@ -149,7 +148,7 @@ class ArgsRule(AnsibleLintRule):
                     "Unable to load module %s at %s:%s for options validation",
                     module_name,
                     file.filename if file else None,
-                    task[LINE_NUMBER_KEY],
+                    task.line,
                 )
                 return []
             spec = importlib.util.spec_from_file_location(
@@ -162,7 +161,7 @@ class ArgsRule(AnsibleLintRule):
                     "Unable to load module %s at %s:%s for options validation",
                     module_name,
                     file.filename,
-                    task[LINE_NUMBER_KEY],
+                    task.line,
                 )
                 return []
             assert spec.loader is not None
@@ -221,7 +220,7 @@ class ArgsRule(AnsibleLintRule):
     def _parse_failed_msg(
         self,
         failed_msg: str,
-        task: dict[str, Any],
+        task: Task,
         module_name: str,
         file: Lintable | None = None,
     ) -> list[MatchError]:
@@ -246,7 +245,7 @@ class ArgsRule(AnsibleLintRule):
                     "Type checking ignored for '%s' option in task '%s' at line %s.",
                     option_key,
                     module_name,
-                    task[LINE_NUMBER_KEY],
+                    task.line,
                 )
                 return results
 
@@ -263,14 +262,14 @@ class ArgsRule(AnsibleLintRule):
                     "Value checking ignored for '%s' option in task '%s' at line %s.",
                     choice_key,
                     module_name,
-                    task[LINE_NUMBER_KEY],
+                    task.line,
                 )
                 return results
 
         results.append(
             self.create_matcherror(
                 message=error_message,
-                lineno=task[LINE_NUMBER_KEY],
+                lineno=task.line,
                 tag="args[module]",
                 filename=file,
             ),
