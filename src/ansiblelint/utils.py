@@ -100,9 +100,9 @@ def parse_yaml_from_file(filepath: str) -> AnsibleBaseYAMLObject:  # type: ignor
     """Extract a decrypted YAML object from file."""
     dataloader = DataLoader()
     if hasattr(dataloader, "set_vault_secrets"):
-        dataloader.set_vault_secrets(
-            [("default", PromptVaultSecret(_bytes=to_bytes(DEFAULT_VAULT_PASSWORD)))]
-        )
+        dataloader.set_vault_secrets([
+            ("default", PromptVaultSecret(_bytes=to_bytes(DEFAULT_VAULT_PASSWORD)))
+        ])
 
     return dataloader.load_from_file(filepath)
 
@@ -618,7 +618,7 @@ def _get_task_handler_children_for_tasks_or_playbooks(
                 basedir = os.path.dirname(basedir)
                 f = path_dwim(basedir, file_name)
             return Lintable(f, kind=child_type)
-    msg = f'The node contains none of: {", ".join(sorted(INCLUSION_ACTION_NAMES))}'
+    msg = f"The node contains none of: {', '.join(sorted(INCLUSION_ACTION_NAMES))}"
     raise LookupError(msg)
 
 
@@ -712,37 +712,6 @@ def normalize_task_v2(task: Task) -> dict[str, Any]:
     return result
 
 
-def task_to_str(task: dict[str, Any]) -> str:
-    """Make a string identifier for the given task."""
-    name = task.get("name")
-    if name:
-        return str(name)
-    action = task.get("action")
-    if isinstance(action, str) or not isinstance(action, dict):
-        return str(action)
-    args = [
-        f"{k}={v}"
-        for (k, v) in action.items()
-        if k
-        not in [
-            "__ansible_module__",
-            "__ansible_module_original__",
-            "_raw_params",
-            LINE_NUMBER_KEY,
-            FILENAME_KEY,
-        ]
-    ]
-
-    raw_params = action.get("_raw_params", [])
-    if isinstance(raw_params, list):
-        for item in raw_params:
-            args.extend(str(item))
-    else:
-        args.append(raw_params)
-
-    return f"{action['__ansible_module__']} {' '.join(args)}"
-
-
 # pylint: disable=too-many-nested-blocks
 def extract_from_list(  # type: ignore[no-any-unimported]
     blocks: AnsibleBaseYAMLObject,
@@ -790,14 +759,16 @@ class Task(dict[str, Any]):
     error:
         This is normally None. It will be a MatchError when the raw_task cannot be
         normalized due to an AnsibleParserError.
-    position: Any
+    position:
+        The position of the task in the data structure using JSONPath like
+        notation (no $ prefix).
     """
 
     raw_task: dict[str, Any]
     filename: str = ""
     _normalized_task: dict[str, Any] | _MISSING_TYPE = field(init=False, repr=False)
     error: MatchError | None = None
-    position: Any = None
+    position: str = ""
 
     @property
     def name(self) -> str | None:
@@ -875,9 +846,43 @@ class Task(dict[str, Any]):
                 is_handler_file = "handlers" in paths
         return is_handler_file or ".handlers[" in self.position
 
+    def __str__(self) -> str:
+        """Make a string identifier for the given task."""
+        name = self.get("name")
+        if name:
+            return str(name)
+        action = self.get("action")
+        if isinstance(action, str) or not isinstance(action, dict):
+            return str(action)
+        args = [
+            f"{k}={v}"
+            for (k, v) in action.items()
+            if k
+            not in [
+                "__ansible_module__",
+                "__ansible_module_original__",
+                "_raw_params",
+                LINE_NUMBER_KEY,
+                FILENAME_KEY,
+            ]
+        ]
+
+        raw_params = action.get("_raw_params", [])
+        if isinstance(raw_params, list):
+            for item in raw_params:
+                args.extend(str(item))
+        else:
+            args.append(raw_params)
+
+        return f"{action['__ansible_module__']} {' '.join(args)}"
+
     def __repr__(self) -> str:
         """Return a string representation of the task."""
-        return f"Task('{self.name}' [{self.position}])"
+        result = f"Task('{self.name or self.action}'"
+        if self.position:
+            result += f" [{self.position}])"
+        result += ")"
+        return result
 
     def get(self, key: str, default: Any = None) -> Any:
         """Get a value from the task."""
@@ -926,7 +931,6 @@ def task_in_list(  # type: ignore[no-any-unimported]
     """Get action tasks from block structures."""
 
     def each_entry(data: AnsibleBaseYAMLObject, position: str) -> Iterator[Task]:  # type: ignore[no-any-unimported]
-
         if not data or not isinstance(data, Iterable):
             return
         for entry_index, entry in enumerate(data):
@@ -958,7 +962,7 @@ def task_in_list(  # type: ignore[no-any-unimported]
                     if isinstance(item[attribute], list):
                         yield from each_entry(
                             item[attribute],
-                            f"{position }[{item_index}].{attribute}",
+                            f"{position}[{item_index}].{attribute}",
                         )
                     elif item[attribute] is not None:
                         msg = f"Key '{attribute}' defined, but bad value: '{item[attribute]!s}'"
