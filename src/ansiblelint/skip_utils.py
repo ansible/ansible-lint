@@ -49,9 +49,8 @@ from ansiblelint.errors import LintWarning, WarnSource
 if TYPE_CHECKING:
     from collections.abc import Generator
 
-    from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject
-
     from ansiblelint.file_utils import Lintable
+    from ansiblelint.types import AnsibleBaseYAMLObject
 
 
 _logger = logging.getLogger(__name__)

@@ -17,10 +17,9 @@ from ansiblelint.skip_utils import (
 )
 
 if TYPE_CHECKING:
-    from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject
-
     from ansiblelint.rules import RulesCollection
     from ansiblelint.testing import RunFromText
+    from ansiblelint.types import AnsibleBaseYAMLObject
 
 PLAYBOOK_WITH_NOQA = """\
 ---

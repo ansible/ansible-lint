@@ -298,6 +298,7 @@ pyright
 pytest
 pyupgrade
 pyyaml
+redef
 redirections
 reexec
 reformatter
