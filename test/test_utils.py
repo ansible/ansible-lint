@@ -281,8 +281,7 @@ def test_template(template: str, output: str) -> None:
 def test_task_to_str_unicode() -> None:
     """Ensure that extracting messages from tasks preserves Unicode."""
     task = utils.Task({"fail": {"msg": "unicode é ô à"}}, filename="filename.yml")
-    result = utils.task_to_str(task._normalize_task())  # noqa: SLF001
-    assert result == "fail msg=unicode é ô à"
+    assert str(task) == "fail msg=unicode é ô à"
 
 
 def test_logger_debug(caplog: LogCaptureFixture) -> None:

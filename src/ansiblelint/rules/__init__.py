@@ -108,7 +108,7 @@ class AnsibleLintRule(BaseRule):
     ) -> None:
         match.task = task
         if not match.details:
-            match.details = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
+            match.details = "Task/Handler: " + str(task)
 
         match.lineno = max(match.lineno, task[LINE_NUMBER_KEY])
 
