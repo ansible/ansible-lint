@@ -46,7 +46,16 @@ from ansible.parsing.mod_args import ModuleArgsParser
 from ansible.parsing.plugin_docs import read_docstring
 from ansible.parsing.splitter import split_args
 from ansible.parsing.vault import PromptVaultSecret
-from ansible.parsing.yaml.constructor import AnsibleConstructor, AnsibleMapping
+
+try:
+    from ansible.parsing.yaml.constructor import AnsibleMapping
+except ImportError:  # core 2.19+
+    from ansible.parsing.yaml.objects import AnsibleMapping
+try:
+    from ansible.parsing.yaml.constructor import AnsibleConstructor
+except ImportError:  # core 2.19+
+    from ansible._internal._yaml import AnsibleConstructor
+
 from ansible.parsing.yaml.loader import AnsibleLoader
 from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject, AnsibleSequence
 from ansible.plugins.loader import (
