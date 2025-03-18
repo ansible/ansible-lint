@@ -26,7 +26,7 @@ from ansiblelint._internal.rules import (
 from ansiblelint.app import App, get_app
 from ansiblelint.config import PROFILES, Options
 from ansiblelint.config import options as default_options
-from ansiblelint.constants import LINE_NUMBER_KEY, RULE_DOC_URL, SKIPPED_RULES_KEY
+from ansiblelint.constants import RULE_DOC_URL, SKIPPED_RULES_KEY
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, expand_paths_vars
 
@@ -110,7 +110,7 @@ class AnsibleLintRule(BaseRule):
         if not match.details:
             match.details = "Task/Handler: " + str(task)
 
-        match.lineno = max(match.lineno, task[LINE_NUMBER_KEY])
+        match.lineno = max(match.lineno, task.line)
 
     def matchlines(self, file: Lintable) -> list[MatchError]:
         matches: list[MatchError] = []
@@ -204,7 +204,7 @@ class AnsibleLintRule(BaseRule):
                     message = result
                 match = self.create_matcherror(
                     message=message,
-                    lineno=task.normalized_task[LINE_NUMBER_KEY],
+                    lineno=task.line,
                     filename=file,
                 )
 

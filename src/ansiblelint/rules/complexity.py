@@ -61,7 +61,7 @@ class ComplexityRule(AnsibleLintRule):
                 results.append(
                     self.create_matcherror(
                         message=f"Replace nested block with an include_tasks to make code easier to maintain. Maximum block depth allowed is {self._collection.options.max_block_depth}.",
-                        lineno=task[LINE_NUMBER_KEY],
+                        lineno=task.line,
                         tag=f"{self.id}[nesting]",
                         filename=file,
                     ),

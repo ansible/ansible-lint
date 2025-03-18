@@ -9,10 +9,7 @@ from typing import TYPE_CHECKING, Any
 
 from ruamel.yaml.scalarstring import DoubleQuotedScalarString, SingleQuotedScalarString
 
-from ansiblelint.constants import (
-    INCLUSION_ACTION_NAMES,
-    LINE_NUMBER_KEY,
-)
+from ansiblelint.constants import INCLUSION_ACTION_NAMES
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.rules.key_order import task_property_sorter
 
@@ -59,7 +56,7 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
                     results.append(
                         self.create_matcherror(
                             message="Avoid embedding `executable=` inside raw calls, use explicit args dictionary instead.",
-                            lineno=task[LINE_NUMBER_KEY],
+                            lineno=task.line,
                             filename=file,
                             tag=f"{self.id}[raw]",
                         ),
@@ -68,7 +65,7 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
                 results.append(
                     self.create_matcherror(
                         message="Passing a non string value to `raw` module is neither documented or supported.",
-                        lineno=task[LINE_NUMBER_KEY],
+                        lineno=task.line,
                         filename=file,
                         tag=f"{self.id}[raw-non-string]",
                     ),
@@ -93,7 +90,7 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
                 results.append(
                     self.create_matcherror(
                         message=f"Avoid using free-form when calling module actions. ({action})",
-                        lineno=task[LINE_NUMBER_KEY],
+                        lineno=task.line,
                         filename=file,
                     ),
                 )
