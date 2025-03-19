@@ -30,6 +30,8 @@ from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.text import has_glob, has_jinja, is_fqcn_or_name
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from ansiblelint.file_utils import Lintable
     from ansiblelint.utils import Task
 
@@ -81,7 +83,7 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
     def _matchvar(
         self,
         varstring: str,
-        task: dict[str, Any],
+        task: Mapping[str, Any],
         loop_type: str,
     ) -> bool | str:
         if (

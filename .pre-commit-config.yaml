@@ -157,9 +157,10 @@ repos:
     rev: v1.15.0
     hooks:
       - id: mypy
-        # empty args needed in order to match mypy cli behavior
-        args: [--strict]
-        additional_dependencies:
+        # "." and pass_files are used to make pre-commit mypy behave the same as standalone mypy
+        args: ["."]
+        pass_filenames: false
+        additional_dependencies: &deps
           - ansible-compat>=25.1.3
           - black>=22.10.0
           - cryptography>=39.0.1
@@ -167,71 +168,29 @@ repos:
           - importlib_metadata
           - jinja2
           - license-expression >= 30.3.0
+          - pip>=22.3.1
           - pytest-mock
           - pytest>=7.2.2
-          - pip>=22.3.1
+          - pyyaml>=6.0.2 # types-PyYAML is not enough
           - ruamel-yaml-clib>=0.2.8
           - ruamel-yaml>=0.18.6
           - subprocess-tee
-          - types-PyYAML
           - types-jsonschema>=4.20.0.0
           - types-setuptools
           - wcmatch
-        exclude: >
-          (?x)^(
-            .config/.*|
-            collections/.*|
-            test/local-content/.*|
-            plugins/.*
-          )$
+          - yamllint>=1.34.0
   - repo: https://github.com/RobertCraigie/pyright-python
-    rev: v1.1.396
+    rev: v1.1.397
     hooks:
       - id: pyright
-        additional_dependencies:
-          - nodejs-wheel-binaries
-          - ansible-compat>=25.1.3
-          - black>=22.10.0
-          - cryptography>=39.0.1
-          - filelock>=3.12.2
-          - importlib_metadata
-          - jinja2
-          - license-expression >= 30.3.0
-          - pip>=22.3.1
-          - pytest-mock
-          - pytest>=7.2.2
-          - ruamel-yaml-clib>=0.2.8
-          - ruamel-yaml>=0.18.6
-          - subprocess-tee
-          - types-PyYAML
-          - types-jsonschema>=4.20.0.0
-          - types-setuptools
-          - wcmatch
-          - yamllint
+        additional_dependencies: *deps
   - repo: https://github.com/pycqa/pylint
-    rev: v3.3.5
+    rev: v3.3.6
     hooks:
       - id: pylint
         args:
           - --output-format=colorized
-        additional_dependencies:
-          - ansible-compat>=25.1.3
-          - ansible-core>=2.16.0
-          - black>=24.10.0
-          - docutils
-          - filelock>=3.12.2
-          - importlib_metadata
-          - jsonschema>=4.20.0
-          - license-expression >= 30.3.0
-          - pytest-mock
-          - pytest>=7.2.2
-          - pyyaml
-          - ruamel-yaml-clib>=0.2.7
-          - ruamel-yaml>=0.18.2
-          - setuptools # needed for pkg_resources import
-          - typing_extensions
-          - wcmatch
-          - yamllint
+        additional_dependencies: *deps
   - repo: https://github.com/jendrikseipp/vulture
     rev: v2.14
     hooks:

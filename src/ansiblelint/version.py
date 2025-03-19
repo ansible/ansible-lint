@@ -13,7 +13,7 @@ if not TYPE_CHECKING:
         from ._version import version as __version__
     except ImportError:  # pragma: no cover
         try:
-            import pkg_resources
+            import pkg_resources  # pylint: disable=import-error
 
             __version__ = pkg_resources.get_distribution("ansible-lint").version
         except Exception:  # pylint: disable=broad-except  # noqa: BLE001, S110

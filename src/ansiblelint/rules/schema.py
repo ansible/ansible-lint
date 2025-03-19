@@ -14,6 +14,8 @@ from ansiblelint.schemas.main import validate_file_schema
 from ansiblelint.text import has_jinja
 
 if TYPE_CHECKING:
+    from collections.abc import MutableMapping
+
     from ansiblelint.config import Options
     from ansiblelint.errors import MatchError
     from ansiblelint.utils import Task
@@ -110,7 +112,7 @@ class ValidateSchemaRule(AnsibleLintRule):
     def _get_field_matches(
         self,
         file: Lintable,
-        data: dict[str, Any],
+        data: MutableMapping[str, Any],
     ) -> list[MatchError]:
         """Retrieve all matches related to fields for the given data block."""
         results = []

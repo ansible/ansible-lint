@@ -311,7 +311,7 @@ def test_formatted_yaml_loader_dumper(
     # Running our files through yamllint, after we reformatted them,
     # should not yield any problems.
     config = ansiblelint.yaml_utils.load_yamllint_config()
-    assert not list(run_yamllint(after_content, config))
+    assert not list(run_yamllint(after_content, config))  # type: ignore[no-untyped-call]
 
 
 @pytest.fixture(name="lintable")
