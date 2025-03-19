@@ -46,9 +46,7 @@ from ansible.parsing.mod_args import ModuleArgsParser
 from ansible.parsing.plugin_docs import read_docstring
 from ansible.parsing.splitter import split_args
 from ansible.parsing.vault import PromptVaultSecret
-from ansible.parsing.yaml.constructor import AnsibleConstructor, AnsibleMapping
 from ansible.parsing.yaml.loader import AnsibleLoader
-from ansible.parsing.yaml.objects import AnsibleBaseYAMLObject, AnsibleSequence
 from ansible.plugins.loader import (
     PluginLoadContext,
     action_loader,
@@ -82,6 +80,12 @@ from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable, discover_lintables
 from ansiblelint.skip_utils import is_nested_task
 from ansiblelint.text import has_jinja, is_fqcn, removeprefix
+from ansiblelint.types import (
+    AnsibleBaseYAMLObject,
+    AnsibleConstructor,
+    AnsibleMapping,
+    AnsibleSequence,
+)
 
 if TYPE_CHECKING:
     from ansiblelint.rules import RulesCollection

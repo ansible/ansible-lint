@@ -28,7 +28,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import pytest
-from ansible.parsing.yaml.constructor import AnsibleMapping, AnsibleSequence
 from ansible.utils.sentinel import Sentinel
 from ansible_compat.runtime import Runtime
 
@@ -39,6 +38,7 @@ from ansiblelint.constants import RC
 from ansiblelint.file_utils import Lintable, cwd
 from ansiblelint.runner import Runner
 from ansiblelint.testing import run_ansible_lint
+from ansiblelint.types import AnsibleMapping, AnsibleSequence
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
