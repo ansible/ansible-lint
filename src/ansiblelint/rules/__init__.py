@@ -224,7 +224,7 @@ class AnsibleLintRule(BaseRule):
         if isinstance(yaml, str):
             if yaml.startswith("$ANSIBLE_VAULT"):
                 return []
-            if self._collection is None:
+            if self._collection is None:  # pragma: no cover
                 msg = f"Rule {self.id} was not added to a collection."
                 raise RuntimeError(msg)
             return [

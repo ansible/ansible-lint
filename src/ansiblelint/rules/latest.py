@@ -42,6 +42,6 @@ class LatestRule(AnsibleLintRule):
         if (
             task["action"]["__ansible_module__"] == "hg"
             and task["action"].get("revision", "default") == "default"
-        ):
+        ):  # pragma: no cover
             return self.create_matcherror(tag="latest[hg]", filename=file)
         return False

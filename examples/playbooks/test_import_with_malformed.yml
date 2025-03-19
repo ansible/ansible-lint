@@ -1,4 +1,6 @@
 ---
-- hosts: all
+- name: Some test fixture
+  hosts: all
   tasks:
-    - import_tasks: tasks/malformed.yml
+    - name: Some import
+      ansible.builtin.import_tasks: tasks/malformed.yml

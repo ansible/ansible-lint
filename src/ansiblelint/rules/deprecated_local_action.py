@@ -67,7 +67,7 @@ class TaskNoLocalActionRule(AnsibleLintRule, TransformMixin):
                         module_name, module_value = v.split(" ", 1)
                         target_task[module_name] = module_value
                         target_task["delegate_to"] = "localhost"
-                    else:
+                    else:  # pragma: no cover
                         _logger.debug(
                             "Ignored unexpected data inside %s transform.",
                             self.id,

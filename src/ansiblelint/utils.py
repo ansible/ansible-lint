@@ -26,11 +26,19 @@ from __future__ import annotations
 import ast
 import collections.abc
 import contextlib
+import copy
 import inspect
 import logging
 import os
 import re
-from collections.abc import ItemsView, Iterable, Iterator, Mapping, Sequence
+from collections.abc import (
+    ItemsView,
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    Sequence,
+)
 from dataclasses import _MISSING_TYPE, dataclass, field
 from functools import cache, lru_cache
 from pathlib import Path
@@ -82,7 +90,8 @@ from ansiblelint.skip_utils import is_nested_task
 from ansiblelint.text import has_jinja, is_fqcn, removeprefix
 from ansiblelint.types import (
     AnsibleBaseYAMLObject,
-    AnsibleConstructor,
+    AnsibleConstructor,  # pyright: ignore[reportAttributeAccessIssue]
+    AnsibleJSON,
     AnsibleMapping,
     AnsibleSequence,
 )
@@ -95,30 +104,39 @@ if TYPE_CHECKING:
 DEFAULT_VAULT_PASSWORD = "x"  # noqa: S105
 
 PLAYBOOK_DIR = os.environ.get("ANSIBLE_PLAYBOOK_DIR", None)
+LINE_COLUMN_REGEX = re.compile(
+    r".*line (?P<line>\d+), column (?P<column>\d+).*", flags=re.MULTILINE
+)
 
 
 _logger = logging.getLogger(__name__)
 
 
-def parse_yaml_from_file(filepath: str) -> AnsibleBaseYAMLObject:  # type: ignore[no-any-unimported]
+def parse_yaml_from_file(filepath: str) -> AnsibleJSON:
     """Extract a decrypted YAML object from file."""
-    dataloader = DataLoader()
+    dataloader = DataLoader()  # type: ignore[no-untyped-call]
     if hasattr(dataloader, "set_vault_secrets"):
         dataloader.set_vault_secrets([
-            ("default", PromptVaultSecret(_bytes=to_bytes(DEFAULT_VAULT_PASSWORD)))
+            ("default", PromptVaultSecret(_bytes=to_bytes(DEFAULT_VAULT_PASSWORD)))  # type: ignore[no-untyped-call]
         ])
-
-    return dataloader.load_from_file(filepath)
+    result: object = dataloader.load_from_file(filepath)
+    if result is None:
+        return result
+    if isinstance(result, AnsibleJSON):
+        return result
+    # pragma: no cover
+    msg = "Expected a YAML object"
+    raise TypeError(msg)
 
 
 def path_dwim(basedir: str, given: str) -> str:
     """Convert a given path do-what-I-mean style."""
-    dataloader = DataLoader()
+    dataloader = DataLoader()  # type: ignore[no-untyped-call]
     dataloader.set_basedir(basedir)
     return str(dataloader.path_dwim(given))
 
 
-def ansible_templar(basedir: Path, templatevars: Any) -> Templar:  # type: ignore[no-any-unimported]
+def ansible_templar(basedir: Path, templatevars: Any) -> Templar:
     """Create an Ansible Templar using templatevars."""
     # `basedir` is the directory containing the lintable file.
     # Therefore, for tasks in a role, `basedir` has the form
@@ -128,9 +146,9 @@ def ansible_templar(basedir: Path, templatevars: Any) -> Templar:  # type: ignor
     if basedir.name == "tasks":
         basedir = basedir.parent
 
-    dataloader = DataLoader()
+    dataloader = DataLoader()  # type: ignore[no-untyped-call]
     dataloader.set_basedir(str(basedir))
-    templar = Templar(dataloader, variables=templatevars)
+    templar = Templar(dataloader, variables=templatevars)  # type: ignore[no-untyped-call]
     return templar
 
 
@@ -185,7 +203,7 @@ def ansible_template(
     kwargs["disable_lookups"] = True
     for _i in range(10):
         try:
-            templated = templar.template(varname, **kwargs)
+            templated = templar.template(varname, **kwargs)  # type: ignore[no-untyped-call]
         except AnsibleError as exc:
             if lookup_error in exc.message:
                 return varname
@@ -207,7 +225,10 @@ def ansible_template(
                     _logger.warning(err)
                     raise
 
-                templar.environment.filters._delegatee[missing_filter] = mock_filter  # fmt: skip # noqa: SLF001
+                v = templar.environment.filters
+                if not hasattr(v, "_delegatee"):  # pragma: no cover
+                    raise
+                v._delegatee[missing_filter] = mock_filter  # fmt: skip # noqa: SLF001
                 # Record the mocked filter so we can warn the user
                 if missing_filter not in options.mock_filters:
                     _logger.debug("Mocking missing filter %s", missing_filter)
@@ -236,7 +257,7 @@ def tokenize(value: str) -> tuple[list[str], dict[str, str]]:
     if value and "=" not in value:
         return ([value], {})
 
-    parts = split_args(value)
+    parts = split_args(value)  # type: ignore[no-untyped-call]
     args: list[str] = []
     kwargs: dict[str, str] = {}
     for part in parts:
@@ -248,17 +269,22 @@ def tokenize(value: str) -> tuple[list[str], dict[str, str]]:
     return (args, kwargs)
 
 
-def playbook_items(pb_data: AnsibleBaseYAMLObject) -> ItemsView:  # type: ignore[type-arg,no-any-unimported]
+def playbook_items(pb_data: AnsibleJSON) -> ItemsView:  # type: ignore[type-arg]
     """Return a list of items from within the playbook."""
     if isinstance(pb_data, dict):
         return pb_data.items()
-    if not pb_data:
-        return []  # type: ignore[return-value]
-
     # "if play" prevents failure if the play sequence contains None,
     # which is weird but currently allowed by Ansible
     # https://github.com/ansible/ansible-lint/issues/849
-    return [item for play in pb_data if play for item in play.items()]  # type: ignore[return-value]
+    if isinstance(pb_data, Sequence):
+        return [
+            item
+            for play in pb_data
+            if isinstance(play, Mapping)
+            for item in play.items()
+        ]  # type: ignore[return-value]
+
+    return {}.items()
 
 
 def set_collections_basedir(basedir: Path) -> None:
@@ -267,7 +293,7 @@ def set_collections_basedir(basedir: Path) -> None:
     # produce weird errors if we use a relative one.
     # https://github.com/psf/black/issues/4519
     # fmt: off
-    AnsibleCollectionConfig.playbook_paths = (  # pyright: ignore[reportAttributeAccessIssue]
+    AnsibleCollectionConfig.playbook_paths = (  # type: ignore[attr-defined] # pyright: ignore[reportAttributeAccessIssue]
         str(basedir.resolve()))
     # fmt: on
 
@@ -576,7 +602,7 @@ class HandleChildren:
                 break
 
         if role_path:  # pragma: no branch
-            add_all_plugin_dirs(role_path)
+            add_all_plugin_dirs(role_path)  # type: ignore[no-untyped-call]
 
         return role_path
 
@@ -626,13 +652,13 @@ def _get_task_handler_children_for_tasks_or_playbooks(
     raise LookupError(msg)
 
 
-def _sanitize_task(task: dict[str, Any]) -> dict[str, Any]:
+def _sanitize_task(task: MutableMapping[str, Any]) -> MutableMapping[str, Any]:
     """Return a stripped-off task structure compatible with new Ansible.
 
     This helper takes a copy of the incoming task and drops
     any internally used keys from it.
     """
-    result = task.copy()
+    result = copy.deepcopy(task)
     # task is an AnsibleMapping which inherits from OrderedDict, so we need
     # to use `del` to remove unwanted keys.
     for k in [SKIPPED_RULES_KEY, FILENAME_KEY, LINE_NUMBER_KEY]:
@@ -642,10 +668,10 @@ def _sanitize_task(task: dict[str, Any]) -> dict[str, Any]:
 
 
 def _extract_ansible_parsed_keys_from_task(
-    result: dict[str, Any],
-    task: dict[str, Any],
+    result: MutableMapping[str, Any],
+    task: MutableMapping[str, Any],
     keys: tuple[str, ...],
-) -> dict[str, Any]:
+) -> MutableMapping[str, Any]:
     """Return a dict with existing key in task."""
     for k, v in list(task.items()):
         if k in keys:
@@ -673,18 +699,25 @@ def normalize_task_v2(task: Task) -> dict[str, Any]:
         return result
 
     sanitized_task = _sanitize_task(raw_task)
-    mod_arg_parser = ModuleArgsParser(sanitized_task)
+    mod_arg_parser = ModuleArgsParser(sanitized_task)  # type: ignore[no-untyped-call]
 
     try:
-        action, arguments, result["delegate_to"] = mod_arg_parser.parse(
+        action, arguments, result["delegate_to"] = mod_arg_parser.parse(  # type: ignore[no-untyped-call]
             skip_action_validation=options.skip_action_validation,
         )
-    except AnsibleParserError as exc:
+    except AnsibleParserError as exc:  # pragma: no cover
+        line = 0
+        column = 0
+        regex = LINE_COLUMN_REGEX.search(exc.message)
+        if regex:
+            line = int(regex.group("line"))
+            column = int(regex.group("column"))
         raise MatchError(
             rule=AnsibleParserErrorRule(),
             message=exc.message,
             lintable=Lintable(task.filename or ""),
-            lineno=raw_task.get(LINE_NUMBER_KEY, 1),
+            lineno=line or raw_task.get(LINE_NUMBER_KEY, 1),
+            column=column or None,
         ) from exc
 
     # denormalize shell -> command conversion
@@ -717,14 +750,14 @@ def normalize_task_v2(task: Task) -> dict[str, Any]:
 
 
 # pylint: disable=too-many-nested-blocks
-def extract_from_list(  # type: ignore[no-any-unimported]
+def extract_from_list(
     blocks: AnsibleBaseYAMLObject,
     candidates: list[str],
     *,
     recursive: bool = False,
 ) -> list[Any]:
     """Get action tasks from block structures."""
-    results = []
+    results: list[Any] = []
     if isinstance(blocks, Iterable):
         for block in blocks:
             for candidate in candidates:
@@ -747,7 +780,7 @@ def extract_from_list(  # type: ignore[no-any-unimported]
 
 
 @dataclass
-class Task(dict[str, Any]):
+class Task(Mapping[str, Any]):
     """Class that represents a task from linter point of view.
 
     raw_task:
@@ -768,17 +801,29 @@ class Task(dict[str, Any]):
         notation (no $ prefix).
     """
 
-    raw_task: dict[str, Any]
+    raw_task: MutableMapping[str, Any]
     filename: str = ""
-    _normalized_task: dict[str, Any] | _MISSING_TYPE = field(init=False, repr=False)
+    _normalized_task: MutableMapping[str, Any] | _MISSING_TYPE = field(
+        init=False, repr=False
+    )
     error: MatchError | None = None
     position: str = ""
+
+    def __post_init__(self) -> None:
+        """Ensures that the task is valid."""
+        # This command ensures that we can print the task, ensuring that we
+        # fail fast if someone tries to instantiate an invalid task.
+        str(self)
+
+    def __len__(self) -> int:
+        """Return the length of the normalized task."""
+        return len(self.normalized_task)
 
     @property
     def name(self) -> str | None:
         """Return the name of the task."""
         name = self.raw_task.get("name", None)
-        if name is not None and not isinstance(name, str):
+        if name is not None and not isinstance(name, str):  # pragma: no cover
             msg = "Task name can only be a string."
             raise RuntimeError(msg)
         return name
@@ -809,7 +854,7 @@ class Task(dict[str, Any]):
         return result
 
     @property
-    def normalized_task(self) -> dict[str, Any]:
+    def normalized_task(self) -> MutableMapping[str, Any]:
         """Return the name of the task."""
         if not hasattr(self, "_normalized_task"):
             try:
@@ -824,11 +869,11 @@ class Task(dict[str, Any]):
             raise TypeError(msg)
         return self._normalized_task
 
-    def _normalize_task(self) -> dict[str, Any]:
+    def _normalize_task(self) -> MutableMapping[str, Any]:
         """Unify task-like object structures."""
         ansible_action_type = self.raw_task.get("__ansible_action_type__", "task")
         if "__ansible_action_type__" in self.raw_task:
-            del self.raw_task["__ansible_action_type__"]
+            del self.raw_task["__ansible_action_type__"]  # pragma: no cover
         task = normalize_task_v2(self)
         task[FILENAME_KEY] = self.filename
         task["__ansible_action_type__"] = ansible_action_type
@@ -851,7 +896,7 @@ class Task(dict[str, Any]):
         return is_handler_file or ".handlers[" in self.position
 
     def __str__(self) -> str:
-        """Make a string identifier for the given task."""
+        """Return a string representation of the task."""
         name = self.get("name")
         if name:
             return str(name)
@@ -877,8 +922,8 @@ class Task(dict[str, Any]):
                 args.extend(str(item))
         else:
             args.append(raw_params)
-
-        return f"{action['__ansible_module__']} {' '.join(args)}"
+        result = f"{action['__ansible_module__']} {' '.join(args)}"
+        return result
 
     def __repr__(self) -> str:
         """Return a string representation of the task."""
@@ -934,7 +979,7 @@ class Task(dict[str, Any]):
         return line
 
 
-def task_in_list(  # type: ignore[no-any-unimported]
+def task_in_list(
     data: AnsibleBaseYAMLObject,
     file: Lintable,
     kind: str,
@@ -942,25 +987,30 @@ def task_in_list(  # type: ignore[no-any-unimported]
 ) -> Iterator[Task]:
     """Get action tasks from block structures."""
 
-    def each_entry(data: AnsibleBaseYAMLObject, position: str) -> Iterator[Task]:  # type: ignore[no-any-unimported]
+    def each_entry(
+        data: AnsibleSequence | AnsibleMapping, file: Lintable, position: str
+    ) -> Iterator[Task]:
         if not data or not isinstance(data, Iterable):
             return
         for entry_index, entry in enumerate(data):
             if not entry:
                 continue
             pos_ = f"{position}[{entry_index}]"
-            if isinstance(entry, dict):
+            if isinstance(entry, MutableMapping):
                 yield Task(
                     entry,
+                    filename=file.filename,
                     position=pos_,
                 )
             for block in [k for k in entry if k in NESTED_TASK_KEYS]:
-                yield from task_in_list(
-                    data=entry[block],
-                    file=file,
-                    kind="tasks",
-                    position=f"{pos_}.{block}",
-                )
+                v = entry[block]
+                if isinstance(v, AnsibleBaseYAMLObject):
+                    yield from task_in_list(
+                        data=v,
+                        file=file,
+                        kind="tasks",
+                        position=f"{pos_}.{block}",
+                    )
 
     if not isinstance(data, list):
         return
@@ -974,16 +1024,17 @@ def task_in_list(  # type: ignore[no-any-unimported]
                     if isinstance(item[attribute], list):
                         yield from each_entry(
                             item[attribute],
-                            f"{position}[{item_index}].{attribute}",
+                            file=file,
+                            position=f"{position}[{item_index}].{attribute}",
                         )
-                    elif item[attribute] is not None:
+                    elif item[attribute] is not None:  # pragma: no cover
                         msg = f"Key '{attribute}' defined, but bad value: '{item[attribute]!s}'"
                         raise RuntimeError(msg)
-    else:
-        yield from each_entry(data, position)
+    elif isinstance(data, AnsibleSequence):
+        yield from each_entry(data, file=file, position=position)
 
 
-def add_action_type(  # type: ignore[no-any-unimported]
+def add_action_type(
     actions: AnsibleBaseYAMLObject, action_type: str
 ) -> AnsibleSequence:
     """Add action markers to task objects."""
@@ -991,7 +1042,7 @@ def add_action_type(  # type: ignore[no-any-unimported]
     if isinstance(actions, Iterable):
         for action in actions:
             # ignore empty task
-            if not action:
+            if not action or isinstance(action, str):  # pragma: no cover
                 continue
             action["__ansible_action_type__"] = BLOCK_NAME_TO_ACTION_TYPE_MAP[
                 action_type
@@ -1001,33 +1052,37 @@ def add_action_type(  # type: ignore[no-any-unimported]
 
 
 @cache
-def parse_yaml_linenumbers(  # type: ignore[no-any-unimported]
+def parse_yaml_linenumbers(
     lintable: Lintable,
 ) -> AnsibleBaseYAMLObject | None:
     """Parse yaml as ansible.utils.parse_yaml but with linenumbers.
 
     The line numbers are stored in each node's LINE_NUMBER_KEY key.
     """
+    loader: AnsibleLoader
     result = AnsibleSequence()
 
     # signature of Composer.compose_node
     def compose_node(parent: yaml.nodes.Node | None, index: int) -> yaml.nodes.Node:
         # the line number where the previous token has ended (plus empty lines)
-        line = loader.line
-        node = Composer.compose_node(loader, parent, index)
+        node = Composer.compose_node(loader, parent, index)  # type: ignore[no-untyped-call,arg-type,unused-ignore]
         if not isinstance(node, yaml.nodes.Node):
             msg = "Unexpected yaml data."
             raise TypeError(msg)
-        node.__line__ = line + 1  # type: ignore[attr-defined]
+        if hasattr(loader, "line"):  # pragma: no cover
+            line = loader.line
+            node.__line__ = line + 1  # type: ignore[attr-defined]
         return node
 
     # signature of AnsibleConstructor.construct_mapping
-    def construct_mapping(  # type: ignore[no-any-unimported]
+    def construct_mapping(
         node: yaml.MappingNode,
         deep: bool = False,  # noqa: FBT002
     ) -> AnsibleMapping:
         # pyright: ignore[reportArgumentType]
-        mapping = AnsibleConstructor.construct_mapping(loader, node, deep=deep)
+        mapping: AnsibleMapping = AnsibleConstructor.construct_mapping(
+            loader, node, deep=deep
+        )  # type: ignore[no-untyped-call]
         if hasattr(node, LINE_NUMBER_KEY):
             mapping[LINE_NUMBER_KEY] = getattr(node, LINE_NUMBER_KEY)
         else:
@@ -1039,16 +1094,18 @@ def parse_yaml_linenumbers(  # type: ignore[no-any-unimported]
         kwargs = {}
         if "vault_password" in inspect.getfullargspec(AnsibleLoader.__init__).args:
             kwargs["vault_password"] = DEFAULT_VAULT_PASSWORD
-        loader = AnsibleLoader(lintable.content, **kwargs)
+        # WARNING: 'unused-ignore' is needed below in order to allow mypy to
+        # be passing with both pre-2.19 and post-2.19 versions of Ansible core.
+        loader = AnsibleLoader(lintable.content, **kwargs)  # type: ignore[no-untyped-call]
         # redefine Composer.compose_node
-        loader.compose_node = compose_node
+        loader.compose_node = compose_node  # type: ignore[attr-defined,unused-ignore]
         # redefine AnsibleConstructor.construct_mapping
-        loader.construct_mapping = construct_mapping
+        loader.construct_mapping = construct_mapping  # type: ignore[method-assign]
         # while Ansible only accepts single documents, we also need to load
         # multi-documents, as we attempt to load any YAML file, not only
         # Ansible managed ones.
         while True:
-            data = loader.get_data()
+            data = loader.get_data()  # type: ignore[no-untyped-call]
             if data is None:
                 break
             result.append(data)
@@ -1064,11 +1121,14 @@ def parse_yaml_linenumbers(  # type: ignore[no-any-unimported]
     if len(result) == 0:
         return None  # empty documents
     if len(result) == 1:
+        if not isinstance(result[0], AnsibleBaseYAMLObject):  # pragma: no cover
+            msg = "Unexpected yaml data."
+            raise TypeError(msg)
         return result[0]
     return result
 
 
-def get_cmd_args(task: dict[str, Any]) -> str:
+def get_cmd_args(task: Mapping[str, Any]) -> str:
     """Extract the args from a cmd task as a string."""
     if "cmd" in task["action"]:
         args = task["action"]["cmd"]
@@ -1079,7 +1139,7 @@ def get_cmd_args(task: dict[str, Any]) -> str:
     return args
 
 
-def get_first_cmd_arg(task: dict[str, Any]) -> Any:
+def get_first_cmd_arg(task: Task) -> Any:
     """Extract the first arg from a cmd task."""
     try:
         first_cmd_arg = get_cmd_args(task).split()[0]
@@ -1088,7 +1148,7 @@ def get_first_cmd_arg(task: dict[str, Any]) -> Any:
     return first_cmd_arg
 
 
-def get_second_cmd_arg(task: dict[str, Any]) -> Any:
+def get_second_cmd_arg(task: Task) -> Any:
     """Extract the second arg from a cmd task."""
     try:
         second_cmd_arg = get_cmd_args(task).split()[1]
@@ -1178,7 +1238,7 @@ def _extend_with_roles(lintables: list[Lintable]) -> None:
 
 def convert_to_boolean(value: Any) -> bool:
     """Use Ansible to convert something to a boolean."""
-    return bool(boolean(value))
+    return bool(boolean(value))  # type: ignore[no-untyped-call]
 
 
 def parse_examples_from_plugin(lintable: Lintable) -> tuple[int, str]:
@@ -1195,7 +1255,7 @@ def parse_examples_from_plugin(lintable: Lintable) -> tuple[int, str]:
                 offset = child.lineno - 1
                 break
 
-    docs = read_docstring(str(lintable.path))
+    docs = read_docstring(str(lintable.path))  # type: ignore[no-untyped-call]
     examples = docs["plainexamples"]
 
     # Ignore the leading newline and lack of document start
@@ -1204,26 +1264,31 @@ def parse_examples_from_plugin(lintable: Lintable) -> tuple[int, str]:
 
 
 @lru_cache
-def load_plugin(name: str) -> PluginLoadContext:  # type: ignore[no-any-unimported]
+def load_plugin(name: str) -> PluginLoadContext:
     """Return loaded ansible plugin/module."""
-    loaded_module = action_loader.find_plugin_with_context(
+    loaded_module = action_loader.find_plugin_with_context(  # type: ignore[no-untyped-call]
         name,
         ignore_deprecated=True,
         check_aliases=True,
     )
     if not loaded_module.resolved:
-        loaded_module = module_loader.find_plugin_with_context(
+        loaded_module = module_loader.find_plugin_with_context(  # type: ignore[no-untyped-call]
             name,
             ignore_deprecated=True,
             check_aliases=True,
         )
-    if not loaded_module.resolved and name.startswith("ansible.builtin."):
+    if not loaded_module.resolved and name.startswith(
+        "ansible.builtin."
+    ):  # pragma: no cover
         # fallback to core behavior of using legacy
-        loaded_module = module_loader.find_plugin_with_context(
+        loaded_module = module_loader.find_plugin_with_context(  # type: ignore[no-untyped-call]
             name.replace("ansible.builtin.", "ansible.legacy."),
             ignore_deprecated=True,
             check_aliases=True,
         )
+    if not isinstance(loaded_module, PluginLoadContext):  # pragma: no cover
+        msg = f"Failed to load plugin: {name}"
+        raise TypeError(msg)
     return loaded_module
 
 

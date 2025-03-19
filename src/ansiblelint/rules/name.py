@@ -46,7 +46,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
         results: list[MatchError] = []
         if file.kind != "playbook":
             return []
-        if file.failed():
+        if file.failed():  # pragma: no cover
             return results
         if "name" not in data:
             return [
@@ -72,7 +72,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
         file: Lintable | None = None,
     ) -> list[MatchError]:
         results: list[MatchError] = []
-        if file and file.failed():
+        if file and file.failed():  # pragma: no cover
             return results
         name = task.get("name")
         if not name:

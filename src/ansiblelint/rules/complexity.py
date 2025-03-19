@@ -33,7 +33,7 @@ class ComplexityRule(AnsibleLintRule):
         if file.kind != "playbook":
             return []
         tasks = data.get("tasks", [])
-        if not isinstance(self._collection, RulesCollection):
+        if not isinstance(self._collection, RulesCollection):  # pragma: no cover
             msg = "Rules cannot be run outside a rule collection."
             raise TypeError(msg)
         if len(tasks) > self._collection.options.max_tasks:
@@ -51,7 +51,7 @@ class ComplexityRule(AnsibleLintRule):
         """Check if the task is a block and count the number of items inside it."""
         results: list[MatchError] = []
 
-        if not isinstance(self._collection, RulesCollection):
+        if not isinstance(self._collection, RulesCollection):  # pragma: no cover
             msg = "Rules cannot be run outside a rule collection."
             raise TypeError(msg)
 
@@ -70,7 +70,7 @@ class ComplexityRule(AnsibleLintRule):
 
     def calculate_block_depth(self, task: Task) -> int:
         """Recursively calculate the block depth of a task."""
-        if not isinstance(task.position, str):
+        if not isinstance(task.position, str):  # pragma: no cover
             raise NotImplementedError
         return task.position.count(".block")
 

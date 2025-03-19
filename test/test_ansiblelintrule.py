@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import pytest
 
 from ansiblelint.rules import AnsibleLintRule, RulesCollection
-
-if TYPE_CHECKING:
-    from ansiblelint.config import Options
+from ansiblelint.rules.complexity import ComplexityRule
 
 
 def test_unjinja() -> None:
@@ -19,15 +17,22 @@ def test_unjinja() -> None:
     assert AnsibleLintRule.unjinja(text) == output
 
 
-@pytest.mark.parametrize("rule_config", ({}, {"foo": True, "bar": 1}))
+@pytest.mark.parametrize(
+    ("rule_name", "rule_config"),
+    (
+        pytest.param("load-failure", {}, id="load-failure"),
+        pytest.param("complexity", {}, id="complexity"),
+    ),
+)
 def test_rule_config(
+    rule_name: str,
     rule_config: dict[str, Any],
-    config_options: Options,
 ) -> None:
     """Check that a rule config can be accessed."""
-    config_options.rules["load-failure"] = rule_config
-    rules = RulesCollection(options=config_options)
+    rules = RulesCollection()
+    rules.register(ComplexityRule())
+
     for rule in rules:
-        if rule.id == "load-failure":
+        if rule.id == rule_name:
             assert rule._collection  # noqa: SLF001
             assert rule.rule_config == rule_config

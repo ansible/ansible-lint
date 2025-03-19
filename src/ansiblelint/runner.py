@@ -37,7 +37,7 @@ from ansiblelint.file_utils import (
 from ansiblelint.logger import timed_info
 from ansiblelint.rules.syntax_check import OUTPUT_PATTERNS
 from ansiblelint.text import strip_ansi_escape
-from ansiblelint.types import AnsibleMapping
+from ansiblelint.types import AnsibleJSON, AnsibleMapping
 from ansiblelint.utils import (
     PLAYBOOK_DIR,
     HandleChildren,
@@ -273,12 +273,26 @@ class Runner:
         matches.extend(
             self._emit_matches([file for file in files if not file.failed()])
         )
-
+        # mark failed failed lintables as stop processing in order to avoid
+        # duplicated errors from further processing of the other rules
+        for match in matches:
+            if match.lintable.failed():
+                match.lintable.stop_processing = True
+                # Look into making lintables singletons to avoid having to update them
+                for lintable in self.lintables:
+                    if lintable == match.lintable:
+                        lintable.stop_processing = True
+                        break
         # remove duplicates from files list
         files = list(dict.fromkeys(files))
 
         for file in self.lintables:
-            if file in self.checked_files or not file.kind or file.failed():
+            if (
+                file in self.checked_files
+                or not file.kind
+                or file.failed()
+                or file.stop_processing
+            ):
                 continue
             _logger.debug(
                 "Examining %s of type %s",
@@ -347,6 +361,9 @@ class Runner:
             cmd = [
                 "ansible-playbook",
                 "--syntax-check",
+                "-vv",  # needed or ansible-core will fail to mention the loaded file with includes:
+                # statically imported: /foo/bar/malformed.yml
+                # ERROR! A malformed block was encountered while loading a block. ..."
                 playbook_path,
             ]
             if app.options.extra_vars:
@@ -488,11 +505,12 @@ class Runner:
 
     def find_children(self, lintable: Lintable) -> list[Lintable]:
         """Traverse children of a single file or folder."""
+        playbook_ds: AnsibleJSON
         if not lintable.path.exists():
             return []
         playbook_dir = str(lintable.path.parent)
         ansiblelint.utils.set_collections_basedir(lintable.path.parent)
-        add_all_plugin_dirs(playbook_dir or ".")
+        add_all_plugin_dirs(playbook_dir or ".")  # type: ignore[no-untyped-call]
         if lintable.kind == "role":
             playbook_ds = AnsibleMapping({"roles": [{"role": str(lintable.path)}]})
         elif lintable.kind == "plugin":
@@ -526,7 +544,7 @@ class Runner:
                 # Repair incorrect paths obtained when old syntax was used, like:
                 # - include: simpletask.yml tags=nginx
                 valid_tokens = []
-                for token in split_args(path_str):
+                for token in split_args(path_str):  # type: ignore[no-untyped-call]
                     if "=" in token:
                         break
                     valid_tokens.append(token)
@@ -570,7 +588,7 @@ class Runner:
             "ansible.builtin.import_tasks": handlers.include_children,
         }
         (k, v) = item
-        add_all_plugin_dirs(str(basedir.resolve()))
+        add_all_plugin_dirs(str(basedir.resolve()))  # type: ignore[no-untyped-call]
 
         if k in delegate_map and v:
             v = template(

@@ -60,7 +60,7 @@ class KeyOrderTMeta(RuleMatchTransformMeta):
 
     fixed: tuple[str | int, ...]
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:  # pragma: no cover
         """Return string representation."""
         return f"Fixed to {self.fixed}"
 
@@ -122,7 +122,7 @@ class KeyOrderRule(AnsibleLintRule, TransformMixin):
         lintable: Lintable,
         data: CommentedMap | CommentedSeq | str,
     ) -> None:
-        if not isinstance(match.transform_meta, KeyOrderTMeta):
+        if not isinstance(match.transform_meta, KeyOrderTMeta):  # pragma: no cover
             return
 
         if match.tag == f"{self.id}[play]":

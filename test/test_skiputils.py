@@ -15,6 +15,7 @@ from ansiblelint.skip_utils import (
     get_rule_skips_from_line,
     is_nested_task,
 )
+from ansiblelint.utils import Task
 
 if TYPE_CHECKING:
     from ansiblelint.rules import RulesCollection
@@ -186,7 +187,7 @@ def test_playbook_noqa2(default_text_runner: RunFromText) -> None:
         ),
     ),
 )
-def test_append_skipped_rules(  # type: ignore[no-any-unimported]
+def test_append_skipped_rules(
     lintable: Lintable,
     yaml: AnsibleBaseYAMLObject,
     expected_form: AnsibleBaseYAMLObject,
@@ -233,7 +234,7 @@ def test_append_skipped_rules(  # type: ignore[no-any-unimported]
 )
 def test_is_nested_task(task: dict[str, Any], expected: bool) -> None:
     """Test is_nested_task() returns expected bool."""
-    assert is_nested_task(task) == expected
+    assert is_nested_task(Task(task)) == expected
 
 
 def test_capture_warning_outdated_tag(

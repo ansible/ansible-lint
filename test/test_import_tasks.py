@@ -15,7 +15,7 @@ from ansiblelint.runner import Runner
             4,
             id="0",
         ),
-        pytest.param("examples/playbooks/test_import_with_malformed.yml", 1, 1, id="1"),
+        pytest.param("examples/playbooks/test_import_with_malformed.yml", 2, 1, id="1"),
     ),
 )
 def test_import_tasks(

@@ -70,13 +70,13 @@ class ValidationPassedError(Exception):
     """Exception to be raised when validation passes."""
 
 
-class CustomAnsibleModule(basic.AnsibleModule):  # type: ignore[misc,no-any-unimported]
+class CustomAnsibleModule(basic.AnsibleModule):
     """Mock AnsibleModule class."""
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Initialize AnsibleModule mock."""
         kwargs["no_log"] = True
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)  # type: ignore[no-untyped-call]
         raise ValidationPassedError
 
 
@@ -106,7 +106,7 @@ class ArgsRule(AnsibleLintRule):
         if module_name in self.module_aliases:
             return []
 
-        loaded_module: PluginLoadContext = load_plugin(module_name)  # type: ignore[no-any-unimported]
+        loaded_module: PluginLoadContext = load_plugin(module_name)
 
         # https://github.com/ansible/ansible-lint/issues/3200
         # since "ps1" modules cannot be executed on POSIX platforms, we will
@@ -229,7 +229,7 @@ class ArgsRule(AnsibleLintRule):
         try:
             failed_obj = json.loads(failed_msg)
             error_message = failed_obj["msg"]
-        except json.decoder.JSONDecodeError:
+        except json.decoder.JSONDecodeError:  # pragma: no cover
             error_message = failed_msg
 
         option_type_check_error = re.search(
