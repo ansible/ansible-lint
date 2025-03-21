@@ -187,6 +187,9 @@ class BaseRule:
     @property
     def options(self) -> Options | None:
         """Used to access linter configuration."""
+        if self.unloadable:
+            # internal rules are not configurable
+            return None
         if self._collection is None:
             msg = f"A rule ({self.id}) that is not part of a collection cannot access its configuration."
             _logger.warning(msg)

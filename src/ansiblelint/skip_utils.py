@@ -26,7 +26,7 @@ import collections.abc
 import logging
 import re
 import warnings
-from collections.abc import MutableMapping, Sequence
+from collections.abc import Mapping, MutableMapping, Sequence
 from functools import cache
 from itertools import product
 from typing import TYPE_CHECKING, Any
@@ -94,7 +94,7 @@ def get_rule_skips_from_line(
     return result
 
 
-def append_skipped_rules(  # type: ignore[no-any-unimported]
+def append_skipped_rules(
     pyyaml_data: AnsibleBaseYAMLObject,
     lintable: Lintable,
 ) -> AnsibleBaseYAMLObject:
@@ -142,7 +142,7 @@ def load_data(file_text: str) -> Any:
         return yaml.load_all(file_text)
 
 
-def _append_skipped_rules(  # type: ignore[no-any-unimported]
+def _append_skipped_rules(
     pyyaml_data: AnsibleBaseYAMLObject,
     lintable: Lintable,
 ) -> AnsibleBaseYAMLObject | None:
@@ -310,7 +310,7 @@ def normalize_tag(tag: str) -> str:
     return tag
 
 
-def is_nested_task(task: dict[str, Any]) -> bool:
+def is_nested_task(task: Mapping[str, Any]) -> bool:
     """Check if task includes block/always/rescue."""
     # Cannot really trust the input
     if isinstance(task, str):

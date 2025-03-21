@@ -4,7 +4,8 @@ collections:
   - ansible.posix
   - ansible.windows
   - community.crypto
-  - community.docker
+  - name: community.docker
+    version: ">=4.5.1"
   - community.general
   - community.molecule
   - community.windows

@@ -7,6 +7,7 @@ import functools
 import logging
 import os
 import re
+from collections.abc import Mapping
 from io import StringIO
 from pathlib import Path
 from re import Pattern
@@ -46,7 +47,7 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__name__)
 
 
-class CustomYamlLintConfig(YamlLintConfig):  # type: ignore[misc,no-any-unimported]
+class CustomYamlLintConfig(YamlLintConfig):
     """Extension of YamlLintConfig."""
 
     def __init__(
@@ -55,7 +56,7 @@ class CustomYamlLintConfig(YamlLintConfig):  # type: ignore[misc,no-any-unimport
         file: str | Path | None = None,
     ) -> None:
         """Initialize config."""
-        super().__init__(content, file)
+        super().__init__(content=content, file=file)  # type: ignore[no-untyped-call]
         self.incompatible = ""
 
 
@@ -95,7 +96,7 @@ def load_yamllint_config() -> CustomYamlLintConfig:
                 file,
             )
             custom_config = CustomYamlLintConfig(file=str(file))
-            custom_config.extend(config)
+            custom_config.extend(config)  # type: ignore[no-untyped-call]
             config = custom_config
             break
 
@@ -158,7 +159,7 @@ def load_yamllint_config() -> CustomYamlLintConfig:
 
 
 def nested_items_path(
-    data_collection: dict[Any, Any] | list[Any],
+    data_collection: Mapping[Any, Any] | list[Any],
     ignored_keys: Sequence[str] = (),
 ) -> Iterator[tuple[Any, Any, list[str | int]]]:
     """Iterate a nested data structure, yielding key/index, value, and parent_path.
@@ -220,7 +221,7 @@ def nested_items_path(
     # valid data, we better ignore NoneType
     if data_collection is None:
         return
-    data: dict[Any, Any] | list[Any]
+    data: Mapping[Any, Any] | list[Any]
     if isinstance(data_collection, Task):
         data = data_collection.normalized_task
     else:
@@ -233,7 +234,7 @@ def nested_items_path(
 
 
 def _nested_items_path(
-    data_collection: dict[Any, Any] | list[Any],
+    data_collection: Mapping[Any, Any] | list[Any],
     parent_path: list[str | int],
     ignored_keys: Sequence[str] = (),
 ) -> Iterator[tuple[Any, Any, list[str | int]]]:
@@ -246,7 +247,7 @@ def _nested_items_path(
     # we have to cast each convert_to_tuples assignment or mypy complains
     # that both assignments (for dict and list) do not have the same type
     # convert_to_tuples_type = Callable[[], Iterator[tuple[str | int, Any]]]
-    if isinstance(data_collection, dict):
+    if isinstance(data_collection, Mapping):
         convert_data_collection_to_tuples = cast(
             "Callable[[], Iterator[tuple[str | int, Any]]]",
             functools.partial(data_collection.items),

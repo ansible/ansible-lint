@@ -885,10 +885,10 @@ if "pytest" in sys.modules:
             data = args[1]
 
             if data != "{{ 12 | random(seed=inventory_hostname) }}":
-                return do_template(*args, **kwargs)
+                return do_template(*args, **kwargs)  # type: ignore[no-untyped-call]
 
             msg = "Unexpected templating type error occurred on (foo): bar"
-            raise AnsibleError(msg)
+            raise AnsibleError(str(msg))  # type: ignore[no-untyped-call]
 
         do_template = Templar.do_template
         collection = RulesCollection()

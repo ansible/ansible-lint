@@ -60,4 +60,4 @@
     - name: Restart something # noqa: fqcn[action-core] no-changed-when
       command: do something
     - name: Foo # noqa: fqcn[action-core] deprecated-module
-      include: handlers/included-handlers.yml
+      include_tasks: handlers/included-handlers.yml
