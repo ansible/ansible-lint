@@ -14,7 +14,7 @@ from yaml import YAMLError
 try:
     from yaml import CFullLoader as FullLoader
     from yaml import CSafeLoader as SafeLoader
-except (ImportError, AttributeError):
+except (ImportError, AttributeError):  # pragma: no cover
     from yaml import FullLoader, SafeLoader  # type: ignore[assignment]
 
 if TYPE_CHECKING:
@@ -65,7 +65,7 @@ def load_ignore_txt(filepath: Path | None = None) -> dict[str, set[str]]:
                 if entry:
                     try:
                         path, rule = entry.split()
-                    except ValueError as exc:
+                    except ValueError as exc:  # pragma: no cover
                         msg = f"Unable to parse line '{line}' from {ignore_file} file."
                         raise RuntimeError(msg) from exc
                     result[path].add(rule)

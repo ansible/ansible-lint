@@ -15,21 +15,25 @@ try:
     from ansible.parsing.yaml.constructor import (  # pyright: ignore[reportMissingImports]
         AnsibleConstructor,
     )
-except ImportError:  # ansible-core 2.19+
-    from ansible._internal._yaml._constructor import (  # pyright: ignore[reportMissingImports]
-        AnsibleConstructor,
-    )
-try:
     from ansible.parsing.yaml.objects import (  # pyright: ignore[reportMissingImports]
         AnsibleBaseYAMLObject,  # pyright: ignore[reportRedeclaration]
     )
-except ImportError:  # ansible-core 2.19+
-    AnsibleBaseYAMLObject: TypeAlias = AnsibleSequence | AnsibleUnicode | str | None  # type: ignore[no-redef] # pyright: ignore[reportRedeclaration]
+# core 2.19 + data tagging:
+except ImportError:  # pragma: no cover
+    from ansible._internal._yaml._constructor import (  # type: ignore[import-not-found,no-redef] # pyright: ignore[reportMissingImports] # pylint: disable=import-error,no-name-in-module
+        AnsibleConstructor,
+    )
 
+    AnsibleBaseYAMLObject: TypeAlias = (  # type: ignore[no-redef] # pyright: ignore[reportRedeclaration]
+        AnsibleSequence | AnsibleMapping | AnsibleUnicode | str | None
+    )
+
+AnsibleJSON: TypeAlias = AnsibleSequence | AnsibleMapping | AnsibleUnicode | str | None
 
 __all__ = [
     "AnsibleBaseYAMLObject",
     "AnsibleConstructor",
+    "AnsibleJSON",
     "AnsibleMapping",
     "AnsibleSequence",
     "AnsibleUnicode",

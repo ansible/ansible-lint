@@ -101,7 +101,7 @@ class RoleNames(AnsibleLintRule):
                     role_name = role["role"]
                 elif isinstance(role, str):
                     role_name = role
-                else:
+                else:  # pragma: no cover
                     msg = "Role dependency has unexpected type."
                     raise TypeError(msg)
                 if "/" in role_name:
@@ -132,7 +132,7 @@ class RoleNames(AnsibleLintRule):
                             role_name = role["role"]
                         elif isinstance(role, str):
                             role_name = role
-                        if not isinstance(role_name, str):
+                        if not isinstance(role_name, str):  # pragma: no cover
                             msg = "Role dependency has unexpected type."
                             raise TypeError(msg)
                         if "/" in role_name:

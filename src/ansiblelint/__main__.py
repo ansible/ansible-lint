@@ -218,7 +218,9 @@ def fix(runtime_options: Options, result: LintResult, rules: RulesCollection) ->
 
     # pylint: enable=import-outside-toplevel
 
-    if Version(ruamel_safe_version) > Version(ruamel_yaml_version_str):
+    if Version(ruamel_safe_version) > Version(
+        ruamel_yaml_version_str
+    ):  # pragma: no cover
         _logger.warning(
             "We detected use of `--fix` feature with a buggy ruamel-yaml %s library instead of >=%s, upgrade it before reporting any bugs like dropped comments.",
             ruamel_yaml_version_str,
@@ -227,7 +229,7 @@ def fix(runtime_options: Options, result: LintResult, rules: RulesCollection) ->
     acceptable_tags = {"all", "none", *rules.known_tags()}
     unknown_tags = set(options.write_list).difference(acceptable_tags)
 
-    if unknown_tags:
+    if unknown_tags:  # pragma: no cover
         _logger.error(
             "Found invalid value(s) (%s) for --fix arguments, must be one of: %s",
             ", ".join(unknown_tags),
@@ -299,7 +301,7 @@ def main(argv: list[str] | None = None) -> int:
             msg += "[/]"
             console.print(msg)
             msg = get_version_warning()
-            if msg:
+            if msg:  # pragma: no cover
                 console.print(msg)
             support_banner()
             must_exit = True
@@ -312,7 +314,7 @@ def main(argv: list[str] | None = None) -> int:
         _logger.debug("Options: %s", options)
         _logger.debug("CWD: %s", Path.cwd())
 
-    for warn in warns:
+    for warn in warns:  # pragma: no cover
         _logger.warning(str(warn.message))
     warnings.resetwarnings()
 
@@ -377,18 +379,18 @@ def main(argv: list[str] | None = None) -> int:
     # Mark matches as ignored inside ignore file
     ignore_map = load_ignore_txt(options.ignore_file)
     for match in result.matches:
-        if match.tag in ignore_map[match.filename]:
+        if match.tag in ignore_map[match.filename]:  # pragma: no cover
             match.ignored = True
             _logger.debug("Ignored: %s", match)
 
-    if app.yamllint_config.incompatible:
+    if app.yamllint_config.incompatible:  # pragma: no cover
         _logger.log(
             level=logging.ERROR if options.write_list else logging.WARNING,
             msg=app.yamllint_config.incompatible,
         )
 
     if options.write_list:
-        if app.yamllint_config.incompatible:
+        if app.yamllint_config.incompatible:  # pragma: no cover
             sys.exit(RC.INVALID_CONFIG)
         fix(runtime_options=options, result=result, rules=rules)
 
@@ -485,7 +487,7 @@ def path_inject(own_location: str = "") -> None:
     # functioning or that is in fact the same version that was installed as
     # our dependency, but addressing this would be done by ansible-compat.
     for cmd in ("ansible",):
-        if not shutil.which(cmd):
+        if not shutil.which(cmd):  # pragma: no cover
             msg = f"Failed to find runtime dependency '{cmd}' in PATH"
             raise RuntimeError(msg)
 

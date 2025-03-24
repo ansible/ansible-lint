@@ -22,23 +22,9 @@ def rules_as_str(rules: RulesCollection) -> str:
     return result
 
 
-def profiles_as_md(*, header: bool = False, docs_url: str = RULE_DOC_URL) -> Markdown:
+def profiles_as_md(*, docs_url: str = RULE_DOC_URL) -> Markdown:
     """Return markdown representation of supported profiles."""
     result = ""
-
-    if header:
-        result += """<!---
-Do not manually edit, generated from generate_docs.py
--->
-# Profiles
-
-Ansible-lint profiles gradually increase the strictness of rules as your Ansible content lifecycle.
-
-!!! note
-
-    Rules with `*` in the suffix are not yet implemented but are documented with linked GitHub issues.
-
-"""
 
     for name, profile in PROFILES.items():
         extends = ""

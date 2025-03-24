@@ -63,7 +63,7 @@ source = ["src", ".tox/*/site-packages"]
 [tool.coverage.report]
 exclude_also = ["pragma: no cover", "if TYPE_CHECKING:"]
 # Increase it just so it would pass on any single-python run
-fail_under = 92
+fail_under = 93
 # During development we might remove code (files) with coverage data, and we dont want to fail:
 ignore_errors = true
 omit = ["test/*"]
@@ -89,8 +89,9 @@ disallow_untyped_calls = true
 disallow_untyped_defs = true
 error_summary = true
 # site-packages is here to help vscode mypy integration getting confused
-exclude = "(.cache|.config|.eggs|.tox|_readthedocs|build|dist|test/local-content|site|site-packages|~/.pyenv|examples|plugins/modules)"
+exclude = "(.cache|.config|.eggs|.tox|_readthedocs|build|dist|test/local-content|site|site-packages|~/.pyenv|examples|plugins/modules).*"
 # https://github.com/python/mypy/issues/12664
+follow_untyped_imports = true
 incremental = false
 no_implicit_optional = true
 python_version = "3.10"
@@ -105,10 +106,15 @@ warn_unused_configs = true
 ignore_errors = true
 ignore_missing_imports = true
 module = [
-  "ansible.*",
   "ansiblelint._version", # generated
   "license_expression",
-  "ruamel.yaml",
+  "ruamel.yaml"
+]
+
+[[tool.mypy.overrides]]
+implicit_reexport = true
+module = [
+  "ansible.*",
   "yamllint.*"
 ]
 
@@ -364,7 +370,10 @@ exclude = [
   ".ansible",
   ".cache",
   ".config",
+  ".direnv",
+  ".eggs",
   ".tox",
+  ".venv",
   "ansible_collections",
   "build",
   "dist",

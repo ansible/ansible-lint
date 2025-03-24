@@ -67,7 +67,7 @@ class YamllintRule(AnsibleLintRule, TransformMixin):
         if str(file.base_kind) != "text/yaml":
             return matches
 
-        for problem in run_yamllint(
+        for problem in run_yamllint(  # type: ignore[no-untyped-call]
             file.content,
             YamllintRule.config,
             filepath=file.path,

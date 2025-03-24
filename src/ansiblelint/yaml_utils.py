@@ -7,6 +7,7 @@ import functools
 import logging
 import os
 import re
+from collections.abc import Mapping
 from io import StringIO
 from pathlib import Path
 from re import Pattern
@@ -46,7 +47,7 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__name__)
 
 
-class CustomYamlLintConfig(YamlLintConfig):  # type: ignore[misc,no-any-unimported]
+class CustomYamlLintConfig(YamlLintConfig):
     """Extension of YamlLintConfig."""
 
     def __init__(
@@ -55,7 +56,7 @@ class CustomYamlLintConfig(YamlLintConfig):  # type: ignore[misc,no-any-unimport
         file: str | Path | None = None,
     ) -> None:
         """Initialize config."""
-        super().__init__(content, file)
+        super().__init__(content=content, file=file)  # type: ignore[no-untyped-call]
         self.incompatible = ""
 
 
@@ -95,7 +96,7 @@ def load_yamllint_config() -> CustomYamlLintConfig:
                 file,
             )
             custom_config = CustomYamlLintConfig(file=str(file))
-            custom_config.extend(config)
+            custom_config.extend(config)  # type: ignore[no-untyped-call]
             config = custom_config
             break
 
@@ -158,7 +159,7 @@ def load_yamllint_config() -> CustomYamlLintConfig:
 
 
 def nested_items_path(
-    data_collection: dict[Any, Any] | list[Any],
+    data_collection: Mapping[Any, Any] | list[Any],
     ignored_keys: Sequence[str] = (),
 ) -> Iterator[tuple[Any, Any, list[str | int]]]:
     """Iterate a nested data structure, yielding key/index, value, and parent_path.
@@ -218,9 +219,9 @@ def nested_items_path(
     """
     # As typing and mypy cannot effectively ensure we are called only with
     # valid data, we better ignore NoneType
-    if data_collection is None:
+    if data_collection is None:  # pragma: no cover
         return
-    data: dict[Any, Any] | list[Any]
+    data: Mapping[Any, Any] | list[Any]
     if isinstance(data_collection, Task):
         data = data_collection.normalized_task
     else:
@@ -233,7 +234,7 @@ def nested_items_path(
 
 
 def _nested_items_path(
-    data_collection: dict[Any, Any] | list[Any],
+    data_collection: Mapping[Any, Any] | list[Any],
     parent_path: list[str | int],
     ignored_keys: Sequence[str] = (),
 ) -> Iterator[tuple[Any, Any, list[str | int]]]:
@@ -246,7 +247,7 @@ def _nested_items_path(
     # we have to cast each convert_to_tuples assignment or mypy complains
     # that both assignments (for dict and list) do not have the same type
     # convert_to_tuples_type = Callable[[], Iterator[tuple[str | int, Any]]]
-    if isinstance(data_collection, dict):
+    if isinstance(data_collection, Mapping):
         convert_data_collection_to_tuples = cast(
             "Callable[[], Iterator[tuple[str | int, Any]]]",
             functools.partial(data_collection.items),
@@ -295,7 +296,7 @@ def get_path_to_play(
             next_play_line_index = None
 
         lc = play.lc
-        if not isinstance(lc.line, int):
+        if not isinstance(lc.line, int):  # pragma: no cover
             msg = f"expected lc.line to be an int, got {lc.line!r}"
             raise TypeError(msg)
         if lc.line == line_index:
@@ -325,7 +326,7 @@ def get_path_to_task(
         msg = f"expected lineno >= 1, got {lineno}"
         raise ValueError(msg)
     if lintable.kind in ("tasks", "handlers", "playbook"):
-        if not isinstance(ruamel_data, CommentedSeq):
+        if not isinstance(ruamel_data, CommentedSeq):  # pragma: no cover
             msg = f"expected ruamel_data to be a CommentedSeq, got {ruamel_data!r}"
             raise ValueError(msg)
         if lintable.kind in ("tasks", "handlers"):
@@ -432,7 +433,7 @@ def _get_path_to_task_in_tasks_block(
                 task_path: list[str | int] = [task_index]
                 return task_path + list(subtask_path)
 
-        if not isinstance(task.lc.line, int):
+        if not isinstance(task.lc.line, int):  # pragma: no cover
             msg = f"expected task.lc.line to be an int, got {task.lc.line!r}"
             raise TypeError(msg)
         if task.lc.line == line_index:
@@ -547,7 +548,7 @@ class CustomConstructor(RoundTripConstructor):
                 underscore = [len(v) - v.rindex("_") - 1, False, False]  # type: Any
             except ValueError:
                 underscore = None
-            except IndexError:
+            except IndexError:  # pragma: no cover
                 underscore = None
             value_s = value_su.replace("_", "")
             if value_s[0] in "+-":
@@ -733,7 +734,7 @@ class FormattedEmitter(Emitter):
                 string = string.replace("#", "\uff03#\ufe5f")
                 # this is safe even if this sequence is present
                 # because it gets reversed in post-processing
-        except (ValueError, TypeError):
+        except (ValueError, TypeError):  # pragma: no cover
             # probably not really a string. Whatever.
             pass
         return string
@@ -1028,7 +1029,7 @@ class FormattedYAML(YAML):
 
     def load(self, stream: Path | Any) -> Any:
         """Load YAML content from a string while avoiding known ruamel.yaml issues."""
-        if not isinstance(stream, str):
+        if not isinstance(stream, str):  # pragma: no cover
             msg = f"expected a str but got {type(stream)}"
             raise NotImplementedError(msg)
         # As ruamel drops comments for any document that is not a mapping or sequence,

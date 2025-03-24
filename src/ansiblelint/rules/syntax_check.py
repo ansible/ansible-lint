@@ -44,7 +44,7 @@ OUTPUT_PATTERNS = (
     KnownError(
         tag="malformed",
         regex=re.compile(
-            r"^ERROR! (?P<title>A malformed block was encountered while loading a block[^\n]*)",
+            r"^(statically imported: (?P<filename>[\w\/\.\-]+)\n)?ERROR! (?P<title>A malformed block was encountered while loading a block[^\n]*)",
             re.MULTILINE | re.DOTALL | re.DOTALL,
         ),
     ),

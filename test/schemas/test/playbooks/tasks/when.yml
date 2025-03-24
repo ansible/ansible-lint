@@ -1,10 +1,10 @@
-- action: foo
+- action: debug
   when: true # valid
 
-- action: foo 2
+- action: debug msg="foo"
   when: foo in bar # valid
 
-- action: foo 3
+- action: debug msg="foo 3"
   when: # valid
     - foo in bar
     - apple is orange

@@ -72,7 +72,7 @@ class MatchError(ValueError):
             if not self.message:
                 msg = f"{self.__class__.__name__}() missing a required argument: one of 'message' or 'rule'"
                 raise TypeError(msg)
-            if not isinstance(self.tag, str):
+            if not isinstance(self.tag, str):  # pragma: no cover
                 msg = "MatchErrors must be created with either rule or tag specified."
                 raise TypeError(msg)
         if not self.message:

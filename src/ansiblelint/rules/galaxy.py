@@ -73,7 +73,7 @@ class GalaxyRule(AnsibleLintRule):
         for path in changelog_paths:
             if path.is_file():
                 changelog_found = 1
-        galaxy_tag_list = data.get("tags")
+        galaxy_tag_list = data.get("tags", [])
         galaxy_tag_invalid_format = [
             tag for tag in galaxy_tag_list if not TAG_NAME_REGEXP.match(tag)
         ]
@@ -247,6 +247,11 @@ if "pytest" in sys.modules:
                 "examples/.no_collection_version/galaxy.yml",
                 ["schema[galaxy]", "galaxy[version-missing]"],
                 id="no-collection-version",
+            ),
+            pytest.param(
+                "examples/collections/broken_no_runtime/galaxy.yml",
+                ["galaxy[no-runtime]"],
+                id="broken_no_runtime",
             ),
         ),
     )

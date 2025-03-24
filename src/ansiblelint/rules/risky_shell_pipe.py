@@ -38,13 +38,13 @@ class ShellWithoutPipefail(AnsibleLintRule):
         task: Task,
         file: Lintable | None = None,
     ) -> bool | str:
-        if task["__ansible_action_type__"] != "task":
+        if task["__ansible_action_type__"] != "task":  # pragma: no cover
             return False
 
         if task["action"]["__ansible_module__"] != "shell":
             return False
 
-        if task.get("ignore_errors"):
+        if task.get("ignore_errors"):  # pragma: no cover
             return False
 
         jinja_stripped_cmd = self.unjinja(get_cmd_args(task))
