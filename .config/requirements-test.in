@@ -13,6 +13,7 @@ pytest-instafail >= 0.5.0 # only for local development, via PYTEST_ADDOPTS=-edit
 pytest-mock
 pytest-plus >= 0.6 # for PYTEST_REQPASS
 pytest-xdist[psutil,setproctitle] >= 2.1.0
+pytest-sugar  # shows failures immediately, even with xdist
 ruamel-yaml-clib  # needed for mypy
 ruamel.yaml>=0.17.31
 tox >= 4.0.0
