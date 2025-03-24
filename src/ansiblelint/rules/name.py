@@ -52,7 +52,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
             return [
                 self.create_matcherror(
                     message="All plays should be named.",
-                    lineno=data[LINE_NUMBER_KEY],
+                    lineno=data.get(LINE_NUMBER_KEY, 1),
                     tag="name[play]",
                     filename=file,
                 ),
@@ -61,7 +61,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
             self._check_name(
                 data["name"],
                 lintable=file,
-                lineno=data[LINE_NUMBER_KEY],
+                lineno=data.get(LINE_NUMBER_KEY, 1),
             ),
         )
         return results

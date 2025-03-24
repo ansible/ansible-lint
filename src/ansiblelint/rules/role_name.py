@@ -27,7 +27,7 @@ import sys
 from functools import cache
 from typing import TYPE_CHECKING
 
-from ansiblelint.constants import ROLE_IMPORT_ACTION_NAMES
+from ansiblelint.constants import LINE_NUMBER_KEY, ROLE_IMPORT_ACTION_NAMES
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import parse_yaml_from_file
 
@@ -124,11 +124,11 @@ class RoleNames(AnsibleLintRule):
         if file.kind == "playbook":
             for play in file.data:
                 if "roles" in play:
-                    line = play["__line__"]
+                    line = play[LINE_NUMBER_KEY]
                     for role in play["roles"]:
                         role_name = None
                         if isinstance(role, dict):
-                            line = role["__line__"]
+                            line = role[LINE_NUMBER_KEY]
                             role_name = role["role"]
                         elif isinstance(role, str):
                             role_name = role
