@@ -49,10 +49,16 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
         self.prefix = re.compile(
             options.loop_var_prefix.format(role=toidentifier(file.role)),
         )
-        has_loop = "loop" in task.raw_task
-        for key in task.raw_task:
-            if key.startswith("with_"):
-                has_loop = True
+        has_loop = False
+        if "loop" in task.raw_task:
+            data = task.raw_task["loop"]
+            has_loop = True
+        else:
+            for key in task.raw_task:
+                if key.startswith("with_"):
+                    data = key
+                    has_loop = True
+                    break
 
         if has_loop:
             loop_control = task.raw_task.get("loop_control", {})
@@ -64,6 +70,7 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
                         self.create_matcherror(
                             message=f"Loop variable name does not match /{options.loop_var_prefix}/ regex, where role={toidentifier(file.role)}.",
                             filename=file,
+                            data=loop_var,
                             tag="loop-var-prefix[wrong]",
                         ),
                     ]
@@ -72,6 +79,7 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
                     self.create_matcherror(
                         message=f"Replace unsafe implicit `item` loop variable by adding a `loop_var` that is matching /{options.loop_var_prefix}/ regex.",
                         filename=file,
+                        data=data,
                         tag="loop-var-prefix[missing]",
                     ),
                 ]

@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import TypeAlias
+from collections.abc import Mapping, Sequence
+from typing import Never, TypeAlias
 
 from ansible.parsing.yaml.objects import (  # pyright: ignore[reportMissingImports]
     AnsibleMapping,
@@ -18,17 +19,31 @@ try:
     from ansible.parsing.yaml.objects import (  # pyright: ignore[reportMissingImports]
         AnsibleBaseYAMLObject,  # pyright: ignore[reportRedeclaration]
     )
+
+    TrustedAsTemplate = None
+    AnsibleTemplateSyntaxError = Never
 # core 2.19 + data tagging:
 except ImportError:  # pragma: no cover
+    from ansible._internal._datatag._tags import TrustedAsTemplate
     from ansible._internal._yaml._constructor import (  # type: ignore[import-not-found,no-redef] # pyright: ignore[reportMissingImports] # pylint: disable=import-error,no-name-in-module
         AnsibleConstructor,
     )
+    from ansible.errors import AnsibleTemplateSyntaxError
 
     AnsibleBaseYAMLObject: TypeAlias = (  # type: ignore[no-redef] # pyright: ignore[reportRedeclaration]
-        AnsibleSequence | AnsibleMapping | AnsibleUnicode | str | None
+        AnsibleSequence
+        | AnsibleMapping
+        | AnsibleUnicode
+        | str
+        | Mapping
+        | Sequence
+        | None
     )
 
-AnsibleJSON: TypeAlias = AnsibleSequence | AnsibleMapping | AnsibleUnicode | str | None
+# temporary ignoring the type parameters for Sequence and Mapping because once
+# add them we can no longer use isinstance() to check for them and we will
+# need to implement a more complex runtime type checking.
+AnsibleJSON: TypeAlias = Sequence | Mapping | AnsibleUnicode | str | None  # type: ignore[type-arg]
 
 __all__ = [
     "AnsibleBaseYAMLObject",
@@ -36,6 +51,8 @@ __all__ = [
     "AnsibleJSON",
     "AnsibleMapping",
     "AnsibleSequence",
+    "AnsibleTemplateSyntaxError",
     "AnsibleUnicode",
     "AnsibleVaultEncryptedUnicode",
+    "TrustedAsTemplate",
 ]

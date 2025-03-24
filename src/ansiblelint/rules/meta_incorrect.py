@@ -6,7 +6,6 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 
-from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
@@ -48,8 +47,8 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
                 results.append(
                     self.create_matcherror(
                         filename=file,
-                        lineno=file.data[LINE_NUMBER_KEY],
                         message=f"Should change default metadata: {field}",
+                        data=file.data,
                     ),
                 )
 

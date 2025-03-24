@@ -66,7 +66,7 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule, TransformMixin):
                 message=self.shortdesc,
                 filename=file,
                 tag=f"{self.id}[play]",
-                lineno=data[LINE_NUMBER_KEY],
+                data=data,
             )
             errors.append(error)
         return errors

@@ -28,10 +28,19 @@ from yamllint.config import YamlLintConfig
 
 from ansiblelint.constants import (
     ANNOTATION_KEYS,
+    LINE_NUMBER_KEY,
     NESTED_TASK_KEYS,
     PLAYBOOK_TASK_KEYWORDS,
 )
 from ansiblelint.utils import Task
+
+try:  # ansible 2.19 + data tagging
+    # cspell: ignore datatag
+    from ansible._internal._datatag._tags import (  # type: ignore[import-not-found] # pyright: ignore[reportMissingImports]
+        Origin,
+    )
+except ImportError:  # pragma: no cover
+    Origin = None
 
 if TYPE_CHECKING:
     # noinspection PyProtectedMember
@@ -1266,3 +1275,22 @@ def clean_json(
         # neither a dict nor a list, do nothing
         pass
     return obj
+
+
+def get_line_column(data: object, default_line: int = 1) -> tuple[int, int | None]:
+    """Return the line and column of the given data.
+
+    Args:
+        data: Object for which to introspect line number.
+        default_line: fallbacl default line numebr to return if no line number is found.
+    """
+    line = 0
+    column = None
+    if isinstance(data, Mapping) and LINE_NUMBER_KEY in data:
+        line = int(data[LINE_NUMBER_KEY])
+    # ansible 2.19+
+    if not line and Origin:  # pragma: no cover
+        tag = Origin.get_tag(data)
+        line = tag.line_num
+        column = tag.col_num
+    return (line or default_line, column)

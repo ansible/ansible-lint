@@ -94,6 +94,7 @@ from ansiblelint.types import (
     AnsibleJSON,
     AnsibleMapping,
     AnsibleSequence,
+    TrustedAsTemplate,
 )
 
 if TYPE_CHECKING:
@@ -203,6 +204,8 @@ def ansible_template(
     kwargs["disable_lookups"] = True
     for _i in range(10):
         try:
+            if TrustedAsTemplate and not isinstance(varname, TrustedAsTemplate):
+                varname = TrustedAsTemplate().tag(varname)
             templated = templar.template(varname, **kwargs)  # type: ignore[no-untyped-call]
         except AnsibleError as exc:
             if lookup_error in exc.message:
@@ -958,7 +961,9 @@ class Task(Mapping[str, Any]):
     def get_error_line(self, path: list[str | int]) -> int:
         """Return error line number."""
         ctx = self.normalized_task
-        line = self.normalized_task[LINE_NUMBER_KEY]
+        line = 1
+        if LINE_NUMBER_KEY in self.normalized_task:
+            line = self.normalized_task[LINE_NUMBER_KEY]
         for _ in path:
             if (
                 isinstance(ctx, collections.abc.Container) and _ in ctx
@@ -972,7 +977,8 @@ class Task(Mapping[str, Any]):
                     isinstance(ctx, collections.abc.Container)
                     and LINE_NUMBER_KEY in ctx
                 ):
-                    line = ctx[LINE_NUMBER_KEY]  # pyright: ignore[reportIndexIssue]
+                    if LINE_NUMBER_KEY in ctx:
+                        line = ctx[LINE_NUMBER_KEY]  # pyright: ignore[reportIndexIssue]
         if not isinstance(line, int):  # pragma: no cover
             msg = "Line number is not an integer"
             raise TypeError(msg)
@@ -988,7 +994,7 @@ def task_in_list(
     """Get action tasks from block structures."""
 
     def each_entry(
-        data: AnsibleSequence | AnsibleMapping, file: Lintable, position: str
+        data: Sequence[Any] | AnsibleMapping, file: Lintable, position: str
     ) -> Iterator[Task]:
         if not data or not isinstance(data, Iterable):
             return
@@ -1012,16 +1018,16 @@ def task_in_list(
                         position=f"{pos_}.{block}",
                     )
 
-    if not isinstance(data, list):
+    if not isinstance(data, Sequence):
         return
     if kind == "playbook":
         attributes = ["tasks", "pre_tasks", "post_tasks", "handlers"]
         for item_index, item in enumerate(data):
             for attribute in attributes:
-                if not isinstance(item, dict):
+                if not isinstance(item, Mapping):
                     continue
                 if attribute in item:
-                    if isinstance(item[attribute], list):
+                    if isinstance(item[attribute], Sequence):
                         yield from each_entry(
                             item[attribute],
                             file=file,
@@ -1030,7 +1036,7 @@ def task_in_list(
                     elif item[attribute] is not None:  # pragma: no cover
                         msg = f"Key '{attribute}' defined, but bad value: '{item[attribute]!s}'"
                         raise RuntimeError(msg)
-    elif isinstance(data, AnsibleSequence):
+    elif isinstance(data, Sequence):
         yield from each_entry(data, file=file, position=position)
 
 

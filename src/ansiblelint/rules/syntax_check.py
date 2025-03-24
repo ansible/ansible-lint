@@ -70,6 +70,16 @@ OUTPUT_PATTERNS = (
             re.MULTILINE | re.DOTALL | re.DOTALL,
         ),
     ),
+    # 2.19:
+    # [ERROR]: no module/action detected in task.
+    # Origin: /Users/ssbarnea/code/a/ansible-lint/examples/roles/invalid_due_syntax/tasks/main.yml:2:3
+    KnownError(
+        tag="specific",
+        regex=re.compile(
+            r"^\[ERROR\]: (?P<title>[^\n]*)\nOrigin: (?P<filename>[\w\/\.\-]+):(?P<line>\d+):(?P<column>\d+)",
+            re.MULTILINE | re.DOTALL | re.DOTALL,
+        ),
+    ),
 )
 
 
