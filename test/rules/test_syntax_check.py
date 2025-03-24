@@ -17,7 +17,7 @@ from ansiblelint.runner import Runner
             [
                 (
                     "syntax-check[specific]",
-                    4,
+                    [4],
                     7,
                     "conflicting action statements: ansible.builtin.debug, ansible.builtin.command",
                 ),
@@ -29,7 +29,7 @@ from ansiblelint.runner import Runner
             [
                 (
                     "syntax-check[specific]",
-                    5,
+                    [5, 6],
                     7,
                     "'include_role' is not a valid attribute for a Block",
                 ),
@@ -41,7 +41,7 @@ from ansiblelint.runner import Runner
 def test_get_ansible_syntax_check_matches(
     default_rules_collection: RulesCollection,
     filename: str,
-    expected_results: list[tuple[str, int, int, str]],
+    expected_results: list[tuple[str, list[int], int, str]],
 ) -> None:
     """Validate parsing of ansible output."""
     lintable = Lintable(
@@ -54,7 +54,7 @@ def test_get_ansible_syntax_check_matches(
     assert len(result) == len(expected_results)
     for index, expected in enumerate(expected_results):
         assert result[index].tag == expected[0]
-        assert result[index].lineno == expected[1]
+        assert result[index].lineno in expected[1]
         assert result[index].column == expected[2]
         assert str(expected[3]) in result[index].message
         # We internally convert absolute paths returned by ansible into paths

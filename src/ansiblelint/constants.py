@@ -89,6 +89,7 @@ FileType = Literal[
     "ansible-lint-config",
     "sanity-ignore-file",  # tests/sanity/ignore file
     "plugin",
+    "galaxy",  # galaxy.yml
     "",  # unknown file type
 ]
 

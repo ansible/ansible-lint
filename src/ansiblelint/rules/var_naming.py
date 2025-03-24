@@ -7,13 +7,11 @@ import re
 import sys
 from typing import TYPE_CHECKING, Any, NamedTuple
 
-from ansible.parsing.yaml.objects import AnsibleUnicode
 from ansible.vars.reserved import get_reserved_names
 
 from ansiblelint.config import Options, options
 from ansiblelint.constants import (
     ANNOTATION_KEYS,
-    LINE_NUMBER_KEY,
     PLAYBOOK_ROLE_KEYWORDS,
     RC,
 )
@@ -137,6 +135,7 @@ class VariableNamingRule(AnsibleLintRule):
                 tag="var-naming[non-ascii]",
                 message=f"Variables names must be ASCII. ({ident})",
                 filename=file,
+                data=ident,
             )
 
         if keyword.iskeyword(ident):
@@ -144,6 +143,7 @@ class VariableNamingRule(AnsibleLintRule):
                 tag="var-naming[no-keyword]",
                 message=f"Variables names must not be Python keywords. ({ident})",
                 filename=file,
+                data=ident,
             )
 
         if ident in self.reserved_names:
@@ -151,6 +151,7 @@ class VariableNamingRule(AnsibleLintRule):
                 tag="var-naming[no-reserved]",
                 message=f"Variables names must not be Ansible reserved names. ({ident})",
                 filename=file,
+                data=ident,
             )
 
         if ident in self.read_only_names:
@@ -158,6 +159,7 @@ class VariableNamingRule(AnsibleLintRule):
                 tag="var-naming[read-only]",
                 message=f"This special variable is read-only. ({ident})",
                 filename=file,
+                data=ident,
             )
 
         # We want to allow use of jinja2 templating for variable names
@@ -171,6 +173,7 @@ class VariableNamingRule(AnsibleLintRule):
                 tag="var-naming[pattern]",
                 message=f"Variables names should match {self.re_pattern_str} regex. ({ident})",
                 filename=file,
+                data=ident,
             )
 
         if (
@@ -183,6 +186,7 @@ class VariableNamingRule(AnsibleLintRule):
                 tag="var-naming[no-role-prefix]",
                 message=f"Variables names from within roles should use {prefix.value}_ as a prefix.",
                 filename=file,
+                data=ident,
             )
         return None
 
@@ -198,32 +202,20 @@ class VariableNamingRule(AnsibleLintRule):
         for key in our_vars:
             match_error = self.get_var_naming_matcherror(key, file=file)
             if match_error:
-                match_error.lineno = (
-                    key.ansible_pos[1]
-                    if isinstance(key, AnsibleUnicode)
-                    else our_vars[LINE_NUMBER_KEY]
-                )
                 raw_results.append(match_error)
         roles = data.get("roles", [])
         for role in roles:
-            if isinstance(role, AnsibleUnicode):
+            if isinstance(role, str):
                 continue
             role_fqcn = role.get("role", role.get("name"))
             prefix = self._parse_prefix(role_fqcn)
             for key in list(role.keys()):
                 if key not in PLAYBOOK_ROLE_KEYWORDS:
                     match_error = self.get_var_naming_matcherror(
-                        key,
-                        prefix=prefix,
-                        file=file,
+                        key, prefix=prefix, file=file
                     )
                     if match_error:
                         match_error.message += f" (vars: {key})"
-                        match_error.lineno = (
-                            key.ansible_pos[1]
-                            if isinstance(key, AnsibleUnicode)
-                            else role[LINE_NUMBER_KEY]
-                        )
                         raw_results.append(match_error)
 
             our_vars = role.get("vars", {})
@@ -235,11 +227,6 @@ class VariableNamingRule(AnsibleLintRule):
                 )
                 if match_error:
                     match_error.message += f" (vars: {key})"
-                    match_error.lineno = (
-                        key.ansible_pos[1]
-                        if isinstance(key, AnsibleUnicode)
-                        else our_vars[LINE_NUMBER_KEY]
-                    )
                     raw_results.append(match_error)
         if raw_results:
             lines = file.content.splitlines()
@@ -281,7 +268,6 @@ class VariableNamingRule(AnsibleLintRule):
                 file=file or Lintable(""),
             )
             if match_error:
-                match_error.lineno = our_vars[LINE_NUMBER_KEY]
                 match_error.message += f" (vars: {key})"
                 results.append(match_error)
 
@@ -336,7 +322,6 @@ class VariableNamingRule(AnsibleLintRule):
                     file=file,
                 )
                 if match_error:
-                    match_error.lineno = key.ansible_pos[1]
                     match_error.message += f" (vars: {key})"
                     raw_results.append(match_error)
             if raw_results:

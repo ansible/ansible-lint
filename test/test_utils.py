@@ -324,7 +324,10 @@ def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
     out, err = capfd.readouterr()
 
     # An expected rule match from our examples
-    assert "playbook.yml:6: name[casing]" in out
+    assert any(
+        x in out
+        for x in ("playbook.yml:6: name[casing]", "playbook.yml:6:13: name[casing]")
+    )
     # assures that our ansible-lint config exclude was effective in excluding github files
     assert "Identified: .github/" not in out
     # assures that we can parse playbooks as playbooks

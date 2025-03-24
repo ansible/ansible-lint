@@ -31,6 +31,11 @@ def pytest_configure(config: pytest.Config) -> None:
     if is_help_option_present(config):
         return
     if is_master(config):
+        # linter should be able de detect and convert some deprecation warnings
+        # into validation errors but during testing we disable this to avoid
+        # unnecessary noise. Still, we might want to enable it for particular
+        # tests, for testing our ability to detect deprecations.
+        os.environ["ANSIBLE_DEPRECATION_WARNINGS"] = "False"
         # we need to be sure that we have the requirements installed as some tests
         # might depend on these. This approach is compatible with GHA caching.
         try:

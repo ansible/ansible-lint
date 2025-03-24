@@ -6,8 +6,7 @@ authors:
   - John
 description: your collection description
 license:
-  - GPL
-  - Apache
+  - GPL-3.0-or-later
 
 dependencies: {}
 repository: http://example.com/repository

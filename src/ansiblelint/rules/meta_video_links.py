@@ -56,16 +56,24 @@ class MetaVideoLinksRule(AnsibleLintRule):
                     self.create_matcherror(
                         "Expected item in 'video_links' to be a dictionary",
                         filename=file,
+                        data=video,
                     ),
                 )
                 continue
 
-            if set(video) != {"url", "title", FILENAME_KEY, LINE_NUMBER_KEY}:
+            unexpected_keys = set(video) - {
+                "url",
+                "title",
+                FILENAME_KEY,
+                LINE_NUMBER_KEY,
+            }
+            if unexpected_keys:
                 results.append(
                     self.create_matcherror(
                         "Expected item in 'video_links' to contain "
                         "only keys 'url' and 'title'",
                         filename=file,
+                        data=video,
                     ),
                 )
                 continue
@@ -79,7 +87,9 @@ class MetaVideoLinksRule(AnsibleLintRule):
                     "Expected it be a shared link from Vimeo, YouTube, "
                     "or Google Drive."
                 )
-                results.append(self.create_matcherror(msg, filename=file))
+                results.append(
+                    self.create_matcherror(msg, filename=file, data=video["url"])
+                )
 
         return results
 
@@ -97,10 +107,10 @@ if "pytest" in sys.modules:
             pytest.param(
                 "examples/roles/meta_video_links_fail/meta/main.yml",
                 (
+                    "URL format 'https://www.youtube.com/watch?v=aWmRepTSFKs&feature=youtu.be' is not recognized. Expected it be a shared link from Vimeo, YouTube, or Google Drive.",
                     "Expected item in 'video_links' to be a dictionary",
                     "Expected item in 'video_links' to contain only keys 'url' and 'title'",
-                    "URL format 'https://www.youtube.com/watch?v=aWmRepTSFKs&feature=youtu.be' is not recognized. Expected it be a shared link from Vimeo, YouTube, or Google Drive.",
-                    "URL format 'www.acme.com/vid' is not recognized",
+                    "URL format 'www.acme.com/vid' is not recognized. Expected it be a shared link from Vimeo, YouTube, or Google Drive.",
                 ),
                 id="1",
             ),
@@ -119,6 +129,8 @@ if "pytest" in sys.modules:
         """Test rule matches."""
         results = Runner(test_file, rules=default_rules_collection).run()
         assert len(results) == len(failures)
-        for index, result in enumerate(results):
+        # order of results is different between pre/post 2.19 due to increased
+        # line precision in 2.19
+        for result in results:
             assert result.tag == "meta-video-links"
-            assert failures[index] in result.message
+            assert result.message in failures

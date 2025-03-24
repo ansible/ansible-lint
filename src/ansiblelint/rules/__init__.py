@@ -76,15 +76,22 @@ class AnsibleLintRule(BaseRule):
         self,
         message: str = "",
         lineno: int = 1,
+        column: int | None = None,
         details: str = "",
         filename: Lintable | None = None,
         tag: str = "",
         transform_meta: RuleMatchTransformMeta | None = None,
+        data: Any | None = None,
     ) -> MatchError:
         """Instantiate a new MatchError."""
+        if data is not None and lineno == 1 and column is None:
+            lineno, column = ansiblelint.yaml_utils.get_line_column(
+                data, default_line=lineno
+            )
         match = MatchError(
             message=message,
             lineno=lineno,
+            column=column,
             details=details,
             lintable=filename or Lintable(""),
             rule=copy.copy(self),

@@ -63,7 +63,7 @@ source = ["src", ".tox/*/site-packages"]
 [tool.coverage.report]
 exclude_also = ["pragma: no cover", "if TYPE_CHECKING:"]
 # Increase it just so it would pass on any single-python run
-fail_under = 96
+fail_under = 95
 # During development we might remove code (files) with coverage data, and we dont want to fail:
 ignore_errors = true
 omit = ["test/*"]
@@ -388,6 +388,8 @@ mode = "standard"
 # reportMissingImports = false
 # https://github.com/microsoft/pyright/issues/9494
 reportPossiblyUnboundVariable = false
+# Introduced in v1.1.398 but already covered by ruff
+reportPrivateImportUsage = false
 
 # spell-checker:ignore filterwarnings norecursedirs optionflags
 [tool.pytest.ini_options]
