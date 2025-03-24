@@ -1086,7 +1086,8 @@ def parse_yaml_linenumbers(
         if hasattr(node, LINE_NUMBER_KEY):
             mapping[LINE_NUMBER_KEY] = getattr(node, LINE_NUMBER_KEY)
         else:
-            mapping[LINE_NUMBER_KEY] = mapping._line_number  # noqa: SLF001
+            if hasattr(mapping, "_line_number"):
+                mapping[LINE_NUMBER_KEY] = mapping._line_number  # noqa: SLF001
         mapping[FILENAME_KEY] = lintable.path
         return mapping
 
