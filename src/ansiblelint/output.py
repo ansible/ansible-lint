@@ -83,6 +83,9 @@ _styles = (
     "number",
     "path",
 )
+RE_BB_LINK_PATTERN = re.compile(
+    r"\[link=([^\]]+)\]((?:[^\[]|\[(?!\/link\]))+)\[/link\]"
+)
 
 
 # Based on Ansible implementation
@@ -258,6 +261,8 @@ class Console:
 
     colored: bool = True
     style: type[PlainStyle] = AnsiStyle
+    # Regex to find opening tags and their content
+    tag_pattern = re.compile(r"\[([\w\.]+)(?:=(.*?))?\]|\[/\]")
 
     def __init__(self, file: TextIO | None = sys.stdout):
         """Console constructor."""
@@ -298,8 +303,6 @@ class Console:
             "failed": (style.failed, style.normal),
             "success": (style.success, style.normal),
         }
-        # Regex to find opening tags and their content
-        tag_pattern = re.compile(r"\[([\w\.]+)(?:=(.*?))?\]|\[/\]")
 
         def replace_bb_links(text: str) -> str:
             """Replaces BBCode-style links ([link=url]title[/link]) with HTML <a> tags.
@@ -310,9 +313,6 @@ class Console:
             Returns:
                 str: The text with BBCode links replaced by HTML <a> tags.
             """
-            # Define a safe regex pattern
-            pattern = r"\[link=([^\]]+)\]((?:[^\[]|\[(?!\/link\]))+)\[/link\]"
-
             # Replace matches with HTML <a> tags
 
             def replacement(match: re.Match[str]) -> str:
@@ -320,7 +320,7 @@ class Console:
                 title = match.group(2)
                 return style.render_link(url, title)
 
-            result = re.sub(pattern, replacement, text)
+            result = RE_BB_LINK_PATTERN.sub(replacement, text)
             return result
 
         def replace_bb_tags(text: str) -> str:
@@ -331,7 +331,7 @@ class Console:
             result = []  # Result list to build the output HTML
             pos = 0  # Current position in the text
 
-            for match in tag_pattern.finditer(text):
+            for match in self.tag_pattern.finditer(text):
                 start, end = match.span()
                 tag = match.group(1)
                 param = match.group(2)

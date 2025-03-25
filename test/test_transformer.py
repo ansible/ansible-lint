@@ -205,6 +205,13 @@ def fixture_runner_result(
             True,
             id="4114",
         ),
+        pytest.param(
+            "examples/playbooks/transform-name.yml",
+            3,
+            True,
+            True,
+            id="name-capitalize",
+        ),
     ),
 )
 @mock.patch.dict(os.environ, {"ANSIBLE_LINT_WRITE_TMP": "1"}, clear=True)

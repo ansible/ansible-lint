@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 import sys
+from collections.abc import MutableMapping
 from typing import TYPE_CHECKING, Any
 
 import wcmatch.pathlib
@@ -234,7 +235,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
             if orig_task_name:
                 updated_task_name = update_task_name(orig_task_name)
                 for item in data:
-                    if isinstance(item, dict) and "tasks" in item:
+                    if isinstance(item, MutableMapping) and "tasks" in item:
                         for task in item["tasks"]:
                             # We want to rewrite task names in the notify keyword, but
                             # if there isn't a notify section, there's nothing to do.

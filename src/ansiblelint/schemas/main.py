@@ -22,6 +22,12 @@ if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
 
 
+RE_MD_URLS = re.compile(
+    r"\[.{0,256}?\]\((?P<url>https?://[^\s]+)\)|(?P<url2>https?://[^\s]+)"
+)
+RE_URLS_AND_MD_URLS = re.compile(r"\[.{0,256}?\]\((https?://[^\s]+)\)|https?://[^\s]+")
+
+
 def find_best_deep_match(
     errors: ValidationError,
 ) -> ValidationError:
@@ -58,7 +64,9 @@ def validate_file_schema(file: Lintable) -> list[str]:
         if error.context:
             error = find_best_deep_match(error)
         # determine if we want to use our own messages embedded into schemas inside title/markdownDescription fields
-        if not hasattr(error, "schema") or not isinstance(error.schema, dict):
+        if not hasattr(error, "schema") or not isinstance(
+            error.schema, dict
+        ):  # pragma: no cover
             msg = "error object does not have schema attribute"
             raise TypeError(msg)
         if "not" in error.schema and len(error.schema["not"]) == 0:
@@ -72,8 +80,7 @@ def validate_file_schema(file: Lintable) -> list[str]:
             for k in ("description", "markdownDescription"):
                 if k in json_schema:
                     # Find standalone URLs and also markdown urls.
-                    match = re.search(
-                        r"\[.*?\]\((?P<url>https?://[^\s]+)\)|(?P<url2>https?://[^\s]+)",
+                    match = RE_MD_URLS.search(
                         json_schema[k],
                     )
                     if match:
@@ -89,14 +96,14 @@ def validate_file_schema(file: Lintable) -> list[str]:
             message += f" See {documentation_url}"
     except yaml.constructor.ConstructorError as exc:
         return [f"Failed to load YAML file '{file.path}': {exc.problem}"]
-    except ValidationError as exc:
+    except ValidationError as exc:  # pragma: no cover
         message = exc.message
         documentation_url = ""
         for k in ("description", "markdownDescription"):
             if k in schema:
                 # Find standalone URLs and also markdown urls.
-                match = re.search(
-                    r"\[.*?\]\((https?://[^\s]+)\)|https?://[^\s]+",
+
+                match = RE_URLS_AND_MD_URLS.search(
                     schema[k],
                 )
                 if match:

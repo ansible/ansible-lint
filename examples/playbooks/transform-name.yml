@@ -1,0 +1,16 @@
+---
+- name: Fixture testing transform name capitalize
+  hosts: all
+  tasks:
+    - name: missing capital name with notify
+      ansible.builtin.debug:
+        msg: "foo"
+      notify: missing capital name
+    - name: missing capital name with notify list
+      ansible.builtin.debug:
+        msg: "foo"
+      notify:
+        - missing capital name
+    - name: missing capital name
+      ansible.builtin.debug:
+        msg: "bar"

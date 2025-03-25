@@ -92,6 +92,8 @@ class ArgsRule(AnsibleLintRule):
     _ids = {
         "args[module]": description,
     }
+    RE_PATTERN = re.compile(r"(argument|option) '(?P<name>.*)' is of type")
+    RE_VALUE_OF = re.compile(r"value of (?P<name>.*) must be one of:")
 
     def matchtask(
         self,
@@ -232,8 +234,7 @@ class ArgsRule(AnsibleLintRule):
         except json.decoder.JSONDecodeError:  # pragma: no cover
             error_message = failed_msg
 
-        option_type_check_error = re.search(
-            r"(argument|option) '(?P<name>.*)' is of type",
+        option_type_check_error = self.RE_PATTERN.search(
             error_message,
         )
         if option_type_check_error:
@@ -249,8 +250,7 @@ class ArgsRule(AnsibleLintRule):
                 )
                 return results
 
-        value_not_in_choices_error = re.search(
-            r"value of (?P<name>.*) must be one of:",
+        value_not_in_choices_error = self.RE_VALUE_OF.search(
             error_message,
         )
         if value_not_in_choices_error:

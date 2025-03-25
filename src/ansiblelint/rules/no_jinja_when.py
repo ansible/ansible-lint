@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 import sys
+from collections.abc import MutableMapping
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.constants import LINE_NUMBER_KEY
@@ -15,6 +16,8 @@ if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
     from ansiblelint.utils import Task
+
+RE_JINJA = re.compile(r"{{ (.*?) }}")
 
 
 class NoFormattingInWhenRule(AnsibleLintRule, TransformMixin):
@@ -80,12 +83,13 @@ class NoFormattingInWhenRule(AnsibleLintRule, TransformMixin):
             task = self.seek(match.yaml_path, data)
             key_to_check = ("when", "changed_when", "failed_when")
             for _ in range(len(task)):
-                k, v = task.popitem(False)
-                if k == "roles" and isinstance(v, list):
-                    transform_for_roles(v, key_to_check=key_to_check)
-                elif k in key_to_check:
-                    v = re.sub(r"{{ (.*?) }}", r"\1", v)
-                task[k] = v
+                if isinstance(task, MutableMapping):
+                    for k, v in task.items():
+                        if k == "roles" and isinstance(v, list):
+                            transform_for_roles(v, key_to_check=key_to_check)
+                        elif k in key_to_check:
+                            v = RE_JINJA.sub(r"\1", v)
+                            task[k] = v
             match.fixed = True
 
 
@@ -96,10 +100,10 @@ def transform_for_roles(v: list[Any], key_to_check: tuple[str, ...]) -> None:
             if new_key in key_to_check:
                 if isinstance(new_value, list):
                     for index, nested_value in enumerate(new_value):
-                        new_value[index] = re.sub(r"{{ (.*?) }}", r"\1", nested_value)
+                        new_value[index] = RE_JINJA.sub(r"\1", nested_value)
                     v[idx][new_key] = new_value
                 if isinstance(new_value, str):
-                    v[idx][new_key] = re.sub(r"{{ (.*?) }}", r"\1", new_value)
+                    v[idx][new_key] = RE_JINJA.sub(r"\1", new_value)
 
 
 if "pytest" in sys.modules:

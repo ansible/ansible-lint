@@ -4,17 +4,16 @@ from __future__ import annotations
 
 import logging
 import sys
-from collections.abc import Iterable, MutableMapping, MutableSequence
 from typing import TYPE_CHECKING
 
 from yamllint.linter import run as run_yamllint
 
-from ansiblelint.constants import LINE_NUMBER_KEY, SKIPPED_RULES_KEY
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.yaml_utils import load_yamllint_config
 
 if TYPE_CHECKING:
+    from collections.abc import MutableMapping, MutableSequence
     from typing import Any
 
     from ansiblelint.config import Options
@@ -108,42 +107,6 @@ class YamllintRule(AnsibleLintRule, TransformMixin):
         # This method does nothing because the YAML reformatting is implemented
         # in data dumper. Still presence of this method helps us with
         # documentation generation.
-
-
-def _combine_skip_rules(data: Any) -> set[str]:
-    """Return a consolidated list of skipped rules."""
-    result = set(data.get(SKIPPED_RULES_KEY, []))
-    tags = data.get("tags", [])
-    if tags and (
-        (isinstance(tags, Iterable) and "skip_ansible_lint" in tags)
-        or tags == "skip_ansible_lint"
-    ):
-        result.add("skip_ansible_lint")
-    return result
-
-
-def _fetch_skips(data: Any, collector: dict[int, set[str]]) -> dict[int, set[str]]:
-    """Retrieve a dictionary with line: skips by looking recursively in given JSON structure."""
-    if hasattr(data, "get") and data.get(LINE_NUMBER_KEY):
-        rules = _combine_skip_rules(data)
-        if rules:
-            collector[data.get(LINE_NUMBER_KEY)].update(rules)
-    if isinstance(data, Iterable) and not isinstance(data, str):
-        if isinstance(data, dict):
-            for value in data.values():
-                _fetch_skips(value, collector)
-        else:  # must be some kind of list
-            for entry in data:
-                if (
-                    entry
-                    and hasattr(entry, "get")
-                    and LINE_NUMBER_KEY in entry
-                    and SKIPPED_RULES_KEY in entry
-                    and entry[SKIPPED_RULES_KEY]
-                ):
-                    collector[entry[LINE_NUMBER_KEY]].update(entry[SKIPPED_RULES_KEY])
-                _fetch_skips(entry, collector)
-    return collector
 
 
 # testing code to be loaded only with pytest or when executed the rule file

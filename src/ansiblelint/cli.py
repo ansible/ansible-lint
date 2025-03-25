@@ -519,7 +519,7 @@ def merge_config(file_config: dict[Any, Any], cli_config: Options) -> Options:
                 setattr(cli_config, entry, default)
         if cli_config.write_list is None:
             cli_config.write_list = []
-        elif cli_config.write_list == [WriteArgAction._default]:  # noqa: SLF001
+        elif cli_config.write_list == [WriteArgAction._default]:  # noqa: SLF001 # pragma: no cover
             cli_config.write_list = ["all"]
         return cli_config
 

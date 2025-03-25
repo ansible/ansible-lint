@@ -8,6 +8,8 @@ from functools import cache
 RE_HAS_JINJA = re.compile(r"{[{%#].*[%#}]}", re.DOTALL)
 RE_HAS_GLOB = re.compile(r"[][*?]")
 RE_IS_FQCN_OR_NAME = re.compile(r"^\w+(\.\w+){2,100}$|^\w+$")
+RE_STRIP_ANSI_ESCAPE = re.compile(r"\x1b[^m]*m")
+RE_TO_IDENTIFIER = re.compile(r"[\s-]+")
 
 
 def strip_ansi_escape(data: str | bytes) -> str:
@@ -19,12 +21,12 @@ def strip_ansi_escape(data: str | bytes) -> str:
     if isinstance(data, bytes):  # pragma: no branch
         data = data.decode("utf-8")
 
-    return re.sub(r"\x1b[^m]*m", "", data)
+    return RE_STRIP_ANSI_ESCAPE.sub("", data)
 
 
 def toidentifier(text: str) -> str:
     """Convert unsafe chars to ones allowed in variables."""
-    result = re.sub(r"[\s-]+", "_", text)
+    result = RE_TO_IDENTIFIER.sub("_", text)
     if not result.isidentifier():
         msg = f"Unable to convert role name '{text}' to valid variable name."
         raise RuntimeError(msg)

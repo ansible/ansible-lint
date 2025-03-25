@@ -6,6 +6,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from collections.abc import Mapping
 from http.client import RemoteDisconnected
 from pathlib import Path
 
@@ -14,6 +15,7 @@ from pytest_mock import MockerFixture
 
 from ansiblelint.config import get_version_warning, options
 from ansiblelint.constants import RC
+from ansiblelint.loaders import yaml_load_safe
 
 
 @pytest.mark.parametrize(
@@ -155,3 +157,21 @@ def test_broken_ansible_cfg() -> None:
         "Invalid type for configuration option setting: CACHE_PLUGIN_TIMEOUT"
         in proc.stderr
     )
+
+
+def test_list_tags() -> None:
+    """Asserts that we can list tags and that the output is parseable yaml."""
+    result = subprocess.run(
+        ["ansible-lint", "--list-tags"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0
+    data = yaml_load_safe(result.stdout)
+    assert isinstance(data, Mapping)
+    for key, value in data.items():
+        assert isinstance(key, str)
+        assert isinstance(value, list)
+        for item in value:
+            assert isinstance(item, str)

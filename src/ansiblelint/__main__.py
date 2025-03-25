@@ -336,7 +336,7 @@ def main(argv: list[str] | None = None) -> int:
         or options.nodeps
     )
 
-    if not skip_schema_update:
+    if not skip_schema_update:  # pragma: no cover
         # pylint: disable=import-outside-toplevel
         from ansiblelint.schemas.__main__ import refresh_schemas
 

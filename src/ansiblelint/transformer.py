@@ -97,7 +97,7 @@ class Transformer:
 
             try:
                 data: str = file.content
-            except (UnicodeDecodeError, IsADirectoryError):
+            except (UnicodeDecodeError, IsADirectoryError):  # pragma: no cover
                 # we hit a binary file (eg a jar or tar.gz) or a directory
                 data = ""
                 file_is_yaml = False
@@ -132,7 +132,7 @@ class Transformer:
                 # noinspection PyUnboundLocalVariable
                 file.content = yaml.dumps(ruamel_data)
 
-            elif self.write_set != {"none"}:
+            elif self.write_set != {"none"}:  # pragma: no cover
                 self._do_transforms(file, ruamel_data or data, file_is_yaml, matches)
 
             if file.updated:
