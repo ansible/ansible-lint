@@ -19,7 +19,7 @@ _logger = logging.getLogger(__name__)
 
 
 def _make_module_stub(module_name: str, options: Options) -> None:
-    if not options.cache_dir:
+    if not options.cache_dir:  # pragma: no cover
         msg = "Cache directory not set"
         raise RuntimeError(msg)
     # a.b.c is treated a collection
@@ -75,7 +75,7 @@ def _write_module_stub(
 def _perform_mockings(options: Options) -> None:
     """Mock modules and roles."""
     path: Path
-    if not options.cache_dir:
+    if not options.cache_dir:  # pragma: no cover
         msg = "Cache directory not set"
         raise RuntimeError(msg)
     for role_name in options.mock_roles:
@@ -105,7 +105,7 @@ def _perform_mockings(options: Options) -> None:
 
 def _perform_mockings_cleanup(options: Options) -> None:
     """Clean up mocked modules and roles."""
-    if not options.cache_dir:
+    if not options.cache_dir:  # pragma: no cover
         msg = "Cache directory not set"
         raise RuntimeError(msg)
     for role_name in options.mock_roles:

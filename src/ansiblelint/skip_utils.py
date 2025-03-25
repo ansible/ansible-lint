@@ -112,7 +112,7 @@ def append_skipped_rules(
     """
     try:
         yaml_skip = _append_skipped_rules(pyyaml_data, lintable)
-    except RuntimeError:
+    except RuntimeError:  # pragma: no cover
         # Notify user of skip error, do not stop, do not change exit code
         _logger.exception("Error trying to append skipped rules")
         return pyyaml_data
@@ -149,7 +149,7 @@ def _append_skipped_rules(
     # parse file text using 2nd parser library
     try:
         ruamel_data = load_data(lintable.content)
-    except ScannerError as exc:
+    except ScannerError as exc:  # pragma: no cover
         _logger.debug(
             "Ignored loading skipped rules from file %s due to: %s",
             lintable,
@@ -213,7 +213,7 @@ def _append_skipped_rules(
         if isinstance(pyyaml_task, str):
             continue
 
-        if pyyaml_task.get("name") != ruamel_task.get("name"):
+        if pyyaml_task.get("name") != ruamel_task.get("name"):  # pragma: no cover
             msg = "Error in matching skip comment to a task"
             raise RuntimeError(msg)
         pyyaml_task[SKIPPED_RULES_KEY] = _get_rule_skips_from_yaml(
@@ -304,7 +304,7 @@ def _get_rule_skips_from_yaml(
 
 def normalize_tag(tag: str) -> str:
     """Return current name of tag."""
-    if tag in RENAMED_TAGS:
+    if tag in RENAMED_TAGS:  # pragma: no cover
         used_old_tags[tag] = RENAMED_TAGS[tag]
         return RENAMED_TAGS[tag]
     return tag

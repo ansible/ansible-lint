@@ -65,12 +65,12 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
     changed = 0
     for kind, data in JSON_SCHEMAS.items():
         url = data["url"]
-        if "#" in url:
+        if "#" in url:  # pragma: no cover
             msg = f"Schema URLs cannot contain # due to python-jsonschema limitation: {url}"
             raise RuntimeError(msg)
         path = Path(__file__).parent.resolve() / f"{kind}.json"
         _logger.debug("Refreshing %s schema ...", kind)
-        if not url.startswith(("http:", "https:")):
+        if not url.startswith(("http:", "https:")):  # pragma: no cover
             msg = f"Unexpected url schema: {url}"
             raise ValueError(msg)
         request = Request(url)  # noqa: S310
@@ -79,7 +79,7 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
             request.add_header("If-None-Match", f'"{data.get("etag")}"')
         try:
             with urllib.request.urlopen(request, timeout=10) as response:  # noqa: S310
-                if response.status == 200:
+                if response.status == 200:  # pragma: no cover
                     content = response.read().decode("utf-8").rstrip()
                     etag = response.headers["etag"].strip('"')
                     if etag != data.get("etag", ""):

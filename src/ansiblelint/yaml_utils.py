@@ -285,9 +285,12 @@ def get_path_to_play(
     lc: LineCol  # lc uses 0-based counts
     # lineno is 1-based. Convert to 0-based.
     line_index = lineno - 1
+    if line_index == 0:
+        return []
 
     prev_play_line_index = ruamel_data.lc.line
     last_play_index = len(ruamel_data)
+    play_index = None
     for play_index, play in enumerate(ruamel_data):
         next_play_index = play_index + 1
         if last_play_index > next_play_index:
@@ -307,13 +310,15 @@ def get_path_to_play(
         # so, handle the last play separately.
         if (
             next_play_index == last_play_index
-            and line_index > lc.line
+            and line_index <= lc.line
             and (next_play_line_index is None or line_index < next_play_line_index)
         ):
             # part of this (last) play
             return [play_index]
         prev_play_line_index = play.lc.line
-    return []
+    if play_index is None:
+        return []
+    return [play_index]
 
 
 def get_path_to_task(
@@ -900,7 +905,7 @@ class FormattedYAML(YAML):
                 - name: Task
         """
         if version:
-            if isinstance(version, str):
+            if isinstance(version, str):  # pragma: no cover
                 x, y = version.split(".", maxsplit=1)
                 version = (int(x), int(y))
             self._yaml_version_default: tuple[int, int] = version
@@ -990,7 +995,7 @@ class FormattedYAML(YAML):
                 # one of: bool, "whatever", "consistent"
                 # so, we use True for "whatever" and "consistent"
                 config["indent_sequences"] = bool(indent_sequences)
-            elif rule == "quoted-strings":
+            elif rule == "quoted-strings":  # pragma: no cover
                 quote_type = rule_config["quote-type"]
                 # one of: single, double, any
                 if quote_type == "single":

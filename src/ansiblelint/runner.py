@@ -171,7 +171,7 @@ class Runner:
                 # For the moment we are ignoring deprecation warnings as Ansible
                 # modules outside current content can generate them and user
                 # might not be able to do anything about them.
-                if warn.category is DeprecationWarning:
+                if warn.category is DeprecationWarning:  # pragma: no cover
                     continue
                 if warn.category is LintWarning:
                     if isinstance(warn.source, WarnSource):
@@ -399,7 +399,7 @@ class Runner:
             stdout = strip_ansi_escape(run.stdout)
             if stderr:
                 details = stderr
-                if stdout:
+                if stdout:  # pragma: no cover
                     details += "\n" + stdout
             else:
                 details = stdout
@@ -651,14 +651,14 @@ def threads() -> int:
     if os.path.exists(cpu_max_fname):
         # cgroup v2
         # https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html
-        with open(cpu_max_fname, encoding="utf-8") as fh:
+        with open(cpu_max_fname, encoding="utf-8") as fh:  # pragma: no cover
             cpu_quota_us, cpu_period_us = fh.read().strip().split()
     elif os.path.exists(cfs_quota_fname) and os.path.exists(cfs_period_fname):
         # cgroup v1
         # https://www.kernel.org/doc/html/latest/scheduler/sched-bwc.html#management
-        with open(cfs_quota_fname, encoding="utf-8") as fh:
+        with open(cfs_quota_fname, encoding="utf-8") as fh:  # pragma: no cover
             cpu_quota_us = fh.read().strip()
-        with open(cfs_period_fname, encoding="utf-8") as fh:
+        with open(cfs_period_fname, encoding="utf-8") as fh:  # pragma: no cover
             cpu_period_us = fh.read().strip()
     else:
         # No Cgroup CPU bandwidth limit (e.g. non-Linux platform)

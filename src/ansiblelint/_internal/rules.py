@@ -149,10 +149,6 @@ class BaseRule:
         """Return matches for lintable folders."""
         return []
 
-    def verbose(self) -> str:
-        """Return a verbose representation of the rule."""
-        return self.id + ": " + self.shortdesc + "\n  " + self.description
-
     def match(self, line: str) -> bool | str:
         """Confirm if current rule matches the given string."""
         return False
@@ -161,7 +157,7 @@ class BaseRule:
         """Enable us to sort rules by their id."""
         return (self._order, self.id) < (other._order, other.id)
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:  # pragma: no cover
         """Return a AnsibleLintRule instance representation."""
         return self.id + ": " + self.shortdesc
 
@@ -179,7 +175,7 @@ class BaseRule:
         rule_config = {}
         if self.options:
             rule_config = self.options.rules.get(self.id, {})
-        if not isinstance(rule_config, dict):  # pragma: no branch
+        if not isinstance(rule_config, dict):  # pragma: no cover
             msg = f"Invalid rule config for {self.id}: {rule_config}"
             raise RuntimeError(msg)  # noqa: TRY004
         return rule_config

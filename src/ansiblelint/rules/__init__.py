@@ -46,6 +46,9 @@ match_types = {
     "matchplay": "play",  # called by matchyaml
     "matchdir": "dir",
 }
+RE_JINJA_EXPRESSION = re.compile(r"{{.+?}}")
+RE_JINJA_STATEMENT = re.compile(r"{%.+?%}")
+RE_JINJA_COMMENT = re.compile(r"{#.+?#}")
 
 
 class AnsibleLintRule(BaseRule):
@@ -63,9 +66,9 @@ class AnsibleLintRule(BaseRule):
     @staticmethod
     def unjinja(text: str) -> str:
         """Remove jinja2 bits from a string."""
-        text = re.sub(r"{{.+?}}", "JINJA_EXPRESSION", text)
-        text = re.sub(r"{%.+?%}", "JINJA_STATEMENT", text)
-        text = re.sub(r"{#.+?#}", "JINJA_COMMENT", text)
+        text = RE_JINJA_EXPRESSION.sub("JINJA_EXPRESSION", text)
+        text = RE_JINJA_STATEMENT.sub("JINJA_STATEMENT", text)
+        text = RE_JINJA_COMMENT.sub("JINJA_COMMENT", text)
         return text
 
     # pylint: disable=too-many-arguments,too-many-positional-arguments
@@ -467,10 +470,6 @@ class RulesCollection:
         msg = f"Rule {item} is not present inside this collection."
         raise ValueError(msg)
 
-    def extend(self, more: list[AnsibleLintRule]) -> None:
-        """Combine rules."""
-        self.rules.extend(more)
-
     def run(
         self,
         file: Lintable,
@@ -525,12 +524,6 @@ class RulesCollection:
 
         return matches
 
-    def __repr__(self) -> str:
-        """Return a RulesCollection instance representation."""
-        return "\n".join(
-            [rule.verbose() for rule in sorted(self.rules, key=lambda x: x.id)],
-        )
-
     def known_tags(self) -> list[str]:
         """Return a list of known tags, without returning no sub-tags."""
         tags = set()
@@ -561,7 +554,7 @@ class RulesCollection:
         tags = defaultdict(list)
         for rule in self.rules:
             # Fail early if a rule does not have any of our required tags
-            if not set(rule.tags).intersection(tag_desc.keys()):
+            if not set(rule.tags).intersection(tag_desc.keys()):  # pragma: no cover
                 msg = f"Rule {rule} does not have any of the required tags: {', '.join(tag_desc.keys())}"
                 raise RuntimeError(msg)
             for tag in rule.tags:

@@ -112,11 +112,12 @@ class ValidateSchemaRule(AnsibleLintRule):
 
     def _get_field_matches(
         self,
-        file: Lintable,
+        file: Lintable | None,
         data: MutableMapping[str, Any],
     ) -> list[MatchError]:
         """Retrieve all matches related to fields for the given data block."""
         results = []
+        kind = "tasks" if not file else file.kind
         for key, values in self.field_checks.items():
             if key in data:
                 plugin_value = data[key]
@@ -128,7 +129,7 @@ class ValidateSchemaRule(AnsibleLintRule):
                             lineno=data.get(LINE_NUMBER_KEY, 1),
                             filename=file,
                             details=ValidateSchemaRule.description,
-                            tag=f"schema[{file.kind}]",
+                            tag=f"schema[{kind}]",
                         ),
                     )
         return results
@@ -142,7 +143,7 @@ class ValidateSchemaRule(AnsibleLintRule):
         if not file:
             file = Lintable("", kind="tasks")
 
-        if file.failed():
+        if file and file.failed():
             return results
 
         results.extend(self._get_field_matches(file=file, data=task.raw_task))
