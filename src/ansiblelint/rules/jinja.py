@@ -199,10 +199,11 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                         # AnsibleError: template error while templating string: expected token ':', got '}'. String: {{ {{ '1' }} }}
                         # AnsibleError: template error while templating string: unable to locate collection ansible.netcommon. String: Foo {{ buildset_registry.host | ipwrap }}
                         if not bypass:
+                            lineno = task.get_error_line([*path, key])
                             result.append(
                                 self.create_matcherror(
                                     message=str(exc),
-                                    lineno=task.get_error_line(path),
+                                    lineno=lineno,
                                     data=v,
                                     filename=file,
                                     tag=f"{self.id}[invalid]",
@@ -215,6 +216,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                         lintable=file,
                     )
                     if reformatted != v:
+                        lineno = task.get_error_line([*path, key])
                         result.append(
                             self.create_matcherror(
                                 message=self._msg(
@@ -222,7 +224,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                                     value=v,
                                     reformatted=reformatted,
                                 ),
-                                lineno=task.get_error_line(path),
+                                lineno=lineno,
                                 data=v,
                                 details=details,
                                 filename=file,
@@ -835,7 +837,7 @@ if "pytest" in sys.modules:
         assert len(errs) == 2
         assert errs[0].tag == "jinja[spacing]"
         assert errs[0].rule.id == "jinja"
-        assert errs[0].lineno in [7, 9]  # 2.19 has better line identification
+        assert errs[0].lineno == 9
         assert errs[1].tag == "jinja[invalid]"
         assert errs[1].rule.id == "jinja"
         assert errs[1].lineno in [9, 10]  # 2.19 has better line identification

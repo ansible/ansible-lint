@@ -1288,9 +1288,14 @@ def get_line_column(data: object, default_line: int = 1) -> tuple[int, int | Non
     column = None
     if isinstance(data, Mapping) and LINE_NUMBER_KEY in data:
         line = int(data[LINE_NUMBER_KEY])
-    # ansible 2.19+
-    if not line and Origin:  # pragma: no cover
-        tag = Origin.get_tag(data)
-        line = tag.line_num
-        column = tag.col_num
+    if not line:
+        # ansible 2.19+
+        if Origin:  # pragma: no cover
+            tag = Origin.get_tag(data)
+            line = tag.line_num
+            column = tag.col_num
+        else:  # pre-ansible 2.19
+            if hasattr(data, "ansible_pos"):  # AnsibleUnicode object
+                _, line, column = data.ansible_pos  # pyright: ignore[reportAttributeAccessIssue]
+
     return (line or default_line, column)

@@ -106,17 +106,11 @@ class RoleNames(AnsibleLintRule):
                     msg = "Role dependency has unexpected type."
                     raise TypeError(msg)
                 if "/" in role_name:
-                    lineno = 1
-                    if hasattr(role_name, "ansible_pos"):
-                        lineno = role_name.ansible_pos[  # pyright: ignore[reportAttributeAccessIssue]
-                            1
-                        ]
-
                     result.append(
                         self.create_matcherror(
                             f"Avoid using paths when importing roles. ({role_name})",
                             filename=file,
-                            lineno=lineno,
+                            data=role_name,
                             tag=f"{self.id}[path]",
                         ),
                     )

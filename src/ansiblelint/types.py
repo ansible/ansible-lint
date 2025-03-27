@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from typing import Never, TypeAlias
+from typing import TypeAlias
 
 from ansible.parsing.yaml.objects import (  # pyright: ignore[reportMissingImports]
     AnsibleMapping,
@@ -21,7 +21,11 @@ try:
     )
 
     TrustedAsTemplate = None
-    AnsibleTemplateSyntaxError = Never
+
+    class AnsibleTemplateSyntaxError:
+        """Fake class introduced in 2.19."""
+
+    ansible_error_format = 1
 # core 2.19 + data tagging:
 except ImportError:  # pragma: no cover
     from ansible._internal._datatag._tags import TrustedAsTemplate
@@ -39,7 +43,7 @@ except ImportError:  # pragma: no cover
         | Sequence
         | None
     )
-
+    ansible_error_format = 2
 # temporary ignoring the type parameters for Sequence and Mapping because once
 # add them we can no longer use isinstance() to check for them and we will
 # need to implement a more complex runtime type checking.
@@ -55,4 +59,5 @@ __all__ = [
     "AnsibleUnicode",
     "AnsibleVaultEncryptedUnicode",
     "TrustedAsTemplate",
+    "ansible_error_format",
 ]

@@ -664,10 +664,25 @@ def _sanitize_task(task: MutableMapping[str, Any]) -> MutableMapping[str, Any]:
     result = copy.deepcopy(task)
     # task is an AnsibleMapping which inherits from OrderedDict, so we need
     # to use `del` to remove unwanted keys.
-    for k in [SKIPPED_RULES_KEY, FILENAME_KEY, LINE_NUMBER_KEY]:
-        if k in result:
-            del result[k]
-    return result
+
+    def remove_keys(obj: Any) -> Any:
+        """Recursively removes specified keys from a nested dictionary or list.
+
+        :param obj: The input dictionary or list to process.
+        :param forbidden_keys: List of keys to remove from dictionaries.
+        :return: A new object with forbidden keys removed.
+        """
+        if isinstance(obj, MutableMapping):
+            for key in [SKIPPED_RULES_KEY, FILENAME_KEY, LINE_NUMBER_KEY]:
+                if key in obj:
+                    del obj[key]
+            for value in obj.values():
+                if isinstance(value, MutableMapping):
+                    remove_keys(value)
+
+        return obj  # Base case: return non-dict, non-list values unchanged
+
+    return remove_keys(result)
 
 
 def _extract_ansible_parsed_keys_from_task(
@@ -747,6 +762,13 @@ def normalize_task_v2(task: Task) -> dict[str, Any]:
         "__ansible_module__": action,
         "__ansible_module_original__": action_unnormalized,
     }
+    # Inject back original line number information into the task
+    if (
+        action_unnormalized in task.raw_task
+        and isinstance(task.raw_task[action_unnormalized], Mapping)
+        and "__line__" in task.raw_task[action_unnormalized]
+    ):
+        result["action"]["__line__"] = task.raw_task[action_unnormalized]["__line__"]
 
     result["action"].update(arguments)
     return result
@@ -811,6 +833,7 @@ class Task(Mapping[str, Any]):
     )
     error: MatchError | None = None
     position: str = ""
+    kind: str = "tasks"
 
     def __post_init__(self) -> None:
         """Ensures that the task is valid."""
@@ -890,13 +913,7 @@ class Task(Mapping[str, Any]):
 
     def is_handler(self) -> bool:
         """Return true for tasks that are handlers."""
-        is_handler_file = False
-        if isinstance(self._normalized_task, dict):
-            file_name = str(self._normalized_task["action"].get(FILENAME_KEY, None))
-            if file_name:
-                paths = file_name.split("/")
-                is_handler_file = "handlers" in paths
-        return is_handler_file or ".handlers[" in self.position
+        return self.kind == "handlers"
 
     def __str__(self) -> str:
         """Return a string representation of the task."""
@@ -952,7 +969,9 @@ class Task(Mapping[str, Any]):
     def line(self) -> int:
         """Return the line number of the task."""
         result: int = 0
-        result = int(self.get(LINE_NUMBER_KEY, 0))
+        if "get_line_column" not in globals():
+            from ansiblelint.yaml_utils import get_line_column
+        result, _ = get_line_column(self.raw_task)  # pylint: disable=possibly-used-before-assignment
         if not result:  # pragma: no cover
             x = self.get("action", {})
             result = int(x.get(LINE_NUMBER_KEY, 0))
@@ -971,7 +990,7 @@ class Task(Mapping[str, Any]):
                 value = ctx.get(  # pyright: ignore[reportAttributeAccessIssue]
                     _  # pyright: ignore[reportArgumentType]
                 )
-                if isinstance(value, dict):
+                if isinstance(value, Mapping):
                     ctx = value
                 if (
                     isinstance(ctx, collections.abc.Container)
@@ -994,7 +1013,7 @@ def task_in_list(
     """Get action tasks from block structures."""
 
     def each_entry(
-        data: Sequence[Any] | AnsibleMapping, file: Lintable, position: str
+        data: Sequence[Any] | AnsibleMapping, file: Lintable, kind: str, position: str
     ) -> Iterator[Task]:
         if not data or not isinstance(data, Iterable):
             return
@@ -1006,6 +1025,7 @@ def task_in_list(
                 yield Task(
                     entry,
                     filename=file.filename,
+                    kind=kind,
                     position=pos_,
                 )
             for block in [k for k in entry if k in NESTED_TASK_KEYS]:
@@ -1014,7 +1034,7 @@ def task_in_list(
                     yield from task_in_list(
                         data=v,
                         file=file,
-                        kind="tasks",
+                        kind=kind,
                         position=f"{pos_}.{block}",
                     )
 
@@ -1031,13 +1051,14 @@ def task_in_list(
                         yield from each_entry(
                             item[attribute],
                             file=file,
+                            kind="tasks" if "tasks" in attribute else "handlers",
                             position=f"{position}[{item_index}].{attribute}",
                         )
                     elif item[attribute] is not None:  # pragma: no cover
                         msg = f"Key '{attribute}' defined, but bad value: '{item[attribute]!s}'"
                         raise RuntimeError(msg)
     elif isinstance(data, Sequence):
-        yield from each_entry(data, file=file, position=position)
+        yield from each_entry(data, file=file, position=position, kind=kind)
 
 
 def add_action_type(
@@ -1196,7 +1217,7 @@ def is_playbook(filename: str) -> bool:
         )
     else:
         if (
-            isinstance(f, AnsibleSequence)
+            isinstance(f, Sequence)
             and hasattr(next(iter(f), {}), "keys")
             and playbooks_keys.intersection(next(iter(f), {}).keys())
         ):

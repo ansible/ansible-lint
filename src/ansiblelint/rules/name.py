@@ -160,7 +160,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
             results.append(
                 self.create_matcherror(
                     message="All names should start with an uppercase letter.",
-                    data=data,
+                    data=effective_name,
                     tag="name[casing]",
                     filename=lintable,
                 ),
@@ -169,7 +169,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
             results.append(
                 self.create_matcherror(
                     message="Jinja templates should only be at the end of 'name'",
-                    data=data,
+                    data=name,
                     tag="name[template]",
                     filename=lintable,
                 ),

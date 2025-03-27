@@ -26,7 +26,6 @@ from typing import TYPE_CHECKING, Any
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
-from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 
 if TYPE_CHECKING:
@@ -90,7 +89,7 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule, TransformMixin):
                 message=self.shortdesc,
                 filename=file,
                 tag=f"{self.id}[task]",
-                lineno=task[LINE_NUMBER_KEY],
+                lineno=task.line,
             )
             errors.append(error)
         return errors
