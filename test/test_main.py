@@ -153,9 +153,13 @@ def test_broken_ansible_cfg() -> None:
         cwd="test/fixtures/broken-ansible.cfg",
     )
     assert proc.returncode == RC.INVALID_CONFIG, proc
-    assert (
-        "Invalid type for configuration option setting: CACHE_PLUGIN_TIMEOUT"
-        in proc.stderr
+    # 2.19 had different errors
+    assert any(
+        x in proc.stderr
+        for x in (
+            "Invalid type for configuration option setting: CACHE_PLUGIN_TIMEOUT",
+            "has an invalid value: Invalid type provided for 'int': 'invalid-value'",
+        )
     )
 
 

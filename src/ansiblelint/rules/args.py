@@ -289,13 +289,26 @@ if "pytest" in sys.modules:
         results = Runner(success, rules=default_rules_collection).run()
         assert len(results) == 5
         assert results[0].tag == "args[module]"
-        assert "missing required arguments" in results[0].message
+        # First part of regex is for ansible-core up to 2.18, second part is for ansible-core 2.19+
+        assert re.match(
+            r"(missing required arguments|Unsupported parameters for \(basic.py\) module: foo)",
+            results[0].message,
+        )
         assert results[1].tag == "args[module]"
-        assert "missing parameter(s) required by " in results[1].message
+        assert re.match(
+            r"(missing parameter\(s\) required by |Unsupported parameters for \(basic.py\) module: foo. Supported parameters include: fact_path)",
+            results[1].message,
+        )
         assert results[2].tag == "args[module]"
-        assert "Unsupported parameters for" in results[2].message
+        assert re.match(
+            r"(Unsupported parameters for|missing parameter\(s\) required by 'enabled': name)",
+            results[2].message,
+        )
         assert results[3].tag == "args[module]"
-        assert "Unsupported parameters for" in results[3].message
+        assert re.match(
+            r"(Unsupported parameters for|missing required arguments: repo)",
+            results[3].message,
+        )
         assert results[4].tag == "args[module]"
         assert "value of state must be one of" in results[4].message
 

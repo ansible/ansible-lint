@@ -6,6 +6,7 @@ import logging
 import os
 import re
 import sys
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, NamedTuple
@@ -13,7 +14,6 @@ from typing import TYPE_CHECKING, NamedTuple
 import black
 import jinja2
 from ansible.errors import AnsibleError, AnsibleFilterError, AnsibleParserError
-from ansible.parsing.yaml.objects import AnsibleUnicode
 from jinja2.exceptions import TemplateSyntaxError
 
 from ansiblelint.errors import RuleMatchTransformMeta
@@ -22,6 +22,7 @@ from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.runner import get_matches
 from ansiblelint.skip_utils import get_rule_skips_from_line
 from ansiblelint.text import has_jinja
+from ansiblelint.types import AnsibleTemplateSyntaxError
 from ansiblelint.utils import (  # type: ignore[attr-defined]
     Templar,
     parse_yaml_from_file,
@@ -187,14 +188,23 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                         elif re.match(r"^lookup plugin (.*) not found$", exc.message):
                             # lookup plugin 'template' not found
                             bypass = True
+                        elif isinstance(
+                            orig_exc, AnsibleTemplateSyntaxError
+                        ) and re.match(
+                            r"^Syntax error in template: No filter named '.*'.",
+                            exc.message,
+                        ):
+                            bypass = True
 
                         # AnsibleError: template error while templating string: expected token ':', got '}'. String: {{ {{ '1' }} }}
                         # AnsibleError: template error while templating string: unable to locate collection ansible.netcommon. String: Foo {{ buildset_registry.host | ipwrap }}
                         if not bypass:
+                            lineno = task.get_error_line([*path, key])
                             result.append(
                                 self.create_matcherror(
                                     message=str(exc),
-                                    lineno=task.get_error_line(path),
+                                    lineno=lineno,
+                                    data=v,
                                     filename=file,
                                     tag=f"{self.id}[invalid]",
                                 ),
@@ -206,6 +216,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                         lintable=file,
                     )
                     if reformatted != v:
+                        lineno = task.get_error_line([*path, key])
                         result.append(
                             self.create_matcherror(
                                 message=self._msg(
@@ -213,7 +224,8 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                                     value=v,
                                     reformatted=reformatted,
                                 ),
-                                lineno=task.get_error_line(path),
+                                lineno=lineno,
+                                data=v,
                                 details=details,
                                 filename=file,
                                 tag=f"{self.id}[{tag}]",
@@ -237,10 +249,10 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
 
         if str(file.kind) == "vars":
             data = parse_yaml_from_file(str(file.path))
-            if not isinstance(data, dict):
+            if not isinstance(data, Mapping):
                 return results
             for key, v, _path in nested_items_path(data):
-                if isinstance(v, AnsibleUnicode):
+                if isinstance(v, str):
                     reformatted, details, tag = self.check_whitespace(
                         v,
                         key=key,
@@ -254,7 +266,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                                     value=v,
                                     reformatted=reformatted,
                                 ),
-                                lineno=v.ansible_pos[1],
+                                data=v,
                                 details=details,
                                 filename=file,
                                 tag=f"{self.id}[{tag}]",
@@ -506,31 +518,23 @@ if "pytest" in sys.modules:
     from ansiblelint.runner import Runner
     from ansiblelint.transformer import Transformer
 
-    @pytest.fixture(name="error_expected_lines")
-    def fixture_error_expected_lines() -> list[int]:
-        """Return list of expected error lines."""
-        return [33, 36, 39, 42, 45, 48, 74]
-
-    # 21 68
-    @pytest.fixture(name="lint_error_lines")
-    def fixture_lint_error_lines() -> list[int]:
-        """Get VarHasSpacesRules linting results on test_playbook."""
-        collection = RulesCollection()
-        collection.register(JinjaRule())
-        lintable = Lintable("examples/playbooks/jinja-spacing.yml")
-        results = Runner(lintable, rules=collection).run()
-        return [item.lineno for item in results]
-
-    def test_jinja_spacing_playbook(
-        error_expected_lines: list[int],
-        lint_error_lines: list[int],
-    ) -> None:
+    def test_jinja_spacing_playbook() -> None:
         """Ensure that expected error lines are matching found linting error lines."""
         # list unexpected error lines or non-matching error lines
-        error_lines_difference = list(
-            set(error_expected_lines).symmetric_difference(set(lint_error_lines)),
-        )
-        assert len(error_lines_difference) == 0
+        lineno_list = [33, 36, 39, 42, 45, 48, 74]
+        lintable = Lintable("examples/playbooks/jinja-spacing.yml")
+        collection = RulesCollection()
+        collection.register(JinjaRule())
+        results = Runner(lintable, rules=collection).run()
+        assert len(results) == len(lineno_list)
+        for index, result in enumerate(results):
+            assert result.tag == "jinja[spacing]"
+            assert result.lineno == lineno_list[index]
+
+        # error_lines_difference = list(
+        #     set(error_expected_lines).symmetric_difference(set(lint_error_lines)),
+        # )
+        # assert len(error_lines_difference) == 0
 
     def test_jinja_spacing_vars() -> None:
         """Ensure that expected error details are matching found linting error details."""
@@ -836,7 +840,7 @@ if "pytest" in sys.modules:
         assert errs[0].lineno == 9
         assert errs[1].tag == "jinja[invalid]"
         assert errs[1].rule.id == "jinja"
-        assert errs[1].lineno == 9
+        assert errs[1].lineno in [9, 10]  # 2.19 has better line identification
 
     def test_jinja_valid() -> None:
         """Tests our ability to parse jinja, even when variables may not be defined."""
