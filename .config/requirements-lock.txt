@@ -20,7 +20,7 @@ platformdirs==4.3.7       # via black
 pycparser==2.22           # via cffi
 pyyaml==6.0.2             # via ansible-compat, ansible-core, yamllint, ansible-lint (pyproject.toml)
 referencing==0.36.2       # via jsonschema, jsonschema-specifications, ansible-lint (pyproject.toml)
-rpds-py==0.23.1           # via jsonschema, referencing
+rpds-py==0.24.0           # via jsonschema, referencing
 ruamel-yaml==0.18.10      # via ansible-lint (pyproject.toml)
 subprocess-tee==0.4.2     # via ansible-compat, ansible-lint (pyproject.toml)
 wcmatch==10.0             # via ansible-lint (pyproject.toml)
