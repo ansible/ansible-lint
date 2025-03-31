@@ -561,7 +561,6 @@ class HandleChildren:
 
     def _rolepath(self, basedir: str, role: str) -> str | None:
         role_path = None
-        #namespace_name, collection_name, role_name, role_path_level = parse_fqcn(role)
         namespace_name, collection_name, *role_name = parse_fqcn(role)
 
         possible_paths = [
@@ -575,6 +574,7 @@ class HandleChildren:
             path_dwim(basedir, os.path.join("..", role_name[-1])),
         ]
         if len(role_name) > 1:
+            # This ignores deeper structures than 1 level, but at least there's not errors anymore
             possible_paths.append( path_dwim(basedir, os.path.join("roles", role_name[-2], role_name[-1])))
             possible_paths.append( path_dwim(basedir, os.path.join(role_name[-2], role_name[-1])))
             possible_paths.append(path_dwim(basedir, os.path.join("..", "..", role_name[-2], role_name[-1])))
