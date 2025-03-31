@@ -261,8 +261,7 @@ def _get_tasks_from_blocks(task_blocks: Sequence[Any]) -> Generator[Any, None, N
 def _continue_skip_next_lines(
     lintable: Lintable,
 ) -> None:
-    """
-    When a line only contains a noqa comment (and possibly indentation), add the skip also to the next non-empty line
+    """When a line only contains a noqa comment (and possibly indentation), add the skip also to the next non-empty line
     """
     # If line starts with _noqa_comment_line_re, add next non-empty line to same lintable.line_skips
     line_content = lintable.content.splitlines()
