@@ -270,7 +270,7 @@ def _continue_skip_next_lines(
         if _noqa_comment_line_re.fullmatch(line_content[line_no - 1]):
             # Find next non-empty line
             next_line_no = line_no
-            while line_content[next_line_no].strip() == "" and next_line_no >= len(line_content):
+            while next_line_no < len(line_content) and line_content[next_line_no].strip() == "":
                 next_line_no += 1
             if next_line_no >= len(line_content):
                 continue
