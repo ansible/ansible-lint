@@ -545,4 +545,4 @@ def test_import_role_children_subdirs() -> None:
             "ANSIBLE_COLLECTIONS_PATH": "../collections",
         },
     )
-    assert (not result.stderr)
+    assert not result.stderr
