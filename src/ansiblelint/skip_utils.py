@@ -55,7 +55,7 @@ if TYPE_CHECKING:
 
 _logger = logging.getLogger(__name__)
 _found_deprecated_tags: set[str] = set()
-_noqa_comment_re = re.compile(r"^# noqa(\s|:)")
+_noqa_comment_re = re.compile(r"^\s*# noqa(\s|:)", flags=re.MULTILINE)
 _noqa_comment_line_re = re.compile(r"^\s*# noqa(\s|:).*$")
 
 # playbook: Sequence currently expects only instances of one of the two
@@ -290,7 +290,10 @@ def _get_rule_skips_from_yaml(
         return []
 
     def traverse_yaml(obj: Any) -> None:
-        for entry in obj.ca.items.values():
+        traversable = list(obj.ca.items.values())
+        if obj.ca.comment:
+            traversable.append(obj.ca.comment)
+        for entry in traversable:
             # flatten all lists we might have in entries. Some arcane ruamel CommentedMap magic
             entry = [item for sublist in entry if sublist is not None
                      for item in (sublist if isinstance(sublist, list) else [sublist])]
