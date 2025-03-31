@@ -1,0 +1,8 @@
+---
+- name: Fixture
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Import role in subdir
+      ansible.builtin.import_role:
+        name: local.testcollection.subdirectory.bug4452
