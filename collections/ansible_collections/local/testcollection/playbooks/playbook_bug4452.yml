@@ -1,6 +1,6 @@
 ---
-- name: Fixture
-  hosts: all
+- name: Role for 4452
+  hosts: localhost
   gather_facts: false
   tasks:
     - name: Import role in subdir
