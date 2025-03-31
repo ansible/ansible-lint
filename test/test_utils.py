@@ -537,7 +537,7 @@ def test_import_playbook_children_subdirs() -> None:
 
 
 def test_import_role_children_subdirs() -> None:
-    """Verify when a role is in a subdirectory."""
+    """Verify import_playbook_children()."""
     result = run_ansible_lint(
         Path("playbooks/import_role_fqcn.yml"),
         cwd=Path(__file__).resolve().parent.parent / "examples",
@@ -545,3 +545,4 @@ def test_import_role_children_subdirs() -> None:
             "ANSIBLE_COLLECTIONS_PATH": "../collections",
         },
     )
+    assert(not result.stderr)
