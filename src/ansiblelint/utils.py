@@ -574,7 +574,7 @@ class HandleChildren:
             path_dwim(basedir, os.path.join("..", role_name[-1])),
         ]
         if len(role_name) > 1:
-            # This ignores deeper structures than 1 level, but at least there's not errors anymore
+            # This ignores deeper structures than 1 level
             possible_paths.append(path_dwim(basedir, os.path.join("roles", role_name[-2], role_name[-1])))
             possible_paths.append(path_dwim(basedir, os.path.join(role_name[-2], role_name[-1])))
             possible_paths.append(path_dwim(basedir, os.path.join("..", "..", role_name[-2], role_name[-1])))
@@ -1303,7 +1303,4 @@ def parse_fqcn(name: str) -> tuple[str, ...]:
     if not is_fqcn(name):
         return ("", "", name)
 
-    fragments = name.split(".")
-    if len(fragments) == 3:
-        return (fragments[0], fragments[1], fragments[2])
-    return tuple(fragments)
+    return tuple(name.split("."))
