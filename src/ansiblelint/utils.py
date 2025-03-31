@@ -575,8 +575,8 @@ class HandleChildren:
         ]
         if len(role_name) > 1:
             # This ignores deeper structures than 1 level, but at least there's not errors anymore
-            possible_paths.append( path_dwim(basedir, os.path.join("roles", role_name[-2], role_name[-1])))
-            possible_paths.append( path_dwim(basedir, os.path.join(role_name[-2], role_name[-1])))
+            possible_paths.append(path_dwim(basedir, os.path.join("roles", role_name[-2], role_name[-1])))
+            possible_paths.append(path_dwim(basedir, os.path.join(role_name[-2], role_name[-1])))
             possible_paths.append(path_dwim(basedir, os.path.join("..", "..", role_name[-2], role_name[-1])))
 
         for loc in self.app.runtime.config.default_roles_path:
@@ -1299,13 +1299,11 @@ def load_plugin(name: str) -> PluginLoadContext:
 
 
 def parse_fqcn(name: str) -> tuple[str, ...]:
-    """Parse name parameter into FQCN segments.
-    """
+    """Parse name parameter into FQCN segments."""
     if not is_fqcn(name):
         return ("", "", name)
 
     fragments = name.split(".")
     if len(fragments) == 3:
         return (fragments[0], fragments[1], fragments[2])
-    else:
-        return tuple(fragments)
+    return tuple(fragments)
