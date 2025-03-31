@@ -540,3 +540,15 @@ def test_import_playbook_children_subdirs() -> None:
         "Failed to find local.testcollection.test.bar.foo playbook."
         not in result.stderr
     )
+
+
+def test_import_role_children_subdirs() -> None:
+    """Verify import_playbook_children()."""
+    result = run_ansible_lint(
+        Path("playbooks/import_role_fqcn.yml"),
+        cwd=Path(__file__).resolve().parent.parent / "examples",
+        env={
+            "ANSIBLE_COLLECTIONS_PATH": "../collections",
+        },
+    )
+    assert "Failed " not in result.stderr
