@@ -12,6 +12,7 @@ from ansiblelint.text import has_jinja
 from ansiblelint.yaml_utils import nested_items_path
 
 if TYPE_CHECKING:
+    from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
     from ansiblelint.utils import Task
 
@@ -51,19 +52,32 @@ class NoTabsRule(AnsibleLintRule):
         self,
         task: Task,
         file: Lintable | None = None,
-    ) -> bool | str:
+    ) -> list[MatchError]:
+        result = []
         action = task["action"]["__ansible_module__"]
         for k, v, _ in nested_items_path(task):
             if isinstance(k, str) and "\t" in k and not has_jinja(k):
-                return True
+                result.append(
+                    self.create_matcherror(
+                        message=self.shortdesc,
+                        data=k,
+                        filename=file,
+                    )
+                )
             if (
                 isinstance(v, str)
                 and "\t" in v
                 and (action, k) not in self.allow_list
                 and not has_jinja(v)
             ):
-                return True
-        return False
+                result.append(
+                    self.create_matcherror(
+                        message=self.shortdesc,
+                        data=v,
+                        filename=file,
+                    )
+                )
+        return result
 
 
 # testing code to be loaded only with pytest or when executed the rule file
@@ -77,12 +91,11 @@ if "pytest" in sys.modules:
             "examples/playbooks/rule-no-tabs.yml",
             rules=default_rules_collection,
         ).run()
-        expected_results = [
-            (10, NoTabsRule().shortdesc),
-            (13, NoTabsRule().shortdesc),
-        ]
-        for i, expected in enumerate(expected_results):
-            assert len(results) >= i + 1
-            assert results[i].lineno == expected[0]
-            assert results[i].message == expected[1]
-        assert len(results) == len(expected_results), results
+        lines = []
+        for result in results:
+            assert result.rule.id == "no-tabs"
+            lines.append(result.lineno)
+        assert lines
+        # 2.19 has more precise line:columns numbers so the effective result
+        # is different.
+        assert lines == [10, 13] or lines == [12, 15, 15], lines

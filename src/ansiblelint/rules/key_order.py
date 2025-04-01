@@ -7,7 +7,7 @@ import sys
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
-from ansiblelint.constants import ANNOTATION_KEYS, LINE_NUMBER_KEY
+from ansiblelint.constants import ANNOTATION_KEYS
 from ansiblelint.errors import MatchError, RuleMatchTransformMeta
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 
@@ -90,8 +90,8 @@ class KeyOrderRule(AnsibleLintRule, TransformMixin):
                     f"You can improve the play key order to: {', '.join(sorted_keys)}",
                     filename=file,
                     tag=f"{self.id}[play]",
-                    lineno=data[LINE_NUMBER_KEY],
                     transform_meta=KeyOrderTMeta(fixed=tuple(sorted_keys)),
+                    data=data,
                 ),
             )
         return result

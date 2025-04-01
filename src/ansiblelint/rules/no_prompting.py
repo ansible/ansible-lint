@@ -5,7 +5,6 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING, Any
 
-from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
@@ -40,7 +39,7 @@ class NoPromptingRule(AnsibleLintRule):
         return [
             self.create_matcherror(
                 message="Play uses vars_prompt",
-                lineno=vars_prompt[0][LINE_NUMBER_KEY],
+                data=vars_prompt[0],
                 filename=file,
             ),
         ]

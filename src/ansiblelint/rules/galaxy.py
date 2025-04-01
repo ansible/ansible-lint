@@ -40,7 +40,7 @@ class GalaxyRule(AnsibleLintRule):
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific play (entry in playbook)."""
-        if file.kind != "galaxy":  # type: ignore[comparison-overlap]
+        if file.kind != "galaxy":
             return []
 
         # Defined by Automation Hub Team and Partner Engineering
@@ -161,7 +161,7 @@ class GalaxyRule(AnsibleLintRule):
             results.append(
                 self.create_matcherror(
                     message="galaxy.yaml should have version tag.",
-                    lineno=data[LINE_NUMBER_KEY],
+                    data=data,
                     tag="galaxy[version-missing]",
                     filename=file,
                 ),
