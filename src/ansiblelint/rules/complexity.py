@@ -6,7 +6,6 @@ import re
 import sys
 from typing import TYPE_CHECKING, Any
 
-from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.rules import AnsibleLintRule, RulesCollection
 
 if TYPE_CHECKING:
@@ -40,9 +39,9 @@ class ComplexityRule(AnsibleLintRule):
             results.append(
                 self.create_matcherror(
                     message=f"Maximum tasks allowed in a play is {self._collection.options.max_tasks}.",
-                    lineno=data[LINE_NUMBER_KEY],
                     tag=f"{self.id}[play]",
                     filename=file,
+                    data=data,
                 ),
             )
         return results

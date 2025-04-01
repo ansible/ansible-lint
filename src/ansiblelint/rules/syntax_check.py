@@ -6,6 +6,7 @@ import re
 from dataclasses import dataclass
 
 from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.types import ansible_error_format
 
 
 @dataclass
@@ -15,6 +16,18 @@ class KnownError:
     tag: str
     regex: re.Pattern[str]
 
+
+if ansible_error_format == 1:
+    _ansible_error_prefix = "ERROR! "
+    _ansible_error_detail = r"\n\nThe error appears to be in '(?P<filename>[\w\/\.\-]+)': line (?P<line>\d+), column (?P<column>\d+)"
+elif ansible_error_format == 2:  # 2.19 with data tagging
+    _ansible_error_prefix = r"\[ERROR\]: "
+    _ansible_error_detail = (
+        r"\nOrigin: (?P<filename>[\w\/\.\-]+):(?P<line>\d+):(?P<column>\d+)"
+    )
+else:  # pragma: no cover
+    msg = f"Unsupported ansible_error_format: {ansible_error_format}"
+    raise NotImplementedError(msg)
 
 # Order matters, we only report the first matching pattern, the one at the end
 # is used to match generic or less specific patterns.
@@ -30,7 +43,7 @@ OUTPUT_PATTERNS = (
     KnownError(
         tag="no-file",
         regex=re.compile(
-            r"^ERROR! (?P<title>No file specified for [^\n]*)",
+            rf"^{_ansible_error_prefix}(?P<title>No file specified for [^\n]*){_ansible_error_detail}",
             re.MULTILINE | re.DOTALL | re.DOTALL,
         ),
     ),
@@ -51,14 +64,14 @@ OUTPUT_PATTERNS = (
     KnownError(
         tag="unknown-module",
         regex=re.compile(
-            r"^ERROR! (?P<title>couldn't resolve module/action [^\n]*)\n\nThe error appears to be in '(?P<filename>[\w\/\.\-]+)': line (?P<line>\d+), column (?P<column>\d+)",
+            rf"^{_ansible_error_prefix}(?P<title>couldn't resolve module/action [^\n]*){_ansible_error_detail}",
             re.MULTILINE | re.DOTALL | re.DOTALL,
         ),
     ),
     KnownError(
         tag="specific",
         regex=re.compile(
-            r"^ERROR! (?P<title>[^\n]*)\n\nThe error appears to be in '(?P<filename>[\w\/\.\-]+)': line (?P<line>\d+), column (?P<column>\d+)",
+            rf"^{_ansible_error_prefix}(?P<title>[^\n]*){_ansible_error_detail}",
             re.MULTILINE | re.DOTALL | re.DOTALL,
         ),
     ),
@@ -66,10 +79,20 @@ OUTPUT_PATTERNS = (
     KnownError(
         tag="specific",
         regex=re.compile(
-            r"^ERROR! (?P<title>the role '.*' was not found in[^\n]*)'(?P<filename>[\w\/\.\-]+)': line (?P<line>\d+), column (?P<column>\d+)",
+            rf"^{_ansible_error_prefix}(?P<title>the role '.*' was not found in[^\n]*){_ansible_error_detail}",
             re.MULTILINE | re.DOTALL | re.DOTALL,
         ),
     ),
+    # 2.19:
+    # [ERROR]: no module/action detected in task.
+    # Origin: /Users/ssbarnea/code/a/ansible-lint/examples/roles/invalid_due_syntax/tasks/main.yml:2:3
+    # KnownError(
+    #     tag="specific",
+    #     regex=re.compile(
+    #         r"^\[ERROR\]: (?P<title>[^\n]*)\nOrigin: (?P<filename>[\w\/\.\-]+):(?P<line>\d+):(?P<column>\d+)",
+    #         re.MULTILINE | re.DOTALL | re.DOTALL,
+    #     ),
+    # ),
 )
 
 

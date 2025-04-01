@@ -7,7 +7,6 @@ import re
 import sys
 from typing import TYPE_CHECKING, Any
 
-from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.schemas.__main__ import JSON_SCHEMAS
@@ -126,7 +125,7 @@ class ValidateSchemaRule(AnsibleLintRule):
                     results.append(
                         self.create_matcherror(
                             message=msg,
-                            lineno=data.get(LINE_NUMBER_KEY, 1),
+                            data=plugin_value,
                             filename=file,
                             details=ValidateSchemaRule.description,
                             tag=f"schema[{kind}]",

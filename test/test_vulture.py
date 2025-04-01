@@ -10,6 +10,7 @@ from ansiblelint.rules.meta_incorrect import MetaChangeFromDefaultRule
 from ansiblelint.rules.meta_video_links import MetaVideoLinksRule
 from ansiblelint.rules.no_handler import UseHandlerRatherThanWhenChangedRule
 from ansiblelint.rules.no_relative_paths import RoleRelativePath
+from ansiblelint.rules.no_tabs import NoTabsRule
 from ansiblelint.rules.risky_file_permissions import MissingFilePermissionsRule
 from ansiblelint.rules.syntax_check import AnsibleSyntaxCheckRule
 from test.custom_rules.example_com.example_com_rule import ExampleComRule
@@ -27,6 +28,7 @@ __all__ = [
     "MetaChangeFromDefaultRule",
     "MetaVideoLinksRule",
     "MissingFilePermissionsRule",
+    "NoTabsRule",
     "RoleRelativePath",
     "TaskNoLocalActionRule",
     "UnsetVariableMatcherRule",
