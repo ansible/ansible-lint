@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, Any
 
 from ruamel.yaml.comments import CommentedSeq
 
-from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.utils import load_plugin
 
@@ -159,7 +158,7 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
                             message=message,
                             details=details,
                             filename=file,
-                            lineno=task.line,
+                            data=module,
                             tag="fqcn[action-core]",
                         ),
                     )
@@ -169,7 +168,7 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
                         message=f"Use FQCN for module actions, such `{self.module_aliases[module]}`.",
                         details=f"Action `{module}` is not FQCN.",
                         filename=file,
-                        lineno=task.line,
+                        data=module,
                         tag="fqcn[action]",
                     ),
                 )
@@ -183,7 +182,7 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
                     self.create_matcherror(
                         message=f"You should use canonical module name `{self.module_aliases[module]}` instead of `{module}`.",
                         filename=file,
-                        lineno=task[LINE_NUMBER_KEY],
+                        data=module,
                         tag="fqcn[canonical]",
                     ),
                 )
@@ -219,7 +218,7 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
             return [
                 self.create_matcherror(
                     message="Avoid `collections` keyword by using FQCN for all plugins, modules, roles and playbooks.",
-                    lineno=data.get(LINE_NUMBER_KEY, 1),
+                    data=data,
                     tag="fqcn[keyword]",
                     filename=file,
                 ),

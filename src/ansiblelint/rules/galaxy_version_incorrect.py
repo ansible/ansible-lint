@@ -24,16 +24,16 @@ class GalaxyVersionIncorrectRule(AnsibleLintRule):
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific play (entry in playbook)."""
-        if file.kind != "galaxy":  # type: ignore[comparison-overlap]
+        if file.kind != "galaxy":
             return []
 
         results = []
         version = data.get("version")
-        if Version(version) < Version("1.0.0"):
+        if not version or Version(version) < Version("1.0.0"):
             results.append(
                 self.create_matcherror(
                     message="collection version should be greater than or equal to 1.0.0",
-                    lineno=version._line_number,  # noqa: SLF001
+                    data=version,
                     filename=file,
                 ),
             )

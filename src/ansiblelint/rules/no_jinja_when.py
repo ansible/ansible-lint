@@ -7,7 +7,6 @@ import sys
 from collections.abc import MutableMapping
 from typing import TYPE_CHECKING, Any
 
-from ansiblelint.constants import LINE_NUMBER_KEY
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 
 if TYPE_CHECKING:
@@ -55,7 +54,7 @@ class NoFormattingInWhenRule(AnsibleLintRule, TransformMixin):
                 self.create_matcherror(
                     details=str({"when": role}),
                     filename=file,
-                    lineno=role[LINE_NUMBER_KEY],
+                    data=role,
                 )
                 for role in data["roles"]
                 if (

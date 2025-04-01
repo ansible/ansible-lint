@@ -388,6 +388,8 @@ mode = "standard"
 # reportMissingImports = false
 # https://github.com/microsoft/pyright/issues/9494
 reportPossiblyUnboundVariable = false
+# Introduced in v1.1.398 but already covered by ruff
+reportPrivateImportUsage = false
 
 # spell-checker:ignore filterwarnings norecursedirs optionflags
 [tool.pytest.ini_options]

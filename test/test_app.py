@@ -10,7 +10,7 @@ from ansiblelint.testing import run_ansible_lint
 def test_generate_ignore(tmp_path: Path) -> None:
     """Validate that --generate-ignore dumps expected ignore to the file."""
     lintable = Lintable(tmp_path / "vars.yaml")
-    lintable.content = "foo: bar\nfoo: baz\n"
+    lintable.content = "foo: 1\nbar:   baz\n"
     lintable.write(force=True)
     ignore_file = tmp_path / ".ansible-lint-ignore"
     assert not ignore_file.exists()
@@ -19,7 +19,7 @@ def test_generate_ignore(tmp_path: Path) -> None:
 
     assert ignore_file.exists()
     with ignore_file.open(encoding="utf-8") as f:
-        assert "vars.yaml yaml[key-duplicates]\n" in f.readlines()
+        assert "vars.yaml yaml[colons]\n" in f.readlines()
     # Run again and now we expect to succeed as we have an ignore file.
     result = run_ansible_lint(lintable.filename, cwd=tmp_path)
     assert result.returncode == 0

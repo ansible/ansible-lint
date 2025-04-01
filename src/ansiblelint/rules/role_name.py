@@ -27,9 +27,10 @@ import sys
 from functools import cache
 from typing import TYPE_CHECKING
 
-from ansiblelint.constants import LINE_NUMBER_KEY, ROLE_IMPORT_ACTION_NAMES
+from ansiblelint.constants import ROLE_IMPORT_ACTION_NAMES
 from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import parse_yaml_from_file
+from ansiblelint.yaml_utils import get_line_column
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -91,6 +92,7 @@ class RoleNames(AnsibleLintRule):
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         result: list[MatchError] = []
+        column: int | None = None
 
         if file.kind not in ("meta", "role", "playbook"):
             return result
@@ -105,17 +107,11 @@ class RoleNames(AnsibleLintRule):
                     msg = "Role dependency has unexpected type."
                     raise TypeError(msg)
                 if "/" in role_name:
-                    lineno = 1
-                    if hasattr(role_name, "ansible_pos"):
-                        lineno = role_name.ansible_pos[  # pyright: ignore[reportAttributeAccessIssue]
-                            1
-                        ]
-
                     result.append(
                         self.create_matcherror(
                             f"Avoid using paths when importing roles. ({role_name})",
                             filename=file,
-                            lineno=lineno,
+                            data=role_name,
                             tag=f"{self.id}[path]",
                         ),
                     )
@@ -124,11 +120,11 @@ class RoleNames(AnsibleLintRule):
         if file.kind == "playbook":
             for play in file.data:
                 if "roles" in play:
-                    line = play[LINE_NUMBER_KEY]
+                    line, column = get_line_column(play)
                     for role in play["roles"]:
                         role_name = None
                         if isinstance(role, dict):
-                            line = role[LINE_NUMBER_KEY]
+                            line, column = get_line_column(role)
                             role_name = role["role"]
                         elif isinstance(role, str):
                             role_name = role
@@ -141,6 +137,7 @@ class RoleNames(AnsibleLintRule):
                                     f"Avoid using paths when importing roles. ({role_name})",
                                     filename=file,
                                     lineno=line,
+                                    column=column,
                                     tag=f"{self.id}[path]",
                                 ),
                             )

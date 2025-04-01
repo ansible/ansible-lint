@@ -23,11 +23,13 @@
 from __future__ import annotations
 
 import sys
+from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
+    from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
     from ansiblelint.utils import Task
 
@@ -69,18 +71,26 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
         self,
         task: Task,
         file: Lintable | None = None,
-    ) -> bool | str:
-        if task["__ansible_action_type__"] != "task" or task.is_handler():
-            return False
+    ) -> list[MatchError]:
+        if task.is_handler():
+            return []
 
         when = task.get("when")
-        result = False
+        result = []
 
-        if isinstance(when, list):
-            if len(when) <= 1:
-                result = _changed_in_when(when[0])
-        elif isinstance(when, str):
-            result = _changed_in_when(when)
+        if (isinstance(when, str) and _changed_in_when(when)) or (
+            isinstance(when, Sequence)
+            and not isinstance(when, str)
+            and len(when) <= 1
+            and _changed_in_when(when[0])
+        ):
+            result.append(
+                self.create_matcherror(
+                    message=self.shortdesc,
+                    data=when,
+                    filename=file,
+                )
+            )
         return result
 
 
@@ -114,5 +124,5 @@ if "pytest" in sys.modules:
         """Test role with handler."""
         role_path = "examples/roles/role_with_handler"
 
-        results = run_ansible_lint("-v", role_path)
+        results = run_ansible_lint("-v", role_path, env={"NO_COLOR": "1"})
         assert "no-handler" not in results.stdout
