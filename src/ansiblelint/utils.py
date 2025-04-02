@@ -582,9 +582,9 @@ class HandleChildren:
         ]
         if len(role_name) > 1:
             # This ignores deeper structures than 1 level
-            possible_paths.append(path_dwim(basedir, os.path.join("roles", role_name[-2], role_name[-1])))
-            possible_paths.append(path_dwim(basedir, os.path.join(role_name[-2], role_name[-1])))
-            possible_paths.append(path_dwim(basedir, os.path.join("..", "..", role_name[-2], role_name[-1])))
+            possible_paths.append(path_dwim(basedir, os.path.join("roles", *role_name)))
+            possible_paths.append(path_dwim(basedir, os.path.join(*role_name)))
+            possible_paths.append(path_dwim(basedir, os.path.join("..", "..", *role_name)))
 
         for loc in self.app.runtime.config.default_roles_path:
             loc = os.path.expanduser(loc)
