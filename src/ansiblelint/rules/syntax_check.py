@@ -57,7 +57,7 @@ OUTPUT_PATTERNS = (
     KnownError(
         tag="malformed",
         regex=re.compile(
-            r"^(statically imported: (?P<filename>[\w\/\.\-]+)\n)?ERROR! (?P<title>A malformed block was encountered while loading a block[^\n]*)",
+            rf"^(statically imported: (?P<filename>[\w\/\.\-]+)\n)?{_ansible_error_prefix}(?P<title>A malformed block was encountered while loading a block[^\n]*)",
             re.MULTILINE | re.DOTALL | re.DOTALL,
         ),
     ),

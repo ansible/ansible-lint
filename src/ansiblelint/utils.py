@@ -704,11 +704,12 @@ def _extract_ansible_parsed_keys_from_task(
     return result
 
 
-def normalize_task_v2(task: Task) -> dict[str, Any]:
+def normalize_task_v2(task: Task) -> MutableMapping[str, Any]:
     """Ensure tasks have a normalized action key and strings are converted to python objects."""
     raw_task = task.raw_task
-    result: dict[str, Any] = {}
+    result: MutableMapping[str, Any] = {}
     ansible_parsed_keys = ("action", "local_action", "args", "delegate_to")
+    arguments = {}
 
     if is_nested_task(raw_task):
         _extract_ansible_parsed_keys_from_task(result, raw_task, ansible_parsed_keys)
@@ -728,19 +729,32 @@ def normalize_task_v2(task: Task) -> dict[str, Any]:
             skip_action_validation=options.skip_action_validation,
         )
     except AnsibleParserError as exc:  # pragma: no cover
-        line = 0
-        column = 0
-        regex = LINE_COLUMN_REGEX.search(exc.message)
-        if regex:
-            line = int(regex.group("line"))
-            column = int(regex.group("column"))
-        raise MatchError(
-            rule=AnsibleParserErrorRule(),
-            message=exc.message,
-            lintable=Lintable(task.filename or ""),
-            lineno=line or raw_task.get(LINE_NUMBER_KEY, 1),
-            column=column or None,
-        ) from exc
+        if "get_line_column" not in globals():
+            from ansiblelint.yaml_utils import get_line_column
+        # pylint: disable=possibly-used-before-assignment
+        line, column = get_line_column(raw_task, 0)
+        if not line:
+            line = 0
+            column = 0
+            regex = LINE_COLUMN_REGEX.search(exc.message)
+            if regex:
+                line = int(regex.group("line"))
+                column = int(regex.group("column"))
+        if not exc.message.startswith(
+            "Complex args containing variables cannot use bare variables"
+        ):
+            raise MatchError(
+                rule=AnsibleParserErrorRule(),
+                message=exc.message,
+                lintable=Lintable(task.filename or ""),
+                lineno=line or 1,
+                column=column or None,
+            ) from exc
+        result = sanitized_task
+        if "action" not in result:
+            msg = "Unable to normalize task"
+            raise NotImplementedError(msg) from exc
+        action = result["action"]
 
     # denormalize shell -> command conversion
     if "_uses_shell" in arguments:

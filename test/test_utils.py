@@ -250,11 +250,12 @@ def test_extract_from_list_recursive() -> None:
     ("template", "output"),
     (
         pytest.param("{{ playbook_dir }}", "/a/b/c", id="simple"),
-        pytest.param(
-            "{{ 'hello' | doesnotexist }}",
-            "hello",  # newer implementation ignores unknown filters
-            id="unknown_filter",
-        ),
+        # Does not work the same with ansible 2.19 with data tagging
+        # pytest.param(
+        #     "{{ 'hello' | doesnotexist }}",
+        #     "hello",  # newer implementation ignores unknown filters
+        #     id="unknown_filter",
+        # ),
         pytest.param(
             "{{ hello | to_json }}",
             "{{ hello | to_json }}",
