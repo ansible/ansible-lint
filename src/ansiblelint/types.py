@@ -40,13 +40,7 @@ except ImportError:  # pragma: no cover
     )
 
     AnsibleBaseYAMLObject: TypeAlias = (  # type: ignore[no-redef] # pyright: ignore[reportRedeclaration]
-        AnsibleSequence
-        | AnsibleMapping
-        | AnsibleUnicode
-        | str
-        | Mapping
-        | Sequence
-        | None
+        Sequence | Mapping | str | None
     )
     ansible_error_format = 2
 # temporary ignoring the type parameters for Sequence and Mapping because once

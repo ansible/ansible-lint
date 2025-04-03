@@ -188,11 +188,15 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                         elif re.match(r"^lookup plugin (.*) not found$", exc.message):
                             # lookup plugin 'template' not found
                             bypass = True
-                        elif isinstance(
-                            orig_exc, AnsibleTemplateSyntaxError
-                        ) and re.match(
-                            r"^Syntax error in template: No filter named '.*'.",
-                            exc.message,
+                        elif (
+                            exc.message == "A template was resolved to an Omit scalar."
+                            or (
+                                isinstance(orig_exc, AnsibleTemplateSyntaxError)
+                                and re.match(
+                                    r"^Syntax error in template: No filter named '.*'.",
+                                    exc.message,
+                                )
+                            )
                         ):
                             bypass = True
 
