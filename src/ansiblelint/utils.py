@@ -572,14 +572,19 @@ class HandleChildren:
 
         possible_paths = [
             # if included from a playbook
-            path_dwim(basedir, os.path.join("roles", *role_name)),
-            path_dwim(basedir, *role_name),
+            path_dwim(basedir, os.path.join("roles", role_name[-1])),
+            path_dwim(basedir, role_name[-1]),
             # if included from roles/[role]/meta/main.yml
-            path_dwim(basedir, os.path.join("..", "..", "..", "roles", *role_name)),
-            path_dwim(basedir, os.path.join("..", "..", *role_name)),
+            path_dwim(basedir, os.path.join("..", "..", "..", "roles", role_name[-1])),
+            path_dwim(basedir, os.path.join("..", "..", role_name[-1])),
             # if checking a role in the current directory
-            path_dwim(basedir, os.path.join("..", *role_name)),
+            path_dwim(basedir, os.path.join("..", role_name[-1])),
         ]
+        if len(role_name) > 1:
+            # This ignores deeper structures than 1 level
+            possible_paths.append(path_dwim(basedir, os.path.join("roles", *role_name)))
+            possible_paths.append(path_dwim(basedir, os.path.join(*role_name)))
+            possible_paths.append(path_dwim(basedir, os.path.join("..", "..", *role_name)))
 
         for loc in self.app.runtime.config.default_roles_path:
             loc = os.path.expanduser(loc)
