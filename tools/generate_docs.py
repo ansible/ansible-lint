@@ -11,7 +11,7 @@ from ansiblelint.config import Options
 from ansiblelint.rules import RulesCollection, TransformMixin
 
 if __name__ == "__main__":
-    subprocess.run(  # noqa: S603
+    subprocess.run(
         ["ansible-lint", "--list-rules"],  # noqa: S607
         check=True,
         stdout=subprocess.DEVNULL,
