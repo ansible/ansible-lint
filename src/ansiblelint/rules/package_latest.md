@@ -2,7 +2,7 @@
 
 This rule checks that package managers install software in a controlled, safe manner.
 
-Package manager modules, such as `ansible.builtin.yum`, include a `state` parameter that configures how Ansible installs software.
+Package manager modules, such as `ansible.builtin.dnf`, include a `state` parameter that configures how Ansible installs software.
 In production environments, you should set `state` to `present` and specify a target version to ensure that packages are installed to a planned and tested version.
 
 Setting `state` to `latest` not only installs software, it performs an update and installs additional packages.
@@ -17,7 +17,7 @@ If you do want to update packages to the latest version, you should also set the
   hosts: localhost
   tasks:
     - name: Install Ansible
-      ansible.builtin.yum:
+      ansible.builtin.dnf:
         name: ansible
         state: latest # <- Installs the latest package.
 
@@ -33,7 +33,7 @@ If you do want to update packages to the latest version, you should also set the
         state: latest # <- Installs the latest package.
 
     - name: Install sudo with update_only to false
-      ansible.builtin.yum:
+      ansible.builtin.dnf:
         name: sudo
         state: latest
         update_only: false # <- Updates and installs packages.
@@ -53,9 +53,9 @@ If you do want to update packages to the latest version, you should also set the
   hosts: localhost
   tasks:
     - name: Install Ansible
-      ansible.builtin.yum:
+      ansible.builtin.dnf:
         name: ansible-2.12.7.0
-        state: present # <- Pins the version to install with yum.
+        state: present # <- Pins the version to install with dnf.
 
     - name: Install Ansible-lint
       ansible.builtin.pip:
@@ -70,7 +70,7 @@ If you do want to update packages to the latest version, you should also set the
         state: present # <- Ensures the package is installed.
 
     - name: Update sudo with update_only to true
-      ansible.builtin.yum:
+      ansible.builtin.dnf:
         name: sudo
         state: latest
         update_only: true # <- Updates but does not install additional packages.
