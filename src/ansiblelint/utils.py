@@ -523,11 +523,11 @@ class HandleChildren:
             for loc in self.app.runtime.config.collections_paths:
                 append_playbook_path(
                     loc,
-                    playbook_path[:-1] + [f"{playbook_path[-1]}.yml"],
+                    [*playbook_path[:-1], f"{playbook_path[-1]}.yml"],
                 )
                 append_playbook_path(
                     loc,
-                    playbook_path[:-1] + [f"{playbook_path[-1]}.yaml"],
+                    [*playbook_path[:-1], f"{playbook_path[-1]}.yaml"],
                 )
         else:
             possible_paths.append(lintable.path.parent / v)
