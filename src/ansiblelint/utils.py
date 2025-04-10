@@ -1214,6 +1214,7 @@ def is_playbook(filename: str) -> bool:
         "gather_facts",
         "hosts",
         "import_playbook",
+        "ansible.builtin.import_playbook",
         "post_tasks",
         "pre_tasks",
         "roles",
