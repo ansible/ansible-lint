@@ -338,7 +338,9 @@ def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
 
 def test_is_playbook() -> None:
     """Verify that we can detect a playbook as a playbook."""
-    assert utils.is_playbook("examples/playbooks/always-run-success.yml")
+    assert utils.is_playbook(filename="examples/playbooks/always-run-success.yml")
+    assert utils.is_playbook(filename="examples/playbooks/import-failed-syntax-check.yml")
+    assert utils.is_playbook(filename="examples/playbooks/import_playbook_fqcn.yml")
 
 
 @pytest.mark.parametrize(
