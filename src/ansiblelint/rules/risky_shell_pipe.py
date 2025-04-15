@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 class ShellWithoutPipefail(AnsibleLintRule):
-    """Shells that use pipes should set the pipefail option."""
+    """Shells that use pipes should set the pipefail option. NB: This requires changing the shell, see the docs."""
 
     id = "risky-shell-pipe"
     description = (
@@ -24,7 +24,8 @@ class ShellWithoutPipefail(AnsibleLintRule):
         "any part of the pipeline other than the terminal command "
         "fails, the whole pipeline will still return 0, which may "
         "be considered a success by Ansible. "
-        "Pipefail is available in the bash shell."
+        "Pipefail is not available in the default (POSIX) shell, "
+        "consider bash."
     )
     severity = "MEDIUM"
     tags = ["command-shell"]
