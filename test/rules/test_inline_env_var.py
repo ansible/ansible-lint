@@ -59,6 +59,11 @@ SUCCESS_PLAY_TASKS = """
     command: echo
     args:
       strip_empty_ends: false
+
+  - name: Command with expand_argument_vars option
+    command:
+      cmd: /bin/echo $LITERAL
+      expand_argument_vars: false
 """
 
 FAIL_PLAY_TASKS = """
