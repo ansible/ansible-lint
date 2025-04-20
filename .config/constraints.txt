@@ -6,7 +6,7 @@ asttokens==3.0.0          # via stack-data
 attrs==25.3.0             # via jsonschema, referencing
 babel==2.17.0             # via mkdocs-material
 backrefs==5.8             # via mkdocs-material
-beautifulsoup4==4.13.3    # via linkchecker, mkdocs-htmlproofer-plugin
+beautifulsoup4==4.13.4    # via linkchecker, mkdocs-htmlproofer-plugin
 bindep==2.13.0            # via tox-extra
 black==25.1.0             # via ansible-lint (pyproject.toml)
 boolean-py==5.0           # via license-expression
@@ -27,7 +27,7 @@ csscompressor==0.9.5      # via mkdocs-minify-plugin
 cssselect2==0.8.0         # via cairosvg
 decorator==5.2.1          # via ipdb, ipython
 defusedxml==0.7.1         # via cairosvg
-dill==0.3.9               # via pylint
+dill==0.4.0               # via pylint
 distlib==0.3.9            # via virtualenv
 distro==1.9.0             # via bindep
 dnspython==2.7.0          # via linkchecker
@@ -68,7 +68,7 @@ mkdocs-gen-files==0.5.0   # via mkdocs-ansible
 mkdocs-get-deps==0.2.0    # via mkdocs
 mkdocs-htmlproofer-plugin==1.3.0  # via mkdocs-ansible
 mkdocs-macros-plugin==1.3.7  # via mkdocs-ansible
-mkdocs-material==9.6.11   # via mkdocs-ansible
+mkdocs-material==9.6.12   # via mkdocs-ansible
 mkdocs-material-extensions==1.3.1  # via mkdocs-ansible, mkdocs-material
 mkdocs-minify-plugin==0.8.0  # via mkdocs-ansible
 mkdocs-monorepo-plugin==1.1.0  # via mkdocs-ansible
@@ -87,7 +87,7 @@ pexpect==4.9.0            # via ipython
 pillow==11.2.1            # via cairosvg, mkdocs-ansible
 platformdirs==4.3.7       # via black, mkdocs-get-deps, pylint, tox, virtualenv
 pluggy==1.5.0             # via pytest, tox
-prompt-toolkit==3.0.50    # via ipython
+prompt-toolkit==3.0.51    # via ipython
 psutil==7.0.0             # via pytest-xdist, ansible-lint (pyproject.toml)
 ptyprocess==0.7.0         # via pexpect
 pure-eval==0.2.3          # via stack-data
@@ -111,7 +111,7 @@ requests==2.32.3          # via linkchecker, mkdocs-htmlproofer-plugin, mkdocs-m
 rpds-py==0.24.0           # via jsonschema, referencing
 ruamel-yaml==0.18.10      # via ansible-lint (pyproject.toml)
 setproctitle==1.3.5       # via pytest-xdist
-setuptools==78.1.0        # via pbr
+setuptools==78.1.1        # via pbr
 six==1.17.0               # via python-dateutil
 smmap==5.0.2              # via gitdb
 soupsieve==2.6            # via beautifulsoup4
