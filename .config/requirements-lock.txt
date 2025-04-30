@@ -11,9 +11,9 @@ filelock==3.18.0          # via ansible-lint (pyproject.toml)
 importlib-metadata==8.6.1  # via ansible-lint (pyproject.toml)
 jinja2==3.1.6             # via ansible-core
 jsonschema==4.23.0        # via ansible-compat, ansible-lint (pyproject.toml)
-jsonschema-specifications==2024.10.1  # via jsonschema
+jsonschema-specifications==2025.4.1  # via jsonschema
 markupsafe==3.0.2         # via jinja2
-mypy-extensions==1.0.0    # via black
+mypy-extensions==1.1.0    # via black
 packaging==24.2           # via ansible-compat, ansible-core, black, ansible-lint (pyproject.toml)
 pathspec==0.12.1          # via black, yamllint, ansible-lint (pyproject.toml)
 platformdirs==4.3.7       # via black
