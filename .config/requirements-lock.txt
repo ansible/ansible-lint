@@ -6,7 +6,7 @@ black==25.1.0             # via ansible-lint (pyproject.toml)
 bracex==2.5.post1         # via wcmatch
 cffi==1.17.1              # via cryptography
 click==8.1.8              # via black
-cryptography==44.0.2      # via ansible-core
+cryptography==44.0.3      # via ansible-core
 filelock==3.18.0          # via ansible-lint (pyproject.toml)
 importlib-metadata==8.6.1  # via ansible-lint (pyproject.toml)
 jinja2==3.1.6             # via ansible-core
