@@ -6,6 +6,14 @@ Always set the `no_log: true` attribute to protect sensitive data.
 While most Ansible modules mask sensitive data, using secrets inside a loop can result in those secrets being logged.
 Explicitly adding `no_log: true` prevents accidentally exposing secrets.
 
+This is an opt-in rule.
+You must enable it in your Ansible-lint configuration as follows:
+
+```yaml
+enable_list:
+  - no-log-password
+```
+
 ## Problematic Code
 
 ```yaml
