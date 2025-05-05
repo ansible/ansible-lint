@@ -60,7 +60,7 @@ repos:
           - prettier@3.2.4
           - prettier-plugin-sort-json@3.1.0
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v8.19.0
+    rev: v8.19.1
     hooks:
       - id: cspell
         # entry: codespell --relative
@@ -117,7 +117,7 @@ repos:
         additional_dependencies:
           - tomli
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.37.0
+    rev: v1.37.1
     hooks:
       - id: yamllint
         exclude: >
@@ -144,7 +144,7 @@ repos:
       - id: tox-ini-fmt
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.7
+    rev: v0.11.8
     hooks:
       - id: ruff
         args:
@@ -185,7 +185,7 @@ repos:
       - id: pyright
         additional_dependencies: *deps
   - repo: https://github.com/pycqa/pylint
-    rev: v3.3.6
+    rev: v3.3.7
     hooks:
       - id: pylint
         args:
