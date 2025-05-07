@@ -6,7 +6,7 @@ asttokens==3.0.0          # via stack-data
 attrs==25.3.0             # via jsonschema, referencing
 babel==2.17.0             # via mkdocs-material
 backrefs==5.8             # via mkdocs-material
-beautifulsoup4==4.13.3    # via linkchecker, mkdocs-htmlproofer-plugin
+beautifulsoup4==4.13.4    # via linkchecker, mkdocs-htmlproofer-plugin
 bindep==2.13.0            # via tox-extra
 black==25.1.0             # via ansible-lint (pyproject.toml)
 boolean-py==5.0           # via license-expression
@@ -14,20 +14,20 @@ bracex==2.5.post1         # via wcmatch
 cachetools==5.5.2         # via tox
 cairocffi==1.7.1          # via cairosvg
 cairosvg==2.7.1           # via mkdocs-ansible
-certifi==2025.1.31        # via requests
+certifi==2025.4.26        # via requests
 cffi==1.17.1              # via cairocffi, cryptography
 chardet==5.2.0            # via tox
-charset-normalizer==3.4.1  # via requests
+charset-normalizer==3.4.2  # via requests
 click==8.1.8              # via black, mkdocs
 colorama==0.4.6           # via griffe, mkdocs-material, tox
 coverage==7.8.0           # via coverage-enable-subprocess, ansible-lint (pyproject.toml)
 coverage-enable-subprocess==1.0  # via ansible-lint (pyproject.toml)
-cryptography==44.0.2      # via ansible-core
+cryptography==44.0.3      # via ansible-core
 csscompressor==0.9.5      # via mkdocs-minify-plugin
 cssselect2==0.8.0         # via cairosvg
 decorator==5.2.1          # via ipdb, ipython
 defusedxml==0.7.1         # via cairosvg
-dill==0.3.9               # via pylint
+dill==0.4.0               # via pylint
 distlib==0.3.9            # via virtualenv
 distro==1.9.0             # via bindep
 dnspython==2.7.0          # via linkchecker
@@ -37,7 +37,7 @@ filelock==3.18.0          # via tox, virtualenv, ansible-lint (pyproject.toml)
 ghp-import==2.1.0         # via mkdocs
 gitdb==4.0.12             # via gitpython
 gitpython==3.1.44         # via tox-extra
-griffe==1.7.2             # via mkdocstrings-python
+griffe==1.7.3             # via mkdocstrings-python
 hjson==3.1.0              # via mkdocs-macros-plugin, super-collections
 htmlmin2==0.1.13          # via mkdocs-minify-plugin
 idna==3.10                # via requests
@@ -51,7 +51,7 @@ jinja2==3.1.6             # via ansible-core, mkdocs, mkdocs-macros-plugin, mkdo
 jmespath==1.0.1           # via ansible-lint (pyproject.toml)
 jsmin==3.0.1              # via mkdocs-minify-plugin
 jsonschema==4.23.0        # via ansible-compat, ansible-lint (pyproject.toml)
-jsonschema-specifications==2024.10.1  # via jsonschema
+jsonschema-specifications==2025.4.1  # via jsonschema
 license-expression==30.4.1  # via ansible-lint (pyproject.toml)
 linkchecker==10.5.0       # via mkdocs-ansible
 markdown==3.7             # via markdown-include, mkdocs, mkdocs-autorefs, mkdocs-htmlproofer-plugin, mkdocs-material, mkdocstrings, pymdown-extensions
@@ -68,14 +68,14 @@ mkdocs-gen-files==0.5.0   # via mkdocs-ansible
 mkdocs-get-deps==0.2.0    # via mkdocs
 mkdocs-htmlproofer-plugin==1.3.0  # via mkdocs-ansible
 mkdocs-macros-plugin==1.3.7  # via mkdocs-ansible
-mkdocs-material==9.6.11   # via mkdocs-ansible
+mkdocs-material==9.6.12   # via mkdocs-ansible
 mkdocs-material-extensions==1.3.1  # via mkdocs-ansible, mkdocs-material
 mkdocs-minify-plugin==0.8.0  # via mkdocs-ansible
 mkdocs-monorepo-plugin==1.1.0  # via mkdocs-ansible
 mkdocstrings==0.29.1      # via mkdocs-ansible, mkdocstrings-python
 mkdocstrings-python==1.16.10  # via mkdocs-ansible
 mypy==1.15.0              # via ansible-lint (pyproject.toml)
-mypy-extensions==1.0.0    # via black, mypy
+mypy-extensions==1.1.0    # via black, mypy
 netaddr==1.3.0            # via ansible-lint (pyproject.toml)
 packaging==24.2           # via ansible-compat, ansible-core, bindep, black, mkdocs, mkdocs-macros-plugin, pyproject-api, pytest, pytest-sugar, tox, tox-extra, tox-uv, ansible-lint (pyproject.toml)
 paginate==0.5.7           # via mkdocs-material
@@ -87,14 +87,14 @@ pexpect==4.9.0            # via ipython
 pillow==11.2.1            # via cairosvg, mkdocs-ansible
 platformdirs==4.3.7       # via black, mkdocs-get-deps, pylint, tox, virtualenv
 pluggy==1.5.0             # via pytest, tox
-prompt-toolkit==3.0.50    # via ipython
+prompt-toolkit==3.0.51    # via ipython
 psutil==7.0.0             # via pytest-xdist, ansible-lint (pyproject.toml)
 ptyprocess==0.7.0         # via pexpect
 pure-eval==0.2.3          # via stack-data
 pycparser==2.22           # via cffi
 pygments==2.19.1          # via ipython, mkdocs-material
 pylint==3.3.6             # via ansible-lint (pyproject.toml)
-pymdown-extensions==10.14.3  # via markdown-exec, mkdocs-ansible, mkdocs-material, mkdocstrings
+pymdown-extensions==10.15  # via markdown-exec, mkdocs-ansible, mkdocs-material, mkdocstrings
 pyproject-api==1.9.0      # via tox
 pytest==8.3.5             # via pytest-instafail, pytest-mock, pytest-plus, pytest-sugar, pytest-xdist, ansible-lint (pyproject.toml)
 pytest-instafail==0.5.0   # via ansible-lint (pyproject.toml)
@@ -110,15 +110,15 @@ referencing==0.36.2       # via jsonschema, jsonschema-specifications, types-jso
 requests==2.32.3          # via linkchecker, mkdocs-htmlproofer-plugin, mkdocs-material
 rpds-py==0.24.0           # via jsonschema, referencing
 ruamel-yaml==0.18.10      # via ansible-lint (pyproject.toml)
-setproctitle==1.3.5       # via pytest-xdist
-setuptools==78.1.0        # via pbr
+setproctitle==1.3.6       # via pytest-xdist
+setuptools==80.3.0        # via pbr
 six==1.17.0               # via python-dateutil
 smmap==5.0.2              # via gitdb
-soupsieve==2.6            # via beautifulsoup4
+soupsieve==2.7            # via beautifulsoup4
 stack-data==0.6.3         # via ipython
 subprocess-tee==0.4.2     # via ansible-compat, ansible-lint (pyproject.toml)
 super-collections==0.5.3  # via mkdocs-macros-plugin
-termcolor==3.0.1          # via mkdocs-macros-plugin, pytest-sugar
+termcolor==3.1.0          # via mkdocs-macros-plugin, pytest-sugar
 text-unidecode==1.3       # via python-slugify
 tinycss2==1.4.0           # via cairosvg, cssselect2
 tomlkit==0.13.2           # via pylint
