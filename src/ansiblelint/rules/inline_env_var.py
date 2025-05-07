@@ -47,6 +47,7 @@ class EnvVarsInCommandRule(AnsibleLintRule):
         "chdir",
         "creates",
         "executable",
+        "expand_argument_vars",
         "removes",
         "stdin",
         "stdin_add_newline",
