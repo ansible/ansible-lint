@@ -36,26 +36,6 @@ theme:
     - search.share
     - search.suggest
     - toc.integrate
-extra:
-  social:
-    - icon: fontawesome/brands/python
-      link: https://pypi.org/project/ansible-lint/
-      name: PyPI
-    - icon: fontawesome/solid/scroll
-      link: https://github.com/ansible/ansible-lint/releases
-      name: Releases
-    - icon: simple/mastodon
-      link: https://fosstodon.org/@ansible
-      name: Mastodon
-    - icon: fontawesome/brands/twitter
-      link: https://twitter.com/ansible
-      name: Twitter
-    - icon: simple/matrix
-      link: https://matrix.to/#/#devtools:ansible.com
-      name: Matrix
-    - icon: fontawesome/brands/discourse
-      link: https://forum.ansible.com/c/project/7
-      name: Ansible forum
 
 nav:
   - Home:
