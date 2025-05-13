@@ -56,9 +56,6 @@ extra:
     - icon: fontawesome/brands/discourse
       link: https://forum.ansible.com/c/project/7
       name: Ansible forum
-    - icon: fontawesome/brands/github-alt
-      link: https://github.com/ansible/ansible-lint
-      name: GitHub
 
 nav:
   - Home:
@@ -141,7 +138,6 @@ plugins:
         - tools/generate_docs.py
   - material/search:
       separator: '[\s\-,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
-  - material/social
   - material/tags
   # https://github.com/manuzhang/mkdocs-htmlproofer-plugin
   # - htmlproofer
