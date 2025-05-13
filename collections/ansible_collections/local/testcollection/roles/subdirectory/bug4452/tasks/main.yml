@@ -1,0 +1,4 @@
+---
+- name: Debug
+  ansible.builtin.debug:
+    msg: "Role in subdir"
