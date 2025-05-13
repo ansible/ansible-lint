@@ -48,7 +48,7 @@ All the arguments are optional and most users should not need them:
 - `requirements_file`: Path to the requirements.yml file to install role and
   collection dependencies.
 
-For more details, see [ansible-lint-action].
+For more detail, see [ansible-lint-action].
 
 # Communication
 
