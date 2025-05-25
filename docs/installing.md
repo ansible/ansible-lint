@@ -35,9 +35,9 @@ automation content.
     related to the installation will be closed and locked.
 
 For a container image, we recommend using
-[creator-ee](https://github.com/ansible/creator-ee/) which includes
+[community-ansible-dev-tools](https://ansible.readthedocs.io/projects/dev-tools/container/) which includes
 `ansible-dev-tools` (it combines critical Ansible development packages into a
-unified Python package). If you have a use case that the `creator-ee` container
+unified Python package). If you have a use case that the `community-ansible-dev-tools` container
 doesn't satisfy, please contact the team through the
 [discussion](https://github.com/ansible/ansible-lint/discussions) forum.
 
