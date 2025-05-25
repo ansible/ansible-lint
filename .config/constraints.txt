@@ -22,7 +22,7 @@ click==8.2.0              # via black, mkdocs
 colorama==0.4.6           # via griffe, mkdocs-material, tox
 coverage==7.8.0           # via coverage-enable-subprocess, ansible-lint (pyproject.toml)
 coverage-enable-subprocess==1.0  # via ansible-lint (pyproject.toml)
-cryptography==44.0.3      # via ansible-core
+cryptography==45.0.2      # via ansible-core
 csscompressor==0.9.5      # via mkdocs-minify-plugin
 cssselect2==0.8.0         # via cairosvg
 decorator==5.2.1          # via ipdb, ipython
@@ -85,7 +85,7 @@ pbr==6.1.1                # via bindep
 pexpect==4.9.0            # via ipython
 pillow==11.2.1            # via cairosvg, mkdocs-ansible
 platformdirs==4.3.8       # via black, mkdocs-get-deps, pylint, tox, virtualenv
-pluggy==1.5.0             # via pytest, tox
+pluggy==1.6.0             # via pytest, tox
 prompt-toolkit==3.0.51    # via ipython
 psutil==7.0.0             # via pytest-xdist, ansible-lint (pyproject.toml)
 ptyprocess==0.7.0         # via pexpect
@@ -103,13 +103,13 @@ pytest-sugar==1.0.0       # via ansible-lint (pyproject.toml)
 pytest-xdist==3.6.1       # via ansible-lint (pyproject.toml)
 python-dateutil==2.9.0.post0  # via ghp-import, mkdocs-macros-plugin
 pyyaml==6.0.2             # via ansible-compat, ansible-core, mkdocs, mkdocs-get-deps, mkdocs-macros-plugin, pymdown-extensions, pyyaml-env-tag, yamllint, ansible-lint (pyproject.toml)
-pyyaml-env-tag==1.0       # via mkdocs
+pyyaml-env-tag==1.1       # via mkdocs
 referencing==0.36.2       # via jsonschema, jsonschema-specifications, types-jsonschema, ansible-lint (pyproject.toml)
 requests==2.32.3          # via linkchecker, mkdocs-htmlproofer-plugin, mkdocs-material
-rpds-py==0.24.0           # via jsonschema, referencing
+rpds-py==0.25.0           # via jsonschema, referencing
 ruamel-yaml==0.18.10      # via ansible-lint (pyproject.toml)
 setproctitle==1.3.6       # via pytest-xdist
-setuptools==80.4.0        # via pbr
+setuptools==80.7.1        # via pbr
 six==1.17.0               # via python-dateutil
 smmap==5.0.2              # via gitdb
 soupsieve==2.7            # via beautifulsoup4
@@ -119,12 +119,12 @@ super-collections==0.5.3  # via mkdocs-macros-plugin
 termcolor==3.1.0          # via mkdocs-macros-plugin, pytest-sugar
 tinycss2==1.4.0           # via cairosvg, cssselect2
 tomlkit==0.13.2           # via pylint
-tox==4.25.0               # via tox-extra, tox-uv, ansible-lint (pyproject.toml)
+tox==4.26.0               # via tox-extra, tox-uv, ansible-lint (pyproject.toml)
 tox-extra==2.1.0          # via ansible-lint (pyproject.toml)
 tox-uv==1.25.0            # via tox-extra, ansible-lint (pyproject.toml)
 traitlets==5.14.3         # via ipython, matplotlib-inline
-types-jsonschema==4.23.0.20241208  # via ansible-lint (pyproject.toml)
-types-pyyaml==6.0.12.20250402  # via ansible-lint (pyproject.toml)
+types-jsonschema==4.23.0.20250516  # via ansible-lint (pyproject.toml)
+types-pyyaml==6.0.12.20250516  # via ansible-lint (pyproject.toml)
 urllib3==2.4.0            # via requests
 virtualenv==20.31.2       # via tox
 watchdog==6.0.0           # via mkdocs
