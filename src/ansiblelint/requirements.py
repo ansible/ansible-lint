@@ -13,10 +13,12 @@ class Reqs(dict[str, SpecifierSet]):
 
     def __init__(self, name: str = "ansible-lint") -> None:
         """Load linter metadata requirements."""
-        for req_str in importlib_metadata.metadata(name).json["requires_dist"]:
-            req = Requirement(req_str)
-            if req.name:
-                self[req.name] = req.specifier
+        metadata = importlib_metadata.metadata(name)
+        if metadata:
+            for req_str in metadata.json["requires_dist"]:
+                req = Requirement(req_str)
+                if req.name:
+                    self[req.name] = req.specifier
 
     def matches(self, req_name: str, req_version: str | Version) -> bool:
         """Verify if given version is matching current metadata dependencies."""

@@ -287,7 +287,7 @@
           "$ref": "#/$defs/EnvironmentVariablesModel"
         },
         "image": {
-          "default": "quay.io/ansible/creator-ee:v0.2.0",
+          "default": "ghcr.io/ansible/community-ansible-dev-tools:latest",
           "description": "Specify the name of the execution environment image",
           "title": "Image",
           "type": "string"

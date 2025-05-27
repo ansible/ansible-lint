@@ -39,7 +39,7 @@ def pytest_configure(config: pytest.Config) -> None:
         # we need to be sure that we have the requirements installed as some tests
         # might depend on these. This approach is compatible with GHA caching.
         try:
-            subprocess.check_output(  # noqa: S603
+            subprocess.check_output(
                 ["./tools/install-reqs.sh"],
                 stderr=subprocess.PIPE,
                 text=True,

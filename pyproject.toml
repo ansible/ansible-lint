@@ -411,11 +411,7 @@ filterwarnings = [
   # https://github.com/ansible/ansible/pull/80968
   "ignore:Attribute s is deprecated and will be removed in Python 3.14; use value instead:DeprecationWarning"
 ]
-junit_duration_report = "call"
-junit_family = "xunit1"
-# Our github annotation parser from .github/workflows/tox.yml requires xunit1 format. Ref:
-# https://github.com/shyim/junit-report-annotations-action/issues/3#issuecomment-663241378
-junit_suite_name = "ansible_lint_test_suite"
+junit_family = "legacy"
 minversion = "4.6.6"
 # https://code.visualstudio.com/docs/python/testing
 # coverage is re-enabled in `tox.ini`. That approach is safer than

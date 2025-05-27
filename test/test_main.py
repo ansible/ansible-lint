@@ -159,8 +159,9 @@ def test_broken_ansible_cfg() -> None:
         for x in (
             "Invalid type for configuration option setting: CACHE_PLUGIN_TIMEOUT",
             "has an invalid value: Invalid type provided for 'int': 'invalid-value'",
+            "has an invalid value: Invalid value provided for 'integer': 'invalid-value'",
         )
-    )
+    ), proc.stderr
 
 
 def test_list_tags() -> None:
