@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import enum
 import logging
 import os
 from collections import defaultdict
@@ -23,9 +24,19 @@ if TYPE_CHECKING:
 
 class IgnoreFile(NamedTuple):
     """IgnoreFile n."""
-
     default: str
     alternative: str
+
+
+class IgnoreRuleQualifier(enum.Enum):
+    """Extra flags for ignored rules."""
+    SKIP = "Force skip, not warning"
+
+
+class IgnoreRule(NamedTuple):
+    """Ignored rule."""
+    rule: str
+    qualifiers: frozenset[IgnoreRuleQualifier]
 
 
 IGNORE_FILE = IgnoreFile(".ansible-lint-ignore", ".config/ansible-lint-ignore.txt")
@@ -41,7 +52,19 @@ def yaml_from_file(filepath: str | Path) -> Any:
         return yaml_load(content)
 
 
-def load_ignore_txt(filepath: Path | None = None) -> dict[str, set[str]]:
+def get_ignore_rule(rule: str, qualifiers: str) -> IgnoreRule:
+    """Validate qualifiers and return an IgnoreRule."""
+    s = set()
+    if qualifiers:
+        for q in qualifiers.split(","):
+            if q == "skip":
+                s.add(IgnoreRuleQualifier.SKIP)
+            else:
+                raise ValueError
+    return IgnoreRule(rule, frozenset(s))
+
+
+def load_ignore_txt(filepath: Path | None = None) -> dict[str, set[IgnoreRule]]:
     """Return a list of rules to ignore."""
     result = defaultdict(set)
 
@@ -64,17 +87,21 @@ def load_ignore_txt(filepath: Path | None = None) -> dict[str, set[str]]:
                 entry = line.split("#")[0].rstrip()
                 if entry:
                     try:
-                        path, rule = entry.split()
+                        fields = entry.split()
+                        path = fields[0]
+                        rule = fields[1]
+                        qualifiers = fields[2] if len(fields) == 3 else ""
+                        result[path].add(get_ignore_rule(rule, qualifiers))
                     except ValueError as exc:  # pragma: no cover
                         msg = f"Unable to parse line '{line}' from {ignore_file} file."
                         raise RuntimeError(msg) from exc
-                    result[path].add(rule)
-
     return result
 
 
 __all__ = [
     "IGNORE_FILE",
+    "IgnoreRule",
+    "IgnoreRuleQualifier",
     "YAMLError",
     "load_ignore_txt",
     "yaml_from_file",

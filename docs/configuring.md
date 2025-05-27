@@ -42,7 +42,7 @@ counterparts:
 
 ## Ignoring rules for entire files
 
-Ansible-lint will load skip rules from an `.ansible-lint-ignore` or
+Ansible-lint will load ignore rules from an `.ansible-lint-ignore` or
 `.config/ansible-lint-ignore.txt` file that should reside adjacent to the config
 file. The file format is very simple, containing the filename and the rule to be
 ignored. It also supports comments starting with `#`.
@@ -55,6 +55,15 @@ playbook.yml deprecated-module
 
 The file can also be created by adding `--generate-ignore` to the command line.
 Keep in mind that this will override any existing file content.
+
+By default, rules ignored here will raise a non-fatal warning in the
+output.  If you add `skip` to the line, the test will be skipped
+(see `skip_list`) and not raise any warning.
+
+```yaml title=".ansible-lint-ignore"
+playbook.yml role-name  # raises warning
+playbook2.yml role-name skip  # no warning
+```
 
 ## Pre-commit setup
 
