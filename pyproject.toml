@@ -497,6 +497,7 @@ ignore = [
   "FURB110",
   "FURB113",
   "FURB118",
+  "PLC0207", # maxsplit with [-1] preview rule
   "PLC0415",
   "PLC2701",
   "PLW1641",
