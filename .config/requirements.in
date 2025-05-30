@@ -9,7 +9,7 @@ jsonschema>=4.10.0 # MIT, version needed for improved errors
 packaging>=22.0 # Apache-2.0,BSD-2-Clause
 pathspec>=0.10.3 # Mozilla Public License 2.0 (MPL 2.0)
 pyyaml>=6.0.2 # MIT (compilation probles with older versions)
-ruamel.yaml>=0.18.5,!=0.18.7,!=0.18.8 # MIT
+ruamel.yaml>=0.18.11 # MIT (https://sourceforge.net/p/ruamel-yaml/tickets/545/)
 referencing>=0.36.2 # MIT, https://github.com/python-jsonschema/referencing/issues/216
 subprocess-tee>=0.4.1 # MIT, used by ansible-compat
 yamllint >= 1.34.0 # GPLv3
