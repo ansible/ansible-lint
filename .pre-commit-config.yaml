@@ -154,7 +154,7 @@ repos:
       # - id: ruff-format # must be after ruff
       #   types_or: [python, pyi]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.15.0
+    rev: v1.16.0
     hooks:
       - id: mypy
         # "." and pass_files are used to make pre-commit mypy behave the same as standalone mypy
