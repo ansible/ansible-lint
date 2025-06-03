@@ -7,6 +7,9 @@ The return status of a pipeline is the exit status of the command. The
 `pipefail` option ensures that tasks fail as expected if the first command
 fails.
 
+This does not work in the standard (POSIX) shell. You will need to set the executable
+to a different shell, such as bash. See the example below.
+
 As this requirement does not apply to PowerShell, for shell commands that have
 `pwsh` inside `executable` attribute, this rule will not trigger.
 
