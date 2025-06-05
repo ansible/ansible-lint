@@ -158,12 +158,11 @@ jobs:
         if: ${{ matrix.command5 }}
 
       - name: Archive logs
-        uses: actions/upload-artifact@v4
+        uses: coactions/upload-artifact@v4
         with:
           name: logs-${{ matrix.name }}.zip
           include-hidden-files: true
           path: |
-            .tox/**/log/
             .tox/**/.coverage*
             .tox/**/coverage.xml
 
