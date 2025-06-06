@@ -9,7 +9,7 @@ jsonschema==4.10.0 # MIT, version needed for improved errors
 packaging==24.2 # Due to tox-uv
 pathspec==0.10.3
 pyyaml==6.0.2
-ruamel.yaml==0.18.5 # MIT
+ruamel.yaml==0.18.11 # MIT
 subprocess-tee==0.4.1 # MIT, used by ansible-compat
 # https://packages.ubuntu.com/noble/python3-wcmatch
 # https://packages.fedoraproject.org/pkgs/python-wcmatch/python3-wcmatch/
