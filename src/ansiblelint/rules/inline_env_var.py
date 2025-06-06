@@ -44,6 +44,7 @@ class EnvVarsInCommandRule(AnsibleLintRule):
     version_changed = "5.0.11"
 
     expected_args = [
+        "argv",
         "chdir",
         "creates",
         "executable",

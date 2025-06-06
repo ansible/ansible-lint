@@ -64,6 +64,10 @@ workarounds_inject_map = {
     # https://github.com/ansible/ansible-lint/issues/2824
     "ansible.builtin.async_status": {"_async_dir": "/tmp/ansible-async"},
 }
+workarounds_mutex_args_map = {
+    # https://github.com/ansible/ansible-lint/issues/4623
+    "ansible.builtin.command": [{"cmd", "argv"}],
+}
 
 
 class ValidationPassedError(Exception):
@@ -136,6 +140,19 @@ class ArgsRule(AnsibleLintRule):
 
         if loaded_module.resolved_fqcn in workarounds_inject_map:
             module_args.update(workarounds_inject_map[loaded_module.resolved_fqcn])
+        if loaded_module.resolved_fqcn in workarounds_mutex_args_map:
+            results.extend(
+                self.create_matcherror(
+                    message=f"Module arguments {mutex_set} are mutually exclusive",
+                    lineno=task.line,
+                    tag="args[module]",
+                    filename=file,
+                )
+                for mutex_set in workarounds_mutex_args_map[loaded_module.resolved_fqcn]
+                if len(mutex_set - module_args.keys()) < len(mutex_set) - 1
+            )
+            if results:
+                return self._sanitize_results(results, module_name)
         if loaded_module.resolved_fqcn in workarounds_drop_map:
             for key in workarounds_drop_map[loaded_module.resolved_fqcn]:
                 module_args.pop(key, None)
@@ -287,7 +304,7 @@ if "pytest" in sys.modules:
         """Test rule invalid module options."""
         success = "examples/playbooks/rule-args-module-fail.yml"
         results = Runner(success, rules=default_rules_collection).run()
-        assert len(results) == 5
+        assert len(results) == 6
         assert results[0].tag == "args[module]"
         # First part of regex is for ansible-core up to 2.18, second part is for ansible-core 2.19+
         assert re.match(
@@ -311,6 +328,8 @@ if "pytest" in sys.modules:
         )
         assert results[4].tag == "args[module]"
         assert "value of state must be one of" in results[4].message
+        assert results[5].tag == "args[module]"
+        assert "are mutually exclusive" in results[5].message
 
     def test_args_module_pass(
         default_rules_collection: RulesCollection,

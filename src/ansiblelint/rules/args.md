@@ -40,6 +40,13 @@ Possible messages:
           - my_param <= 100
           - my_param >= 0
         quiet: invalid # <- Value for option `quiet` is invalid.
+
+    - name: Do not use mutually exclusive arguments together
+      ansible.builtin.command:
+        cmd: /bin/echo # <- cmd and argv are mutually exclusive options
+        argv:
+          - Hello
+      when_changed: false
 ```
 
 ## Correct Code
@@ -69,6 +76,18 @@ Possible messages:
           - my_param <= 100
           - my_param >= 0
         quiet: True # <- Has correct type value for option `quiet` which is boolean.
+
+    - name: Do not use mutually exclusive arguments together
+      ansible.builtin.command:
+        cmd: "/bin/echo Hello" # <- Does not use `cmd` and `argv`
+      when_changed: false
+
+    - name: Do not use mutually exclusive arguments together alternative
+      ansible.builtin.command:
+        argv: # <- Does not use `cmd` and `argv`
+          - /bin/echo
+          - Hello
+      when_changed: false
 ```
 
 ## Special cases
