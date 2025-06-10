@@ -1160,8 +1160,8 @@ def parse_yaml_linenumbers(
         yaml.constructor.ConstructorError,
         ruamel.yaml.parser.ParserError,
     ) as exc:
-        msg = f"Failed to load YAML file: {lintable.path}"
-        raise RuntimeError(msg) from exc
+        msg = "Failed to load YAML file"
+        raise RuntimeError(msg, lintable.path) from exc
 
     if len(result) == 0:
         return None  # empty documents

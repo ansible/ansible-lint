@@ -17,6 +17,7 @@ exclude: >
     examples/broken/encoding.yml|
     examples/broken/encoding.j2|
     examples/broken/yaml-with-tabs/invalid-due-tabs.yaml|
+    examples/broken/load-failure-invalid.yml|
     examples/playbooks/collections/.*|
     examples/playbooks/vars/empty.transformed.yml|
     examples/playbooks/vars/empty.yml|

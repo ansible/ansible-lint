@@ -241,6 +241,25 @@ def test_runner_not_found(default_rules_collection: RulesCollection) -> None:
     assert result[0].tag == "load-failure[not-found]"
 
 
+def test_runner_load_failure_yaml(default_rules_collection: RulesCollection) -> None:
+    """Ensure load-failure[yaml] work as expected."""
+    checked_files: set[Lintable] = set()
+
+    filename = Path("examples/broken/load-failure-invalid.yml").resolve()
+    runner = Runner(
+        filename,
+        rules=default_rules_collection,
+        verbosity=0,
+        checked_files=checked_files,
+    )
+    result = runner.run()
+    assert len(runner.checked_files) == 1
+    assert len(result) == 1
+    assert result[0].tag == "load-failure[yaml]"
+    assert result[0].lineno == 5
+    assert result[0].column == 1
+
+
 def test_runner_tmp_file(
     tmp_path: Path,
     default_rules_collection: RulesCollection,
