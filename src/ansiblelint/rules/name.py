@@ -60,20 +60,20 @@ class NameRule(AnsibleLintRule, TransformMixin):
                 continue
 
             # The linter adds '__line__' to each task dictionary.
-            line_number = task["__line__"]
+            lineno = task["__line__"]
 
             if task_name in seen_names:
                 message = f"Task name '{task_name}' is not unique. It was first used on line {seen_names[task_name]}."
                 errors.append(
                     self.create_matcherror(
                         message=message,
-                        lineno=line_number,
+                        lineno=lineno,
                         filename=file,
                         tag="name[unique]",
                     )
                 )
             else:
-                seen_names[task_name] = line_number
+                seen_names[task_name] = lineno
         return errors
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
