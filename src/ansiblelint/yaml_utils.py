@@ -1,5 +1,6 @@
 """Utility helpers to simplify working with yaml-based data."""
 
+# cspell: ignore docinfo
 # pylint: disable=too-many-lines
 from __future__ import annotations
 
@@ -17,6 +18,7 @@ import ruamel.yaml.events
 from ruamel.yaml.comments import CommentedMap, CommentedSeq, Format
 from ruamel.yaml.composer import ComposerError
 from ruamel.yaml.constructor import RoundTripConstructor
+from ruamel.yaml.docinfo import Version
 from ruamel.yaml.emitter import Emitter, ScalarAnalysis
 
 # Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
@@ -1028,7 +1030,7 @@ class FormattedYAML(YAML):
         return None
 
     @version.setter
-    def version(self, val: tuple[int, int] | None) -> None:
+    def version(self, val: str | tuple[int, int] | list[int] | Version | None) -> None:
         """Ensure that yaml version uses our default value.
 
         The yaml Reader updates this value based on the ``%YAML`` directive in files.
@@ -1036,7 +1038,15 @@ class FormattedYAML(YAML):
         But, None effectively resets the parsing version to YAML 1.2 (ruamel's default).
         """
         if val is not None:
-            self._yaml_version = val
+            if isinstance(val, tuple):
+                self._yaml_version = val
+            elif isinstance(val, list):
+                self._yaml_version = (val[0], val[1])
+            elif isinstance(val, Version):
+                self._yaml_version = (val.major, val.minor)
+            else:
+                msg = f"Unsupported argument {val}"
+                raise TypeError(msg)
         elif hasattr(self, "_yaml_version_default"):
             self._yaml_version = self._yaml_version_default
         # We do nothing if the object did not have a previous default version defined
