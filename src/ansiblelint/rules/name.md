@@ -15,9 +15,14 @@ This rule can produce messages as:
   helps with the identification of tasks inside the source code when they fail.
   The use of templating inside `name` keys is discouraged as there are multiple
   cases where the rendering of the name template is not possible.
+- `name[unique]` - All task names within a single play should be unique.
 
 If you want to ignore some of the messages above, you can add any of them to the
 `skip_list`.
+
+## name[unique]
+
+This check ensures that every task name is unique within the same play. This includes tasks defined in the `pre_tasks`, `tasks`, `post_tasks`, and `handlers` sections. Having unique names is crucial for reliably using features like `--start-at-task` and makes playbook execution easier to follow and debug.
 
 ## name[prefix]
 
