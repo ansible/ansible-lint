@@ -35,3 +35,11 @@
         path: /opt/software/deployment
         state: away
         mode: "0600"
+
+    - name: Mutually exclusive cmd and argv
+      # module should produce: 'arguments {"cmd", "argv"} are mutually exclusive'
+      ansible.builtin.command:
+        cmd: /bin/echo
+        argv:
+          - Hello
+      changed_when: false

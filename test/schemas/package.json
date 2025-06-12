@@ -4,7 +4,7 @@
     "js-yaml": "^4.1.0",
     "safe-stable-stringify": "^2.5.0",
     "ts-node": "^10.9.2",
-    "vscode-json-languageservice": "^5.4.3"
+    "vscode-json-languageservice": "^5.5.0"
   },
   "scripts": {
     "compile": "tsc",
@@ -12,15 +12,15 @@
     "test": "python3 src/rebuild.py && mocha"
   },
   "devDependencies": {
-    "@types/chai": "^5.2.0",
+    "@types/chai": "^5.2.2",
     "@types/js-yaml": "^4.0.9",
     "@types/minimatch": "^5.1.2",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^22.13.10",
+    "@types/node": "^22.15.25",
     "chai": "^5.2.0",
     "minimatch": "^10.0.1",
-    "mocha": "^11.1.0",
-    "typescript": "^5.8.2"
+    "mocha": "^11.5.0",
+    "typescript": "^5.8.3"
   },
   "directories": {
     "test": "./src"
