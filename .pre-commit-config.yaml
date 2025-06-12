@@ -17,6 +17,7 @@ exclude: >
     examples/broken/encoding.yml|
     examples/broken/encoding.j2|
     examples/broken/yaml-with-tabs/invalid-due-tabs.yaml|
+    examples/broken/load-failure-invalid.yml|
     examples/playbooks/collections/.*|
     examples/playbooks/vars/empty.transformed.yml|
     examples/playbooks/vars/empty.yml|
@@ -60,7 +61,7 @@ repos:
           - prettier@3.2.4
           - prettier-plugin-sort-json@3.1.0
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v8.19.1
+    rev: v9.0.1
     hooks:
       - id: cspell
         # entry: codespell --relative
@@ -144,7 +145,7 @@ repos:
       - id: tox-ini-fmt
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.8
+    rev: v0.11.12
     hooks:
       - id: ruff
         args:
@@ -154,7 +155,7 @@ repos:
       # - id: ruff-format # must be after ruff
       #   types_or: [python, pyi]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.15.0
+    rev: v1.16.0
     hooks:
       - id: mypy
         # "." and pass_files are used to make pre-commit mypy behave the same as standalone mypy
@@ -180,7 +181,7 @@ repos:
           - wcmatch
           - yamllint>=1.34.0
   - repo: https://github.com/RobertCraigie/pyright-python
-    rev: v1.1.400
+    rev: v1.1.401
     hooks:
       - id: pyright
         additional_dependencies: *deps

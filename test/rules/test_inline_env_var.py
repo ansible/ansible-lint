@@ -64,6 +64,12 @@ SUCCESS_PLAY_TASKS = """
     command:
       cmd: /bin/echo $LITERAL
       expand_argument_vars: false
+
+  - name: Mutually exclusive cmd and argv should not trigger a false-positive
+    ansible.builtin.command:
+      cmd: /bin/echo
+      argv:
+         - Hello
 """
 
 FAIL_PLAY_TASKS = """

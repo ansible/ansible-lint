@@ -1,0 +1,5 @@
+---
+- aaa: 1
+  bbb: 2
+  c: 3
+foo: bar
