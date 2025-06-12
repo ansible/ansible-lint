@@ -2,7 +2,7 @@
 - name: Fixture for literal-compare
   hosts: localhost
   tasks:
-    - name: Example task
+    - name: Example task 1
       ansible.builtin.debug:
         msg: test
       when: my_var
@@ -14,12 +14,12 @@
         - 1 + 1 == 2
         - true
 
-    - name: Example task
+    - name: Example task 2
       ansible.builtin.debug:
         msg: test
       when: not my_var
 
-    - name: Example task
+    - name: Example task 3
       ansible.builtin.debug:
         msg: test
       when: my_var not None
