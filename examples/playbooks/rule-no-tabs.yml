@@ -2,7 +2,7 @@
 - name: Fixture for no-tabs rule
   hosts: localhost
   tasks:
-    - name: Should not trigger no-tabs rules
+    - name: Should not trigger no-tabs rules 1
       ansible.builtin.lineinfile:
         path: some.txt
         regexp: ^\t$
@@ -13,7 +13,7 @@
     - name: Key has a tab
       ansible.builtin.debug:
         "ms\tg": "The associated key has \t and should trigger no-tabs here."
-    - name: Should not trigger no-tabs rules # noqa fqcn
+    - name: Should not trigger no-tabs rules 2 # noqa fqcn
       lineinfile:
         path: some.txt
         regexp: "^\t$"
@@ -24,7 +24,7 @@
     #     path: some.txt
     #     regexp: "^\t$"
     #     line: string with \t inside
-    - name: Should not trigger no-tabs rules
+    - name: Should not trigger no-tabs rules 3
       community.windows.win_lineinfile:
         path: some.txt
         regexp: "^\t$"
