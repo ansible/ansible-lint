@@ -59,6 +59,10 @@ class NameRule(AnsibleLintRule, TransformMixin):
             if not task_name:
                 continue
 
+            # If a task-like dict lacks a line number, we cannot perform the uniqueness check, so we skip it.
+            if "__line__" not in task:
+                continue
+
             # The linter adds '__line__' to each task dictionary.
             lineno = task["__line__"]
 
