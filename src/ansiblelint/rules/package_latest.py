@@ -81,5 +81,6 @@ class PackageIsNotLatestRule(AnsibleLintRule):
             and not task["action"].get("version")
             and not task["action"].get("update_only")
             and not task["action"].get("only_upgrade")
+            and not task["action"].get("download_only")
             and task["action"].get("state") == "latest"
         )
