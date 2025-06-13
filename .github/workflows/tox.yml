@@ -3,8 +3,6 @@ name: tox
 
 on:
   merge_group:
-    branches:
-      - "main"
   push:
     branches:
       - "main"
@@ -158,12 +156,11 @@ jobs:
         if: ${{ matrix.command5 }}
 
       - name: Archive logs
-        uses: actions/upload-artifact@v4
+        uses: coactions/upload-artifact@v4
         with:
           name: logs-${{ matrix.name }}.zip
           include-hidden-files: true
           path: |
-            .tox/**/log/
             .tox/**/.coverage*
             .tox/**/coverage.xml
 
@@ -262,7 +259,7 @@ jobs:
           fi
 
       - name: Upload coverage data
-        uses: codecov/codecov-action@v5.4.2
+        uses: codecov/codecov-action@v5.4.3
         with:
           name: ${{ matrix.name }}
           # verbose: true # optional (default = false)
