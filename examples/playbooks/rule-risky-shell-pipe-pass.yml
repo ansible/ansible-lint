@@ -13,19 +13,19 @@
         false | cat
       changed_when: false
 
-    - name: Pipeline with pipefail, complex set
+    - name: Pipeline with pipefail, complex set - 1
       ansible.builtin.shell: |
         set -e -x -o pipefail
         false | cat
       changed_when: false
 
-    - name: Pipeline with pipefail, complex set
+    - name: Pipeline with pipefail, complex set - 2
       ansible.builtin.shell: |
         set -e -x -o pipefail
         false | cat
       changed_when: false
 
-    - name: Pipeline with pipefail, complex set
+    - name: Pipeline with pipefail, complex set - 3
       ansible.builtin.shell: |
         set -eo pipefail
         false | cat
