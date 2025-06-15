@@ -6,7 +6,7 @@ black==25.1.0             # via ansible-lint (pyproject.toml)
 bracex==2.5.post1         # via wcmatch
 cffi==1.17.1              # via cryptography
 click==8.2.1              # via black
-cryptography==45.0.3      # via ansible-core
+cryptography==45.0.4      # via ansible-core
 filelock==3.18.0          # via ansible-lint (pyproject.toml)
 importlib-metadata==8.7.0  # via ansible-lint (pyproject.toml)
 jinja2==3.1.6             # via ansible-core
@@ -25,7 +25,7 @@ ruamel-yaml==0.18.11      # via ansible-lint (pyproject.toml)
 subprocess-tee==0.4.2     # via ansible-compat, ansible-lint (pyproject.toml)
 wcmatch==10.0             # via ansible-lint (pyproject.toml)
 yamllint==1.37.1          # via ansible-lint (pyproject.toml)
-zipp==3.22.0              # via importlib-metadata
+zipp==3.23.0              # via importlib-metadata
 
 # The following packages were excluded from the output:
 # ansible-core
