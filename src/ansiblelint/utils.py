@@ -1159,8 +1159,8 @@ def parse_yaml_linenumbers(
         yaml.constructor.ConstructorError,
         ruamel.yaml.parser.ParserError,
     ) as exc:
-        msg = f"Failed to load YAML file: {lintable.path}"
-        raise RuntimeError(msg) from exc
+        msg = "Failed to load YAML file"
+        raise RuntimeError(msg, lintable.path) from exc
 
     if len(result) == 0:
         return None  # empty documents
@@ -1213,6 +1213,7 @@ def is_playbook(filename: str) -> bool:
         "gather_facts",
         "hosts",
         "import_playbook",
+        "ansible.builtin.import_playbook",
         "post_tasks",
         "pre_tasks",
         "roles",

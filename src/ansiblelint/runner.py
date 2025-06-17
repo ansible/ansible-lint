@@ -23,6 +23,9 @@ from ansible.errors import AnsibleError
 from ansible.parsing.splitter import split_args
 from ansible.plugins.loader import add_all_plugin_dirs
 from ansible_compat.runtime import AnsibleWarning
+from ruamel.yaml.parser import ParserError as RuamelParserError
+from yaml.parser import ParserError
+from yaml.scanner import ScannerError
 
 import ansiblelint.skip_utils
 import ansiblelint.utils
@@ -213,14 +216,30 @@ class Runner:
                 self.lintables.remove(lintable)
                 continue
             if isinstance(lintable.data, States) and lintable.exc:
+                line = 1
+                column = None
+                detail = ""
+                sub_tag = ""
                 lintable.exc.__class__.__name__.lower()
+                message = None
+                if lintable.exc.__cause__ and isinstance(lintable.exc.__cause__, ScannerError | ParserError | RuamelParserError):
+                    sub_tag = "yaml"
+                    if isinstance(lintable.exc.args, tuple):
+                        message = lintable.exc.args[0]
+                    detail = lintable.exc.__cause__.problem
+                    if lintable.exc.__cause__.problem_mark:
+                        line = lintable.exc.__cause__.problem_mark.line + 1
+                        column = lintable.exc.__cause__.problem_mark.column + 1
+
                 matches.append(
                     MatchError(
                         lintable=lintable,
-                        message=str(lintable.exc),
-                        details=str(lintable.exc.__cause__),
+                        message=message or str(lintable.exc),
+                        details=detail or str(lintable.exc.__cause__),
                         rule=self.rules["load-failure"],
-                        tag=f"load-failure[{lintable.exc.__class__.__name__.lower()}]",
+                        lineno=line,
+                        column=column,
+                        tag=f"load-failure[{sub_tag or lintable.exc.__class__.__name__.lower()}]",
                     ),
                 )
                 lintable.stop_processing = True
