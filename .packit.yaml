@@ -27,11 +27,12 @@ jobs:
       # API to get available targets: https://api.dev.testing-farm.io/v0.1/composes/public
       - fedora-rawhide-x86_64
       - fedora-rawhide-aarch64
+
       - fedora-latest-stable-x86_64
       - fedora-latest-stable-aarch64
-      # Missing python3-build see https://bugzilla.redhat.com/show_bug.cgi?id=2129071
-      # - centos-stream-9-aarch64
-      # - centos-stream-9-x86_64
+
+      - centos-stream-9-aarch64
+      - centos-stream-9-x86_64
 
   # - job: copr_build
   #   trigger: pull_request
