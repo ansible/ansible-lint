@@ -39,7 +39,46 @@ class NameRule(AnsibleLintRule, TransformMixin):
         "name[prefix]": "Task name should start with a prefix.",
         "name[casing]": "All names should start with an uppercase letter.",
         "name[template]": "Jinja templates should only be at the end of 'name'",
+        "name[unique]": "Task names should be unique within a play.",
     }
+
+    def _check_unique_task_names(
+        self,
+        tasks: list[MutableMapping[str, Any]],
+        seen_names: dict[str, int],
+        file: Lintable,
+    ) -> list[MatchError]:
+        """Helper function to iterate through a list of tasks and check for duplicates."""
+        errors: list[MatchError] = []
+        if not tasks:
+            return errors
+
+        for task in tasks:
+            # We skip tasks without a name, as that is covered by the 'name[missing]' rule.
+            task_name = task.get("name")
+            if not task_name:
+                continue
+
+            # If a task-like dict lacks a line number, we cannot perform the uniqueness check, so we skip it.
+            if "__line__" not in task:
+                continue
+
+            # The linter adds '__line__' to each task dictionary.
+            lineno = task["__line__"]
+
+            if task_name in seen_names:
+                message = f"Task name '{task_name}' is not unique. It was first used on line {seen_names[task_name]}."
+                errors.append(
+                    self.create_matcherror(
+                        message=message,
+                        lineno=lineno,
+                        filename=file,
+                        tag="name[unique]",
+                    )
+                )
+            else:
+                seen_names[task_name] = lineno
+        return errors
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific play (entry in playbook)."""
@@ -48,6 +87,8 @@ class NameRule(AnsibleLintRule, TransformMixin):
             return []
         if file.failed():  # pragma: no cover
             return results
+
+        # Check if the play itself is named
         if "name" not in data:
             return [
                 self.create_matcherror(
@@ -64,6 +105,17 @@ class NameRule(AnsibleLintRule, TransformMixin):
                 data=data,
             ),
         )
+
+        # Check for unique task names within this play
+        seen_task_names: dict[str, int] = {}
+        task_sections = ["pre_tasks", "tasks", "post_tasks", "handlers"]
+        for section in task_sections:
+            tasks = data.get(section, [])
+            if tasks:
+                results.extend(
+                    self._check_unique_task_names(tasks, seen_task_names, file)
+                )
+
         return results
 
     def matchtask(
@@ -71,6 +123,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
         task: Task,
         file: Lintable | None = None,
     ) -> list[MatchError]:
+        """Check rules for a single task."""
         results: list[MatchError] = []
         if file and file.failed():  # pragma: no cover
             return results
@@ -153,7 +206,8 @@ class NameRule(AnsibleLintRule, TransformMixin):
                     effective_name = name[len(prefix) :]
 
         if (
-            effective_name[0].isalpha()
+            effective_name
+            and effective_name[0].isalpha()
             and effective_name[0].islower()
             and not effective_name[0].isupper()
         ):
@@ -204,7 +258,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
             lintable_dir = lintable_dir.parent
             pathex = lintable_dir / stem
 
-        if stems[0].startswith(kind):
+        if stems and stems[0].startswith(kind):
             del stems[0]
         return str(wcmatch.pathlib.PurePath(*stems, stem))
 

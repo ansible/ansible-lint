@@ -8,7 +8,7 @@
         cmd: touch foo
       changed_when: false
 
-    - name: Create a placefolder file
+    - name: Create a placefolder file 2
       ansible.builtin.command: # <-- command can also go first
         chdir: /tmp
         cmd: touch bar

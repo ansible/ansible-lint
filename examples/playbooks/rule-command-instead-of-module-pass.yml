@@ -46,7 +46,7 @@
       ansible.builtin.command: yum clean all
       changed_when: false
 
-    - name: Clear yum cache
+    - name: Clear yum cache (Empty command)
       ansible.builtin.command: ""
       changed_when: false
 
