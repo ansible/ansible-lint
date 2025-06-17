@@ -1,6 +1,7 @@
 ---
 # spell-checker:ignore packit specfile copr epel
 specfile_path: dist/ansible-lint.spec
+
 actions:
   create-archive:
     # packit.dev service does have these module pre-installed:
@@ -12,14 +13,12 @@ actions:
     - "git submodule init"
     - "git submodule update"
     - ./tools/update-version.sh
+
 srpm_build_deps:
   - python3-build
   - python3-setuptools_scm
+
 jobs:
-  # - job: copr_build
-  #   targets:
-  #     - fedora-rawhide-aarch64 # one on PR should be enough
-  #   trigger: pull_request
   - job: copr_build
     trigger: commit
     branch: main
@@ -33,12 +32,18 @@ jobs:
       # Missing python3-build see https://bugzilla.redhat.com/show_bug.cgi?id=2129071
       # - centos-stream-9-aarch64
       # - centos-stream-9-x86_64
+
+  # - job: copr_build
+  #   trigger: pull_request
+  #   targets:
+  #     - fedora-rawhide-aarch64 # one on PR should be enough
+
   # - job: tests
   #   trigger: pull_request
-  #   metadata:
-  #     targets:
-  #     - fedora-all
+  #   targets:
+  #   - fedora-all
+
   # - job: propose_downstream
   #   trigger: release
-  #   metadata:
-  #     dist-git-branch: master
+  #   dist_git_branches:
+  #     - main
