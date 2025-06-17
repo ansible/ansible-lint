@@ -13,7 +13,7 @@ pylint # IDE support
 pytest >= 7.2.2
 pytest-instafail >= 0.5.0 # only for local development, via PYTEST_ADDOPTS=-edit
 pytest-mock
-pytest-plus >= 0.6 # for PYTEST_REQPASS
+pytest-plus >= 0.6
 pytest-sugar  # shows failures immediately, even with xdist
 pytest-xdist[psutil,setproctitle] >= 2.1.0
 ruamel-yaml-clib  # needed for mypy
