@@ -15,10 +15,8 @@ classifiers = [
   "Intended Audience :: Developers",
   "Intended Audience :: Information Technology",
   "Intended Audience :: System Administrators",
-  "License :: OSI Approved :: MIT License",
   "Operating System :: MacOS",
   "Operating System :: POSIX",
-  "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
@@ -34,7 +32,7 @@ classifiers = [
 description = "Checks playbooks for practices and behavior that could potentially be improved"
 dynamic = ["version", "dependencies", "optional-dependencies"]
 keywords = ["ansible", "lint"]
-license = {text = "GPLv3+"}
+license = "GPL-3.0-or-later"
 maintainers = [{"email" = "info@ansible.com", "name" = "Ansible by Red Hat"}]
 name = "ansible-lint"
 readme = "README.md"
