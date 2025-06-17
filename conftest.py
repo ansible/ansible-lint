@@ -75,8 +75,10 @@ if not HAS_LIBYAML:
             stacklevel=1,
         )
     else:
-        pytest.fail(
-            "FATAL: For testing, we require pyyaml to be installed with its native extension, missing it would make testing 3x slower and risk missing essential bugs.",
+        warnings.warn(
+            "Some tests are skipped because when pyyaml precompile lib is missing they produce different results. This is also making testing 3x slower.",
+            category=pytest.PytestWarning,
+            stacklevel=1,
         )
 
 
@@ -84,3 +86,9 @@ if not HAS_LIBYAML:
 def fixture_project_path() -> Path:
     """Fixture to linter root folder."""
     return Path(__file__).resolve().parent
+
+
+def pytest_runtest_setup(item: pytest.Item) -> None:
+    """Filters some tests if libyaml is not available."""
+    if not HAS_LIBYAML and list(item.iter_markers("libyaml")):
+        pytest.skip("skipped because libyaml is not installed")

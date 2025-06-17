@@ -202,7 +202,7 @@ class Runner:
                     warn.category.__name__,
                     warn.message,
                 )
-        return matches
+        return sorted(matches)
 
     def _run(self) -> list[MatchError]:
         """Run the linting (inner loop)."""
