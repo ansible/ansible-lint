@@ -259,9 +259,12 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
 
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
+    import pytest
+
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
 
+    @pytest.mark.libyaml
     def test_fqcn_builtin_fail() -> None:
         """Test rule matches."""
         collection = RulesCollection()

@@ -215,6 +215,7 @@ def fixture_runner_result(
     ),
 )
 @mock.patch.dict(os.environ, {"ANSIBLE_LINT_WRITE_TMP": "1"}, clear=True)
+@pytest.mark.libyaml
 def test_transformer(  # pylint: disable=too-many-arguments,too-many-positional-arguments
     config_options: Options,
     playbook_str: str,
@@ -373,6 +374,7 @@ def test_write_exclude_list(
             match.rule.transform.assert_not_called()  # type: ignore[attr-defined]
 
 
+@pytest.mark.libyaml
 def test_pruned_err_after_fix(monkeypatch: pytest.MonkeyPatch, tmpdir: Path) -> None:
     """Test that pruned errors are not reported after fixing.
 
@@ -464,6 +466,7 @@ class TransformTests:
         return f"{cls.FILE_NAME} ({cls.FILE_TYPE}), {cls.VERSION_PART}"
 
 
+@pytest.mark.libyaml
 @pytest.fixture(name="test_result")
 def fixture_test_result(
     config_options: Options,
@@ -501,6 +504,7 @@ def fixture_test_result(
     return result, config_options
 
 
+@pytest.mark.libyaml
 def test_transform_na(
     caplog: pytest.LogCaptureFixture,
     monkeypatch: pytest.MonkeyPatch,
@@ -544,6 +548,7 @@ def test_transform_na(
     assert logs[1].levelname == "DEBUG"
 
 
+@pytest.mark.libyaml
 def test_transform_no_tb(
     caplog: pytest.LogCaptureFixture,
     test_result: tuple[LintResult, Options],
@@ -599,6 +604,7 @@ def test_transform_no_tb(
     assert logs[4].levelname == "DEBUG"
 
 
+@pytest.mark.libyaml
 def test_transform_applied(
     caplog: pytest.LogCaptureFixture,
     test_result: tuple[LintResult, Options],
@@ -631,6 +637,7 @@ def test_transform_applied(
     assert logs[2].levelname == "DEBUG"
 
 
+@pytest.mark.libyaml
 def test_transform_not_enabled(
     caplog: pytest.LogCaptureFixture,
     test_result: tuple[LintResult, Options],
@@ -660,6 +667,7 @@ def test_transform_not_enabled(
     assert logs[1].levelname == "DEBUG"
 
 
+@pytest.mark.libyaml
 def test_transform_not_applied(
     caplog: pytest.LogCaptureFixture,
     test_result: tuple[LintResult, Options],

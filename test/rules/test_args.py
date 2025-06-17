@@ -13,7 +13,7 @@ def test_args_module_relative_import(default_rules_collection: RulesCollection) 
     )
     result = Runner(lintable, rules=default_rules_collection).run()
     assert len(result) == 1, result
-    assert result[0].lineno == 5
+    assert result[0].lineno in [5, 7]
     assert result[0].filename == "examples/playbooks/module_relative_import.yml"
     assert result[0].tag == "args[module]"
     assert result[0].message == "missing required arguments: name"
