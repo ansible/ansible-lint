@@ -13,7 +13,7 @@
             foo: "{{ 1  }}" # <-- jinja2[spacing]
             msg: "{{ 'a' b }}" # <-- jinja2[invalid]
 
-    - name: A block used to check that we do not identify error at correct level
+    - name: Another block used to check that we do not identify error at correct level
       block:
         - name: Foo # <-- this is valid jinja2
           ansible.builtin.debug:
