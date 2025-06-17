@@ -1,0 +1,12 @@
+# This file contains ignores rule violations for ansible-lint
+handlers/main.yml name[casing]
+meta/main.yml schema[meta]
+tasks/databases.yml fqcn[action]
+tasks/main.yml name[missing]
+tasks/replication.yml fqcn[action]
+tasks/replication.yml ignore-errors
+tasks/secure-installation.yml fqcn[action]
+tasks/secure-installation.yml jinja[spacing]
+tasks/secure-installation.yml no-changed-when
+tasks/setup-RedHat.yml fqcn[action-core]
+tasks/users.yml fqcn[action]
