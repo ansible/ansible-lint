@@ -34,10 +34,11 @@ jobs:
       - centos-stream-9-aarch64
       - centos-stream-9-x86_64
 
-  # - job: copr_build
-  #   trigger: pull_request
-  #   targets:
-  #     - fedora-rawhide-aarch64 # one on PR should be enough
+  - job: copr_build
+    trigger: pull_request
+    targets:
+      - fedora-rawhide-x86_64 # one on PR should be enough
+
 
   # - job: tests
   #   trigger: pull_request
