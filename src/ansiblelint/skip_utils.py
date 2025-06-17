@@ -268,7 +268,10 @@ def _continue_skip_next_lines(
         if _noqa_comment_line_re.fullmatch(line_content[line_no - 1]):
             # Find next non-empty line
             next_line_no = line_no
-            while next_line_no < len(line_content) and not line_content[next_line_no].strip():
+            while (
+                next_line_no < len(line_content)
+                and not line_content[next_line_no].strip()
+            ):
                 next_line_no += 1
             if next_line_no >= len(line_content):
                 continue
@@ -293,8 +296,12 @@ def _get_rule_skips_from_yaml(
             traversable.append(obj.ca.comment)
         for entry in traversable:
             # flatten all lists we might have in entries. Some arcane ruamel CommentedMap magic
-            entry = [item for sublist in entry if sublist is not None
-                     for item in (sublist if isinstance(sublist, list) else [sublist])]
+            entry = [
+                item
+                for sublist in entry
+                if sublist is not None
+                for item in (sublist if isinstance(sublist, list) else [sublist])
+            ]
             for v in entry:
                 if isinstance(v, CommentToken):
                     comment_str = v.value

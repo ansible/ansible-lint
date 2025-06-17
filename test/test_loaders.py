@@ -55,10 +55,13 @@ def test_load_ignore_txt_default_success() -> None:
         finally:
             os.chdir(cwd)
 
-    assert result == {"playbook2.yml":
-                      {IgnoreRule("package-latest", frozenset()),
-                       IgnoreRule("foo-bar", frozenset()),
-                       IgnoreRule("another-role", frozenset([IgnoreRuleQualifier.SKIP]))}}
+    assert result == {
+        "playbook2.yml": {
+            IgnoreRule("package-latest", frozenset()),
+            IgnoreRule("foo-bar", frozenset()),
+            IgnoreRule("another-role", frozenset([IgnoreRuleQualifier.SKIP])),
+        }
+    }
 
 
 def test_load_ignore_txt_default_success_alternative() -> None:
@@ -87,7 +90,10 @@ def test_load_ignore_txt_default_success_alternative() -> None:
             os.chdir(cwd)
 
     assert result == {
-        "playbook.yml": {IgnoreRule("more-foo", frozenset()), IgnoreRule("foo-bar", frozenset())},
+        "playbook.yml": {
+            IgnoreRule("more-foo", frozenset()),
+            IgnoreRule("foo-bar", frozenset()),
+        },
         "tasks/main.yml": {IgnoreRule("more-bar", frozenset())},
     }
 
