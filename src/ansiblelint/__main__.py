@@ -392,10 +392,14 @@ def main(argv: list[str] | None = None) -> int:
     # load ignore file
     ignore_map = load_ignore_txt(options.ignore_file)
     # prune qualified skips from ignore file
-    result.matches = [m for m in result.matches if not _rule_is_skipped(m.tag, ignore_map[m.filename])]
+    result.matches = [
+        m for m in result.matches if not _rule_is_skipped(m.tag, ignore_map[m.filename])
+    ]
     # others entries are ignored
     for match in result.matches:
-        if match.tag in [i.rule for i in ignore_map[match.filename]]:  # pragma: no cover
+        if match.tag in [
+            i.rule for i in ignore_map[match.filename]
+        ]:  # pragma: no cover
             match.ignored = True
             _logger.debug("Ignored: %s", match)
 

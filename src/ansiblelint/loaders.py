@@ -24,17 +24,20 @@ if TYPE_CHECKING:
 
 class IgnoreFile(NamedTuple):
     """IgnoreFile n."""
+
     default: str
     alternative: str
 
 
 class IgnoreRuleQualifier(enum.Enum):
     """Extra flags for ignored rules."""
+
     SKIP = "Force skip, not warning"
 
 
 class IgnoreRule(NamedTuple):
     """Ignored rule."""
+
     rule: str
     qualifiers: frozenset[IgnoreRuleQualifier]
 
