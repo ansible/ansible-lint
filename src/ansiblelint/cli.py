@@ -61,7 +61,9 @@ def expand_to_normalized_paths(
         config[paths_var] = normalized_paths
 
 
-def load_config(config_file: str | None) -> tuple[dict[Any, Any], str | None]:
+def load_config(
+    config_file: str | None = None, project_path: str | None = None
+) -> tuple[dict[Any, Any], str | None]:
     """Load configuration from disk."""
     config_path = None
 
@@ -74,7 +76,7 @@ def load_config(config_file: str | None) -> tuple[dict[Any, Any], str | None]:
         if not os.path.exists(config_path):
             _logger.error("Config file not found '%s'", config_path)
             sys.exit(RC.INVALID_CONFIG)
-    config_path = config_path or get_config_path()
+    config_path = config_path or get_config_path(None, project_path=project_path)
     if not config_path or not os.path.exists(config_path):
         # a missing default config file should not trigger an error
         return {}, None
@@ -100,7 +102,9 @@ def load_config(config_file: str | None) -> tuple[dict[Any, Any], str | None]:
     return config, config_path
 
 
-def get_config_path(config_file: str | None = None) -> str | None:
+def get_config_path(
+    config_file: str | None = None, project_path: str | None = None
+) -> str | None:
     """Return local config file."""
     if config_file:
         project_filenames = [config_file]
@@ -112,7 +116,7 @@ def get_config_path(config_file: str | None = None) -> str | None:
             ".config/ansible-lint.yml",
             ".config/ansible-lint.yaml",
         ]
-    parent = tail = os.getcwd()
+    parent = tail = project_path or os.getcwd()
     while tail:
         for project_filename in project_filenames:
             filename = os.path.abspath(os.path.join(parent, project_filename))
@@ -460,8 +464,8 @@ def get_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--offline",
         dest="offline",
-        action="store_const",
-        const=True,
+        action=argparse.BooleanOptionalAction,
+        default=False,
         help="Disable installation of requirements.yml and schema refreshing",
     )
     parser.add_argument(
@@ -595,7 +599,9 @@ def get_config(arguments: list[str]) -> Options:
         )
 
     # save info about custom config file, as options.config_file may be modified by merge_config
-    file_config, options.config_file = load_config(options.config_file)
+    file_config, options.config_file = load_config(
+        options.config_file, project_path=options.project_dir
+    )
     config = merge_config(file_config, options)
 
     options.rulesdirs = get_rules_dirs(

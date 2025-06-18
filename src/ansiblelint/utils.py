@@ -177,7 +177,7 @@ def ansible_template(
     """Render a templated string by mocking missing filters.
 
     In the case of a missing lookup, ansible core does an early exit
-    when disable_lookup=True but this happens after the jinja2 syntax already passed
+    but this happens after the jinja2 syntax already passed
     return the original string as if it had been templated.
 
     In the case of a missing filter, extract the missing filter plugin name
@@ -201,7 +201,6 @@ def ansible_template(
     re_valid_filter = re.compile(r"^\w+(\.\w+\.\w+)?$")
     templar = ansible_templar(basedir=basedir, templatevars=templatevars)
 
-    kwargs["disable_lookups"] = True
     for _i in range(10):
         try:
             if TrustedAsTemplate and not isinstance(varname, TrustedAsTemplate):
@@ -568,22 +567,29 @@ class HandleChildren:
 
     def _rolepath(self, basedir: str, role: str) -> str | None:
         role_path = None
-        namespace_name, collection_name, role_name = parse_fqcn(role)
+        namespace_name, collection_name, *role_name = parse_fqcn(role)
 
         possible_paths = [
             # if included from a playbook
-            path_dwim(basedir, os.path.join("roles", role_name)),
-            path_dwim(basedir, role_name),
+            path_dwim(basedir, os.path.join("roles", role_name[-1])),
+            path_dwim(basedir, role_name[-1]),
             # if included from roles/[role]/meta/main.yml
-            path_dwim(basedir, os.path.join("..", "..", "..", "roles", role_name)),
-            path_dwim(basedir, os.path.join("..", "..", role_name)),
+            path_dwim(basedir, os.path.join("..", "..", "..", "roles", role_name[-1])),
+            path_dwim(basedir, os.path.join("..", "..", role_name[-1])),
             # if checking a role in the current directory
-            path_dwim(basedir, os.path.join("..", role_name)),
+            path_dwim(basedir, os.path.join("..", role_name[-1])),
         ]
+        if len(role_name) > 1:
+            # This ignores deeper structures than 1 level
+            possible_paths.append(path_dwim(basedir, os.path.join("roles", *role_name)))
+            possible_paths.append(path_dwim(basedir, os.path.join(*role_name)))
+            possible_paths.append(
+                path_dwim(basedir, os.path.join("..", "..", *role_name))
+            )
 
         for loc in self.app.runtime.config.default_roles_path:
             loc = os.path.expanduser(loc)
-            possible_paths.append(path_dwim(loc, role_name))
+            possible_paths.append(path_dwim(loc, role_name[-1]))
 
         if namespace_name and collection_name:
             for loc in get_app(cached=True).runtime.config.collections_paths:
@@ -596,7 +602,7 @@ class HandleChildren:
                             namespace_name,
                             collection_name,
                             "roles",
-                            role_name,
+                            role_name[-1],
                         ),
                     ),
                 )
@@ -1343,4 +1349,7 @@ def load_plugin(name: str) -> PluginLoadContext:
 
 def parse_fqcn(name: str) -> tuple[str, ...]:
     """Parse name parameter into FQCN segments."""
-    return tuple(name.split(".")) if is_fqcn(name) else ("", "", name)
+    if not is_fqcn(name):
+        return ("", "", name)
+
+    return tuple(name.split("."))

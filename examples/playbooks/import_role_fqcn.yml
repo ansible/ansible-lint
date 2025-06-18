@@ -1,0 +1,9 @@
+---
+- name: Roles
+  hosts: localhost
+  roles:
+    - name: local.testcollection.bug4095
+    - name: local.testcollection.subdirectory.bug4452
+
+- name: Import a playbook with role in a subdirectory
+  ansible.builtin.import_playbook: local.testcollection.playbook_bug4452

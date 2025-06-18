@@ -222,7 +222,10 @@ class Runner:
                 sub_tag = ""
                 lintable.exc.__class__.__name__.lower()
                 message = None
-                if lintable.exc.__cause__ and isinstance(lintable.exc.__cause__, ScannerError | ParserError | RuamelParserError):
+                if lintable.exc.__cause__ and isinstance(
+                    lintable.exc.__cause__,
+                    ScannerError | ParserError | RuamelParserError,
+                ):
                     sub_tag = "yaml"
                     if isinstance(lintable.exc.args, tuple):
                         message = lintable.exc.args[0]

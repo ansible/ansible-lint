@@ -8,6 +8,7 @@ import tempfile
 import time
 from collections.abc import Mapping
 from http.client import RemoteDisconnected
+from os.path import abspath
 from pathlib import Path
 
 import pytest
@@ -180,3 +181,30 @@ def test_list_tags() -> None:
         assert isinstance(value, list)
         for item in value:
             assert isinstance(item, str)
+
+
+def test_ro_venv() -> None:
+    """Tests behavior when the virtual environment is read-only."""
+    tox_work_dir = os.environ.get("TOX_WORK_DIR", ".tox")
+    venv_path = f"{tox_work_dir}/ro"
+    commands = [
+        f"mkdir -p {venv_path}",
+        f"chmod -R a+w {venv_path}",
+        f"rm -rf {venv_path}",
+        f"python -m venv --symlinks {venv_path}",
+        f"{venv_path}/bin/python -m pip install -q -e .",
+        f"chmod -R a-w {venv_path}",
+        # running with a ro venv and default cwd
+        f"{venv_path}/bin/ansible-lint --version",
+        # running from a read-only cwd:
+        f"cd / && {abspath(venv_path)}/bin/ansible-lint --version",  # noqa: PTH100
+        # running with a ro venv and a custom project path in forced non-online mode, so it will need to install requirements
+        f"{venv_path}/bin/ansible-lint -vv --no-offline --project-dir ./examples/reqs_v2/ ./examples/reqs_v2/",
+    ]
+    for cmd in commands:
+        result = subprocess.run(
+            cmd, capture_output=True, shell=True, text=True, check=False
+        )
+        assert result.returncode == 0, (
+            f"Got {result.returncode} running {cmd}\n\tstderr: {result.stderr}\n\tstdout: {result.stdout}"
+        )

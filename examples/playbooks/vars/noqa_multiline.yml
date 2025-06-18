@@ -1,0 +1,26 @@
+---
+# noqa: jinja[spacing]
+foo_postgresql_grafana_password_encoded: >-
+  {% if '!' in foo_postgresql_grafana_password or '#' in foo_postgresql_grafana_password %}
+  {{- ('\"\"\"' + foo_postgresql_grafana_password + '\"\"\"') | b64encode -}}
+  {% else %}
+  {{- foo_postgresql_grafana_password | b64encode -}}
+  {% endif %}
+
+# noqa: jinja[spacing]
+
+foo_postgresql_grafana_password_encoded_2: >-
+  {% if '!' in foo_postgresql_grafana_password or '#' in foo_postgresql_grafana_password %}
+  {{- ('\"\"\"' + foo_postgresql_grafana_password + '\"\"\"') | b64encode -}}
+  {% else %}
+  {{- foo_postgresql_grafana_password | b64encode -}}
+  {% endif %}
+
+inner:
+  # noqa: jinja[spacing]
+  foo_postgresql_grafana_password_encoded: >-
+    {% if '!' in foo_postgresql_grafana_password or '#' in foo_postgresql_grafana_password %}
+    {{- ('\"\"\"' + foo_postgresql_grafana_password + '\"\"\"') | b64encode -}}
+    {% else %}
+    {{- foo_postgresql_grafana_password | b64encode -}}
+    {% endif %}

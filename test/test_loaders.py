@@ -6,7 +6,14 @@ import uuid
 from pathlib import Path
 from textwrap import dedent
 
-from ansiblelint.loaders import IGNORE_FILE, load_ignore_txt
+import pytest
+
+from ansiblelint.loaders import (
+    IGNORE_FILE,
+    IgnoreRule,
+    IgnoreRuleQualifier,
+    load_ignore_txt,
+)
 
 
 def test_load_ignore_txt_default_empty() -> None:
@@ -35,6 +42,7 @@ def test_load_ignore_txt_default_success() -> None:
                     # See https://ansible.readthedocs.io/projects/lint/configuring/#ignoring-rules-for-entire-files
                     playbook2.yml package-latest # comment
                     playbook2.yml foo-bar
+                    playbook2.yml another-role skip # rule with qualifier
                 """,
                 ),
             )
@@ -47,7 +55,13 @@ def test_load_ignore_txt_default_success() -> None:
         finally:
             os.chdir(cwd)
 
-    assert result == {"playbook2.yml": {"package-latest", "foo-bar"}}
+    assert result == {
+        "playbook2.yml": {
+            IgnoreRule("package-latest", frozenset()),
+            IgnoreRule("foo-bar", frozenset()),
+            IgnoreRule("another-role", frozenset([IgnoreRuleQualifier.SKIP])),
+        }
+    }
 
 
 def test_load_ignore_txt_default_success_alternative() -> None:
@@ -76,8 +90,11 @@ def test_load_ignore_txt_default_success_alternative() -> None:
             os.chdir(cwd)
 
     assert result == {
-        "playbook.yml": {"more-foo", "foo-bar"},
-        "tasks/main.yml": {"more-bar"},
+        "playbook.yml": {
+            IgnoreRule("more-foo", frozenset()),
+            IgnoreRule("foo-bar", frozenset()),
+        },
+        "tasks/main.yml": {IgnoreRule("more-bar", frozenset())},
     }
 
 
@@ -108,10 +125,10 @@ def test_load_ignore_txt_custom_success() -> None:
             os.chdir(cwd)
 
     assert result == {
-        "playbook.yml": {"hector"},
-        "roles/eduardo/tasks/main.yml": {"lalo"},
-        "roles/guzman/tasks/main.yml": {"lalo"},
-        "vars/main.yml": {"tuco"},
+        "playbook.yml": {IgnoreRule("hector", frozenset())},
+        "roles/eduardo/tasks/main.yml": {IgnoreRule("lalo", frozenset())},
+        "roles/guzman/tasks/main.yml": {IgnoreRule("lalo", frozenset())},
+        "vars/main.yml": {IgnoreRule("tuco", frozenset())},
     }
 
 
@@ -120,3 +137,22 @@ def test_load_ignore_txt_custom_fail() -> None:
     result = load_ignore_txt(Path(str(uuid.uuid4())))
 
     assert not result
+
+
+def test_load_ignore_txt_invalid_tags(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Test load_ignore_txt with an existing ignore-file in the default location."""
+    with tempfile.TemporaryDirectory() as temporary_directory:
+        ignore_file = Path(temporary_directory) / IGNORE_FILE.default
+
+        with ignore_file.open("w", encoding="utf-8") as _ignore_file:
+            _ignore_file.write(
+                dedent(
+                    """
+                    playbook2.yml package-latest invalid-tag
+                """,
+                ),
+            )
+
+        monkeypatch.chdir(temporary_directory)
+        with pytest.raises(RuntimeError, match="Unable to parse line"):
+            load_ignore_txt()

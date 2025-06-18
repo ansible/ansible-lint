@@ -55,7 +55,8 @@ if TYPE_CHECKING:
 
 _logger = logging.getLogger(__name__)
 _found_deprecated_tags: set[str] = set()
-_noqa_comment_re = re.compile(r"^# noqa(\s|:)")
+_noqa_comment_re = re.compile(r"^\s*# noqa(\s|:)", flags=re.MULTILINE)
+_noqa_comment_line_re = re.compile(r"^\s*# noqa(\s|:).*$")
 
 # playbook: Sequence currently expects only instances of one of the two
 # classes below but we should consider avoiding this chimera.
@@ -257,6 +258,28 @@ def _get_tasks_from_blocks(task_blocks: Sequence[Any]) -> Generator[Any, None, N
         yield task
 
 
+def _continue_skip_next_lines(
+    lintable: Lintable,
+) -> None:
+    """When a line only contains a noqa comment (and possibly indentation), add the skip also to the next non-empty line."""
+    # If line starts with _noqa_comment_line_re, add next non-empty line to same lintable.line_skips
+    line_content = lintable.content.splitlines()
+    for line_no in list(lintable.line_skips.keys()):
+        if _noqa_comment_line_re.fullmatch(line_content[line_no - 1]):
+            # Find next non-empty line
+            next_line_no = line_no
+            while (
+                next_line_no < len(line_content)
+                and not line_content[next_line_no].strip()
+            ):
+                next_line_no += 1
+            if next_line_no >= len(line_content):
+                continue
+            lintable.line_skips[next_line_no + 1].update(
+                lintable.line_skips[line_no],
+            )
+
+
 def _get_rule_skips_from_yaml(
     yaml_input: Sequence[Any],
     lintable: Lintable,
@@ -268,7 +291,17 @@ def _get_rule_skips_from_yaml(
         return []
 
     def traverse_yaml(obj: Any) -> None:
-        for entry in obj.ca.items.values():
+        traversable = list(obj.ca.items.values())
+        if obj.ca.comment:
+            traversable.append(obj.ca.comment)
+        for entry in traversable:
+            # flatten all lists we might have in entries. Some arcane ruamel CommentedMap magic
+            entry = [
+                item
+                for sublist in entry
+                if sublist is not None
+                for item in (sublist if isinstance(sublist, list) else [sublist])
+            ]
             for v in entry:
                 if isinstance(v, CommentToken):
                     comment_str = v.value
@@ -298,6 +331,7 @@ def _get_rule_skips_from_yaml(
     for comment_obj_str in yaml_comment_obj_strings:
         for line in comment_obj_str.split(r"\n"):
             rule_id_list.extend(get_rule_skips_from_line(line, lintable=lintable))
+    _continue_skip_next_lines(lintable)
 
     return [normalize_tag(tag) for tag in rule_id_list]
 

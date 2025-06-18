@@ -57,7 +57,7 @@ from ansiblelint.config import (
     log_entries,
     options,
 )
-from ansiblelint.loaders import load_ignore_txt
+from ansiblelint.loaders import IgnoreRule, IgnoreRuleQualifier, load_ignore_txt
 from ansiblelint.output import (
     console,
     console_stderr,
@@ -272,6 +272,19 @@ def fix(runtime_options: Options, result: LintResult, rules: RulesCollection) ->
         result.matches.pop(idx)
 
 
+# By default, matches ignored in .ansible-lint-ignore are treated
+# as warnings [1].  If the user explicitly adds a skip qualifier
+# to the rule, it is treated as skipped here and does not show up
+# even as a warning.
+# [1] https://github.com/ansible/ansible-lint/issues/3068
+def _rule_is_skipped(tag: str, rules: set[IgnoreRule]) -> bool:
+    for rule in rules:
+        if tag != rule.rule:
+            return False
+        return IgnoreRuleQualifier.SKIP in rule.qualifiers
+    return False
+
+
 # pylint: disable=too-many-locals,too-many-statements
 def main(argv: list[str] | None = None) -> int:
     """Linter CLI entry point."""
@@ -376,10 +389,17 @@ def main(argv: list[str] | None = None) -> int:
 
     # Remove skip_list items from the result
     result.matches = [m for m in result.matches if m.tag not in app.options.skip_list]
-    # Mark matches as ignored inside ignore file
+    # load ignore file
     ignore_map = load_ignore_txt(options.ignore_file)
+    # prune qualified skips from ignore file
+    result.matches = [
+        m for m in result.matches if not _rule_is_skipped(m.tag, ignore_map[m.filename])
+    ]
+    # others entries are ignored
     for match in result.matches:
-        if match.tag in ignore_map[match.filename]:  # pragma: no cover
+        if match.tag in [
+            i.rule for i in ignore_map[match.filename]
+        ]:  # pragma: no cover
             match.ignored = True
             _logger.debug("Ignored: %s", match)
 

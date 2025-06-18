@@ -1,0 +1,12 @@
+---
+- name: Role for 4452
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Import role in subdir
+      ansible.builtin.import_role:
+        name: local.testcollection.subdirectory.bug4452
+
+    - name: Import role in 3rd level subdir
+      ansible.builtin.import_role:
+        name: local.testcollection.level1.level2.role_level3

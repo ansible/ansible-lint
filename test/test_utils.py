@@ -339,7 +339,9 @@ def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
 def test_is_playbook() -> None:
     """Verify that we can detect a playbook as a playbook."""
     assert utils.is_playbook(filename="examples/playbooks/always-run-success.yml")
-    assert utils.is_playbook(filename="examples/playbooks/import-failed-syntax-check.yml")
+    assert utils.is_playbook(
+        filename="examples/playbooks/import-failed-syntax-check.yml"
+    )
     assert utils.is_playbook(filename="examples/playbooks/import_playbook_fqcn.yml")
 
 
@@ -540,3 +542,15 @@ def test_import_playbook_children_subdirs() -> None:
         "Failed to find local.testcollection.test.bar.foo playbook."
         not in result.stderr
     )
+
+
+def test_import_role_children_subdirs() -> None:
+    """Verify import_playbook_children()."""
+    result = run_ansible_lint(
+        Path("playbooks/import_role_fqcn.yml"),
+        cwd=Path(__file__).resolve().parent.parent / "examples",
+        env={
+            "ANSIBLE_COLLECTIONS_PATH": "../collections",
+        },
+    )
+    assert "Failed " not in result.stderr
