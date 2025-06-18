@@ -26,7 +26,14 @@ def test_creator_scaffolded_pattern() -> None:
 
         # Scaffold a pattern using ansible-creator
         result = subprocess.run(
-            ["ansible-creator", "add", "resource", "pattern", "sample_pattern", collection_dest],
+            [
+                "ansible-creator",
+                "add",
+                "resource",
+                "pattern",
+                "sample_pattern",
+                collection_dest,
+            ],
             capture_output=True,
             text=True,
             check=False,
