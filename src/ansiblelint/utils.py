@@ -42,6 +42,7 @@ from collections.abc import (
 from dataclasses import _MISSING_TYPE, dataclass, field
 from functools import cache, lru_cache
 from pathlib import Path
+from packaging.version import Version
 from typing import TYPE_CHECKING, Any
 
 import ruamel.yaml.parser
@@ -73,7 +74,7 @@ from ansiblelint._internal.rules import (
     RuntimeErrorRule,
 )
 from ansiblelint.app import App, get_app
-from ansiblelint.config import Options, options
+from ansiblelint.config import Options, options, get_deps_versions
 from ansiblelint.constants import (
     ANNOTATION_KEYS,
     FILENAME_KEY,
@@ -200,6 +201,10 @@ def ansible_template(
     re_filter_in_err = re.compile(r"Could not load \"(\w+)\"")
     re_valid_filter = re.compile(r"^\w+(\.\w+\.\w+)?$")
     templar = ansible_templar(basedir=basedir, templatevars=templatevars)
+
+    # disable_lookups is only needed for < ansible-core 2.19
+    if Version(str(get_deps_versions().get("ansible-core"))) < Version("2.19.0b"):
+        kwargs["disable_lookups"] = True
 
     for _i in range(10):
         try:
