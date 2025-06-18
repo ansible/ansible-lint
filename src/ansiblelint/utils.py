@@ -42,7 +42,6 @@ from collections.abc import (
 from dataclasses import _MISSING_TYPE, dataclass, field
 from functools import cache, lru_cache
 from pathlib import Path
-from packaging.version import Version
 from typing import TYPE_CHECKING, Any
 
 import ruamel.yaml.parser
@@ -64,6 +63,7 @@ from ansible.plugins.loader import (
 )
 from ansible.template import Templar
 from ansible.utils.collection_loader import AnsibleCollectionConfig
+from packaging.version import Version
 from yaml.composer import Composer
 from yaml.parser import ParserError
 from yaml.representer import RepresenterError
@@ -74,7 +74,7 @@ from ansiblelint._internal.rules import (
     RuntimeErrorRule,
 )
 from ansiblelint.app import App, get_app
-from ansiblelint.config import Options, options, get_deps_versions
+from ansiblelint.config import Options, get_deps_versions, options
 from ansiblelint.constants import (
     ANNOTATION_KEYS,
     FILENAME_KEY,
