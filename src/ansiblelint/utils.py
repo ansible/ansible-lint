@@ -177,7 +177,7 @@ def ansible_template(
     """Render a templated string by mocking missing filters.
 
     In the case of a missing lookup, ansible core does an early exit
-    but this happens after the jinja2 syntax already passed
+    when disable_lookup=True but this happens after the jinja2 syntax already passed
     return the original string as if it had been templated.
 
     In the case of a missing filter, extract the missing filter plugin name
@@ -201,6 +201,7 @@ def ansible_template(
     re_valid_filter = re.compile(r"^\w+(\.\w+\.\w+)?$")
     templar = ansible_templar(basedir=basedir, templatevars=templatevars)
 
+    kwargs["disable_lookups"] = True
     for _i in range(10):
         try:
             if TrustedAsTemplate and not isinstance(varname, TrustedAsTemplate):
