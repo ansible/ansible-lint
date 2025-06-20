@@ -1,0 +1,204 @@
+syntax-check[specific]: the role 'debops.debops.nixos' was not found in debops.debops:ansible.legacy:/Users/ssbarnea/code/a/ansible-lint/test/fixtures/eco/debops/ansible/playbooks/roles:/Users/ssbarnea/code/a/ansible-lint/test/fixtures/eco/debops/.ansible/roles:/Users/ssbarnea/code/a/ansible-lint/test/fixtures/eco/debops/roles:/Users/ssbarnea/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:/Users/ssbarnea/code/a/ansible-lint/test/fixtures/eco/debops/ansible/playbooks
+ansible/playbooks/nixos.yml:29:15
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/apache/tasks/main.yml:44:3
+
+syntax-check[specific]: the role 'debops.debops.global_handlers' was not found in debops.debops:ansible.legacy:/Users/ssbarnea/code/a/ansible-lint/test/fixtures/eco/debops/ansible/playbooks/layer/roles:/Users/ssbarnea/code/a/ansible-lint/test/fixtures/eco/debops/.ansible/roles:/Users/ssbarnea/code/a/ansible-lint/test/fixtures/eco/debops/roles:/Users/ssbarnea/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:/Users/ssbarnea/code/a/ansible-lint/test/fixtures/eco/debops/ansible/playbooks/layer
+ansible/roles/apt/tasks/main.yml:11:11
+
+syntax-check[specific]: the role 'debops.debops.global_handlers' was not found in debops.debops:ansible.legacy:/Users/ssbarnea/code/a/ansible-lint/test/fixtures/eco/debops/ansible/playbooks/roles:/Users/ssbarnea/code/a/ansible-lint/test/fixtures/eco/debops/.ansible/roles:/Users/ssbarnea/code/a/ansible-lint/test/fixtures/eco/debops/roles:/Users/ssbarnea/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:/Users/ssbarnea/code/a/ansible-lint/test/fixtures/eco/debops/ansible/playbooks
+ansible/roles/apt/tasks/main.yml:11:11
+
+syntax-check[specific]: the role 'debops.debops.global_handlers' was not found in debops.debops:ansible.legacy:/Users/ssbarnea/code/a/ansible-lint/test/fixtures/eco/debops/ansible/playbooks/service/roles:/Users/ssbarnea/code/a/ansible-lint/test/fixtures/eco/debops/.ansible/roles:/Users/ssbarnea/code/a/ansible-lint/test/fixtures/eco/debops/roles:/Users/ssbarnea/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:/Users/ssbarnea/code/a/ansible-lint/test/fixtures/eco/debops/ansible/playbooks/service
+ansible/roles/apt/tasks/main.yml:11:11
+
+syntax-check[specific]: the role 'debops.debops.global_handlers' was not found in debops.debops:ansible.legacy:/var/folders/32/1xrphgzd4xv777syxjtkpdw80000gn/T/roles:/Users/ssbarnea/code/a/ansible-lint/test/fixtures/eco/debops/.ansible/roles:/Users/ssbarnea/code/a/ansible-lint/test/fixtures/eco/debops/roles:/Users/ssbarnea/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:/var/folders/32/1xrphgzd4xv777syxjtkpdw80000gn/T
+ansible/roles/apt/tasks/main.yml:11:11
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/apt_cacher_ng/tasks/main.yml:23:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/apt_mirror/tasks/main.yml:52:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/avahi/tasks/main.yml:43:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/backup2l/tasks/main.yml:20:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/bind/tasks/main.yml:196:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.btrfs_subvolume'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/btrfs/tasks/main.yml:21:3
+
+jinja[spacing]: Jinja2 spacing could be improved: {{ ((ansible_local.core.admin_users if (ansible_local.core.admin_users | d()) else []) + [(ansible_user if (ansible_user is defined and ansible_user not in (core__admin_blacklist_default_users + core__admin_blacklist_users)) else lookup("env", "USER"))]) | unique }} -> {{ ((ansible_local.core.admin_users if (ansible_local.core.admin_users | d()) else []) + [ansible_user if (ansible_user is defined and ansible_user not in (core__admin_blacklist_default_users + core__admin_blacklist_users)) else lookup("env", "USER")]) | unique }} (warning)
+ansible/roles/core/defaults/main.yml:133:20 Jinja2 template rewrite recommendation: `{{ ((ansible_local.core.admin_users if (ansible_local.core.admin_users | d()) else []) + [ansible_user if (ansible_user is defined and ansible_user not in (core__admin_blacklist_default_users + core__admin_blacklist_users)) else lookup("env", "USER")]) | unique }}`.
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/cron/tasks/main.yml:42:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/debops_legacy/tasks/main.yml:10:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/dhcpd/tasks/main.yml:25:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/dhcrelay/tasks/main.yml:21:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/dnsmasq/tasks/main.yml:91:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/docker_registry/tasks/main.yml:26:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/dovecot/tasks/main.yml:70:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/elasticsearch/tasks/main.yml:76:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/etc_services/tasks/main.yml:34:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/etckeeper/tasks/main.yml:38:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/extrepo/tasks/main.yml:40:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/fail2ban/tasks/main.yml:24:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/ferm/tasks/main.yml:87:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/filebeat/tasks/main.yml:44:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/freeradius/tasks/main.yml:60:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/fuse/tasks/main.yml:17:3
+
+jinja[spacing]: Jinja2 spacing could be improved: {{ ([(ansible_local.libvirtd.unix_sock_group if (ansible_local.libvirtd.unix_sock_group | d()) else "libvirt")] + (["kvm"] if (ansible_local | d() and ansible_local.libvirtd | d() and (ansible_local.libvirtd.hw_virt | d()) | bool) else [])) | join(",") }} -> {{ ([ansible_local.libvirtd.unix_sock_group if (ansible_local.libvirtd.unix_sock_group | d()) else "libvirt"] + (["kvm"] if (ansible_local | d() and ansible_local.libvirtd | d() and (ansible_local.libvirtd.hw_virt | d()) | bool) else [])) | join(",") }} (warning)
+ansible/roles/gitlab_runner/tasks/main.yml:200 Jinja2 template rewrite recommendation: `{{ ([ansible_local.libvirtd.unix_sock_group if (ansible_local.libvirtd.unix_sock_group | d()) else "libvirt"] + (["kvm"] if (ansible_local | d() and ansible_local.libvirtd | d() and (ansible_local.libvirtd.hw_virt | d()) | bool) else [])) | join(",") }}`.
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/grub/tasks/main.yml:149:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/icinga/tasks/main.yml:63:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/icinga_db/tasks/main.yml:59:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/imapproxy/tasks/main.yml:40:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/influxdb_server/tasks/main.yml:73:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/java/tasks/main.yml:50:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/kibana/tasks/main.yml:74:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/ldap/tasks/main.yml:38:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/libuser/tasks/main.yml:24:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/libvirtd/tasks/main.yml:60:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/libvirtd_qemu/tasks/main.yml:46:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/lldpd/tasks/main.yml:42:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/logrotate/tasks/main.yml:24:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/lvm/tasks/main.yml:13:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/machine/tasks/main.yml:31:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/metricbeat/tasks/main.yml:44:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/minidlna/tasks/main.yml:25:3
+
+fqcn[action-core]: Use FQCN for builtin module actions (shell).
+ansible/roles/netbox/tasks/main.yml:228:3 Use `ansible.builtin.shell` or `ansible.legacy.shell` instead.
+
+fqcn[action-core]: Use FQCN for builtin module actions (file).
+ansible/roles/netbox/tasks/main.yml:245:3 Use `ansible.builtin.file` or `ansible.legacy.file` instead.
+
+fqcn[action-core]: Use FQCN for builtin module actions (shell).
+ansible/roles/netbox/tasks/main.yml:260:3 Use `ansible.builtin.shell` or `ansible.legacy.shell` instead.
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/nginx/tasks/main.yml:133:3
+
+syntax-check[specific]: the role 'debops.debops.secret' was not found in debops.debops:ansible.legacy:/var/folders/32/1xrphgzd4xv777syxjtkpdw80000gn/T/roles:/Users/ssbarnea/code/a/ansible-lint/test/fixtures/eco/debops/.ansible/roles:/Users/ssbarnea/code/a/ansible-lint/test/fixtures/eco/debops/roles:/Users/ssbarnea/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:/var/folders/32/1xrphgzd4xv777syxjtkpdw80000gn/T
+ansible/roles/nixos/tasks/main.yml:18:11
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/nscd/tasks/main.yml:21:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/opendkim/tasks/main.yml:27:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/pam_access/tasks/main.yml:14:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/pdns/tasks/main.yml:30:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/php/tasks/main.yml:122:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/resolvconf/tasks/main.yml:50:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/rsyslog/tasks/main.yml:104:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/slapd/tasks/main.yml:48:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/snapshot_snapper/tasks/main.yml:42:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/snmpd/tasks/main.yml:77:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/sshd/tasks/main.yml:229:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/sysctl/tasks/main.yml:46:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/tcpwrappers/tasks/main.yml:35:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/tinyproxy/tasks/main.yml:40:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/unattended_upgrades/tasks/main.yml:47:3
+
+syntax-check[unknown-module]: couldn't resolve module/action 'debops.debops.dpkg_divert'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible/roles/zabbix_agent/tasks/main.yml:40:3
+

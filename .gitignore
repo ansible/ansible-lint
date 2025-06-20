@@ -82,3 +82,4 @@ node_modules
 .direnv
 uv.lock
 .ansible
+test/fixtures/eco

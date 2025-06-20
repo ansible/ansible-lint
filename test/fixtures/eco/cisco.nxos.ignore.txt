@@ -1,0 +1,6 @@
+# This file contains ignores rule violations for ansible-lint
+tests/sanity/ignore-2.12.txt sanity[cannot-ignore]
+tests/sanity/ignore-2.13.txt sanity[cannot-ignore]
+tests/sanity/ignore-2.14.txt sanity[cannot-ignore]
+tests/sanity/ignore-2.15.txt sanity[cannot-ignore]
+tests/sanity/ignore-2.16.txt sanity[cannot-ignore]

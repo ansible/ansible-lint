@@ -51,7 +51,7 @@ repository = "https://github.com/ansible/ansible-lint"
 [tool.codespell]
 # indention is a typo in ruamel.yaml's API
 ignore-words-list = "indention"
-skip = ".tox,.mypy_cache,build,.git,.eggs,pip-wheel-metadata"
+skip = ".tox,.mypy_cache,build,.git,.eggs,pip-wheel-metadata,test/fixtures/eco/*.json"
 
 # Keep this default because xml/report do not know to use load it from config file:
 # data_file = ".coverage"
@@ -86,7 +86,7 @@ disallow_untyped_calls = true
 disallow_untyped_defs = true
 error_summary = true
 # site-packages is here to help vscode mypy integration getting confused
-exclude = "(.cache|.config|.eggs|.tox|_readthedocs|build|dist|test/local-content|site|site-packages|~/.pyenv|examples|plugins/modules).*"
+exclude = "(.cache|.config|.eggs|.tox|_readthedocs|build|dist|test/local-content|site|site-packages|~/.pyenv|examples|plugins/modules|test/fixtures/eco).*"
 # https://github.com/python/mypy/issues/12664
 follow_untyped_imports = true
 incremental = false
@@ -392,7 +392,7 @@ reportPrivateImportUsage = false
 [tool.pytest.ini_options]
 # do not add options here as this will likely break either console runs or IDE
 # integration like vscode or pycharm
-addopts = "-p no:pytest_cov --durations=10 --failed-first"
+addopts = "-p no:pytest_cov --durations=10 --failed-first -m 'not eco'"
 doctest_optionflags = ["ALLOW_UNICODE", "ELLIPSIS"]
 filterwarnings = [
   "error",
@@ -409,6 +409,9 @@ filterwarnings = [
   "ignore:Attribute s is deprecated and will be removed in Python 3.14; use value instead:DeprecationWarning"
 ]
 junit_family = "legacy"
+markers = [
+  "eco: test impact on ecosystem repositories (slow)"
+]
 minversion = "4.6.6"
 # https://code.visualstudio.com/docs/python/testing
 # coverage is re-enabled in `tox.ini`. That approach is safer than
@@ -435,6 +438,7 @@ norecursedirs = [
   "plugins",
   "site",
   "src/ansible_lint.egg-info",
+  "test/fixtures/eco",
   "test/schemas"
 ]
 python_files = [
@@ -574,6 +578,7 @@ exclude = [
   "collections",
   "examples",
   "plugins",
+  "test/fixtures/eco",
   "test/local-content",
   "venv",
   "src/ansiblelint/_version.py"
