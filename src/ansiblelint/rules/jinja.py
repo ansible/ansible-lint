@@ -14,7 +14,9 @@ from typing import TYPE_CHECKING, NamedTuple
 import black
 import jinja2
 from ansible.errors import AnsibleError, AnsibleFilterError, AnsibleParserError
+from ansible_compat.config import ansible_version
 from jinja2.exceptions import TemplateSyntaxError
+from packaging.version import Version
 
 from ansiblelint.errors import RuleMatchTransformMeta
 from ansiblelint.file_utils import Lintable
@@ -145,11 +147,15 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                     except AnsibleFilterError:
                         bypass = True
                     # ValueError RepresenterError
-                    except AnsibleError as exc:
+                    except (AnsibleError, ImportError) as exc:
                         bypass = False
-                        orig_exc = (
-                            exc.orig_exc if getattr(exc, "orig_exc", None) else exc
-                        )
+                        orig_exc = exc
+                        if (
+                            isinstance(exc, AnsibleError)
+                            and hasattr(exc, "orig_exc")
+                            and exc.orig_exc
+                        ):
+                            orig_exc = exc.orig_exc
                         orig_exc_message = getattr(orig_exc, "message", str(orig_exc))
                         match = self._ansible_error_re.match(
                             getattr(orig_exc, "message", str(orig_exc)),
@@ -185,6 +191,12 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                                 bypass = True
                             else:
                                 bypass = False
+                        elif isinstance(exc, ImportError):
+                            if self.options and self.options.nodeps:
+                                msg = f"Ignored exception {exc} due to running with nodeps mode."
+                                _logger.debug(msg)
+                                continue
+                            bypass = False
                         elif re.match(r"^lookup plugin (.*) not found$", exc.message):
                             # lookup plugin 'template' not found
                             bypass = True
@@ -905,3 +917,25 @@ if "pytest" in sys.modules:
         with mock.patch.object(Templar, "do_template", _do_template):
             results = Runner(lintable, rules=collection).run()
             assert len(results) == 0
+
+    @pytest.mark.parametrize(
+        ("nodeps", "expected_results"),
+        (
+            pytest.param(
+                "0",
+                0 if ansible_version() >= Version("2.19.0.dev0") else 1,
+                id="normal",
+            ),
+            pytest.param("1", 0, id="nodeps"),
+        ),
+    )
+    def test_filter_import_failure(
+        nodeps: str, expected_results: int, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Tests how we process import failures from within filters."""
+        monkeypatch.setenv("ANSIBLE_LINT_NODEPS", nodeps)
+        collection = RulesCollection()
+        collection.register(JinjaRule())
+        lintable = Lintable("examples/playbooks/test_filter_with_importerror.yml")
+        results = Runner(lintable, rules=collection).run()
+        assert len(results) == expected_results

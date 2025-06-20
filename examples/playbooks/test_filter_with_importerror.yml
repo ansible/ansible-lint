@@ -1,0 +1,7 @@
+---
+- name: Fixture
+  hosts: localhost
+  tasks:
+    - name: Test
+      ansible.builtin.debug:
+        msg: "Some {{ 'foo' | filter_with_importerror }}"
