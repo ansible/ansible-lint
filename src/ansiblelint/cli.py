@@ -462,6 +462,13 @@ def get_cli_parser() -> argparse.ArgumentParser:
         help=f"Specify ignore file to use. By default it will look for '{IGNORE_FILE.default}' or '{IGNORE_FILE.alternative}'",
     )
     parser.add_argument(
+        "--yamllint-file",
+        dest="yamllint_file",
+        type=Path,
+        default=None,
+        help="Specify yamllint config file to use. By default it will look for '.yamllint', '.yamllint.yaml', '.yamllint.yml', '~/.config/yamllint/config' or environment variables XDG_CONFIG_HOME and YAMLLINT_CONFIG_FILE.",
+    )
+    parser.add_argument(
         "--offline",
         dest="offline",
         action=argparse.BooleanOptionalAction,
