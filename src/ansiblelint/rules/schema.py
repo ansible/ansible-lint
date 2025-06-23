@@ -372,7 +372,7 @@ if "pytest" in sys.modules:
                 "examples/patterns/correct_pattern/meta/pattern.json",
                 "pattern",
                 [],
-                id="pattern",
+                id="pattern_positive",
             ),
             pytest.param(
                 "examples/patterns/incorrect_pattern/meta/pattern.json",
@@ -380,7 +380,7 @@ if "pytest" in sys.modules:
                 [
                     r"\$ 'name' is a required property",
                 ],
-                id="pattern",
+                id="pattern_negative",
             ),
         ),
     )
