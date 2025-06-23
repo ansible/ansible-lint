@@ -1,6 +1,5 @@
 {
   "schema_version": "1.0",
-  "name": "weather_forecasting",
   "title": "Weather Forecasting",
   "description": "This pattern is designed to help get the weather forecast for a given airport code. It creates a project, EE, and job templates in automation controller to get the weather forecast.",
   "short_description": "This pattern is designed to help get the weather forecast for a given airport code.",

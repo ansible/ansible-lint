@@ -368,6 +368,20 @@ if "pytest" in sys.modules:
                 ],
                 id="playbook2",
             ),
+            pytest.param(
+                "examples/patterns/correct_pattern/meta/pattern.json",
+                "pattern",
+                [],
+                id="pattern",
+            ),
+            pytest.param(
+                "examples/patterns/incorrect_pattern/meta/pattern.json",
+                "pattern",
+                [
+                    r"\$ 'name' is a required property",
+                ],
+                id="pattern",
+            ),
         ),
     )
     def test_schema(
