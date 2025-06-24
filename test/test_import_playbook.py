@@ -1,17 +1,9 @@
 """Test ability to import playbooks."""
 
-import os
-
-import pytest
-
 from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 
 
-@pytest.mark.xfail(
-    "devel" in os.environ.get("TOX_ENV_NAME", ""),
-    reason="https://github.com/ansible/ansible/issues/85357",
-)
 def test_task_hook_import_playbook(default_rules_collection: RulesCollection) -> None:
     """Assures import_playbook includes are recognized."""
     playbook_path = "examples/playbooks/playbook-parent.yml"
@@ -27,10 +19,6 @@ def test_task_hook_import_playbook(default_rules_collection: RulesCollection) ->
     assert "All tasks should be named" in results_text
 
 
-@pytest.mark.xfail(
-    "devel" in os.environ.get("TOX_ENV_NAME", ""),
-    reason="https://github.com/ansible/ansible/issues/85357",
-)
 def test_import_playbook_from_collection(
     default_rules_collection: RulesCollection,
 ) -> None:
@@ -43,10 +31,6 @@ def test_import_playbook_from_collection(
     assert len(results) == 0
 
 
-@pytest.mark.xfail(
-    "devel" in os.environ.get("TOX_ENV_NAME", ""),
-    reason="https://github.com/ansible/ansible/issues/85357",
-)
 def test_import_playbook_invalid(
     default_rules_collection: RulesCollection,
 ) -> None:
