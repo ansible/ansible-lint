@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import sys
 from typing import TYPE_CHECKING, Any
+
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
@@ -48,7 +49,9 @@ class PatternRule(AnsibleLintRule):
             pattern_dir / "README.md",
             pattern_dir / "playbooks" / "site.yml",
         ]
-        missing = [str(p.relative_to(pattern_dir)) for p in required_paths if not p.exists()]
+        missing = [
+            str(p.relative_to(pattern_dir)) for p in required_paths if not p.exists()
+        ]
 
         # Check execution_environments directory if it exists
         ee_dir = pattern_dir / "execution_environments"
@@ -114,4 +117,5 @@ if "pytest" in sys.modules:
 
         assert len(results) == len(expected)
         for index, result in enumerate(results):
+            assert result.rule.id == PatternRule.id, result
             assert result.tag == expected[index]
