@@ -40,7 +40,6 @@ project:
   or
   [role/metadata.py](https://github.com/ansible/ansible/blob/devel/lib/ansible/playbook/role/metadata.py#L79))
   for details.
-- `schema[pattern]` validates Ansible patterns.
 - `schema[playbook]` validates Ansible playbooks.
 - `schema[requirements]` validates Ansible
   [requirements](https://docs.ansible.com/ansible/latest/galaxy/user_guide.html#install-multiple-collections-with-a-requirements-file)
