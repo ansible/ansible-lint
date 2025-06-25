@@ -1,0 +1,393 @@
+var-naming[no-role-prefix]: Variables names from within roles should use authorized_key_ as a prefix. (vars: authorized_key)
+.ansible/collections/ansible_collections/devroles/system/roles/authorized_key/defaults/main.yml:1:1
+
+yaml[octal-values]: Forbidden implicit octal value "0644"
+.ansible/collections/ansible_collections/devroles/system/roles/dotfiles/tasks/03_vim.yml:31
+
+yaml[comments]: Missing starting space in comment
+.ansible/collections/ansible_collections/devroles/system/roles/firewalld/defaults/main.yml:11
+
+yaml[comments]: Missing starting space in comment
+.ansible/collections/ansible_collections/devroles/system/roles/firewalld/defaults/main.yml:28
+
+yaml[octal-values]: Forbidden implicit octal value "0600"
+.ansible/collections/ansible_collections/devroles/system/roles/mariadb/tasks/configure_access.yml:25
+
+var-naming[no-role-prefix]: Variables names from within roles should use mounts_ as a prefix. (vars: mounts)
+.ansible/collections/ansible_collections/devroles/system/roles/mounts/defaults/main.yml:11:1
+
+no-changed-when: Commands should not change things if nothing needs doing.
+.ansible/collections/ansible_collections/devroles/system/roles/mythtv/handlers/main.yml:27 Task/Handler: Move firmware
+
+yaml[octal-values]: Forbidden implicit octal value "0644"
+.ansible/collections/ansible_collections/devroles/system/roles/mythtv/tasks/main.yml:16
+
+var-naming[no-role-prefix]: Variables names from within roles should use sudoers_ as a prefix. (vars: sudoers)
+.ansible/collections/ansible_collections/devroles/system/roles/sudoers/defaults/main.yml:3:1
+
+yaml[octal-values]: Forbidden implicit octal value "0750"
+.ansible/collections/ansible_collections/devroles/system/roles/sudoers/tasks/main.yml:49
+
+yaml[octal-values]: Forbidden implicit octal value "0600"
+.ansible/collections/ansible_collections/devroles/system/roles/sudoers/tasks/main.yml:57
+
+no-changed-when: Commands should not change things if nothing needs doing.
+.ansible/collections/ansible_collections/devroles/system/roles/update_ca_trust/handlers/main.yml:1 Task/Handler: update-ca-trust
+
+yaml[octal-values]: Forbidden implicit octal value "0644"
+.ansible/collections/ansible_collections/devroles/system/roles/update_ca_trust/tasks/main.yml:23
+
+yaml[octal-values]: Forbidden implicit octal value "0644"
+.ansible/collections/ansible_collections/devroles/system/roles/update_ca_trust/tasks/main.yml:34
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (vars: nginx_zone_cache_size)
+.ansible/collections/ansible_collections/devroles/system/roles/webserver/defaults/main.yml:6:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (vars: nginx_request_limit)
+.ansible/collections/ansible_collections/devroles/system/roles/webserver/defaults/main.yml:8:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (vars: nginx_max_connections_per_ip)
+.ansible/collections/ansible_collections/devroles/system/roles/webserver/defaults/main.yml:10:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (vars: nginx_bandwidth_limit_after_size)
+.ansible/collections/ansible_collections/devroles/system/roles/webserver/defaults/main.yml:12:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (vars: nginx_max_bandwidth_outbound)
+.ansible/collections/ansible_collections/devroles/system/roles/webserver/defaults/main.yml:14:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (vars: nginx_burst_queue)
+.ansible/collections/ansible_collections/devroles/system/roles/webserver/defaults/main.yml:16:1
+
+args[module]: missing required arguments: acme_version (warning)
+.ansible/collections/ansible_collections/devroles/system/roles/webserver/tasks/letsencrypt.yml:57 Task/Handler: Retrieve letsencrypt certificate for {{ domain.tld }}
+
+galaxy[no-changelog]: No changelog found. Please add a changelog file. Refer to the galaxy.md file for more info.
+galaxy.yml:1
+
+galaxy[tags]: galaxy.yaml must have one of the required tags: ['application', 'cloud', 'database', 'eda', 'infrastructure', 'linux', 'monitoring', 'networking', 'security', 'storage', 'tools', 'windows']
+galaxy.yml:1
+
+meta-runtime[unsupported-version]: 'requires_ansible' key must refer to a currently supported version such as: >=2.15.0, >=2.16.0, >=2.17.0, >=2.18.0
+meta/runtime.yml:1
+
+name[play]: All plays should be named.
+playbooks/molecule/dotfiles/prepare.yml:1
+
+fqcn[action-core]: Use FQCN for builtin module actions (package).
+playbooks/molecule/dotfiles/prepare.yml:5:7 Use `ansible.builtin.package` or `ansible.legacy.package` instead.
+
+yaml[line-length]: Line too long (576 > 160 characters)
+playbooks/molecule/sudo/molecule.yml:17
+
+var-naming[no-role-prefix]: Variables names from within roles should use authorized_key_ as a prefix. (vars: authorized_key)
+roles/authorized_key/defaults/main.yml:1:1
+
+name[casing]: All names should start with an uppercase letter.
+roles/authorized_key/molecule/shared/playbook.yml:1:9
+
+var-naming[no-role-prefix]: Variables names from within roles should use authorized_key_ as a prefix. (vars: authorized_key)
+roles/authorized_key/molecule/shared/playbook.yml:7:7
+
+name[casing]: All names should start with an uppercase letter.
+roles/common/molecule/shared/playbook.yml:1:9
+
+name[casing]: All names should start with an uppercase letter.
+roles/container/molecule/shared/playbook.yml:1:9
+
+name[casing]: All names should start with an uppercase letter.
+roles/copy_or_link/molecule/default/playbook.yml:1:9
+
+name[play]: All plays should be named.
+roles/copy_or_link/molecule/default/prepare.yml:1
+
+name[casing]: All names should start with an uppercase letter.
+roles/copy_or_link/molecule/default/prepare.yml:3:13 Task/Handler: touch file
+
+fqcn[action-core]: Use FQCN for builtin module actions (file).
+roles/copy_or_link/molecule/default/prepare.yml:4:7 Use `ansible.builtin.file` or `ansible.legacy.file` instead.
+
+yaml[octal-values]: Forbidden implicit octal value "0600"
+roles/copy_or_link/molecule/default/prepare.yml:7
+
+name[casing]: All names should start with an uppercase letter.
+roles/copy_or_link/molecule/local/playbook.yml:1:9
+
+name[casing]: All names should start with an uppercase letter.
+roles/copy_or_link/molecule/local/playbook.yml:5:13 Task/Handler: run ansible over there
+
+fqcn[action-core]: Use FQCN for builtin module actions (command).
+roles/copy_or_link/molecule/local/playbook.yml:6:7 Use `ansible.builtin.command` or `ansible.legacy.command` instead.
+
+name[play]: All plays should be named.
+roles/copy_or_link/molecule/local/prepare.yml:1
+
+name[casing]: All names should start with an uppercase letter.
+roles/copy_or_link/molecule/local/prepare.yml:5:13 Task/Handler: touch file
+
+fqcn[action-core]: Use FQCN for builtin module actions (file).
+roles/copy_or_link/molecule/local/prepare.yml:6:7 Use `ansible.builtin.file` or `ansible.legacy.file` instead.
+
+yaml[octal-values]: Forbidden implicit octal value "0600"
+roles/copy_or_link/molecule/local/prepare.yml:9
+
+name[casing]: All names should start with an uppercase letter.
+roles/copy_or_link/molecule/local/prepare.yml:11:13 Task/Handler: install ansible
+
+fqcn[action-core]: Use FQCN for builtin module actions (package).
+roles/copy_or_link/molecule/local/prepare.yml:12:7 Use `ansible.builtin.package` or `ansible.legacy.package` instead.
+
+name[casing]: All names should start with an uppercase letter.
+roles/copy_or_link/molecule/local/prepare.yml:16:13 Task/Handler: create play structure
+
+fqcn[action-core]: Use FQCN for builtin module actions (file).
+roles/copy_or_link/molecule/local/prepare.yml:17:7 Use `ansible.builtin.file` or `ansible.legacy.file` instead.
+
+yaml[octal-values]: Forbidden implicit octal value "0644"
+roles/copy_or_link/molecule/local/prepare.yml:22
+
+name[casing]: All names should start with an uppercase letter.
+roles/copy_or_link/molecule/local/prepare.yml:24:13 Task/Handler: create inventory file
+
+fqcn[action-core]: Use FQCN for builtin module actions (copy).
+roles/copy_or_link/molecule/local/prepare.yml:25:7 Use `ansible.builtin.copy` or `ansible.legacy.copy` instead.
+
+yaml[octal-values]: Forbidden implicit octal value "0644"
+roles/copy_or_link/molecule/local/prepare.yml:28
+
+name[casing]: All names should start with an uppercase letter.
+roles/copy_or_link/molecule/local/prepare.yml:30:13 Task/Handler: create test files
+
+fqcn[action-core]: Use FQCN for builtin module actions (copy).
+roles/copy_or_link/molecule/local/prepare.yml:31:7 Use `ansible.builtin.copy` or `ansible.legacy.copy` instead.
+
+yaml[octal-values]: Forbidden implicit octal value "0644"
+roles/copy_or_link/molecule/local/prepare.yml:34
+
+name[casing]: All names should start with an uppercase letter.
+roles/copy_or_link/molecule/local/prepare.yml:40:13 Task/Handler: create archive of collection
+
+fqcn[action]: Use FQCN for module actions, such `community.general.archive`.
+roles/copy_or_link/molecule/local/prepare.yml:42:7 Action `archive` is not FQCN.
+
+name[casing]: All names should start with an uppercase letter.
+roles/copy_or_link/molecule/local/prepare.yml:51:13 Task/Handler: create destination ansible_collections path
+
+fqcn[action-core]: Use FQCN for builtin module actions (file).
+roles/copy_or_link/molecule/local/prepare.yml:52:7 Use `ansible.builtin.file` or `ansible.legacy.file` instead.
+
+yaml[octal-values]: Forbidden implicit octal value "0755"
+roles/copy_or_link/molecule/local/prepare.yml:56
+
+name[casing]: All names should start with an uppercase letter.
+roles/copy_or_link/molecule/local/prepare.yml:58:13 Task/Handler: unarchive collection
+
+fqcn[action-core]: Use FQCN for builtin module actions (unarchive).
+roles/copy_or_link/molecule/local/prepare.yml:59:7 Use `ansible.builtin.unarchive` or `ansible.legacy.unarchive` instead.
+
+name[play]: All plays should be named.
+roles/copy_or_link/molecule/local/remote_playbook.yml:1
+
+name[casing]: All names should start with an uppercase letter.
+roles/dev/molecule/shared/playbook.yml:1:9
+
+name[casing]: All names should start with an uppercase letter.
+roles/dev/molecule/shared/prepare.yml:1:9
+
+name[casing]: All names should start with an uppercase letter.
+roles/dotfiles/molecule/shared/playbook.yml:1:9
+
+fqcn[action-core]: Use FQCN for builtin module actions (package).
+roles/dotfiles/molecule/shared/playbook.yml:6:7 Use `ansible.builtin.package` or `ansible.legacy.package` instead.
+
+yaml[octal-values]: Forbidden implicit octal value "0644"
+roles/dotfiles/tasks/03_vim.yml:31
+
+name[casing]: All names should start with an uppercase letter.
+roles/epel/molecule/shared/playbook.yml:1:9
+
+yaml[comments]: Missing starting space in comment
+roles/firewalld/defaults/main.yml:11
+
+yaml[comments]: Missing starting space in comment
+roles/firewalld/defaults/main.yml:28
+
+name[casing]: All names should start with an uppercase letter.
+roles/firewalld/molecule/shared/playbook.yml:1:9
+
+fqcn[action-core]: Use FQCN for builtin module actions (include_role).
+roles/flatpak/molecule/shared/playbook.yml:5:7 Use `ansible.builtin.include_role` or `ansible.legacy.include_role` instead.
+
+name[casing]: All names should start with an uppercase letter.
+roles/mariadb/molecule/shared/playbook.yml:1:9
+
+name[casing]: All names should start with an uppercase letter.
+roles/mariadb/molecule/shared/playbook.yml:14:13 Task/Handler: run test command
+
+fqcn[action-core]: Use FQCN for builtin module actions (command).
+roles/mariadb/molecule/shared/playbook.yml:16:7 Use `ansible.builtin.command` or `ansible.legacy.command` instead.
+
+yaml[octal-values]: Forbidden implicit octal value "0600"
+roles/mariadb/tasks/configure_access.yml:25
+
+name[play]: All plays should be named.
+roles/mirror/molecule/shared/playbook.yml:1
+
+name[casing]: All names should start with an uppercase letter.
+roles/mirror/molecule/shared/playbook.yml:27:13 Task/Handler: run doohickey
+
+fqcn[action-core]: Use FQCN for builtin module actions (command).
+roles/mirror/molecule/shared/playbook.yml:28:7 Use `ansible.builtin.command` or `ansible.legacy.command` instead.
+
+name[casing]: All names should start with an uppercase letter.
+roles/mirror/molecule/shared/playbook.yml:32:13 Task/Handler: print mirror output
+
+fqcn[action-core]: Use FQCN for builtin module actions (debug).
+roles/mirror/molecule/shared/playbook.yml:33:7 Use `ansible.builtin.debug` or `ansible.legacy.debug` instead.
+
+var-naming[no-role-prefix]: Variables names from within roles should use mounts_ as a prefix. (vars: mounts)
+roles/mounts/defaults/main.yml:11:1
+
+syntax-check[specific]: You cannot use loops on 'import_role' statements. You should use 'include_role' instead.
+roles/mta/tasks/main.yml:1:3
+
+no-changed-when: Commands should not change things if nothing needs doing.
+roles/mythtv/handlers/main.yml:27 Task/Handler: Move firmware
+
+yaml[octal-values]: Forbidden implicit octal value "0644"
+roles/mythtv/tasks/main.yml:16
+
+name[casing]: All names should start with an uppercase letter.
+roles/packages_server/molecule/shared/playbook.yml:1:9
+
+yaml[octal-values]: Forbidden implicit octal value "0711"
+roles/packages_workstation/tasks/Linux/03_libvirt.yml:15
+
+yaml[octal-values]: Forbidden implicit octal value "0755"
+roles/packages_workstation/tasks/Linux/03_libvirt.yml:24
+
+yaml[octal-values]: Forbidden implicit octal value "0755"
+roles/packages_workstation/tasks/Linux/03_libvirt.yml:33
+
+yaml[octal-values]: Forbidden implicit octal value "0755"
+roles/packages_workstation/tasks/Linux/03_libvirt.yml:51
+
+yaml[octal-values]: Forbidden implicit octal value "0644"
+roles/packages_workstation/tasks/Linux/05_kerberos.yml:20
+
+yaml[octal-values]: Forbidden implicit octal value "0755"
+roles/packages_workstation/tasks/Linux/06_blu_ray.yml:5
+
+yaml[octal-values]: Forbidden implicit octal value "0644"
+roles/packages_workstation/tasks/Linux/06_blu_ray.yml:15
+
+yaml[octal-values]: Forbidden implicit octal value "0644"
+roles/packages_workstation/tasks/Linux/06_blu_ray.yml:33
+
+yaml[octal-values]: Forbidden implicit octal value "0644"
+roles/packages_workstation/tasks/Linux/06_blu_ray.yml:39
+
+yaml[octal-values]: Forbidden implicit octal value "0644"
+roles/packages_workstation/tasks/Linux/06_blu_ray.yml:45
+
+var-naming[no-role-prefix]: Variables names from within roles should use packages_workstation_ as a prefix. (vars: packages_workstation)
+roles/packages_workstation/vars/MacOSX.yml:1:1
+
+name[casing]: All names should start with an uppercase letter.
+roles/python_prep/molecule/shared/playbook.yml:1:9
+
+name[casing]: All names should start with an uppercase letter.
+roles/python_prep/molecule/shared/playbook.yml:6:13 Task/Handler: install a package
+
+fqcn[action-core]: Use FQCN for builtin module actions (package).
+roles/python_prep/molecule/shared/playbook.yml:8:7 Use `ansible.builtin.package` or `ansible.legacy.package` instead.
+
+var-naming[no-role-prefix]: Variables names from within roles should use sudoers_ as a prefix. (vars: sudoers)
+roles/sudoers/defaults/main.yml:3:1
+
+name[casing]: All names should start with an uppercase letter.
+roles/sudoers/molecule/shared/playbook.yml:1:9
+
+name[casing]: All names should start with an uppercase letter.
+roles/sudoers/molecule/shared/prepare.yml:1:9
+
+name[casing]: All names should start with an uppercase letter.
+roles/sudoers/molecule/shared/prepare.yml:4:13 Task/Handler: create groups
+
+fqcn[action-core]: Use FQCN for builtin module actions (group).
+roles/sudoers/molecule/shared/prepare.yml:6:7 Use `ansible.builtin.group` or `ansible.legacy.group` instead.
+
+name[casing]: All names should start with an uppercase letter.
+roles/sudoers/molecule/shared/prepare.yml:10:13 Task/Handler: create users in that group
+
+fqcn[action-core]: Use FQCN for builtin module actions (user).
+roles/sudoers/molecule/shared/prepare.yml:12:7 Use `ansible.builtin.user` or `ansible.legacy.user` instead.
+
+yaml[octal-values]: Forbidden implicit octal value "0750"
+roles/sudoers/tasks/main.yml:49
+
+yaml[octal-values]: Forbidden implicit octal value "0600"
+roles/sudoers/tasks/main.yml:57
+
+name[casing]: All names should start with an uppercase letter.
+roles/system_repositories/molecule/container/playbook.yml:6:13 Task/Handler: install sword
+
+fqcn[action-core]: Use FQCN for builtin module actions (package).
+roles/system_repositories/molecule/container/playbook.yml:8:7 Use `ansible.builtin.package` or `ansible.legacy.package` instead.
+
+name[casing]: All names should start with an uppercase letter.
+roles/system_repositories/molecule/container_fedora/playbook.yml:6:13 Task/Handler: install gcc-debuginfo
+
+fqcn[action-core]: Use FQCN for builtin module actions (package).
+roles/system_repositories/molecule/container_fedora/playbook.yml:8:7 Use `ansible.builtin.package` or `ansible.legacy.package` instead.
+
+no-changed-when: Commands should not change things if nothing needs doing.
+roles/update_ca_trust/handlers/main.yml:1 Task/Handler: update-ca-trust
+
+name[casing]: All names should start with an uppercase letter.
+roles/update_ca_trust/molecule/shared/playbook.yml:1:9
+
+name[casing]: All names should start with an uppercase letter.
+roles/update_ca_trust/molecule/shared/prepare.yml:1:9
+
+name[casing]: All names should start with an uppercase letter.
+roles/update_ca_trust/molecule/shared/prepare.yml:4:13 Task/Handler: install openssl
+
+fqcn[action-core]: Use FQCN for builtin module actions (package).
+roles/update_ca_trust/molecule/shared/prepare.yml:6:7 Use `ansible.builtin.package` or `ansible.legacy.package` instead.
+
+name[casing]: All names should start with an uppercase letter.
+roles/update_ca_trust/molecule/shared/prepare.yml:10:13 Task/Handler: upload the source file
+
+fqcn[action-core]: Use FQCN for builtin module actions (copy).
+roles/update_ca_trust/molecule/shared/prepare.yml:12:7 Use `ansible.builtin.copy` or `ansible.legacy.copy` instead.
+
+yaml[octal-values]: Forbidden implicit octal value "0644"
+roles/update_ca_trust/molecule/shared/prepare.yml:17
+
+yaml[octal-values]: Forbidden implicit octal value "0644"
+roles/update_ca_trust/tasks/main.yml:23
+
+yaml[octal-values]: Forbidden implicit octal value "0644"
+roles/update_ca_trust/tasks/main.yml:34
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (vars: nginx_zone_cache_size)
+roles/webserver/defaults/main.yml:6:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (vars: nginx_request_limit)
+roles/webserver/defaults/main.yml:8:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (vars: nginx_max_connections_per_ip)
+roles/webserver/defaults/main.yml:10:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (vars: nginx_bandwidth_limit_after_size)
+roles/webserver/defaults/main.yml:12:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (vars: nginx_max_bandwidth_outbound)
+roles/webserver/defaults/main.yml:14:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (vars: nginx_burst_queue)
+roles/webserver/defaults/main.yml:16:1
+
+args[module]: missing required arguments: acme_version (warning)
+roles/webserver/tasks/letsencrypt.yml:57 Task/Handler: Retrieve letsencrypt certificate for {{ domain.tld }}
+

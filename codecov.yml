@@ -2,7 +2,6 @@
 comment: false
 coverage:
   status:
-    patch: true
+    patch: false # avoid false positives
     project:
-      default:
-        threshold: 0.5%
+      default: true

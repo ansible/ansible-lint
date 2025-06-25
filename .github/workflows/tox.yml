@@ -41,7 +41,6 @@ jobs:
             hook
             docs
             schemas
-            eco
             pre
             py311-devel
             py310-lower
@@ -110,6 +109,7 @@ jobs:
         with:
           path: |
             .cache/eco
+            test/fixtures/eco/*/.tox
             examples/playbooks/collections/ansible_collections
             ~/.cache/ansible-compat
             ~/.ansible/collections
