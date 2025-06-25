@@ -32,7 +32,7 @@ repos:
       - id: check-useless-excludes
   - repo: https://github.com/rbubley/mirrors-prettier
     # keep it before yamllint
-    rev: v3.5.3
+    rev: v3.6.0
     hooks:
       - id: prettier
         # Temporary excludes so we can gradually normalize the formatting
@@ -68,7 +68,7 @@ repos:
         args: [--relative, --no-progress, --no-summary]
         name: Spell check with cspell
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.33.0
+    rev: 0.33.1
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
@@ -145,7 +145,7 @@ repos:
       - id: tox-ini-fmt
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.13
+    rev: v0.12.0
     hooks:
       - id: ruff-format
         alias: ruff
