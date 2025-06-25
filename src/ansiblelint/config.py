@@ -53,6 +53,7 @@ DEFAULT_KINDS = [
     {"vars": "**/{host_vars,group_vars,vars,defaults}/**/*.{yaml,yml}"},
     {"tasks": "**/tasks/**/*.{yaml,yml}"},
     {"rulebook": "**/rulebooks/*.{yml,yaml"},
+    {"pattern": "**/patterns/*/meta/pattern.json"},
     {"playbook": "**/playbooks/*.{yml,yaml}"},
     {"playbook": "**/*playbook*.{yml,yaml}"},
     {"role": "**/roles/*/"},

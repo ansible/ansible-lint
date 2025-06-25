@@ -1,11 +1,12 @@
 import * as path from "path";
-import Ajv from "ajv";
 import fs from "fs";
 import { minimatch } from "minimatch";
 import yaml from "js-yaml";
 import { assert } from "chai";
 import stringify from "safe-stable-stringify";
 import { spawnSync } from "child_process";
+import Ajv2020 from "ajv/dist/2020";
+import draft7MetaSchema from "ajv/dist/refs/json-schema-draft-07.json" with { type: "json" };
 
 function ansiRegex({ onlyFirst = false } = {}) {
   const pattern = [
@@ -25,12 +26,13 @@ function stripAnsi(data: string) {
   return data.replace(ansiRegex(), "");
 }
 
-const ajv = new Ajv({
+const ajv = new Ajv2020({
   strictTypes: false,
   strict: false,
   inlineRefs: true, // https://github.com/ajv-validator/ajv/issues/1581#issuecomment-832211568
   allErrors: true, // https://github.com/ajv-validator/ajv/issues/1581#issuecomment-832211568
 });
+ajv.addMetaSchema(draft7MetaSchema);
 
 // load whitelist of all test file subjects schemas can reference
 const test_files = getAllFiles("./test");
