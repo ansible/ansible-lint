@@ -328,6 +328,7 @@ if "pytest" in sys.modules:
         results = rule_runner.run_playbook(PASSWORD_LOCK_FALSE)
         assert len(results) == 0
 
+    @pytest.mark.libyaml
     @mock.patch.dict(os.environ, {"ANSIBLE_LINT_WRITE_TMP": "1"}, clear=True)
     def test_no_log_password_transform(
         config_options: Options,

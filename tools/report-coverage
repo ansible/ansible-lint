@@ -1,5 +1,10 @@
 #!/bin/bash
+# cspell: ignore nullglob
 set -euo pipefail
-coverage combine -q "--data-file=${TOX_ENV_DIR}/.coverage" "${TOX_ENV_DIR}"/.coverage.*
-coverage xml "--data-file=${TOX_ENV_DIR}/.coverage" -o "${TOX_ENV_DIR}/coverage.xml" --ignore-errors --fail-under=0
-COVERAGE_FILE="${TOX_ENV_DIR}/.coverage" coverage report --fail-under=0 --ignore-errors
+shopt -s nullglob
+files=("${TOX_ENV_DIR}"/.coverage.*)
+if (( ${#files[@]} )); then
+  coverage combine -q "--data-file=${TOX_ENV_DIR}/.coverage" "${files[@]}"
+  coverage xml "--data-file=${TOX_ENV_DIR}/.coverage" -o "${TOX_ENV_DIR}/coverage.xml" --ignore-errors --fail-under=0
+  COVERAGE_FILE="${TOX_ENV_DIR}/.coverage" coverage report --fail-under=0 --ignore-errors
+fi
