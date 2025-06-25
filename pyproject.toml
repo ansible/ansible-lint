@@ -22,6 +22,7 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python",
   "Topic :: System :: Systems Administration",
@@ -409,6 +410,9 @@ filterwarnings = [
   "ignore:Attribute s is deprecated and will be removed in Python 3.14; use value instead:DeprecationWarning"
 ]
 junit_family = "legacy"
+markers = [
+  "libyaml: tests that will pass only with pyyaml libyaml is present."
+]
 minversion = "4.6.6"
 # https://code.visualstudio.com/docs/python/testing
 # coverage is re-enabled in `tox.ini`. That approach is safer than
