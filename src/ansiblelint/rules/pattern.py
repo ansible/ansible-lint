@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import json
 import sys
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule
@@ -20,6 +22,11 @@ class PatternRule(AnsibleLintRule):
     severity = "MEDIUM"
     tags = ["metadata"]
     version_changed = "25.7.0"
+    _ids = {
+        "pattern[missing-readme]": "Missing README.md file in pattern directory.",
+        "pattern[missing-meta]": "Missing meta directory in pattern directory.",
+        "pattern[missing-playbook]": "Missing playbooks sub-directory in pattern directory.",
+    }
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Return matches found for a specific play (entry in playbook)."""
@@ -31,59 +38,65 @@ class PatternRule(AnsibleLintRule):
         pattern_dir = file.path.parent.parent.resolve()
         meta_dir = pattern_dir / "meta"
 
-        # Check if meta directory exists
+        # Check the presence of required meta sub-dir inside a pattern directory
         if not meta_dir.is_dir():
             results.append(
                 self.create_matcherror(
                     message=(
                         f"Pattern directory '{pattern_dir}' contains pattern.json but is missing the required 'meta' directory."
                     ),
-                    tag=self.id,
+                    tag=f"{self.id}[missing-meta]",
                     filename=file,
                 ),
             )
             return results
 
-        # Define required files relative to the pattern dir
-        required_paths = [
-            pattern_dir / "README.md",
-            pattern_dir / "playbooks" / "site.yml",
-        ]
-        missing = [
-            str(p.relative_to(pattern_dir)) for p in required_paths if not p.exists()
-        ]
-
-        # Check execution_environments directory if it exists
-        ee_dir = pattern_dir / "execution_environments"
-        if ee_dir.exists():
-            expected_file = ee_dir / "execution_environment.yml"
-            # Must contain only execution_environment.yml
-            files = list(ee_dir.iterdir())
-            if not expected_file.exists():
-                missing.append("execution_environments/execution_environment.yml")
-            if len(files) != 1 or files[0].name != "execution_environment.yml":
-                results.append(
-                    self.create_matcherror(
-                        message=(
-                            f"'execution_environments' directory in '{pattern_dir}' must contain only 'execution_environment.yml' file."
-                        ),
-                        tag=self.id,
-                        filename=file,
-                    ),
-                )
-
-        if missing:
+        # Check the presence of required README.md file in a pattern directory
+        readme_file = pattern_dir / "README.md"
+        if not readme_file.exists():
             results.append(
                 self.create_matcherror(
                     message=(
-                        f"Pattern directory '{pattern_dir}' is missing required files: {', '.join(missing)}"
+                        f"Pattern directory '{pattern_dir}' is missing required README.md file"
                     ),
-                    tag=self.id,
+                    tag=f"{self.id}[missing-readme]",
+                    filename=file,
+                ),
+            )
+
+        # Check the presence of playbooks directory and file matching entries in the pattern.json file
+        playbooks_dir = pattern_dir / "playbooks"
+        playbook = get_playbook_file(file)
+        missing_playbook_items = []
+
+        if not playbooks_dir.is_dir():
+            missing_playbook_items.append("playbooks directory")
+        else:
+            playbook_file = playbooks_dir / playbook
+            if not playbook_file.exists():
+                missing_playbook_items.append("playbook file")
+
+        if missing_playbook_items:
+            results.append(
+                self.create_matcherror(
+                    message=(
+                        f"Pattern directory '{pattern_dir}' is missing required: {', '.join(missing_playbook_items)}"
+                    ),
+                    tag=f"{self.id}[missing-playbook]",
                     filename=file,
                 ),
             )
 
         return results
+
+
+def get_playbook_file(file: Any) -> str:
+    """Extract the playbook file name from the pattern.json file."""
+    playbook: str = ""
+    with Path(file).open(encoding="utf-8") as f:
+        data = json.load(f)
+    playbook = data["aap_resources"]["controller_job_templates"][0]["playbook"]
+    return playbook
 
 
 if "pytest" in sys.modules:
@@ -97,12 +110,16 @@ if "pytest" in sys.modules:
         (
             pytest.param(
                 "examples/collections/extensions/patterns/valid_pattern/meta/pattern.json",
-                ["pattern"],
+                [],
                 id="valid-pattern",
             ),
             pytest.param(
                 "examples/collections/extensions/patterns/invalid_pattern/pattern.json",
-                ["pattern"],
+                [
+                    "pattern[missing-meta]",
+                    "pattern[missing-readme]",
+                    "pattern[missing-playbook]",
+                ],
                 id="invalid-pattern",
             ),
         ),
