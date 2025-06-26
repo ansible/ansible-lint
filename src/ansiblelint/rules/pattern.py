@@ -63,6 +63,9 @@ class PatternRule(AnsibleLintRule):
                     filename=file,
                 ),
             )
+        
+        # Validate that pattern name matches the name key in pattern.json file
+
 
         # Check the presence of playbooks directory and file matching entries in the pattern.json file
         playbooks_dir = pattern_dir / "playbooks"
@@ -92,6 +95,8 @@ class PatternRule(AnsibleLintRule):
 
 def get_playbook_file(file: Any) -> str:
     """Extract the playbook file name from the pattern.json file."""
+    # update docsstring
+    # try except block for both in here
     playbook: str = ""
     with Path(file).open(encoding="utf-8") as f:
         data = json.load(f)
