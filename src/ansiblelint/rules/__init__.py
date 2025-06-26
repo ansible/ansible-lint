@@ -551,7 +551,7 @@ class RulesCollection:
             "idiom": "Anti-pattern detected, likely to cause undesired behavior",
             "metadata": "Invalid metadata, likely related to galaxy, collections or roles",
             "opt-in": "Rules that are not used unless manually added to `enable_list`",
-            "security": "Rules related o potentially security issues, like exposing credentials",
+            "security": "Rules related to potential security issues, like exposing credentials",
             "syntax": "Related to wrong or deprecated syntax",
             "unpredictability": "Warn about code that might not work in a predictable way",
             "unskippable": "Indicate a fatal error that cannot be ignored or disabled",

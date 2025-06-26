@@ -534,6 +534,7 @@ if "pytest" in sys.modules:
     from ansiblelint.runner import Runner
     from ansiblelint.transformer import Transformer
 
+    @pytest.mark.libyaml
     def test_jinja_spacing_playbook() -> None:
         """Ensure that expected error lines are matching found linting error lines."""
         # list unexpected error lines or non-matching error lines
@@ -853,10 +854,10 @@ if "pytest" in sys.modules:
         assert len(errs) == 2
         assert errs[0].tag == "jinja[spacing]"
         assert errs[0].rule.id == "jinja"
-        assert errs[0].lineno == 9
+        assert errs[0].lineno in [9, 13]  # ruamel w/ clib return different numbers
         assert errs[1].tag == "jinja[invalid]"
         assert errs[1].rule.id == "jinja"
-        assert errs[1].lineno in [9, 10]  # 2.19 has better line identification
+        assert errs[1].lineno in [9, 10, 13]  # 2.19 has better line identification
 
     def test_jinja_valid() -> None:
         """Tests our ability to parse jinja, even when variables may not be defined."""
