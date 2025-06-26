@@ -69,7 +69,6 @@ DEFAULT_KINDS = [
     {"yaml": "**/molecule/*/{base,molecule}.{yaml,yml}"},  # molecule config
     {"requirements": "**/requirements.{yaml,yml}"},  # v2 and v1
     {"playbook": "**/molecule/*/*.{yaml,yml}"},  # molecule playbooks
-    {"pattern": "**/patterns/*/meta/pattern.json"},
     {"yaml": "**/{.ansible-lint,.yamllint}"},
     {"changelog": "**/changelogs/changelog.{yaml,yml}"},
     {"yaml": "**/*.{yaml,yml}"},
