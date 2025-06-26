@@ -125,7 +125,7 @@ class ValidateSchemaRule(AnsibleLintRule):
                 if not has_jinja(plugin_value) and plugin_value not in values:
                     msg = f"'{key}' must be one of the currently available values: {', '.join(values)}"
                     results.append(
-                        self.create_matcherror(
+                        self.create_match_error(
                             message=msg,
                             data=plugin_value,
                             filename=file,
@@ -135,7 +135,7 @@ class ValidateSchemaRule(AnsibleLintRule):
                     )
         return results
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,
@@ -153,7 +153,7 @@ class ValidateSchemaRule(AnsibleLintRule):
                 msg = pre_checks["task"][key]["msg"]
                 tag = pre_checks["task"][key]["tag"]
                 results.append(
-                    self.create_matcherror(
+                    self.create_match_error(
                         message=msg,
                         filename=file,
                         details=ValidateSchemaRule.description,
@@ -162,7 +162,7 @@ class ValidateSchemaRule(AnsibleLintRule):
                 )
         return results
 
-    def matchyaml(self, file: Lintable) -> list[MatchError]:
+    def match_file(self, file: Lintable) -> list[MatchError]:
         """Return JSON validation errors found as a list of MatchError(s)."""
         result: list[MatchError] = []
 
@@ -181,7 +181,7 @@ class ValidateSchemaRule(AnsibleLintRule):
                 return []
 
             result.append(
-                self.create_matcherror(
+                self.create_match_error(
                     message=error,
                     filename=file,
                     details=ValidateSchemaRule.description,
@@ -191,7 +191,7 @@ class ValidateSchemaRule(AnsibleLintRule):
             break
 
         if not result:
-            result = super().matchyaml(file)
+            result = super().match_file(file)
         return result
 
 

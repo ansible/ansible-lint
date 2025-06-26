@@ -68,7 +68,7 @@ class DeprecatedModuleRule(AnsibleLintRule):
         "include",
     ]
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,

@@ -49,7 +49,7 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
     tags = ["deprecations"]
     version_changed = "6.19.0"
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,

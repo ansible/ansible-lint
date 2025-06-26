@@ -28,7 +28,7 @@ class LatestRule(AnsibleLintRule):
         "latest[hg]": "Use a commit hash or tag instead of 'latest' for hg",
     }
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,
@@ -38,10 +38,10 @@ class LatestRule(AnsibleLintRule):
             task["action"]["__ansible_module__"] == "git"
             and task["action"].get("version", "HEAD") == "HEAD"
         ):
-            return self.create_matcherror(tag="latest[git]", filename=file)
+            return self.create_match_error(tag="latest[git]", filename=file)
         if (
             task["action"]["__ansible_module__"] == "hg"
             and task["action"].get("revision", "default") == "default"
         ):  # pragma: no cover
-            return self.create_matcherror(tag="latest[hg]", filename=file)
+            return self.create_match_error(tag="latest[hg]", filename=file)
         return False

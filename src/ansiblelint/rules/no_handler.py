@@ -67,7 +67,7 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
     tags = ["idiom"]
     version_changed = "24.10.0"
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,
@@ -85,7 +85,7 @@ class UseHandlerRatherThanWhenChangedRule(AnsibleLintRule):
             and _changed_in_when(when[0])
         ):
             result.append(
-                self.create_matcherror(
+                self.create_match_error(
                     message=self.shortdesc,
                     data=when,
                     filename=file,

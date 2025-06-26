@@ -89,7 +89,7 @@ class GalaxyRule(AnsibleLintRule):
                     and len(str(ver).strip()) == 0
                 ):
                     results.append(
-                        self.create_matcherror(
+                        self.create_match_error(
                             message=f"Invalid collection metadata. Dependency version spec range is invalid for '{dep}'.",
                             tag="galaxy[invalid-dependency-version]",
                             filename=file,
@@ -100,7 +100,7 @@ class GalaxyRule(AnsibleLintRule):
         # for a nonexistent file
         if not changelog_found:
             results.append(
-                self.create_matcherror(
+                self.create_match_error(
                     message="No changelog found. Please add a changelog file. Refer to the galaxy.md file for more info.",
                     tag="galaxy[no-changelog]",
                     filename=file,
@@ -112,7 +112,7 @@ class GalaxyRule(AnsibleLintRule):
             tag in required_tag_list for tag in galaxy_tag_list
         ):
             results.append(
-                self.create_matcherror(
+                self.create_match_error(
                     message=(
                         f"galaxy.yaml must have one of the required tags: {required_tag_list}"
                     ),
@@ -124,7 +124,7 @@ class GalaxyRule(AnsibleLintRule):
         # Checking if galaxy.yml tags are formatted correctly
         if galaxy_tag_invalid_format:
             results.append(
-                self.create_matcherror(
+                self.create_match_error(
                     message=(
                         f"galaxy.yaml must have properly formatted tags. Invalid tags: {','.join(galaxy_tag_invalid_format)}"
                     ),
@@ -136,7 +136,7 @@ class GalaxyRule(AnsibleLintRule):
         # Checking if galaxy.yml tags length are within limits
         if galaxy_tag_invalid_length:
             results.append(
-                self.create_matcherror(
+                self.create_match_error(
                     message=(
                         f"galaxy.yaml tags must not exceed {MAX_LENGTH_TAG} characters. Invalid tags: {','.join(galaxy_tag_invalid_length)}"
                     ),
@@ -148,7 +148,7 @@ class GalaxyRule(AnsibleLintRule):
         # Checking if galaxy.yml tags does not exceed the max number
         if len(galaxy_tag_list) > MAX_TAGS_COUNT:
             results.append(
-                self.create_matcherror(
+                self.create_match_error(
                     message=(
                         f"galaxy.yaml exceeds {MAX_TAGS_COUNT} tags. Current count: {len(galaxy_tag_list)}"
                     ),
@@ -159,7 +159,7 @@ class GalaxyRule(AnsibleLintRule):
 
         if "version" not in data:
             results.append(
-                self.create_matcherror(
+                self.create_match_error(
                     message="galaxy.yaml should have version tag.",
                     data=data,
                     tag="galaxy[version-missing]",
@@ -172,7 +172,7 @@ class GalaxyRule(AnsibleLintRule):
 
         if not (base_path / "meta" / "runtime.yml").is_file():
             results.append(
-                self.create_matcherror(
+                self.create_match_error(
                     message="meta/runtime.yml file not found.",
                     tag="galaxy[no-runtime]",
                     filename=file,

@@ -34,7 +34,7 @@ class MetaTagValidRule(AnsibleLintRule):
 
     TAG_REGEXP = re.compile(r"^[a-z0-9]+$")
 
-    def matchyaml(self, file: Lintable) -> list[MatchError]:
+    def match_file(self, file: Lintable) -> list[MatchError]:
         """Find violations inside meta files."""
         if file.kind != "meta" or not file.data:
             return []
@@ -51,7 +51,7 @@ class MetaTagValidRule(AnsibleLintRule):
                 tags += galaxy_info["galaxy_tags"]
             else:
                 results.append(
-                    self.create_matcherror(
+                    self.create_match_error(
                         "Expected 'galaxy_tags' to be a list",
                         filename=file,
                     ),
@@ -59,7 +59,7 @@ class MetaTagValidRule(AnsibleLintRule):
 
         if "categories" in galaxy_info:
             results.append(
-                self.create_matcherror(
+                self.create_match_error(
                     "Use 'galaxy_tags' rather than 'categories'",
                     filename=file,
                 ),
@@ -68,7 +68,7 @@ class MetaTagValidRule(AnsibleLintRule):
                 tags += galaxy_info["categories"]
             else:
                 results.append(
-                    self.create_matcherror(
+                    self.create_match_error(
                         "Expected 'categories' to be a list",
                         filename=file,
                     ),
@@ -78,7 +78,7 @@ class MetaTagValidRule(AnsibleLintRule):
             msg = self.shortdesc
             if not isinstance(tag, str):
                 results.append(
-                    self.create_matcherror(
+                    self.create_match_error(
                         f"Tags must be strings: '{tag}'",
                         filename=file,
                     ),
@@ -86,7 +86,7 @@ class MetaTagValidRule(AnsibleLintRule):
                 continue
             if not re.match(self.TAG_REGEXP, tag):
                 results.append(
-                    self.create_matcherror(
+                    self.create_match_error(
                         message=f"{msg}, invalid: '{tag}'",
                         filename=file,
                     ),

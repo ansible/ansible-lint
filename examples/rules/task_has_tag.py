@@ -18,7 +18,7 @@ class TaskHasTag(AnsibleLintRule):
     description = "Tasks must have tag"
     tags = ["productivity", "tags"]
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,

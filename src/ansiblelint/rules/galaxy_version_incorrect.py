@@ -31,7 +31,7 @@ class GalaxyVersionIncorrectRule(AnsibleLintRule):
         version = data.get("version")
         if not version or Version(version) < Version("1.0.0"):
             results.append(
-                self.create_matcherror(
+                self.create_match_error(
                     message="collection version should be greater than or equal to 1.0.0",
                     data=version,
                     filename=file,

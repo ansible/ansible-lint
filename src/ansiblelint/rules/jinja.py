@@ -125,7 +125,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
         return self._tag2msg[tag].format(value=value, reformatted=reformatted)
 
     # pylint: disable=too-many-locals
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,
@@ -217,7 +217,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                         if not bypass:
                             lineno = task.get_error_line([*path, key])
                             result.append(
-                                self.create_matcherror(
+                                self.create_match_error(
                                     message=str(exc),
                                     lineno=lineno,
                                     data=v,
@@ -234,7 +234,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                     if reformatted != v:
                         lineno = task.get_error_line([*path, key])
                         result.append(
-                            self.create_matcherror(
+                            self.create_match_error(
                                 message=self._msg(
                                     tag=tag,
                                     value=v,
@@ -254,11 +254,11 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                             ),
                         )
         except Exception as exc:
-            _logger.info("Exception in JinjaRule.matchtask: %s", exc)
+            _logger.info("Exception in JinjaRule.match_task: %s", exc)
             raise
         return result
 
-    def matchyaml(self, file: Lintable) -> list[MatchError]:
+    def match_file(self, file: Lintable) -> list[MatchError]:
         """Return matches for variables defined in vars files."""
         raw_results: list[MatchError] = []
         results: list[MatchError] = []
@@ -276,7 +276,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                     )
                     if reformatted != v:
                         results.append(
-                            self.create_matcherror(
+                            self.create_match_error(
                                 message=self._msg(
                                     tag=tag,
                                     value=v,
@@ -299,7 +299,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                     if match.rule.id not in skip_list and match.tag not in skip_list:
                         results.append(match)
         else:
-            results.extend(super().matchyaml(file))
+            results.extend(super().match_file(file))
         return results
 
     def lex(self, text: str) -> list[Token]:
@@ -358,7 +358,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                 return value
             return f"{{{{ {value} }}}}"
 
-        def uncook(value: str, *, implicit: bool = False) -> str:
+        def reverse_cook(value: str, *, implicit: bool = False) -> str:
             """Restore an string to original form when it was an implicit one."""
             if not implicit:
                 return value
@@ -440,12 +440,12 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
             # newlines, as we decided to not touch them yet.
             # These both are documented as known limitations.
             _logger.debug("Ignored jinja internal error %s", exc)
-            return uncook(text, implicit=implicit), "", "spacing"
+            return reverse_cook(text, implicit=implicit), "", "spacing"
 
         # finalize
         reformatted = self.unlex(tokens)
         failed = reformatted != text
-        reformatted = uncook(reformatted, implicit=implicit)
+        reformatted = reverse_cook(reformatted, implicit=implicit)
         details = (
             f"Jinja2 template rewrite recommendation: `{reformatted}`."
             if failed

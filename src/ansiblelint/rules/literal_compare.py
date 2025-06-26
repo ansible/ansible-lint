@@ -31,7 +31,7 @@ class ComparisonToLiteralBoolRule(AnsibleLintRule):
 
     literal_bool_compare = re.compile(r"[=!]= ?(True|true|False|false)")
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,

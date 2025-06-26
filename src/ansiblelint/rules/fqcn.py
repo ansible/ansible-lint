@@ -110,7 +110,7 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
         "fqcn[canonical]": "You should use canonical module name",
     }
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,
@@ -154,7 +154,7 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
                         message = f"Use FQCN for builtin module actions ({module})."
                         details = f"Use `{module_alias}` or `{legacy_module}` instead."
                     result.append(
-                        self.create_matcherror(
+                        self.create_match_error(
                             message=message,
                             details=details,
                             filename=file,
@@ -164,7 +164,7 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
                     )
             elif module.count(".") < 2:
                 result.append(
-                    self.create_matcherror(
+                    self.create_match_error(
                         message=f"Use FQCN for module actions, such `{self.module_aliases[module]}`.",
                         details=f"Action `{module}` is not FQCN.",
                         filename=file,
@@ -179,7 +179,7 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
                 "community.network.",
             ):
                 result.append(
-                    self.create_matcherror(
+                    self.create_match_error(
                         message=f"You should use canonical module name `{self.module_aliases[module]}` instead of `{module}`.",
                         filename=file,
                         data=module,
@@ -188,7 +188,7 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
                 )
         return result
 
-    def matchyaml(self, file: Lintable) -> list[MatchError]:
+    def match_file(self, file: Lintable) -> list[MatchError]:
         """Return matches found for a specific YAML text."""
         result = []
         if file.kind == "plugin":
@@ -197,7 +197,7 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
             short_path = file.path.resolve().parts[i + 2 :]
             if len(short_path) > 1 and "test" not in str(file.path):
                 result.append(
-                    self.create_matcherror(
+                    self.create_match_error(
                         message=f"Deep plugins directory is discouraged. Move '{file.path}' directly under '{'/'.join(plugin_type)}' folder.",
                         tag="fqcn[deep]",
                         filename=file,
@@ -216,7 +216,7 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
             return []
         if "collections" in data:
             return [
-                self.create_matcherror(
+                self.create_match_error(
                     message="Avoid `collections` keyword by using FQCN for all plugins, modules, roles and playbooks.",
                     data=data,
                     tag="fqcn[keyword]",

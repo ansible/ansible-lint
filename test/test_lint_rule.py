@@ -42,5 +42,5 @@ def test_rule_matching(lintable: Lintable) -> None:
 def test_raw_rule_matching(lintable: Lintable) -> None:
     """Test rule.matchlines() on a playbook."""
     rule = raw_task.RawTaskRule()
-    matches = rule.matchtasks(lintable)
+    matches = rule.match_tasks(lintable)
     assert len(matches) == 1

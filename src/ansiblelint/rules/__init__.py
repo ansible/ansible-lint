@@ -40,11 +40,11 @@ _logger = logging.getLogger(__name__)
 match_types = {
     "matchlines": "line",
     "match": "line",  # called by matchlines
-    "matchtasks": "task",
-    "matchtask": "task",  # called by matchtasks
-    "matchyaml": "yaml",
-    "matchplay": "play",  # called by matchyaml
-    "matchdir": "dir",
+    "match_tasks": "task",
+    "match_task": "task",  # called by match_tasks
+    "match_file": "yaml",
+    "matchplay": "play",  # called by match_file
+    "match_dir": "dir",
 }
 RE_JINJA_EXPRESSION = re.compile(r"{{.+?}}")
 RE_JINJA_STATEMENT = re.compile(r"{%.+?%}")
@@ -72,7 +72,7 @@ class AnsibleLintRule(BaseRule):
         return text
 
     # pylint: disable=too-many-arguments,too-many-positional-arguments
-    def create_matcherror(
+    def create_match_error(
         self,
         message: str = "",
         lineno: int = 1,
@@ -143,20 +143,20 @@ class AnsibleLintRule(BaseRule):
             message = ""
             if isinstance(result, str):
                 message = result
-            matcherror = self.create_matcherror(
+            match_error = self.create_match_error(
                 message=message,
                 lineno=prev_line_no + 1,
                 details=line,
                 filename=file,
             )
-            matches.append(matcherror)
+            matches.append(match_error)
         return matches
 
-    def matchtasks(self, file: Lintable) -> list[MatchError]:
-        """Call matchtask for each task inside file and return aggregate results.
+    def match_tasks(self, file: Lintable) -> list[MatchError]:
+        """Call match_task for each task inside file and return aggregate results.
 
-        Most rules will never need to override matchtasks because its main
-        purpose is to call matchtask for each task/handlers in the same file,
+        Most rules will never need to override match_tasks because its main
+        purpose is to call match_task for each task/handlers in the same file,
         and to aggregate the results.
         """
         matches: list[MatchError] = []
@@ -185,7 +185,7 @@ class AnsibleLintRule(BaseRule):
             if self.needs_raw_task:
                 task.normalized_task["__raw_task__"] = task.raw_task
 
-            result = self.matchtask(task, file=file)
+            result = self.match_task(task, file=file)
             if not result:
                 continue
 
@@ -212,7 +212,7 @@ class AnsibleLintRule(BaseRule):
                 message = ""
                 if isinstance(result, str):
                     message = result
-                match = self.create_matcherror(
+                match = self.create_match_error(
                     message=message,
                     lineno=task.line,
                     filename=file,
@@ -222,7 +222,7 @@ class AnsibleLintRule(BaseRule):
             matches.append(match)
         return matches
 
-    def matchyaml(self, file: Lintable) -> list[MatchError]:
+    def match_file(self, file: Lintable) -> list[MatchError]:
         matches: list[MatchError] = []
         if str(file.base_kind) != "text/yaml":
             return matches

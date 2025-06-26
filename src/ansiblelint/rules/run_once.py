@@ -41,7 +41,7 @@ class RunOnce(AnsibleLintRule):
             return []
         lineno = getattr(strategy, "_line_number", 1)
         return [
-            self.create_matcherror(
+            self.create_match_error(
                 message="Play uses strategy: free",
                 filename=file,
                 tag=f"{self.id}[play]",
@@ -49,7 +49,7 @@ class RunOnce(AnsibleLintRule):
             ),
         ]
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,
@@ -62,7 +62,7 @@ class RunOnce(AnsibleLintRule):
         if not run_once:
             return []
         return [
-            self.create_matcherror(
+            self.create_match_error(
                 message="Using run_once may behave differently if strategy is set to free.",
                 filename=file,
                 tag=f"{self.id}[task]",

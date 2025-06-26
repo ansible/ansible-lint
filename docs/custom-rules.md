@@ -17,7 +17,7 @@ Each rule definition should have the following parts:
 - `description` explains what the rule checks for.
 - `tags` specifies one or more tags for including or excluding the rule.
 
-### Match and matchtask methods
+### Match and match_task methods
 
 Each rule definition should also invoke one of the following methods:
 
@@ -26,7 +26,7 @@ Each rule definition should also invoke one of the following methods:
   - True or a custom message if the line does match the test. (This allows one
     rule to test multiple behaviors - see e.g. the
     _CommandsInsteadOfModulesRule_.)
-- `matchtask` operates on a single task or handler, such that tasks get
+- `match_task` operates on a single task or handler, such that tasks get
   standardized to always contain a _module_ key and _module_arguments_ key.
   Other common task modifiers, such as _when_, _with_items_, etc., are also
   available as keys if present in the task.
@@ -50,13 +50,13 @@ class DeprecatedVariableRule(AnsibleLintRule):
         return '${' in line
 ```
 
-The following is an example rule that uses the `matchtask` method:
+The following is an example rule that uses the `match_task` method:
 
 ```python
 {!../examples/rules/task_has_tag.py!}
 ```
 
-The task argument to `matchtask` contains a number of keys - the critical one is
+The task argument to `match_task` contains a number of keys - the critical one is
 _action_. The value of `task['action']` contains the module being used, and the
 arguments passed, both as key-value pairs and a list of other arguments (e.g.
 the command used with shell).

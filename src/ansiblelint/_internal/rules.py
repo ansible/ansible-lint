@@ -100,7 +100,7 @@ class BaseRule:
         """Return all matches while ignoring exceptions."""
         matches = []
         if not file.path.is_dir():
-            for method in [self.matchlines, self.matchtasks, self.matchyaml]:
+            for method in [self.matchlines, self.match_tasks, self.match_file]:
                 try:
                     matches.extend(method(file))
                 except Exception as exc:  # pylint: disable=broad-except # noqa: BLE001
@@ -113,14 +113,14 @@ class BaseRule:
                     )
                     _logger.debug("Ignored exception details", exc_info=True)
         else:
-            matches.extend(self.matchdir(file))
+            matches.extend(self.match_dir(file))
         return matches
 
     def matchlines(self, file: Lintable) -> list[MatchError]:
         """Return matches found for a specific line."""
         return []
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,
@@ -133,11 +133,11 @@ class BaseRule:
         """
         return False
 
-    def matchtasks(self, file: Lintable) -> list[MatchError]:
+    def match_tasks(self, file: Lintable) -> list[MatchError]:
         """Return matches for a tasks file."""
         return []
 
-    def matchyaml(self, file: Lintable) -> list[MatchError]:
+    def match_file(self, file: Lintable) -> list[MatchError]:
         """Return matches found for a specific YAML text."""
         return []
 
@@ -145,7 +145,7 @@ class BaseRule:
         """Return matches found for a specific playbook."""
         return []
 
-    def matchdir(self, lintable: Lintable) -> list[MatchError]:
+    def match_dir(self, lintable: Lintable) -> list[MatchError]:
         """Return matches for lintable folders."""
         return []
 

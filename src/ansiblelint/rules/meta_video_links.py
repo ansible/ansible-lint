@@ -36,7 +36,7 @@ class MetaVideoLinksRule(AnsibleLintRule):
         "youtube": re.compile(r"https://youtu\.be/([0-9A-Za-z-_]+)"),
     }
 
-    def matchyaml(self, file: Lintable) -> list[MatchError]:
+    def match_file(self, file: Lintable) -> list[MatchError]:
         if file.kind != "meta" or not file.data:
             return []
 
@@ -53,7 +53,7 @@ class MetaVideoLinksRule(AnsibleLintRule):
         for video in video_links:
             if not isinstance(video, dict):
                 results.append(
-                    self.create_matcherror(
+                    self.create_match_error(
                         "Expected item in 'video_links' to be a dictionary",
                         filename=file,
                         data=video,
@@ -69,7 +69,7 @@ class MetaVideoLinksRule(AnsibleLintRule):
             }
             if unexpected_keys:
                 results.append(
-                    self.create_matcherror(
+                    self.create_match_error(
                         "Expected item in 'video_links' to contain "
                         "only keys 'url' and 'title'",
                         filename=file,
@@ -88,7 +88,7 @@ class MetaVideoLinksRule(AnsibleLintRule):
                     "or Google Drive."
                 )
                 results.append(
-                    self.create_matcherror(msg, filename=file, data=video["url"])
+                    self.create_match_error(msg, filename=file, data=video["url"])
                 )
 
         return results

@@ -25,7 +25,7 @@ class PlaybookExtensionRule(AnsibleLintRule):
     done: list[str] = []
     version_changed = "4.0.0"
 
-    def matchyaml(self, file: Lintable) -> list[MatchError]:
+    def match_file(self, file: Lintable) -> list[MatchError]:
         result: list[MatchError] = []
         if file.kind != "playbook":
             return result
@@ -33,7 +33,7 @@ class PlaybookExtensionRule(AnsibleLintRule):
         ext = file.path.suffix
         if ext not in [".yml", ".yaml"] and path not in self.done:
             self.done.append(path)
-            result.append(self.create_matcherror(filename=file))
+            result.append(self.create_match_error(filename=file))
         return result
 
 

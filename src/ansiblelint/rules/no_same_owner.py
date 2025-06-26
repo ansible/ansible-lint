@@ -29,7 +29,7 @@ should not be preserved when transferring files between them.
     version_changed = "6.4.0"
     RE_ARCHIVES = re.compile(r"^.*\.tar(\.(gz|bz2|xz))?$")
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,

@@ -84,7 +84,7 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
         "rpm": ["--nodeps"],
     }
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,

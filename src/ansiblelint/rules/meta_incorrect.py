@@ -32,7 +32,7 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
     tags = ["metadata"]
     version_changed = "4.0.0"
 
-    def matchyaml(self, file: Lintable) -> list[MatchError]:
+    def match_file(self, file: Lintable) -> list[MatchError]:
         if file.kind != "meta" or not file.data:
             return []
 
@@ -45,7 +45,7 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
             value = galaxy_info.get(field, None)
             if value and value == default:
                 results.append(
-                    self.create_matcherror(
+                    self.create_match_error(
                         filename=file,
                         message=f"Should change default metadata: {field}",
                         data=file.data,
