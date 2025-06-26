@@ -13,6 +13,6 @@ This rule aims to validate Ansible pattern directory structure.
 ## pattern[missing-playbook]
 
 `pattern[missing-playbook]` is triggered when either the required playbooks directory or playbook file is missing.
- 
+
 pattern[missing-] rule that triggers when pattern.json "name" does not matches with pattern name.
 "name": "my_pattern",

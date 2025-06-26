@@ -168,7 +168,7 @@ def kind_from_path(path: Path, *, base: bool = False) -> FileType:
 
     if str(path) == "/dev/stdin":
         return "playbook"
-    
+
     if "pattern.json" in str(path):
         # This is a pattern file
         return "pattern"
