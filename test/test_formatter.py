@@ -37,7 +37,7 @@ DETAILS = "Some [/tmp/foo] details."
 
 
 def test_format_coloured_string() -> None:
-    """Test formetting colored."""
+    """Test colored formatting."""
     match = MatchError(
         message="message",
         lineno=1,

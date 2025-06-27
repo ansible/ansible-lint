@@ -59,7 +59,7 @@ your `enable_list` to activate it.
 ---
 - hosts: localhost # <-- playbook name[play]
   tasks:
-    - name: create placefolder file # <-- name[casing] due lack of capital letter
+    - name: create placeholder file # <-- name[casing] due lack of capital letter
       ansible.builtin.command: touch /tmp/.placeholder
 ```
 

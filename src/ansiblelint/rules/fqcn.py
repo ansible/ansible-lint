@@ -1,4 +1,5 @@
 """Rule definition for usage of fully qualified collection names for builtins."""
+# cspell: ignore debconf
 
 from __future__ import annotations
 

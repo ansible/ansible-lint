@@ -1,4 +1,5 @@
 ---
+# cspell:ignore superfences
 site_name: Ansible Lint Documentation
 site_url: https://ansible.readthedocs.io/projects/lint/
 repo_url: https://github.com/ansible/ansible-lint

@@ -2,7 +2,7 @@
 - name: Example with discouraged free-form syntax
   hosts: localhost
   tasks:
-    - name: Create a placefolder file
+    - name: Create a placeholder file
       ansible.builtin.command: chdir=/tmp touch foo # <-- don't use shorthand
       changed_when: false
 
