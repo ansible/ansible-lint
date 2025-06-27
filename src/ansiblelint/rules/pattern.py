@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from ansiblelint.rules import AnsibleLintRule
 
@@ -72,7 +72,7 @@ class PatternRule(AnsibleLintRule):
         if not playbooks_dir.is_dir():
             missing_playbook_items.append("playbooks directory")
         else:
-            playbook = get_playbook_file(file)
+            playbook = get_playbook_file(file.path)
             playbook_file = playbooks_dir / playbook
             if not playbook_file.exists():
                 missing_playbook_items.append("playbook file")
@@ -91,7 +91,7 @@ class PatternRule(AnsibleLintRule):
         return results
 
 
-def get_playbook_file(file: Any) -> str:
+def get_playbook_file(file: Path) -> str:
     """Extract the playbook file name from the pattern.json file."""
     playbook: str = ""
     try:
@@ -99,9 +99,9 @@ def get_playbook_file(file: Any) -> str:
             data = json.load(f)
         try:
             playbook = data["aap_resources"]["controller_job_templates"][0]["playbook"]
-        except (KeyError, IndexError, TypeError) as exc:
+        except KeyError as exc:
             msg = "Could not extract playbook name"
-            raise ValueError(msg) from exc
+            raise KeyError(msg) from exc
     except FileNotFoundError as exc:
         msg = "Pattern file not found."
         raise FileNotFoundError(msg) from exc
