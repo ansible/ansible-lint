@@ -20,13 +20,13 @@ class PatternRule(AnsibleLintRule):
     id = "pattern"
     description = "Confirm that pattern has valid directory structure."
     severity = "MEDIUM"
-    tags = ["metadata"]
+    tags = ["experimental"]
     version_changed = "25.7.0"
     _ids = {
         "pattern[missing-meta]": "Missing meta directory in pattern directory.",
-        "pattern[mismatch-name]": "Pattern name does not match the name key in pattern.json file.",
         "pattern[missing-playbook]": "Missing playbooks sub-directory in pattern directory.",
         "pattern[missing-readme]": "Missing README.md file in pattern directory.",
+        "pattern[name-mismatch]": "Pattern name does not match the name key in pattern.json file.",
     }
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
@@ -64,7 +64,8 @@ class PatternRule(AnsibleLintRule):
             )
 
         # Validate that pattern name matches with the name key in pattern.json file
-        pattern_name_from_json_file = get_pattern_name(file.path)
+        values = values_from_pattern_json(file.path)
+        pattern_name_from_json_file = values[1]
         pattern_name_from_dir = pattern_dir.name
         if pattern_name_from_json_file != pattern_name_from_dir:
             results.append(
@@ -72,7 +73,7 @@ class PatternRule(AnsibleLintRule):
                     message=(
                         f"Pattern directory name '{pattern_name_from_dir}' does not match the name key in pattern.json file: '{pattern_name_from_json_file}'."
                     ),
-                    tag=f"{self.id}[mismatch-name]",
+                    tag=f"{self.id}[name-mismatch]",
                     filename=file,
                 ),
             )
@@ -84,7 +85,8 @@ class PatternRule(AnsibleLintRule):
         if not playbooks_dir.is_dir():
             missing_playbook_items.append("playbooks directory")
         else:
-            playbook = get_playbook_file(file.path)
+            values = values_from_pattern_json(file.path)
+            playbook = values[0]
             playbook_file = playbooks_dir / playbook
             if not playbook_file.exists():
                 missing_playbook_items.append("playbook file")
@@ -103,38 +105,25 @@ class PatternRule(AnsibleLintRule):
         return results
 
 
-def get_playbook_file(file: Path) -> str:
-    """Extract the playbook file name from the pattern.json file."""
-    playbook: str = ""
+def values_from_pattern_json(file: Path) -> list[str]:
+    """Extract playbook name and pattern name values from pattern.json file."""
+    playbook_name: str = ""
+    pattern_name: str = ""
     try:
         with Path(file).open(encoding="utf-8") as f:
             data = json.load(f)
         try:
-            playbook = data["aap_resources"]["controller_job_templates"][0]["playbook"]
+            playbook_name = data["aap_resources"]["controller_job_templates"][0][
+                "playbook"
+            ]
+            pattern_name = data["name"]
         except KeyError as exc:
             msg = "Could not extract playbook name"
             raise KeyError(msg) from exc
     except FileNotFoundError as exc:
         msg = "Pattern file not found."
         raise FileNotFoundError(msg) from exc
-    return playbook
-
-
-def get_pattern_name(file: Path) -> str:
-    """Extract the value associated with name key inside pattern.json file."""
-    pattern_name: str = ""
-    try:
-        with Path(file).open(encoding="utf-8") as f:
-            data = json.load(f)
-        try:
-            pattern_name = data["name"]
-        except KeyError as exc:
-            msg = "Could not extract pattern name value"
-            raise KeyError(msg) from exc
-    except FileNotFoundError as exc:
-        msg = "Pattern file not found."
-        raise FileNotFoundError(msg) from exc
-    return pattern_name
+    return [playbook_name, pattern_name]
 
 
 if "pytest" in sys.modules:
@@ -157,7 +146,7 @@ if "pytest" in sys.modules:
                     "pattern[missing-meta]",
                     "pattern[missing-readme]",
                     "pattern[missing-playbook]",
-                    "pattern[mismatch-name]",
+                    "pattern[name-mismatch]",
                 ],
                 id="invalid-pattern",
             ),
