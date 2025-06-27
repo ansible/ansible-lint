@@ -1035,3 +1035,10 @@ def test_document_start(
         yaml.dumps(yaml.load(_SINGLE_QUOTE_WITHOUT_INDENTS)).startswith("---")
         == explicit_start
     )
+
+
+def test_yamllint_file_config_loaded() -> None:
+    """Ensure the yamllint configuration from a file is loaded correctly."""
+    config_fixture = Path(fixtures_dir / "yamllint.yml")
+    config = ansiblelint.yaml_utils.load_yamllint_config(yamllint_file=config_fixture)
+    assert config.rules["line-length"]["max"] == 222
