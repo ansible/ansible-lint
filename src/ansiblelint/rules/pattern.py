@@ -20,7 +20,7 @@ class PatternRule(AnsibleLintRule):
     id = "pattern"
     description = "Confirm that pattern has valid directory structure."
     severity = "MEDIUM"
-    tags = ["experimental"]
+    tags = ["metadata"]
     version_changed = "25.7.0"
     _ids = {
         "pattern[missing-meta]": "Missing meta directory in pattern directory.",
