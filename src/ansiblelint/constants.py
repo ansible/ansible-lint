@@ -90,6 +90,7 @@ FileType = Literal[
     "sanity-ignore-file",  # tests/sanity/ignore file
     "plugin",
     "galaxy",  # galaxy.yml
+    "play-argspec",  # play argspec file
     "",  # unknown file type
 ]
 
