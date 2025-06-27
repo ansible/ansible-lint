@@ -88,7 +88,7 @@ class MissingFilePermissionsRule(AnsibleLintRule):
     _modules_with_create = _MODULES_WITH_CREATE
 
     # pylint: disable=too-many-return-statements
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,

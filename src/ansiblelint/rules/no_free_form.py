@@ -38,7 +38,7 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
         "no-free-form[raw-non-string]": "Passing a non string value to `raw` module is neither documented or supported.",
     }
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,
@@ -54,7 +54,7 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
             if isinstance(action_value, str):
                 if "executable=" in action_value:
                     results.append(
-                        self.create_matcherror(
+                        self.create_match_error(
                             message="Avoid embedding `executable=` inside raw calls, use explicit args dictionary instead.",
                             lineno=task.line,
                             filename=file,
@@ -63,7 +63,7 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
                     )
             else:
                 results.append(
-                    self.create_matcherror(
+                    self.create_match_error(
                         message="Passing a non string value to `raw` module is neither documented or supported.",
                         lineno=task.line,
                         filename=file,
@@ -88,7 +88,7 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
                 fail = True
             if fail:
                 results.append(
-                    self.create_matcherror(
+                    self.create_match_error(
                         message=f"Avoid using free-form when calling module actions. ({action})",
                         lineno=task.line,
                         filename=file,

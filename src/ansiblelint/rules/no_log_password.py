@@ -46,7 +46,7 @@ class NoLogPasswordsRule(AnsibleLintRule, TransformMixin):
     tags = ["opt-in", "security", "experimental"]
     version_changed = "5.0.9"
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,

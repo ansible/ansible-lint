@@ -37,7 +37,7 @@ class TaskNoLocalActionRule(AnsibleLintRule, TransformMixin):
     tags = ["deprecations"]
     version_changed = "4.0.0"
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,

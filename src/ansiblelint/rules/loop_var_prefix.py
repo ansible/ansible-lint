@@ -37,7 +37,7 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
     }
     version_changed = "6.7.0"
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,
@@ -67,7 +67,7 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
             if loop_var:
                 if not self.prefix.match(loop_var):
                     return [
-                        self.create_matcherror(
+                        self.create_match_error(
                             message=f"Loop variable name does not match /{options.loop_var_prefix}/ regex, where role={toidentifier(file.role)}.",
                             filename=file,
                             data=loop_var,
@@ -76,7 +76,7 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
                     ]
             else:
                 return [
-                    self.create_matcherror(
+                    self.create_match_error(
                         message=f"Replace unsafe implicit `item` loop variable by adding a `loop_var` that is matching /{options.loop_var_prefix}/ regex.",
                         filename=file,
                         data=data,

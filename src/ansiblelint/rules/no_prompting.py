@@ -37,14 +37,14 @@ class NoPromptingRule(AnsibleLintRule):
         if not vars_prompt:
             return []
         return [
-            self.create_matcherror(
+            self.create_match_error(
                 message="Play uses vars_prompt",
                 data=vars_prompt[0],
                 filename=file,
             ),
         ]
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,

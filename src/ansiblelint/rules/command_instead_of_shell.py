@@ -48,7 +48,7 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule, TransformMixin):
     tags = ["command-shell", "idiom"]
     version_changed = "6.18.0"
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,

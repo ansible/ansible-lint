@@ -64,9 +64,14 @@ repos:
     rev: v9.0.1
     hooks:
       - id: cspell
-        # entry: codespell --relative
-        args: [--relative, --no-progress, --no-summary]
-        name: Spell check with cspell
+        entry: sh
+        pass_filenames: false
+        args:
+          [
+            "-c",
+            "cspell-cli . --relative --no-progress --no-summary && cspell . --disable-dictionary=words --words-only --quiet --unique | sort --ignore-case > .config/dictionary.txt",
+          ]
+        name: Spell check with cspell and remove unused dictionary entries
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 0.33.1
     hooks:

@@ -35,7 +35,7 @@ class CheckRequiresAnsibleVersion(AnsibleLintRule):
         "meta-runtime[invalid-version]": "'requires_ansible' is not a valid requirement specification",
     }
 
-    def matchyaml(self, file: Lintable) -> list[MatchError]:
+    def match_file(self, file: Lintable) -> list[MatchError]:
         """Find violations inside meta files.
 
         :param file: Input lintable file that is a match for `meta-runtime`
@@ -59,7 +59,7 @@ class CheckRequiresAnsibleVersion(AnsibleLintRule):
                 msg = f"'requires_ansible' key must refer to a currently supported version such as: {', '.join(supported_ansible)}"
 
                 results.append(
-                    self.create_matcherror(
+                    self.create_match_error(
                         message=msg,
                         tag="meta-runtime[unsupported-version]",
                         filename=file,
@@ -70,7 +70,7 @@ class CheckRequiresAnsibleVersion(AnsibleLintRule):
                 SpecifierSet(requires_ansible)
             except ValueError:
                 results.append(
-                    self.create_matcherror(
+                    self.create_match_error(
                         message="'requires_ansible' is not a valid requirement specification",
                         tag="meta-runtime[invalid-version]",
                         filename=file,

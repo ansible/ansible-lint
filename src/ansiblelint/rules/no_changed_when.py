@@ -53,7 +53,7 @@ class CommandHasChangesCheckRule(AnsibleLintRule):
         "raw",
     ]
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,
@@ -69,7 +69,7 @@ class CommandHasChangesCheckRule(AnsibleLintRule):
                 and "removes" not in task["action"]
             )
         ):
-            result.append(self.create_matcherror(filename=file))
+            result.append(self.create_match_error(filename=file))
         return result
 
 

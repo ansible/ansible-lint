@@ -19,7 +19,7 @@ class RawTaskRule(AnsibleLintRule):
     tags = ["fake", "dummy", "test3"]
     needs_raw_task = True
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,

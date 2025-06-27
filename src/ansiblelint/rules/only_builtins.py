@@ -24,7 +24,7 @@ class OnlyBuiltinsRule(AnsibleLintRule):
     tags = ["opt-in", "experimental"]
     version_changed = "6.14.0"
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,

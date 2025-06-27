@@ -92,7 +92,7 @@ class OctalPermissionsRule(AnsibleLintRule):
             or group_more_generous_than_user,
         )
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,

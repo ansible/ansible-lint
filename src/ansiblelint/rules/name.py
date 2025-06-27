@@ -69,7 +69,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
             if task_name in seen_names:
                 message = f"Task name '{task_name}' is not unique. It was first used on line {seen_names[task_name]}."
                 errors.append(
-                    self.create_matcherror(
+                    self.create_match_error(
                         message=message,
                         lineno=lineno,
                         filename=file,
@@ -91,7 +91,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
         # Check if the play itself is named
         if "name" not in data:
             return [
-                self.create_matcherror(
+                self.create_match_error(
                     message="All plays should be named.",
                     tag="name[play]",
                     filename=file,
@@ -118,7 +118,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
 
         return results
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,
@@ -130,7 +130,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
         name = task.get("name")
         if not name:
             results.append(
-                self.create_matcherror(
+                self.create_match_error(
                     message="All tasks should be named.",
                     lineno=task.line,
                     tag="name[missing]",
@@ -194,7 +194,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
                     # having to enable the rule.
                     if "name[prefix]" in self._collection.options.enable_list:
                         results.append(
-                            self.create_matcherror(
+                            self.create_match_error(
                                 message=f"Task name should start with '{prefix}'.",
                                 data=data,
                                 tag="name[prefix]",
@@ -212,7 +212,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
             and not effective_name[0].isupper()
         ):
             results.append(
-                self.create_matcherror(
+                self.create_match_error(
                     message="All names should start with an uppercase letter.",
                     data=name,
                     tag="name[casing]",
@@ -221,7 +221,7 @@ class NameRule(AnsibleLintRule, TransformMixin):
             )
         if self._re_templated_inside.match(name):
             results.append(
-                self.create_matcherror(
+                self.create_match_error(
                     message="Jinja templates should only be at the end of 'name'",
                     data=name,
                     tag="name[template]",

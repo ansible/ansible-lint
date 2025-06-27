@@ -37,7 +37,7 @@ class ComplexityRule(AnsibleLintRule):
             raise TypeError(msg)
         if len(tasks) > self._collection.options.max_tasks:
             results.append(
-                self.create_matcherror(
+                self.create_match_error(
                     message=f"Maximum tasks allowed in a play is {self._collection.options.max_tasks}.",
                     tag=f"{self.id}[play]",
                     filename=file,
@@ -46,7 +46,7 @@ class ComplexityRule(AnsibleLintRule):
             )
         return results
 
-    def matchtask(self, task: Task, file: Lintable | None = None) -> list[MatchError]:
+    def match_task(self, task: Task, file: Lintable | None = None) -> list[MatchError]:
         """Check if the task is a block and count the number of items inside it."""
         results: list[MatchError] = []
 
@@ -58,7 +58,7 @@ class ComplexityRule(AnsibleLintRule):
             block_depth = self.calculate_block_depth(task)
             if block_depth > self._collection.options.max_block_depth:
                 results.append(
-                    self.create_matcherror(
+                    self.create_match_error(
                         message=f"Replace nested block with an include_tasks to make code easier to maintain. Maximum block depth allowed is {self._collection.options.max_block_depth}.",
                         lineno=task.line,
                         tag=f"{self.id}[nesting]",

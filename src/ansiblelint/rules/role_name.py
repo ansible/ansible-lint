@@ -68,7 +68,7 @@ class RoleNames(AnsibleLintRule):
         "role-name[path]": "Avoid using paths when importing roles.",
     }
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,
@@ -78,7 +78,7 @@ class RoleNames(AnsibleLintRule):
             name = task["action"].get("name", "")
             if "/" in name:
                 results.append(
-                    self.create_matcherror(
+                    self.create_match_error(
                         f"Avoid using paths when importing roles. ({name})",
                         filename=file,
                         lineno=task.line,
@@ -87,10 +87,10 @@ class RoleNames(AnsibleLintRule):
                 )
         return results
 
-    def matchdir(self, lintable: Lintable) -> list[MatchError]:
-        return self.matchyaml(lintable)
+    def match_dir(self, lintable: Lintable) -> list[MatchError]:
+        return self.match_file(lintable)
 
-    def matchyaml(self, file: Lintable) -> list[MatchError]:
+    def match_file(self, file: Lintable) -> list[MatchError]:
         result: list[MatchError] = []
         column: int | None = None
 
@@ -108,7 +108,7 @@ class RoleNames(AnsibleLintRule):
                     raise TypeError(msg)
                 if "/" in role_name:
                     result.append(
-                        self.create_matcherror(
+                        self.create_match_error(
                             f"Avoid using paths when importing roles. ({role_name})",
                             filename=file,
                             data=role_name,
@@ -133,7 +133,7 @@ class RoleNames(AnsibleLintRule):
                             raise TypeError(msg)
                         if "/" in role_name:
                             result.append(
-                                self.create_matcherror(
+                                self.create_match_error(
                                     f"Avoid using paths when importing roles. ({role_name})",
                                     filename=file,
                                     lineno=line,
@@ -157,7 +157,7 @@ class RoleNames(AnsibleLintRule):
         role_name = _remove_prefix(role_name, "ansible-role-")
         if role_name and not _match_role_name_regex(role_name):
             result.append(
-                self.create_matcherror(
+                self.create_match_error(
                     filename=file,
                     message=self.shortdesc.format(role_name),
                 ),

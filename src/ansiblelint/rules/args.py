@@ -99,7 +99,7 @@ class ArgsRule(AnsibleLintRule):
     RE_PATTERN = re.compile(r"(argument|option) '(?P<name>.*)' is of type")
     RE_VALUE_OF = re.compile(r"value of (?P<name>.*) must be one of:")
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,
@@ -142,7 +142,7 @@ class ArgsRule(AnsibleLintRule):
             module_args.update(workarounds_inject_map[loaded_module.resolved_fqcn])
         if loaded_module.resolved_fqcn in workarounds_mutex_args_map:
             results.extend(
-                self.create_matcherror(
+                self.create_match_error(
                     message=f"Module arguments {mutex_set} are mutually exclusive",
                     lineno=task.line,
                     tag="args[module]",
@@ -284,7 +284,7 @@ class ArgsRule(AnsibleLintRule):
                 return results
 
         results.append(
-            self.create_matcherror(
+            self.create_match_error(
                 message=error_message,
                 lineno=task.line,
                 tag="args[module]",

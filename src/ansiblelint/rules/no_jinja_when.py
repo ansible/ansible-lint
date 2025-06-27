@@ -51,7 +51,7 @@ class NoFormattingInWhenRule(AnsibleLintRule, TransformMixin):
             if "roles" not in data or data["roles"] is None:
                 return errors
             errors = [
-                self.create_matcherror(
+                self.create_match_error(
                     details=str({"when": role}),
                     filename=file,
                     data=role,
@@ -65,7 +65,7 @@ class NoFormattingInWhenRule(AnsibleLintRule, TransformMixin):
             ]
         return errors
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,

@@ -60,7 +60,7 @@ class YamllintRule(AnsibleLintRule, TransformMixin):
         "yaml[truthy]": "",
     }
 
-    def matchyaml(self, file: Lintable) -> list[MatchError]:
+    def match_file(self, file: Lintable) -> list[MatchError]:
         """Return matches found for a specific YAML text."""
         matches: list[MatchError] = []
         if str(file.base_kind) != "text/yaml":
@@ -81,7 +81,7 @@ class YamllintRule(AnsibleLintRule, TransformMixin):
             ):
                 continue
             matches.append(
-                self.create_matcherror(
+                self.create_match_error(
                     # yamllint does return lower-case sentences
                     message=problem.desc.capitalize(),
                     lineno=problem.line,

@@ -39,7 +39,7 @@ DEFAULT_KINDS = [
     {"jinja2": "**/*.j2"},  # jinja2 templates are not always parsable as something else
     {"jinja2": "**/*.j2.*"},
     {"yaml": ".github/**/*.{yaml,yml}"},  # github workflows
-    {"text": "**/templates/**/*.*"},  # templates are likely not validable
+    {"text": "**/templates/**/*.*"},  # templates will probably not validate
     {"execution-environment": "**/execution-environment.yml"},
     {"ansible-lint-config": "**/.ansible-lint"},
     {"ansible-lint-config": "**/.ansible-lint.{yaml,yml}"},
@@ -91,7 +91,7 @@ BASE_KINDS = [
         "text/jinja2": "**/*.j2",
     },  # jinja2 templates are not always parsable as something else
     {"text/jinja2": "**/*.j2.*"},
-    {"text": "**/templates/**/*.*"},  # templates are likely not validable
+    {"text": "**/templates/**/*.*"},  # templates will likely not validate
     {"text/json": "**/*.json"},  # standardized
     {"text/markdown": "**/*.md"},  # https://tools.ietf.org/html/rfc7763
     {"text/rst": "**/*.rst"},  # https://en.wikipedia.org/wiki/ReStructuredText

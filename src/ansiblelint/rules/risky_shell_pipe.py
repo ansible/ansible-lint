@@ -33,7 +33,7 @@ class ShellWithoutPipefail(AnsibleLintRule):
     _pipefail_re = re.compile(r"^\s*set.*[+-][A-Za-z]*o\s*pipefail", re.MULTILINE)
     _pipe_re = re.compile(r"(?<!\|)\|(?!\|)")
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,

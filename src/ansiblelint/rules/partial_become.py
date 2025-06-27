@@ -61,7 +61,7 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule, TransformMixin):
         errors = []
         partial = "become_user" in data and "become" not in data
         if partial:
-            error = self.create_matcherror(
+            error = self.create_match_error(
                 message=self.shortdesc,
                 filename=file,
                 tag=f"{self.id}[play]",
@@ -70,7 +70,7 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule, TransformMixin):
             errors.append(error)
         return errors
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,
@@ -85,7 +85,7 @@ class BecomeUserWithoutBecomeRule(AnsibleLintRule, TransformMixin):
         errors = []
         partial = "become_user" in data and "become" not in data
         if partial:
-            error = self.create_matcherror(
+            error = self.create_match_error(
                 message=self.shortdesc,
                 filename=file,
                 tag=f"{self.id}[task]",

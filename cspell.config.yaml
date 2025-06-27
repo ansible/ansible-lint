@@ -5,11 +5,13 @@ dictionaryDefinitions:
     addWords: true
 dictionaries:
   # Use `cspell-cli trace word` to check where a work is defined
-  - en_US
   - bash
-  - words
+  - cpp
+  - en_US
+  - node
   - python
   - python-common
+  - words
 enabled: true
 ignorePaths:
   - cspell.config.yaml
@@ -23,3 +25,12 @@ ignorePaths:
   # Other
   - "*.svg"
   - ".vscode/**"
+  - build
+  - _readthedocs
+  - examples/playbooks/collections
+  - site
+  - test/schemas/node_modules
+  - .config/dictionary.txt
+  - "*.egg-info"
+  - junit.xml
+  - examples/broken/encoding.yml

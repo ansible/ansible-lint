@@ -48,7 +48,7 @@ class NoTabsRule(AnsibleLintRule):
         ("community.windows.win_lineinfile", "line"),
     ]
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,
@@ -58,7 +58,7 @@ class NoTabsRule(AnsibleLintRule):
         for k, v, _ in nested_items_path(task):
             if isinstance(k, str) and "\t" in k and not has_jinja(k):
                 result.append(
-                    self.create_matcherror(
+                    self.create_match_error(
                         message=self.shortdesc,
                         data=k,
                         filename=file,
@@ -71,7 +71,7 @@ class NoTabsRule(AnsibleLintRule):
                 and not has_jinja(v)
             ):
                 result.append(
-                    self.create_matcherror(
+                    self.create_match_error(
                         message=self.shortdesc,
                         data=v,
                         filename=file,

@@ -26,7 +26,7 @@ class IgnoreErrorsRule(AnsibleLintRule):
     tags = ["unpredictability"]
     version_changed = "5.0.7"
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,

@@ -119,7 +119,7 @@ class VariableNamingRule(AnsibleLintRule):
     ) -> MatchError | None:
         """Return a MatchError if the variable name is not valid, otherwise None."""
         if not isinstance(ident, str):  # pragma: no cover
-            return self.create_matcherror(
+            return self.create_match_error(
                 tag="var-naming[non-string]",
                 message="Variables names must be strings.",
                 filename=file,
@@ -131,7 +131,7 @@ class VariableNamingRule(AnsibleLintRule):
         try:
             ident.encode("ascii")
         except UnicodeEncodeError:
-            return self.create_matcherror(
+            return self.create_match_error(
                 tag="var-naming[non-ascii]",
                 message=f"Variables names must be ASCII. ({ident})",
                 filename=file,
@@ -139,7 +139,7 @@ class VariableNamingRule(AnsibleLintRule):
             )
 
         if keyword.iskeyword(ident):
-            return self.create_matcherror(
+            return self.create_match_error(
                 tag="var-naming[no-keyword]",
                 message=f"Variables names must not be Python keywords. ({ident})",
                 filename=file,
@@ -147,7 +147,7 @@ class VariableNamingRule(AnsibleLintRule):
             )
 
         if ident in self.reserved_names:
-            return self.create_matcherror(
+            return self.create_match_error(
                 tag="var-naming[no-reserved]",
                 message=f"Variables names must not be Ansible reserved names. ({ident})",
                 filename=file,
@@ -155,7 +155,7 @@ class VariableNamingRule(AnsibleLintRule):
             )
 
         if ident in self.read_only_names:
-            return self.create_matcherror(
+            return self.create_match_error(
                 tag="var-naming[read-only]",
                 message=f"This special variable is read-only. ({ident})",
                 filename=file,
@@ -169,7 +169,7 @@ class VariableNamingRule(AnsibleLintRule):
         if not bool(self.re_pattern.match(ident)) and (
             not prefix or not prefix.from_fqcn
         ):
-            return self.create_matcherror(
+            return self.create_match_error(
                 tag="var-naming[pattern]",
                 message=f"Variables names should match {self.re_pattern_str} regex. ({ident})",
                 filename=file,
@@ -182,7 +182,7 @@ class VariableNamingRule(AnsibleLintRule):
             and not has_jinja(prefix.value)
             and is_fqcn_or_name(prefix.value)
         ):
-            return self.create_matcherror(
+            return self.create_match_error(
                 tag="var-naming[no-role-prefix]",
                 message=f"Variables names from within roles should use {prefix.value}_ as a prefix.",
                 filename=file,
@@ -241,7 +241,7 @@ class VariableNamingRule(AnsibleLintRule):
 
         return results
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,
@@ -304,7 +304,7 @@ class VariableNamingRule(AnsibleLintRule):
 
         return results
 
-    def matchyaml(self, file: Lintable) -> list[MatchError]:
+    def match_file(self, file: Lintable) -> list[MatchError]:
         """Return matches for variables defined in vars files."""
         results: list[MatchError] = []
         raw_results: list[MatchError] = []
@@ -335,7 +335,7 @@ class VariableNamingRule(AnsibleLintRule):
                     if match.rule.id not in skip_list and match.tag not in skip_list:
                         results.append(match)
         else:
-            results.extend(super().matchyaml(file))
+            results.extend(super().match_file(file))
         return results
 
     def _parse_prefix(self, fqcn: str) -> Prefix:

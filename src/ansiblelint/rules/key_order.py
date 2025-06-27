@@ -86,7 +86,7 @@ class KeyOrderRule(AnsibleLintRule, TransformMixin):
         sorted_keys = sorted(keys, key=functools.cmp_to_key(task_property_sorter))
         if keys != sorted_keys:
             result.append(
-                self.create_matcherror(
+                self.create_match_error(
                     f"You can improve the play key order to: {', '.join(sorted_keys)}",
                     filename=file,
                     tag=f"{self.id}[play]",
@@ -96,7 +96,7 @@ class KeyOrderRule(AnsibleLintRule, TransformMixin):
             )
         return result
 
-    def matchtask(
+    def match_task(
         self,
         task: Task,
         file: Lintable | None = None,
@@ -107,7 +107,7 @@ class KeyOrderRule(AnsibleLintRule, TransformMixin):
         sorted_keys = sorted(keys, key=functools.cmp_to_key(task_property_sorter))
         if keys != sorted_keys:
             result.append(
-                self.create_matcherror(
+                self.create_match_error(
                     f"You can improve the task key order to: {', '.join(sorted_keys)}",
                     filename=file,
                     tag="key-order[task]",
