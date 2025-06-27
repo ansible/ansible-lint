@@ -74,6 +74,7 @@ class ValidateSchemaRule(AnsibleLintRule):
         "schema[meta-runtime]": "",
         "schema[molecule]": "",
         "schema[pattern]": "",
+        "schema[play-argspec]": "",
         "schema[playbook]": "",
         "schema[requirements]": "",
         "schema[role-arg-spec]": "",
@@ -381,6 +382,20 @@ if "pytest" in sys.modules:
                     r"\$ 'name' is a required property",
                 ],
                 id="pattern_negative",
+            ),
+            pytest.param(
+                "examples/play_argspecs/correct_play_argspec/patterns/example_pattern/playbooks/meta/site.yml",
+                "play-argspec",
+                [],
+                id="play_argspec_positive",
+            ),
+            pytest.param(
+                "examples/play_argspecs/incorrect_play_argspec/site.meta.yaml",
+                "play-argspec",
+                [
+                    r"\$.argument_specs.weather_check 'options' is a required property.",
+                ],
+                id="play_argspec_negative",
             ),
         ),
     )
