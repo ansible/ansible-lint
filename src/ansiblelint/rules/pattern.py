@@ -26,10 +26,11 @@ class PatternRule(AnsibleLintRule):
         "pattern[missing-readme]": "Missing README.md file in pattern directory.",
         "pattern[missing-meta]": "Missing meta directory in pattern directory.",
         "pattern[missing-playbook]": "Missing playbooks sub-directory in pattern directory.",
+        "pattern[mismatch-name]": "Pattern name does not match the name key in pattern.json file.",
     }
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
-        """Return matches found for a specific play (entry in playbook)."""
+        """Return matches found for a specific file."""
         if file.kind != "pattern":
             return []
         results = []
@@ -48,7 +49,6 @@ class PatternRule(AnsibleLintRule):
                     filename=file,
                 ),
             )
-            return results
 
         # Check the presence of required README.md file in a pattern directory
         readme_file = pattern_dir / "README.md"
@@ -63,16 +63,16 @@ class PatternRule(AnsibleLintRule):
                 ),
             )
 
-        # Validate that pattern name matches the name key in pattern.json file
+        # Validate that pattern name matches with the name key in pattern.json file
 
         # Check the presence of playbooks directory and file matching entries in the pattern.json file
         playbooks_dir = pattern_dir / "playbooks"
-        playbook = get_playbook_file(file)
         missing_playbook_items = []
 
         if not playbooks_dir.is_dir():
             missing_playbook_items.append("playbooks directory")
         else:
+            playbook = get_playbook_file(file)
             playbook_file = playbooks_dir / playbook
             if not playbook_file.exists():
                 missing_playbook_items.append("playbook file")
@@ -93,12 +93,18 @@ class PatternRule(AnsibleLintRule):
 
 def get_playbook_file(file: Any) -> str:
     """Extract the playbook file name from the pattern.json file."""
-    # update docstring
-    # try except block for both in here
     playbook: str = ""
-    with Path(file).open(encoding="utf-8") as f:
-        data = json.load(f)
-    playbook = data["aap_resources"]["controller_job_templates"][0]["playbook"]
+    try:
+        with Path(file).open(encoding="utf-8") as f:
+            data = json.load(f)
+        try:
+            playbook = data["aap_resources"]["controller_job_templates"][0]["playbook"]
+        except (KeyError, IndexError, TypeError) as exc:
+            msg = "Could not extract playbook name"
+            raise ValueError(msg) from exc
+    except FileNotFoundError as exc:
+        msg = "Pattern file not found."
+        raise FileNotFoundError(msg) from exc
     return playbook
 
 
