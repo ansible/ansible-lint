@@ -4,8 +4,6 @@
   "title": "Ansible Playbook Argspec Schema",
   "description": "See https://docs.ansible.com/ansible/latest/collections/ansible/builtin/validate_argument_spec_module.html",
   "examples": [
-    "extensions/patterns/*/playbooks/meta/*.yml",
-    "extensions/patterns/*/playbooks/meta/*.yaml",
     "**/*.meta.yml",
     "**/*.meta.yaml"
   ],
