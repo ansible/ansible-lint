@@ -3,10 +3,7 @@
   "$id": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/play-argspec.json",
   "title": "Ansible Playbook Argspec Schema",
   "description": "See https://docs.ansible.com/ansible/latest/collections/ansible/builtin/validate_argument_spec_module.html",
-  "examples": [
-    "**/*.meta.yml",
-    "**/*.meta.yaml"
-  ],
+  "examples": ["**/*.meta.yml", "**/*.meta.yaml"],
   "type": "object",
   "properties": {
     "short_description": {
