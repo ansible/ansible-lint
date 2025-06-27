@@ -54,6 +54,8 @@ DEFAULT_KINDS = [
     {"tasks": "**/tasks/**/*.{yaml,yml}"},
     {"rulebook": "**/rulebooks/*.{yml,yaml"},
     {"pattern": "**/extensions/patterns/*/meta/pattern.json"},
+    {"play-argspec": "**/patterns/*/playbooks/meta/*.{yaml,yml}"},
+    {"play-argspec": "**/*.meta.{yaml,yml}"},
     {"playbook": "**/playbooks/*.{yml,yaml}"},
     {"playbook": "**/*playbook*.{yml,yaml}"},
     {"playbook": "**/extensions/patterns/*/playbooks/*.{yml,yaml}"},
