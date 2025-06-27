@@ -23,10 +23,10 @@ class PatternRule(AnsibleLintRule):
     tags = ["metadata"]
     version_changed = "25.7.0"
     _ids = {
-        "pattern[missing-readme]": "Missing README.md file in pattern directory.",
         "pattern[missing-meta]": "Missing meta directory in pattern directory.",
-        "pattern[missing-playbook]": "Missing playbooks sub-directory in pattern directory.",
         "pattern[mismatch-name]": "Pattern name does not match the name key in pattern.json file.",
+        "pattern[missing-playbook]": "Missing playbooks sub-directory in pattern directory.",
+        "pattern[missing-readme]": "Missing README.md file in pattern directory.",
     }
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
@@ -64,6 +64,18 @@ class PatternRule(AnsibleLintRule):
             )
 
         # Validate that pattern name matches with the name key in pattern.json file
+        pattern_name_from_json_file = get_pattern_name(file.path)
+        pattern_name_from_dir = pattern_dir.name
+        if pattern_name_from_json_file != pattern_name_from_dir:
+            results.append(
+                self.create_matcherror(
+                    message=(
+                        f"Pattern directory name '{pattern_name_from_dir}' does not match the name key in pattern.json file: '{pattern_name_from_json_file}'."
+                    ),
+                    tag=f"{self.id}[mismatch-name]",
+                    filename=file,
+                ),
+            )
 
         # Check the presence of playbooks directory and file matching entries in the pattern.json file
         playbooks_dir = pattern_dir / "playbooks"
@@ -108,6 +120,23 @@ def get_playbook_file(file: Path) -> str:
     return playbook
 
 
+def get_pattern_name(file: Path) -> str:
+    """Extract the value associated with name key inside pattern.json file."""
+    pattern_name: str = ""
+    try:
+        with Path(file).open(encoding="utf-8") as f:
+            data = json.load(f)
+        try:
+            pattern_name = data["name"]
+        except KeyError as exc:
+            msg = "Could not extract pattern name value"
+            raise KeyError(msg) from exc
+    except FileNotFoundError as exc:
+        msg = "Pattern file not found."
+        raise FileNotFoundError(msg) from exc
+    return pattern_name
+
+
 if "pytest" in sys.modules:
     import pytest
 
@@ -128,6 +157,7 @@ if "pytest" in sys.modules:
                     "pattern[missing-meta]",
                     "pattern[missing-readme]",
                     "pattern[missing-playbook]",
+                    "pattern[mismatch-name]",
                 ],
                 id="invalid-pattern",
             ),
