@@ -111,6 +111,7 @@ nav:
       - rules/package-latest.md
       - rules/parser-error.md
       - rules/partial-become.md
+      - rules/pattern.md
       - rules/playbook-extension.md
       - rules/risky-file-permissions.md
       - rules/risky-octal.md
