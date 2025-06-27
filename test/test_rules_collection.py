@@ -173,5 +173,5 @@ def test_rules_id_format(config_options: Options) -> None:
             f"Rule {rule.id} must have at least one of:  .help, .description, .__doc__"
         )
     assert "yaml" in keys, "yaml rule is missing"
-    assert len(rules) == 51  # update this number when adding new rules!
+    assert len(rules) == 52  # update this number when adding new rules!
     assert len(keys) == len(rules), "Duplicate rule ids?"
