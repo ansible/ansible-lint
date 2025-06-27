@@ -41,6 +41,7 @@ ansiblelint
 apidoc
 apport
 argparsing
+argspec
 argspecs
 arxcruz
 audgirka

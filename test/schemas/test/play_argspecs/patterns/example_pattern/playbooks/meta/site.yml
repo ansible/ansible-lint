@@ -1,0 +1,114 @@
+# Valid play argspec
+---
+short_description: Advanced config management
+description: This playbook handles complex infrastructure deployments with comprehensive configuration options
+argument_specs:
+  deploy_infrastructure:
+    short_description: Deploy complete infrastructure stack
+    description:
+      - Deploys a multi-tier application infrastructure
+      - Configures web servers, databases, and load balancers
+    author:
+      - Infrastructure Team (@infra-team)
+      - DevOps Engineer (@devops-lead)
+    options:
+      environment:
+        type: str
+        required: true
+        choices:
+          - development
+          - staging
+          - production
+        description: Target deployment environment
+      web_server_count:
+        type: int
+        required: false
+        default: 2
+        description: Number of web servers to deploy
+      database_engine:
+        type: str
+        required: true
+        choices:
+          - postgresql
+          - mysql
+          - mongodb
+        description: Database engine to use
+      enable_ssl:
+        type: bool
+        required: false
+        default: true
+        description: Whether to enable SSL/TLS encryption
+    examples: |
+      # Basic deployment
+      - import_playbook: site.yml
+        vars:
+          environment: production
+          database_engine: postgresql
+          web_server_count: 3
+    return: ~
+  configure_monitoring:
+    short_description: Configure monitoring and alerting systems
+    description:
+      - Sets up comprehensive monitoring stack
+      - Configures alerting rules and notifications
+      - Integrates with external monitoring services
+    author:
+      - Monitoring Team (@monitoring-team)
+    options:
+      monitoring_stack:
+        type: str
+        required: true
+        choices:
+          - prometheus_grafana
+          - elk_stack
+        description: Monitoring stack to deploy
+      alert_channels:
+        type: list
+        required: false
+        default:
+          - email
+        description: Alert notification channels
+    examples: |
+      # Basic monitoring setup
+      - import_playbook: site.yml
+        vars:
+          monitoring_stack: prometheus_grafana
+          alert_channels:
+            - email
+            - slack
+    return: ~
+
+  security_hardening:
+    short_description: Apply security hardening configurations
+    description:
+      - Implements security best practices
+      - Configures firewalls and access controls
+      - Sets up vulnerability scanning
+    author:
+      - Security Team (@security-team)
+    options:
+      security_level:
+        type: str
+        required: true
+        choices:
+          - basic
+          - enhanced
+          - strict
+        description: Level of security hardening to apply
+      enable_firewall:
+        type: bool
+        required: false
+        default: true
+        description: Whether to configure host-based firewall
+      vulnerability_scanning:
+        type: bool
+        required: false
+        default: false
+        description: Enable automated vulnerability scanning
+    examples: |
+      # Basic security hardening
+      - import_playbook: site.yml
+        vars:
+          security_level: enhanced
+          enable_firewall: true
+    return: ~

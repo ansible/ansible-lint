@@ -41,6 +41,7 @@ project:
   [role/metadata.py](https://github.com/ansible/ansible/blob/devel/lib/ansible/playbook/role/metadata.py#L79))
   for details.
 - `schema[pattern]` validates Ansible patterns.
+- `schema[[play-argspec]]` validates Ansible playbook [argspec files](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/validate_argument_spec_module.html).
 - `schema[playbook]` validates Ansible playbooks.
 - `schema[requirements]` validates Ansible
   [requirements](https://docs.ansible.com/ansible/latest/galaxy/user_guide.html#install-multiple-collections-with-a-requirements-file)
