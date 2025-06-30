@@ -5,12 +5,12 @@ astroid==3.3.10           # via pylint
 asttokens==3.0.0          # via stack-data
 attrs==25.3.0             # via jsonschema, referencing
 babel==2.17.0             # via mkdocs-material
-backrefs==5.8             # via mkdocs-material
+backrefs==5.9             # via mkdocs-material
 beautifulsoup4==4.13.4    # via linkchecker, mkdocs-htmlproofer-plugin
 bindep==2.13.0            # via tox-extra
 black==25.1.0             # via ansible-lint (pyproject.toml)
 boolean-py==5.0           # via license-expression
-bracex==2.5.post1         # via wcmatch
+bracex==2.6               # via wcmatch
 cachetools==6.1.0         # via tox
 cairocffi==1.7.1          # via cairosvg
 cairosvg==2.7.1           # via mkdocs-ansible
@@ -52,10 +52,10 @@ jmespath==1.0.1           # via ansible-lint (pyproject.toml)
 jsmin==3.0.1              # via mkdocs-minify-plugin
 jsonschema==4.24.0        # via ansible-compat, ansible-lint (pyproject.toml)
 jsonschema-specifications==2025.4.1  # via jsonschema
-license-expression==30.4.1  # via ansible-lint (pyproject.toml)
+license-expression==30.4.3  # via ansible-lint (pyproject.toml)
 linkchecker==10.5.0       # via mkdocs-ansible
 markdown==3.8             # via markdown-include, mkdocs, mkdocs-autorefs, mkdocs-htmlproofer-plugin, mkdocs-material, mkdocstrings, pymdown-extensions
-markdown-exec==1.10.3     # via mkdocs-ansible
+markdown-exec==1.11.0     # via mkdocs-ansible
 markdown-include==0.8.1   # via mkdocs-ansible
 markupsafe==3.0.2         # via jinja2, mkdocs, mkdocs-autorefs, mkdocstrings
 matplotlib-inline==0.1.7  # via ipython
@@ -120,8 +120,8 @@ termcolor==3.1.0          # via mkdocs-macros-plugin, pytest-sugar
 tinycss2==1.4.0           # via cairosvg, cssselect2
 tomlkit==0.13.3           # via pylint
 tox==4.27.0               # via tox-extra, tox-uv, ansible-lint (pyproject.toml)
-tox-extra==2.1.1          # via ansible-lint (pyproject.toml)
-tox-uv==1.26.0            # via tox-extra, ansible-lint (pyproject.toml)
+tox-extra==2.2.0          # via ansible-lint (pyproject.toml)
+tox-uv==1.26.1            # via tox-extra, ansible-lint (pyproject.toml)
 traitlets==5.14.3         # via ipython, matplotlib-inline
 types-jsonschema==4.24.0.20250528  # via ansible-lint (pyproject.toml)
 types-pyyaml==6.0.12.20250516  # via ansible-lint (pyproject.toml)
