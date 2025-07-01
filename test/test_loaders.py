@@ -55,10 +55,13 @@ def test_load_ignore_txt_default_success() -> None:
         finally:
             os.chdir(cwd)
 
-    assert result == {"playbook2.yml":
-                      {IgnoreRule("package-latest", frozenset()),
-                       IgnoreRule("foo-bar", frozenset()),
-                       IgnoreRule("another-role", frozenset([IgnoreRuleQualifier.SKIP]))}}
+    assert result == {
+        "playbook2.yml": {
+            IgnoreRule("package-latest", frozenset()),
+            IgnoreRule("foo-bar", frozenset()),
+            IgnoreRule("another-role", frozenset([IgnoreRuleQualifier.SKIP])),
+        }
+    }
 
 
 def test_load_ignore_txt_default_success_alternative() -> None:
@@ -87,7 +90,10 @@ def test_load_ignore_txt_default_success_alternative() -> None:
             os.chdir(cwd)
 
     assert result == {
-        "playbook.yml": {IgnoreRule("more-foo", frozenset()), IgnoreRule("foo-bar", frozenset())},
+        "playbook.yml": {
+            IgnoreRule("more-foo", frozenset()),
+            IgnoreRule("foo-bar", frozenset()),
+        },
         "tasks/main.yml": {IgnoreRule("more-bar", frozenset())},
     }
 
@@ -103,9 +109,9 @@ def test_load_ignore_txt_custom_success() -> None:
                 dedent(
                     """
                     playbook.yml hector
-                    vars/main.yml tuco
-                    roles/guzman/tasks/main.yml lalo
-                    roles/eduardo/tasks/main.yml lalo
+                    vars/main.yml alpha
+                    roles/guzman/tasks/main.yml foo
+                    roles/eduardo/tasks/main.yml foo
                 """,
                 ),
             )
@@ -120,9 +126,9 @@ def test_load_ignore_txt_custom_success() -> None:
 
     assert result == {
         "playbook.yml": {IgnoreRule("hector", frozenset())},
-        "roles/eduardo/tasks/main.yml": {IgnoreRule("lalo", frozenset())},
-        "roles/guzman/tasks/main.yml": {IgnoreRule("lalo", frozenset())},
-        "vars/main.yml": {IgnoreRule("tuco", frozenset())},
+        "roles/eduardo/tasks/main.yml": {IgnoreRule("foo", frozenset())},
+        "roles/guzman/tasks/main.yml": {IgnoreRule("foo", frozenset())},
+        "vars/main.yml": {IgnoreRule("alpha", frozenset())},
     }
 
 

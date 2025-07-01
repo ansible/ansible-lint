@@ -81,6 +81,7 @@ def test_run_role_three_dir_deep(local_test_dir: Path) -> None:
     assert "Use shell only when shell functionality is required" in result.stdout
 
 
+@pytest.mark.libyaml
 def test_run_playbook(local_test_dir: Path) -> None:
     """Call ansible-lint the way molecule does."""
     cwd = local_test_dir / "roles" / "test-role"
@@ -174,6 +175,7 @@ def test_run_single_role_path_with_roles_path_env(local_test_dir: Path) -> None:
     assert "Use shell only when shell functionality is required" in result.stdout
 
 
+@pytest.mark.libyaml
 @pytest.mark.parametrize(
     ("result", "env"),
     (

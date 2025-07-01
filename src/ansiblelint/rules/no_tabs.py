@@ -82,9 +82,12 @@ class NoTabsRule(AnsibleLintRule):
 
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
+    import pytest
+
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
 
+    @pytest.mark.libyaml
     def test_no_tabs_rule(default_rules_collection: RulesCollection) -> None:
         """Test rule matches."""
         results = Runner(

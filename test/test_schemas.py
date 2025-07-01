@@ -47,10 +47,8 @@ def test_request_timeouterror_handling(
 ) -> None:
     """Test that schema refresh can handle time out errors."""
     error_msg = "Simulating handshake operation time out."
-    mock_request.urlopen.side_effect = (
-        urllib.error.URLError(  # pyright: ignore[reportAttributeAccessIssue]
-            TimeoutError(error_msg)
-        )
+    mock_request.urlopen.side_effect = urllib.error.URLError(  # pyright: ignore[reportAttributeAccessIssue]
+        TimeoutError(error_msg)
     )
     with caplog.at_level(logging.DEBUG):
         assert refresh_schemas(min_age_seconds=0) == 0

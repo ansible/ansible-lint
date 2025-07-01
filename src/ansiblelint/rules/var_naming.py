@@ -430,6 +430,7 @@ if "pytest" in sys.modules:
         for result in results:
             assert result.tag == "var-naming[no-role-prefix]"
 
+    @pytest.mark.libyaml
     def test_var_naming_with_role_prefix_plays(
         default_rules_collection: RulesCollection,
     ) -> None:

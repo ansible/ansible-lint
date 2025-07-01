@@ -299,6 +299,7 @@ def test_logger_debug(caplog: LogCaptureFixture) -> None:
     assert expected_info in caplog.record_tuples
 
 
+@pytest.mark.libyaml
 def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
     """Test that run without arguments it will detect and lint the entire repository."""
     cmd = [
@@ -339,7 +340,9 @@ def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
 def test_is_playbook() -> None:
     """Verify that we can detect a playbook as a playbook."""
     assert utils.is_playbook(filename="examples/playbooks/always-run-success.yml")
-    assert utils.is_playbook(filename="examples/playbooks/import-failed-syntax-check.yml")
+    assert utils.is_playbook(
+        filename="examples/playbooks/import-failed-syntax-check.yml"
+    )
     assert utils.is_playbook(filename="examples/playbooks/import_playbook_fqcn.yml")
 
 

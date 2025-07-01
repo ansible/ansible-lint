@@ -66,7 +66,9 @@ def test_playbook_noqa2(default_text_runner: RunFromText) -> None:
 
 def test_var_noqa(default_text_runner: RunFromText) -> None:
     """Check that noqa is properly taken into account on vars and tasks."""
-    results = default_text_runner.run(Path("examples/playbooks/vars/noqa_multiline.yml"))
+    results = default_text_runner.run(
+        Path("examples/playbooks/vars/noqa_multiline.yml")
+    )
     # Should raise no error at "SOME_VAR".
     assert len(results) == 0
 

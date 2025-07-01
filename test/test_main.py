@@ -202,7 +202,9 @@ def test_ro_venv() -> None:
         f"{venv_path}/bin/ansible-lint -vv --no-offline --project-dir ./examples/reqs_v2/ ./examples/reqs_v2/",
     ]
     for cmd in commands:
-        result = subprocess.run(cmd, capture_output=True, shell=True, text=True, check=False)
+        result = subprocess.run(
+            cmd, capture_output=True, shell=True, text=True, check=False
+        )
         assert result.returncode == 0, (
             f"Got {result.returncode} running {cmd}\n\tstderr: {result.stderr}\n\tstdout: {result.stdout}"
         )

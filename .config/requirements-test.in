@@ -1,3 +1,4 @@
+ansible-creator >=24.6.0
 black # IDE support
 coverage-enable-subprocess # see https://github.com/nedbat/coveragepy/issues/1341#issuecomment-1228942657
 coverage[toml] >= 6.4.4
@@ -16,7 +17,7 @@ pytest-mock
 pytest-plus >= 0.6
 pytest-sugar  # shows failures immediately, even with xdist
 pytest-xdist[psutil,setproctitle] >= 2.1.0
-ruamel-yaml-clib  # needed for mypy
+ruamel-yaml-clib; python_version < '3.14'  # needed for mypy
 ruamel.yaml>=0.18.11
 tox >= 4.0.0
 tox-extra>=2.1
