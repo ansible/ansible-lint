@@ -23,10 +23,10 @@ class PatternRule(AnsibleLintRule):
     tags = ["metadata"]
     version_changed = "25.7.0"
     _ids = {
-        "pattern[missing-meta]": "Missing meta directory in pattern directory.",
+        "pattern[missing-meta]": "Missing meta sub-directory in pattern directory.",
         "pattern[missing-playbook]": "Missing playbooks sub-directory in pattern directory.",
         "pattern[missing-readme]": "Missing README.md file in pattern directory.",
-        "pattern[name-mismatch]": "Pattern name does not match the name key in pattern.json file.",
+        "pattern[name-mismatch]": "Pattern directory name does not match the name value in pattern.json file.",
     }
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:

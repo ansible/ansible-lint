@@ -4,7 +4,7 @@ This rule aims to validate Ansible pattern directory structure.
 
 ## pattern[missing-meta]
 
-`pattern[missing-meta]` is triggered when a pattern.json specification file exists but the required meta directory is missing.
+`pattern[missing-meta]` is triggered when a pattern.json definition file exists but the parent meta directory (one level up from the pattern.json) is missing.
 
 ## pattern[missing-playbook]
 
@@ -16,4 +16,4 @@ This rule aims to validate Ansible pattern directory structure.
 
 ## pattern[name-mismatch]
 
-`pattern[name-mismatch]` is triggered when pattern name does not match with the name key in pattern.json file.
+`pattern[name-mismatch]` is triggered when the pattern directory name does not match the `name` field value in the pattern.json file.
