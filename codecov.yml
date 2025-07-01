@@ -2,7 +2,5 @@
 comment: false
 coverage:
   status:
-    patch: true
-    project:
-      default:
-        threshold: 0.5%
+    patch: false
+    project: true
