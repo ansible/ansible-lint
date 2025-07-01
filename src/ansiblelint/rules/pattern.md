@@ -17,3 +17,14 @@ This rule aims to validate Ansible pattern directory structure.
 ## pattern[name-mismatch]
 
 `pattern[name-mismatch]` is triggered when the pattern directory name does not match the `name` field value in the pattern.json file.
+
+## Usage
+
+To validate a pattern's directory structure: navigate to the collection directory, run ansible-lint on the pattern definition meta file, and review the validation results:
+
+```bash
+cd existing_collection
+ansible-lint extensions/patterns/sample_pattern/meta/pattern.json
+```
+
+This command will check the pattern directory structure and report any violations found.
