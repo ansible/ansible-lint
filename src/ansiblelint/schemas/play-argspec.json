@@ -1,0 +1,107 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/play-argspec.json",
+  "title": "Ansible Playbook Argspec Schema",
+  "description": "See https://docs.ansible.com/ansible/latest/collections/ansible/builtin/validate_argument_spec_module.html",
+  "examples": [
+    "extensions/patterns/*/playbooks/meta/*.yml",
+    "extensions/patterns/*/playbooks/meta/*.yaml",
+    "**/*.meta.yml",
+    "**/*.meta.yaml"
+  ],
+  "type": "object",
+  "properties": {
+    "short_description": {
+      "type": "string",
+      "description": "Brief description of the playbook"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the playbook"
+    },
+    "argument_specs": {
+      "type": "object",
+      "description": "Argument specifications for the playbook",
+      "minProperties": 1,
+      "patternProperties": {
+        "^[a-zA-Z_][a-zA-Z0-9_]*$": {
+          "type": "object",
+          "properties": {
+            "short_description": {
+              "type": "string",
+              "description": "Brief description of the argument spec"
+            },
+            "description": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Detailed description lines"
+            },
+            "author": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of authors"
+            },
+            "options": {
+              "type": "object",
+              "description": "Available options/parameters",
+              "patternProperties": {
+                "^[a-zA-Z_][a-zA-Z0-9_]*$": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "str",
+                        "int",
+                        "bool",
+                        "float",
+                        "list",
+                        "dict",
+                        "path",
+                        "raw"
+                      ],
+                      "description": "Parameter type"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "description": "Whether the parameter is required"
+                    },
+                    "default": {
+                      "description": "Default value for the parameter"
+                    },
+                    "choices": {
+                      "type": "array",
+                      "description": "Valid choices for the parameter"
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "Description of the parameter"
+                    }
+                  },
+                  "additionalProperties": true
+                }
+              },
+              "additionalProperties": false
+            },
+            "examples": {
+              "type": "string",
+              "description": "Usage examples in YAML format"
+            },
+            "return": {
+              "description": "Return value specification"
+            }
+          },
+          "required": ["short_description", "options", "examples"],
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["short_description", "description", "argument_specs"],
+  "additionalProperties": false
+}

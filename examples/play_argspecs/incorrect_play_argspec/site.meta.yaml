@@ -1,0 +1,8 @@
+# Violates json schema - missing required fields in argument spec
+---
+short_description: Weather forecast playbook
+description: Gets weather data from airport codes
+argument_specs:
+  weather_check:
+    short_description: Get weather info
+    # Missing required 'options' and 'examples' fields

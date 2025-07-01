@@ -33,15 +33,12 @@ jobs:
         uses: coactions/dynamic-matrix@v4
         with:
           min_python: "3.10"
-          max_python: "3.13"
-          default_python: "3.10"
+          max_python: "3.14"
+          default_python: "3.13"
           other_names: |
-            lint
-            pkg
+            lint-pkg-schemas-eco:tox -e lint;tox -e pkg;tox -e schemas;tox -e eco
             hook
             docs
-            schemas
-            eco
             pre
             py311-devel
             py310-lower
@@ -97,25 +94,18 @@ jobs:
           fetch-depth: 0 # needed by setuptools-scm
           submodules: true
 
-      - name: Set pre-commit cache
-        uses: actions/cache@v4
-        if: ${{ matrix.name == 'lint' }}
-        with:
-          path: |
-            ~/.cache/pre-commit
-          key: pre-commit-${{ matrix.name }}-${{ hashFiles('.pre-commit-config.yaml') }}
-
-      - name: Set ansible cache(s)
+      - name: Set build cache(s)
         uses: actions/cache@v4
         with:
           path: |
             .cache/eco
+            .tox
             examples/playbooks/collections/ansible_collections
-            ~/.cache/ansible-compat
             ~/.ansible/collections
             ~/.ansible/roles
-            .tox
-          key: ${{ matrix.name }}-${{ matrix.os }}--${{ hashFiles('tools/test-eco.sh', 'requirements.yml', 'examples/playbooks/collections/requirements.yml') }}
+            ~/.cache/ansible-compat
+            ~/.cache/pre-commit
+          key: ${{ matrix.name }}-${{ matrix.os }}--${{ hashFiles('.pre-commit-config.yaml', 'tools/test-eco.sh', 'requirements.yml', 'examples/playbooks/collections/requirements.yml') }}
 
       - name: Set up Python ${{ matrix.python_version || '3.10' }}
         if: "!contains(matrix.shell, 'wsl')"
@@ -162,7 +152,6 @@ jobs:
           include-hidden-files: true
           if-no-files-found: ignore
           path: |
-            .tox/**/.coverage*
             .tox/**/coverage.xml
 
       - name: Report failure if git reports dirty status
@@ -253,7 +242,7 @@ jobs:
 
       - name: Check for expected number of coverage.xml reports
         run: |
-          JOBS_PRODUCING_COVERAGE=10
+          JOBS_PRODUCING_COVERAGE=13
           if [ "$(find . -name coverage.xml | wc -l | bc)" -ne "${JOBS_PRODUCING_COVERAGE}" ]; then
             echo "::error::Number of coverage.xml files was not the expected one (${JOBS_PRODUCING_COVERAGE}): $(find . -name coverage.xml |xargs echo)"
             exit 1

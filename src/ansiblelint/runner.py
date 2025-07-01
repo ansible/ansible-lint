@@ -202,7 +202,7 @@ class Runner:
                     warn.category.__name__,
                     warn.message,
                 )
-        return matches
+        return sorted(matches)
 
     def _run(self) -> list[MatchError]:
         """Run the linting (inner loop)."""
@@ -269,7 +269,7 @@ class Runner:
 
             for lintable in self.lintables:
                 if (
-                    lintable.kind not in ("playbook", "role")
+                    lintable.kind not in ("playbook", "role", "pattern")
                     or lintable.stop_processing
                 ):
                     continue
@@ -307,7 +307,6 @@ class Runner:
                         break
         # remove duplicates from files list
         files = list(dict.fromkeys(files))
-
         for file in self.lintables:
             if (
                 file in self.checked_files
