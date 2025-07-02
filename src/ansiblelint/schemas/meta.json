@@ -479,11 +479,11 @@
               ]
             },
             "required": ["description"]
-          },  
+          },
           "else": {
             "$comment": "If standalone is false, then we have a collection role and only description is required",
             "required": ["description"]
-          },
+          }
         }
       ],
       "properties": {
