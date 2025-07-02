@@ -479,13 +479,13 @@
               ]
             },
             "required": ["description"]
-          }
+          },  
+          "else": {
+            "$comment": "If standalone is false, then we have a collection role and only description is required",
+            "required": ["description"]
+          },
         }
       ],
-      "else": {
-        "$comment": "If standalone is false, then we have a collection role and only description is required",
-        "required": ["description"]
-      },
       "properties": {
         "author": {
           "title": "Author",
@@ -1542,8 +1542,8 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "description": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html#using-role-dependencies",
   "examples": ["meta/main.yml"],
+  "additionalProperties": false,
   "properties": {
-    "additionalProperties": false,
     "allow_duplicates": {
       "title": "Allow Duplicates",
       "type": "boolean"
