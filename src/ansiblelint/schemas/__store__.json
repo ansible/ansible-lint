@@ -37,7 +37,7 @@
   },
   "pattern": {
     "etag": "610494e0d08e20f6869475f3b479dcae3d90e92d632d825fa934e2beb5f931c0",
-    "url": "https://raw.githubusercontent.com/ansible/pattern-service/main/specifications/pattern_specification.json"
+    "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/pattern.json"
   },
   "play-argspec": {
     "etag": "49c890f72dab5c43beae8dbeb93899059ccafbf8c63c2110c917ea10fd042538",
