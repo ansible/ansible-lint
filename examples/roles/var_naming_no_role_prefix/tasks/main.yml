@@ -1,0 +1,64 @@
+---
+# Test cases for var-naming[no-role-prefix] rules
+# - "global" variables (set_fact, register) should require role prefix
+# - task-scoped variables (vars) should not require role prefix
+#     (except include_role and import_role tasks)
+
+# register
+- name: Test register without role prefix (should fail)
+  ansible.builtin.command: echo "test"
+  register: bad_register_var
+  changed_when: false
+
+- name: Test register with role prefix (should pass)
+  ansible.builtin.command: echo "test"
+  register: var_naming_no_role_prefix_good_var
+  changed_when: false
+
+# set_fact
+- name: Test set_fact without role prefix (should fail)
+  ansible.builtin.set_fact:
+    bad_set_fact_var: "test"
+
+- name: Test set_fact with role prefix (should pass)
+  ansible.builtin.set_fact:
+    var_naming_no_role_prefix_good_var: "test"
+
+# vars
+- name: Test vars without role prefix (should pass)
+  ansible.builtin.debug:
+    msg: "{{ bad_vars_var }}"
+  vars:
+    bad_vars_var: "test"
+
+- name: Test vars with role prefix (should pass)
+  ansible.builtin.debug:
+    msg: "{{ var_naming_no_role_prefix_good_var }}"
+  vars:
+    var_naming_no_role_prefix_good_var: "test"
+
+# vars include_role
+- name: Test include_role vars without included role prefix (should fail)
+  ansible.builtin.include_role:
+    name: var_naming_pattern
+  vars:
+    bad_included_var: "test"
+
+- name: Test include_role vars with included role prefix (should pass)
+  ansible.builtin.include_role:
+    name: var_naming_pattern
+  vars:
+    var_naming_pattern_included_var: "test"
+
+# vars import_role
+- name: Test import_role vars without imported role prefix (should fail)
+  ansible.builtin.import_role:
+    name: var_naming_pattern
+  vars:
+    bad_imported_var: "test"
+
+- name: Test import_role vars with imported role prefix (should pass)
+  ansible.builtin.import_role:
+    name: var_naming_pattern
+  vars:
+    var_naming_pattern_imported_var: "test"
