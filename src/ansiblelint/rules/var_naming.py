@@ -248,23 +248,23 @@ class VariableNamingRule(AnsibleLintRule):
     ) -> list[MatchError]:
         """Return matches for task based variables."""
         results = []
-        prefix = Prefix()
+        task_prefix = Prefix()
+        role_prefix = Prefix()
         if file and file.parent and file.parent.kind == "role":
-            prefix = Prefix(file.parent.path.name)
+            role_prefix = Prefix(file.parent.path.name)
         ansible_module = task["action"]["__ansible_module__"]
         # If the task uses the 'vars' section to set variables
+        # only check role prefix for include_role and import_role tasks 'vars'
         our_vars = task.get("vars", {})
         if ansible_module in ("include_role", "import_role"):
             action = task["action"]
             if isinstance(action, dict):
                 role_fqcn = action.get("name", "")
-                prefix = self._parse_prefix(role_fqcn)
-        else:
-            prefix = Prefix()
+                task_prefix = self._parse_prefix(role_fqcn)
         for key in our_vars:
             match_error = self.get_var_naming_matcherror(
                 key,
-                prefix=prefix,
+                prefix=task_prefix,
                 file=file or Lintable(""),
             )
             if match_error:
@@ -281,7 +281,7 @@ class VariableNamingRule(AnsibleLintRule):
             ):
                 match_error = self.get_var_naming_matcherror(
                     key,
-                    prefix=prefix,
+                    prefix=role_prefix,
                     file=file or Lintable(""),
                 )
                 if match_error:
@@ -294,7 +294,7 @@ class VariableNamingRule(AnsibleLintRule):
         if registered_var:
             match_error = self.get_var_naming_matcherror(
                 registered_var,
-                prefix=prefix,
+                prefix=role_prefix,
                 file=file or Lintable(""),
             )
             if match_error:
@@ -495,3 +495,24 @@ if "pytest" in sys.modules:
         result = run_ansible_lint(role_path)
         assert result.returncode == RC.SUCCESS
         assert "var-naming" not in result.stdout
+
+    def test_var_naming_register_set_fact_in_roles(
+        default_rules_collection: RulesCollection,
+    ) -> None:
+        """Test register and set_fact variable naming in roles."""
+        results = Runner(
+            Lintable("examples/roles/var_naming_no_role_prefix/tasks/main.yml"),
+            rules=default_rules_collection,
+        ).run()
+        expected_errors = [
+            ("var-naming[no-role-prefix]", "register: bad_register_var"),
+            ("var-naming[no-role-prefix]", "set_fact: bad_set_fact_var"),
+            ("var-naming[no-role-prefix]", "vars: bad_included_var"),
+            ("var-naming[no-role-prefix]", "vars: bad_imported_var"),
+        ]
+        # Filter only var-naming errors
+        # var_naming_errors = [r for r in results if r.rule.id == "var-naming"]
+        assert len(results) == len(expected_errors)
+        for idx, result in enumerate(results):
+            assert result.tag == expected_errors[idx][0]
+            assert expected_errors[idx][1] in result.message
