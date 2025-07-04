@@ -66,7 +66,7 @@ class App:
         # pylint: disable=import-outside-toplevel
         from ansiblelint.yaml_utils import load_yamllint_config
 
-        self.yamllint_config = load_yamllint_config()
+        self.yamllint_config = load_yamllint_config(options.yamllint_file)
 
     def render_matches(self, matches: list[MatchError]) -> None:
         """Display given matches (if they are not fixed)."""
