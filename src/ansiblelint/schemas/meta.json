@@ -441,24 +441,20 @@
       "if": {
         "$comment": "standalone is present and true",
         "properties": {
-           "standalone": {
+          "standalone": {
             "const": true
           }
         },
-        "required": [ "standalone" ]
+        "required": ["standalone"]
       },
       "then": {
         "$comment": "Standalone role, so we require several fields.",
-        "required": [
-          "author",
-          "license",
-          "min_ansible_version"
-        ]
+        "required": ["author", "license", "min_ansible_version"]
       },
       "else": {
         "$comment": "standalone absent or false, some props are not required, but they are not forbidden either? if so, say nothing"
       },
-      "required": [ "description" ],
+      "required": ["description"],
       "properties": {
         "author": {
           "title": "Author",
