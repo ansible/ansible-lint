@@ -452,7 +452,16 @@
         "required": ["author", "license", "min_ansible_version"]
       },
       "else": {
-        "$comment": "standalone absent or false, some props are not required, but they are not forbidden either? if so, say nothing"
+        "$comment": "standalone absent or false, let's say some props are forbidden.",
+        "allOf": [
+          { "not": {"required": ["cloud_platform"] } },
+          { "not": {"required": ["galaxy_tags"] } },
+          { "not": {"required": ["min_ansible_version"] } },
+          { "not": {"required": ["namespace"] } },
+          { "not": {"required": ["platforms"] } },
+          { "not": {"required": ["role_name"] } },
+          { "not": {"required": ["video_links"] } }
+        ]
       },
       "required": ["description"],
       "properties": {
