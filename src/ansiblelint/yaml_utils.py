@@ -86,19 +86,25 @@ def deannotate(data: Any) -> Any:
     return data
 
 
-def load_yamllint_config() -> CustomYamlLintConfig:
+def load_yamllint_config(yamllint_file: Path | None = None) -> CustomYamlLintConfig:
     """Load our default yamllint config and any customized override file."""
     config = CustomYamlLintConfig(file=Path(__file__).parent / "data" / ".yamllint")
     config.incompatible = ""
-    # if we detect local yamllint config we use it but raise a warning
+    # Declare local yamllint config file locations.
+    # If we detect local yamllint config we use it but raise a warning
     # as this is likely to get out of sync with our internal config.
-    for path in [
+    yamllint_config_locations = [
         ".yamllint",
         ".yamllint.yaml",
         ".yamllint.yml",
         os.getenv("YAMLLINT_CONFIG_FILE", ""),
         os.getenv("XDG_CONFIG_HOME", "~/.config") + "/yamllint/config",
-    ]:
+    ]
+    if yamllint_file:
+        # Ensure the CLI option yamllint_file config is the first
+        # file to be loaded
+        yamllint_config_locations.insert(0, str(yamllint_file))
+    for path in yamllint_config_locations:
         file = Path(path).expanduser()
         if file.is_file():
             _logger.debug(
