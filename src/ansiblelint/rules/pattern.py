@@ -7,14 +7,16 @@ import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule, TransformMixin
 
 if TYPE_CHECKING:
+    from ruamel.yaml.comments import CommentedMap, CommentedSeq
+
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
 
-class PatternRule(AnsibleLintRule):
+class PatternRule(AnsibleLintRule, TransformMixin):
     """Rule for checking pattern directory."""
 
     id = "pattern"
@@ -103,6 +105,30 @@ class PatternRule(AnsibleLintRule):
             )
 
         return results
+
+    def transform(
+        self,
+        match: MatchError,
+        lintable: Lintable,
+        data: CommentedMap | CommentedSeq | str,
+    ) -> None:
+        """Transform pattern.json to fix name-mismatch validation issues."""
+        if match.tag == f"{self.id}[name-mismatch]":
+            # Get the pattern directory name from the file path
+            # pattern.json should be located at: pattern_dir/meta/pattern.json
+            pattern_dir = lintable.path.parent.parent.name
+
+            # For JSON files, data is a string, so we need to parse it
+            if isinstance(data, str):
+                pattern_data = json.loads(data)
+                pattern_data["name"] = pattern_dir
+                lintable.content = json.dumps(pattern_data, indent=2)
+            else:
+                # For YAML files, data is CommentedMap/CommentedSeq
+                # This shouldn't happen for pattern.json, but just in case
+                data["name"] = pattern_dir
+
+            match.fixed = True
 
 
 def values_from_pattern_json(file: Path) -> list[str]:

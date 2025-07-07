@@ -40,7 +40,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/pattern.json"
   },
   "play-argspec": {
-    "etag": "49c890f72dab5c43beae8dbeb93899059ccafbf8c63c2110c917ea10fd042538",
+    "etag": "b418c4edcf2a44f0534321e0b38b6b7fb3f73a87c4f6ea18cab15e4b3f53bd20",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/play-argspec.json"
   },
   "playbook": {
