@@ -676,6 +676,7 @@
     },
     "play-argspec": {
       "type": "object",
+      "examples": ["**/*.meta.yml", "**/*.meta.yaml"],
       "properties": {
         "short_description": {
           "type": "string",
