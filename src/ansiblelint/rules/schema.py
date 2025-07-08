@@ -384,7 +384,7 @@ if "pytest" in sys.modules:
                 id="pattern_negative",
             ),
             pytest.param(
-                "examples/play_argspecs/correct_play_argspec/patterns/example_pattern/playbooks/meta/site.yml",
+                "examples/play_argspecs/correct_play_argspec/patterns/example_pattern/playbooks/site.meta.yml",
                 "play-argspec",
                 [],
                 id="play_argspec_positive",
