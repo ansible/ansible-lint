@@ -3,15 +3,20 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
+from unittest import mock
 
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
+from ansiblelint.runner import get_matches
+from ansiblelint.transformer import Transformer
 
 if TYPE_CHECKING:
     from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
+    from ansiblelint.config import Options
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
@@ -190,3 +195,36 @@ if "pytest" in sys.modules:
         for index, result in enumerate(results):
             assert result.rule.id == PatternRule.id, result
             assert result.tag == expected[index]
+
+    @pytest.mark.libyaml
+    @mock.patch.dict(os.environ, {"ANSIBLE_LINT_WRITE_TMP": "1"}, clear=True)
+    def test_pattern_transform(
+        config_options: Options,
+    ) -> None:
+        """Test transform functionality for pattern rule."""
+        pattern_file = Path(
+            "examples/collections/extensions/patterns/transform_pattern/meta/pattern.json"
+        )
+        config_options.write_list = ["pattern"]
+        rules = RulesCollection(options=config_options)
+        rules.register(PatternRule())
+
+        config_options.lintables = [str(pattern_file)]
+        runner_result = get_matches(rules=rules, options=config_options)
+        transformer = Transformer(result=runner_result, options=config_options)
+        transformer.run()
+
+        matches = runner_result.matches
+        assert len(matches) == 3
+
+        orig_content = pattern_file.read_text(encoding="utf-8")
+        transformed_content = pattern_file.with_suffix(
+            f".tmp{pattern_file.suffix}"
+        ).read_text(
+            encoding="utf-8",
+        )
+
+        assert orig_content != transformed_content
+        transformed_name = json.loads(transformed_content)["name"]
+        assert transformed_name == "transform_pattern"
+        pattern_file.with_suffix(f".tmp{pattern_file.suffix}").unlink()
