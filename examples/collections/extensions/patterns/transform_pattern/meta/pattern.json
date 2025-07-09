@@ -4,10 +4,7 @@
   "title": "Weather Forecasting",
   "description": "This pattern is designed to help get the weather forecast for a given airport code. It creates a project, EE, and job templates in automation controller to get the weather forecast.",
   "short_description": "This pattern is designed to help get the weather forecast for a given airport code.",
-  "tags": [
-    "weather",
-    "forecasting"
-  ],
+  "tags": ["weather", "forecasting"],
   "aap_resources": {
     "controller_project": {
       "name": "Weather Forecasting",
@@ -19,10 +16,7 @@
       "image_name": "weather-demo-ee",
       "pull": "missing"
     },
-    "controller_labels": [
-      "weather",
-      "forecasting"
-    ],
+    "controller_labels": ["weather", "forecasting"],
     "controller_job_templates": [
       {
         "name": "Get Weather Forecast",
@@ -30,10 +24,7 @@
         "execution_environment": "Weather Forecasting",
         "playbook": "site.yml",
         "primary": true,
-        "labels": [
-          "weather",
-          "forecasting"
-        ],
+        "labels": ["weather", "forecasting"],
         "survey": {
           "name": "Weather Forecasting",
           "description": "Survey to configure the weather forecasting pattern",
