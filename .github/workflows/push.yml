@@ -1,5 +1,5 @@
 ---
-# See https://github.com/ansible/devtools/blob/main/.github/workflows/push.yml
+# See https://github.com/ansible/team-devtools/blob/main/.github/workflows/push.yml
 name: push
 "on":
   push:
