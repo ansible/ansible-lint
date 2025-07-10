@@ -8,8 +8,8 @@ import re
 from typing import TYPE_CHECKING, Any
 
 import yaml
+from jsonschema import Draft202012Validator
 from jsonschema.exceptions import ValidationError
-from jsonschema.validators import validator_for
 
 from ansiblelint.loaders import yaml_load_safe
 from ansiblelint.schemas.__main__ import JSON_SCHEMAS, _schema_cache
@@ -55,10 +55,9 @@ def validate_file_schema(file: Lintable) -> list[str]:
         json_data = json.loads(json.dumps(yaml_data))
         schema = _schema_cache[file.kind]
 
-        validator = validator_for(schema)
-        v = validator(schema)
+        validator = Draft202012Validator(schema)
         try:
-            error = next(v.iter_errors(json_data))
+            error = next(validator.iter_errors(json_data))
         except StopIteration:
             return []
         if error.context:
