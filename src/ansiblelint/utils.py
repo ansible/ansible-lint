@@ -201,7 +201,6 @@ def ansible_template(
     re_valid_filter = re.compile(r"^\w+(\.\w+\.\w+)?$")
     templar = ansible_templar(basedir=basedir, templatevars=templatevars)
 
-    kwargs["disable_lookups"] = True
     for _i in range(10):
         try:
             if TrustedAsTemplate and not isinstance(varname, TrustedAsTemplate):

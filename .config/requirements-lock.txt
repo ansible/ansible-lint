@@ -6,7 +6,7 @@ black==25.1.0             # via ansible-lint (pyproject.toml)
 bracex==2.6               # via wcmatch
 cffi==1.17.1              # via cryptography
 click==8.2.1              # via black
-cryptography==45.0.4      # via ansible-core
+cryptography==45.0.5      # via ansible-core
 filelock==3.18.0          # via ansible-lint (pyproject.toml)
 importlib-metadata==8.7.0  # via ansible-lint (pyproject.toml)
 jinja2==3.1.6             # via ansible-core
@@ -20,7 +20,7 @@ platformdirs==4.3.8       # via black
 pycparser==2.22           # via cffi
 pyyaml==6.0.2             # via ansible-compat, ansible-core, yamllint, ansible-lint (pyproject.toml)
 referencing==0.36.2       # via jsonschema, jsonschema-specifications, ansible-lint (pyproject.toml)
-rpds-py==0.25.1           # via jsonschema, referencing
+rpds-py==0.26.0           # via jsonschema, referencing
 ruamel-yaml==0.18.14      # via ansible-lint (pyproject.toml)
 subprocess-tee==0.4.2     # via ansible-compat, ansible-lint (pyproject.toml)
 wcmatch==10.1             # via ansible-lint (pyproject.toml)

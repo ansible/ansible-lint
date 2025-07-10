@@ -299,7 +299,8 @@ class App:
         summary.sort()
 
         if changed_files_count:
-            console_stderr.print(f"Modified {changed_files_count} files.")
+            file_word = "file" if changed_files_count == 1 else "files"
+            console_stderr.print(f"Modified {changed_files_count} {file_word}.")
 
         # determine which profile passed
         summary.passed_profile = ""
