@@ -15,7 +15,7 @@ bracex==2.6               # via wcmatch
 cachetools==6.1.0         # via tox
 cairocffi==1.7.1          # via cairosvg
 cairosvg==2.7.1           # via mkdocs-ansible
-certifi==2025.7.9         # via requests
+certifi==2025.7.14         # via requests
 cffi==1.17.1              # via cairocffi, cryptography
 chardet==5.2.0            # via tox
 charset-normalizer==3.4.2  # via requests
@@ -29,7 +29,7 @@ cssselect2==0.8.0         # via cairosvg
 decorator==5.2.1          # via ipdb, ipython
 defusedxml==0.7.1         # via cairosvg
 dill==0.4.0               # via pylint
-distlib==0.3.9            # via virtualenv
+distlib==0.4.0            # via virtualenv
 distro==1.9.0             # via bindep
 dnspython==2.7.0          # via linkchecker
 execnet==2.1.1            # via pytest-xdist
