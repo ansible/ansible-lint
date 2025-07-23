@@ -1,0 +1,29 @@
+---
+- name: Test lookup playbook for template() function
+  hosts: localhost
+  gather_facts: false
+  vars:
+    # File lookup example
+    config_content: "{{ lookup('env', 'HOME') }}"
+
+    # Environment variable lookup
+    current_user: "{{ lookup('env', 'USER') }}"
+
+    # Lookup with default value
+    optional_port: "{{ lookup('env', 'TEST_PORT', default='8080') }}"
+
+  tasks:
+    - name: Display environment variable via lookup
+      ansible.builtin.debug:
+        msg: "Current user: {{ current_user }}"
+
+    - name: Use lookup in task
+      ansible.builtin.set_fact:
+        app_config:
+          port: "{{ lookup('env', 'APP_PORT', default='3000') }}"
+          home: "{{ lookup('env', 'HOME') }}"
+
+    - name: Conditional task with lookup
+      ansible.builtin.debug:
+        msg: "Debug mode enabled"
+      when: lookup('env', 'DEBUG', default='false') | bool
