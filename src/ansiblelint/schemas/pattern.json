@@ -2,7 +2,6 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Ansible Pattern Schema",
   "description": "A schema for validating Ansible pattern definitions",
-  "examples": [],
   "x-ansible-lint": ["extensions/patterns/*/meta/pattern.json"],
   "type": "object",
   "required": [
