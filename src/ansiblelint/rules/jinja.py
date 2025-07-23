@@ -321,7 +321,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
             )
         return tokens
 
-    def unlex(self, tokens: list[Token]) -> str:
+    def unlex(self, tokens: list[Token], original_line_ending: str | None = None) -> str:
         """Return original text by compiling the lex output."""
         result = ""
         last_lineno = 1
@@ -332,7 +332,13 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
             result += value
             last_lineno = lineno
             last_value = value
+        
+        # Preserve original line endings if they were different from \n
+        if original_line_ending and original_line_ending != "\n":
+            result = result.replace("\n", original_line_ending)
+        
         return result
+
 
     # pylint: disable=too-many-locals
     def check_whitespace(
@@ -363,6 +369,16 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
             if not implicit:
                 return value
             return value[3:-3]
+
+        # Detect original line ending style to preserve it
+        original_line_ending = None
+        if "\r\n" in text:
+            original_line_ending = "\r\n"
+        elif "\r" in text:
+            original_line_ending = "\r"
+        elif "\n" in text:
+            original_line_ending = "\n"
+
 
         tokens = []
         details = ""
@@ -443,7 +459,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
             return uncook(text, implicit=implicit), "", "spacing"
 
         # finalize
-        reformatted = self.unlex(tokens)
+        reformatted = self.unlex(tokens, original_line_ending)
         failed = reformatted != text
         reformatted = uncook(reformatted, implicit=implicit)
         details = (
@@ -782,6 +798,13 @@ if "pytest" in sys.modules:
                 "foo\rbar",
                 "spacing",
                 id="45",
+            ),
+            # Windows line endings (\r\n) in jinja templates should be preserved
+            pytest.param(
+                "Created on {{ '%Y-%m-%d %H:%M:%S %Z' | strftime }}.\r\n",
+                "Created on {{ '%Y-%m-%d %H:%M:%S %Z' | strftime }}.\r\n",
+                "spacing",
+                id="46",
             ),
         ),
     )
