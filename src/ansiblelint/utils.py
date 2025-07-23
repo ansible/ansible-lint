@@ -63,6 +63,7 @@ from ansible.plugins.loader import (
 )
 from ansible.template import Templar
 from ansible.utils.collection_loader import AnsibleCollectionConfig
+from packaging.version import Version
 from yaml.composer import Composer
 from yaml.parser import ParserError
 from yaml.representer import RepresenterError
@@ -73,7 +74,7 @@ from ansiblelint._internal.rules import (
     RuntimeErrorRule,
 )
 from ansiblelint.app import App, get_app
-from ansiblelint.config import Options, options
+from ansiblelint.config import Options, get_deps_versions, options
 from ansiblelint.constants import (
     ANNOTATION_KEYS,
     FILENAME_KEY,
@@ -200,6 +201,13 @@ def ansible_template(
     re_filter_in_err = re.compile(r"Could not load \"(\w+)\"")
     re_valid_filter = re.compile(r"^\w+(\.\w+\.\w+)?$")
     templar = ansible_templar(basedir=basedir, templatevars=templatevars)
+
+    # Skip lookups for ansible-core >= 2.19; use disable_lookups for older versions
+    if "lookup" in varname:
+        deps = get_deps_versions()
+        if deps["ansible-core"] and deps["ansible-core"] >= Version("2.19"):
+            return varname
+        kwargs["disable_lookups"] = True
 
     for _i in range(10):
         try:
