@@ -371,13 +371,11 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
             return value[3:-3]
 
         # Detect original line ending style to preserve it
+        # Only preserve \r\n (Windows CRLF), let \r (Mac classic) be normalized to \n
+        # as per jinja 3.0.0 behavior (see test case 44)
         original_line_ending = None
         if "\r\n" in text:
             original_line_ending = "\r\n"
-        elif "\r" in text:
-            original_line_ending = "\r"
-        elif "\n" in text:
-            original_line_ending = "\n"
 
 
         tokens = []
@@ -799,7 +797,7 @@ if "pytest" in sys.modules:
                 "spacing",
                 id="45",
             ),
-            # Windows line endings (\r\n) in jinja templates should be preserved
+            # Windows line endings (\r\n) should be preserved, but \r alone should normalize to \n
             pytest.param(
                 "Created on {{ '%Y-%m-%d %H:%M:%S %Z' | strftime }}.\r\n",
                 "Created on {{ '%Y-%m-%d %H:%M:%S %Z' | strftime }}.\r\n",
