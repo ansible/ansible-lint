@@ -321,7 +321,9 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
             )
         return tokens
 
-    def unlex(self, tokens: list[Token], original_line_ending: str | None = None) -> str:
+    def unlex(
+        self, tokens: list[Token], original_line_ending: str | None = None
+    ) -> str:
         """Return original text by compiling the lex output."""
         result = ""
         last_lineno = 1
@@ -332,13 +334,12 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
             result += value
             last_lineno = lineno
             last_value = value
-        
+
         # Preserve original line endings if they were different from \n
         if original_line_ending and original_line_ending != "\n":
             result = result.replace("\n", original_line_ending)
-        
-        return result
 
+        return result
 
     # pylint: disable=too-many-locals
     def check_whitespace(
@@ -378,7 +379,6 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
             original_line_ending = "\r"
         elif "\n" in text:
             original_line_ending = "\n"
-
 
         tokens = []
         details = ""
