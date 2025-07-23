@@ -5,6 +5,8 @@ import platform
 import subprocess
 import sys
 import warnings
+from collections.abc import Callable
+from importlib.metadata import version
 from importlib.util import find_spec
 from pathlib import Path
 
@@ -23,6 +25,7 @@ if missing:
         reason=f"FATAL: Missing modules: {', '.join(missing)} -- probably you missed installing test requirements with: pip install -e '.[test]'",
         returncode=1,
     )
+ansible_core_version = version("ansible-core")
 
 
 # See: https://github.com/pytest-dev/pytest/issues/1402#issuecomment-186299177
@@ -92,3 +95,9 @@ def pytest_runtest_setup(item: pytest.Item) -> None:
     """Filters some tests if libyaml is not available."""
     if not HAS_LIBYAML and list(item.iter_markers("libyaml")):
         pytest.skip("skipped because libyaml is not installed")
+
+
+@pytest.fixture(autouse=True)
+def record_test_core_version(record_property: Callable[[str, object], None]) -> None:
+    """Inject ansible-core version into the tests (junit reports)."""
+    record_property("ansible_core", ansible_core_version)
