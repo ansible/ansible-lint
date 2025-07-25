@@ -200,10 +200,11 @@ def ansible_template(
     re_filter_fqcn = re.compile(r"\w+\.\w+\.\w+")
     re_filter_in_err = re.compile(r"Could not load \"(\w+)\"")
     re_valid_filter = re.compile(r"^\w+(\.\w+\.\w+)?$")
+    re_lookup_functions = re.compile(r"\b(lookup|query|q)\s*\(")
     templar = ansible_templar(basedir=basedir, templatevars=templatevars)
 
     # Skip lookups for ansible-core >= 2.19; use disable_lookups for older versions
-    if "lookup" in varname:
+    if re_lookup_functions.search(str(varname)):
         deps = get_deps_versions()
         if deps["ansible-core"] and deps["ansible-core"] >= Version("2.19"):
             return varname

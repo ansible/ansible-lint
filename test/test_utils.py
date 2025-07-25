@@ -294,6 +294,22 @@ def test_template(template: str, output: str) -> None:
             True,
             id="lookup_with_text",
         ),
+        pytest.param(
+            "{{ query('env', 'HOME') }}",
+            True,
+            id="query_function_call",
+        ),
+        pytest.param(
+            "{{ q('file', 'config.txt') }}",
+            True,
+            id="q_function_call",
+        ),
+        # query() with whitespace - should still be detected, will throw spacing errors
+        pytest.param(
+            "{{ query  ('dict', my_var) }}",
+            True,
+            id="query_function_with_whitespace",
+        ),
     ),
 )
 def test_template_lookup_behavior(template: str, has_lookup: bool) -> None:
