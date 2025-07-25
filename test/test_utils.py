@@ -310,6 +310,21 @@ def test_template(template: str, output: str) -> None:
             True,
             id="query_function_with_whitespace",
         ),
+        pytest.param(
+            "{{ some_filter(lookup('env', 'USER')) }}",
+            True,
+            id="nested_with_filter",
+        ),
+        pytest.param(
+            "{{ (query)('dict', my_var) }}",
+            True,
+            id="query_with_parentheses",
+        ),
+        pytest.param(
+            "{{ (q)('env', 'HOME') }}",
+            True,
+            id="q_with_parentheses",
+        ),
     ),
 )
 def test_template_lookup_behavior(template: str, has_lookup: bool) -> None:
