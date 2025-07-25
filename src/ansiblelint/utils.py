@@ -181,9 +181,9 @@ def has_lookup_calls(varname: str) -> bool:
 
     try:
         env = Environment(autoescape=True)
-        ast = env.parse(varname)
+        ast_tree = env.parse(varname)
 
-        for node in ast.find_all(nodes.Call):
+        for node in ast_tree.find_all(nodes.Call):
             if isinstance(node.node, nodes.Name) and node.node.name in lookup_names:
                 return True
     except (TemplateSyntaxError, TemplateError, AttributeError):
