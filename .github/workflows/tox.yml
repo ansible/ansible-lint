@@ -71,6 +71,16 @@ jobs:
           args: .ansible-lint
           working_directory: docs
           expected_return_code: "2" # expected to fail because the given argument does not exist in this folder
+      - name: Test explicit ref override
+        uses: ./
+        with:
+          args: .ansible-lint
+          gh_action_ref: "v25.5.0"  # Test explicit ref parameter
+      - name: Test without explicit ref (should use github.action_ref)
+        uses: ./
+        with:
+          args: .ansible-lint
+          # This should use github.action_ref automatically
   build:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os || 'ubuntu-24.04' }}

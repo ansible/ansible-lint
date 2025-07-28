@@ -13,7 +13,7 @@ inputs:
   setup_python:
     description: If false, this action will not setup python and will instead rely on the already installed python.
     required: false
-    default: true
+    default: "true"
   working_directory:
     description: The directory where to run ansible-lint from. Default is `github.workspace`.
     required: false
@@ -47,11 +47,12 @@ runs:
     # This allows a user to override it using the input variable
     - name: Determine github action ref
       shell: bash
+      env:
+        GH_ACTION_REF_INPUT: ${{ inputs.gh_action_ref }}
+        GITHUB_ACTION_REF: ${{ github.action_ref }}
       run: |
-        action_ref="${{ inputs.gh_action_ref }}"
-        if [[ -z "${{ inputs.gh_action_ref }}" ]]; then
-          action_ref="${{ github.action_ref || 'main' }}"
-        fi
+        action_ref="${GH_ACTION_REF_INPUT:-${GITHUB_ACTION_REF:-main}}"
+        echo "Using ansible-lint ref: $action_ref"
         echo "ACTION_REF=${action_ref}" >> "$GITHUB_ENV"
 
     # Due to GHA limitation, caching works only for files within GITHUB_WORKSPACE
