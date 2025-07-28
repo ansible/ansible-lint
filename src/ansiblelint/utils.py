@@ -168,7 +168,7 @@ def mock_filter(left: Any, *args: Any, **kwargs: Any) -> Any:  # noqa: ARG001
     return left
 
 
-def has_lookup_calls(varname: str) -> bool:
+def has_lookup_function_calls(varname: str) -> bool:
     """Check if a template string contains lookup, query, or q function calls using AST parsing.
 
     This function parses Jinja2 templates and looks for function calls to
@@ -230,7 +230,7 @@ def ansible_template(
     deps = get_deps_versions()
 
     # Skip lookups for ansible-core >= 2.19; use disable_lookups for older versions
-    if has_lookup_calls(str(varname)):
+    if has_lookup_function_calls(str(varname)):
         if deps["ansible-core"] and deps["ansible-core"] >= ansible_core_2_19:
             return varname
         kwargs["disable_lookups"] = True
