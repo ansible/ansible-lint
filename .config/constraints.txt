@@ -21,7 +21,7 @@ chardet==5.2.0            # via tox
 charset-normalizer==3.4.2  # via requests
 click==8.2.1              # via black, mkdocs
 colorama==0.4.6           # via griffe, mkdocs-material, tox
-coverage==7.10.0           # via coverage-enable-subprocess, ansible-lint (pyproject.toml)
+coverage==7.10.0          # via coverage-enable-subprocess, ansible-lint (pyproject.toml)
 coverage-enable-subprocess==1.0  # via ansible-lint (pyproject.toml)
 cryptography==45.0.5      # via ansible-core
 csscompressor==0.9.5      # via mkdocs-minify-plugin
