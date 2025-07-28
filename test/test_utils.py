@@ -30,10 +30,12 @@ from typing import TYPE_CHECKING, Any
 import pytest
 from ansible.utils.sentinel import Sentinel
 from ansible_compat.runtime import Runtime
+from packaging.version import Version
 
 from ansiblelint import cli, constants, utils
 from ansiblelint.__main__ import initialize_logger
 from ansiblelint.cli import get_rules_dirs
+from ansiblelint.config import get_deps_versions
 from ansiblelint.constants import RC
 from ansiblelint.file_utils import Lintable, cwd
 from ansiblelint.runner import Runner
@@ -277,6 +279,96 @@ def test_template(template: str, output: str) -> None:
         fail_on_error=False,
     )
     assert result == output
+
+
+@pytest.mark.parametrize(
+    ("template", "has_lookup"),
+    (
+        pytest.param(
+            "{{ lookup('file', '/etc/hostname') }}",
+            True,
+            id="file_lookup",
+        ),
+        pytest.param(
+            "Welcome {{ lookup('env', 'USER', default='user') }}!",
+            True,
+            id="lookup_with_text",
+        ),
+        pytest.param(
+            "{{ query('env', 'HOME') }}",
+            True,
+            id="query_function_call",
+        ),
+        pytest.param(
+            "{{ q('env', 'HOME') }}",
+            True,
+            id="q_function_call",
+        ),
+        # query() with whitespace - should still be detected, will throw spacing errors
+        pytest.param(
+            "{{ query  ('dict', my_var) }}",
+            True,
+            id="query_function_with_whitespace",
+        ),
+        pytest.param(
+            "{{ some_function(lookup('env', 'USER')) }}",
+            True,
+            id="nested_with_function",
+        ),
+        pytest.param(
+            "{{ (query)('env', 'HOME') }}",
+            True,
+            id="query_with_parentheses",
+        ),
+        pytest.param(
+            "{{ (q)('env', 'HOME') }}",
+            True,
+            id="q_with_parentheses",
+        ),
+        pytest.param(
+            "{{ 'This string contains lookup but not a call' }}",
+            False,
+            id="lookup_in_string",
+        ),
+        pytest.param(
+            "{{ query_result }}",
+            False,
+            id="query_variable_name",
+        ),
+        pytest.param(
+            "{{ my_dict.lookup }}",
+            False,
+            id="lookup_as_attribute",
+        ),
+    ),
+)
+def test_template_lookup_behavior(template: str, has_lookup: bool) -> None:
+    """Test template behavior for both ansible-core >= 2.19 and < 2.19."""
+    # Use the lookup detection function directly
+    detected_lookup = utils.has_lookup_function_calls(template)
+    assert detected_lookup == has_lookup, (
+        f"Expected has_lookup_function_calls({template!r}) to return {has_lookup}, "
+        f"but got {detected_lookup}"
+    )
+
+    # Then test template behavior
+    result = utils.template(
+        basedir=Path("/base/dir"),
+        value=template,
+        variables={"some_var": "test_value"},
+        fail_on_error=False,
+    )
+
+    # Get ansible-core version to determine expected behavior
+    deps = get_deps_versions()
+    ansible_version = deps.get("ansible-core")
+    is_new_ansible = ansible_version and ansible_version >= Version("2.19")
+
+    if has_lookup and is_new_ansible:
+        # For ansible-core >= 2.19: lookups should be skipped (returned unchanged)
+        assert result == template, (
+            f"Expected lookup to be skipped for ansible-core >= 2.19, but got: {result}"
+        )
 
 
 def test_task_to_str_unicode() -> None:

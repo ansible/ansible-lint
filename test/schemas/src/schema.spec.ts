@@ -55,14 +55,19 @@ describe("schemas under f/", function () {
     const schema_json = JSON.parse(fs.readFileSync(`f/${schema_file}`, "utf8"));
     ajv.addSchema(schema_json);
     const validator = ajv.compile(schema_json);
-    if (schema_json.examples == undefined) {
+    if (
+      schema_json["examples"] == undefined &&
+      schema_json["x-ansible-lint"] == undefined
+    ) {
       console.error(
-        `Schema file ${schema_file} is missing an examples key that we need for documenting file matching patterns.`,
+        `Schema file ${schema_file} is missing an 'examples' or 'x-ansible-lint' key that we need for documenting file matching patterns.`,
       );
       return process.exit(1);
     }
     describe(schema_file, function () {
-      getTestFiles(schema_json.examples).forEach(
+      const file_path_key =
+        schema_json["x-ansible-lint"] || schema_json["examples"];
+      getTestFiles(file_path_key).forEach(
         ({ file: test_file, expect_fail }) => {
           it(`linting ${test_file} using ${schema_file}`, function () {
             var errors_md = "";
