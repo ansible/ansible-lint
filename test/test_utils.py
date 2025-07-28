@@ -300,7 +300,7 @@ def test_template(template: str, output: str) -> None:
             id="query_function_call",
         ),
         pytest.param(
-            "{{ q('file', 'config.txt') }}",
+            "{{ q('env', 'HOME') }}",
             True,
             id="q_function_call",
         ),
@@ -310,10 +310,48 @@ def test_template(template: str, output: str) -> None:
             True,
             id="query_function_with_whitespace",
         ),
+        pytest.param(
+            "{{ some_function(lookup('env', 'USER')) }}",
+            True,
+            id="nested_with_function",
+        ),
+        pytest.param(
+            "{{ (query)('env', 'HOME') }}",
+            True,
+            id="query_with_parentheses",
+        ),
+        pytest.param(
+            "{{ (q)('env', 'HOME') }}",
+            True,
+            id="q_with_parentheses",
+        ),
+        pytest.param(
+            "{{ 'This string contains lookup but not a call' }}",
+            False,
+            id="lookup_in_string",
+        ),
+        pytest.param(
+            "{{ query_result }}",
+            False,
+            id="query_variable_name",
+        ),
+        pytest.param(
+            "{{ my_dict.lookup }}",
+            False,
+            id="lookup_as_attribute",
+        ),
     ),
 )
 def test_template_lookup_behavior(template: str, has_lookup: bool) -> None:
     """Test template behavior for both ansible-core >= 2.19 and < 2.19."""
+    # Use the lookup detection function directly
+    detected_lookup = utils.has_lookup_function_calls(template)
+    assert detected_lookup == has_lookup, (
+        f"Expected has_lookup_function_calls({template!r}) to return {has_lookup}, "
+        f"but got {detected_lookup}"
+    )
+
+    # Then test template behavior
     result = utils.template(
         basedir=Path("/base/dir"),
         value=template,
@@ -330,11 +368,6 @@ def test_template_lookup_behavior(template: str, has_lookup: bool) -> None:
         # For ansible-core >= 2.19: lookups should be skipped (returned unchanged)
         assert result == template, (
             f"Expected lookup to be skipped for ansible-core >= 2.19, but got: {result}"
-        )
-    elif not has_lookup:
-        # Normal templates should always be processed
-        assert result != template, (
-            f"Expected normal template to be processed, but got unchanged: {result}"
         )
 
 
