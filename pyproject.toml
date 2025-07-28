@@ -560,7 +560,6 @@ sort_table_keys = true
 annotation-style = "line"
 custom-compile-command = "tox run -e deps"
 no-emit-package = [
-  "ansible-core",
   "exceptiongroup", # <py311
   "pip",
   "resolvelib",
