@@ -53,8 +53,8 @@ runs:
       run: |
         action_ref="${GH_ACTION_REF_INPUT:-${GITHUB_ACTION_REF:-main}}"
         if [[ ${GH_ACTION_REF_INPUT} ]]; then
-          echo "::warning::Using input 'gh_action_ref': Loading ansible-lint version ${action_ref}. If possible, use the `uses: ansible-lint@<version>` syntax instead."
-        This input should only be used in composite actions where built-in $GH_ACTION_REF is set to the parent action version.
+          echo "::warning::Using input 'gh_action_ref': Loading ansible-lint version ${action_ref}. If possible, use the 'uses: ansible-lint@<version>' syntax instead.
+        This input should only be used in composite actions where built-in '$GH_ACTION_REF' is set to the parent action version."
         else
           echo "Using ansible-lint ref: $action_ref"
         fi
