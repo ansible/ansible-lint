@@ -23,11 +23,11 @@ inputs:
     required: false
     default: ""
   expected_return_code:
-    description: Expected return code from ansible-lint. Default is 0. Used for self-testing purposes.
+    description: (Internal use only) Expected return code from ansible-lint. Default is 0. Used for self-testing purposes.
     required: false
     default: "0"
   gh_action_ref:
-    description: The branch, tag, or commit to use for ansible-lint.
+    description: The branch, tag, or commit to use for ansible-lint. Only recommended for use with composite actions where $GH_ACTION_REF is set to the parent action version.
     default: ""
     required: false
 runs:
@@ -52,7 +52,13 @@ runs:
         GITHUB_ACTION_REF: ${{ github.action_ref }}
       run: |
         action_ref="${GH_ACTION_REF_INPUT:-${GITHUB_ACTION_REF:-main}}"
-        echo "Using ansible-lint ref: $action_ref"
+        if [[ ${GH_ACTION_REF_INPUT} ]]; then
+          echo "::warning::Using input 'gh_action_ref': Loading ansible-lint version ${action_ref}. This pins ansible-lint to this version.\
+          This input should only be used in composite actions where built-in $GH_ACTION_REF is set to the parent action version. If possible,\
+          use the `uses: ansible-lint@<version>` syntax instead."
+        else
+          echo "Using ansible-lint ref: $action_ref"
+
         echo "ACTION_REF=${action_ref}" >> "$GITHUB_ENV"
 
     # Due to GHA limitation, caching works only for files within GITHUB_WORKSPACE
@@ -89,7 +95,7 @@ runs:
       # SETUPTOOLS_SCM_PRETEND_VERSION=${{ github.action_ref || 'main' }}
       run: |
         cd $GITHUB_ACTION_PATH
-        pip install "ansible-lint[lock] @ git+https://github.com/ansible/ansible-lint@$GH_ACTION_REF"
+        pip install "ansible-lint @ git+https://github.com/ansible/ansible-lint@$GH_ACTION_REF"
         ansible-lint --version
 
     - name: Install role and collection dependencies from requirements file
