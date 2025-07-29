@@ -29,24 +29,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run ansible-lint
-        uses: ansible/ansible-lint@main
+        uses: ansible/ansible-lint@main # or vX.X.X version
         # optional (see below):
         with:
           args: ""
+          gh_action_ref: "<version - e.g. `v25.5.0`>" # Not recommended for non-composite action use
           setup_python: "true"
           working_directory: ""
           requirements_file: ""
 ```
 
-All the arguments are optional and most users should not need them:
+By default, the workflow uses ansible-lint installed from `main`. For production or stable workflows, it is recommended to specify a particular release tag (in format v.X.X.X).
+
+All the arguments are optional:
 
 - `args`: Arguments to be passed to ansible-lint command.
-- `setup_python`: If python should be installed. Default is `true`.
-- `working_directory`: The directory where to run ansible-lint from. Default is
-  `github.workspace`. That might be needed if you want to lint only a subset of
-  your repository.
+- `gh_action_ref`: The git branch, tag, or commit to use for ansible-lint.
+  Not recommended for standard use - only use with composite actions where
+  `GH_ACTION_REF` is set to the parent action version.
 - `requirements_file`: Path to the requirements.yml file to install role and
   collection dependencies.
+- `setup_python`: If python should be installed. Default is `true`.
+- `working_directory`: The directory where to run ansible-lint from. Default is
+  `github.workspace`. Needed if you want to lint only a subset of
+  your repository.
+
 
 For more details, see [ansible-lint-action].
 

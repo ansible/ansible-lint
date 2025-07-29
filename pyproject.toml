@@ -534,6 +534,9 @@ convention = "google"
 [tool.setuptools.dynamic]
 dependencies = {file = [".config/requirements.in"]}
 optional-dependencies.docs = {file = [".config/requirements-docs.in"]}
+# 'lock' will work only if you use a python version supported by the latest
+# release of ansible-core, otherwise installation will fail
+optional-dependencies.lock = {file = [".config/requirements-lock.txt"]}
 optional-dependencies.test = {file = [".config/requirements-test.in"]}
 
 [tool.setuptools_scm]

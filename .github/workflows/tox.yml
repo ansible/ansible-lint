@@ -53,7 +53,7 @@ jobs:
       GITHUB_ACTIONS_TEST: "true"
     steps:
       - uses: actions/checkout@v4
-      - name: Self test 1
+      - name: Self test 1 # Test without explicit ref - fallback to main
         uses: ./
         with:
           # basically we only lint linter own configuration, which should be passing.
@@ -71,6 +71,12 @@ jobs:
           args: .ansible-lint
           working_directory: docs
           expected_return_code: "2" # expected to fail because the given argument does not exist in this folder
+      - name: Self test 4 # Test explicit ref override - expect warning message
+        uses: ./
+        with:
+          args: .ansible-lint
+          gh_action_ref: "v25.5.0"
+
   build:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os || 'ubuntu-24.04' }}
