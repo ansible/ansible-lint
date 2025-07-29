@@ -53,12 +53,12 @@ runs:
       run: |
         action_ref="${GH_ACTION_REF_INPUT:-${GITHUB_ACTION_REF:-main}}"
         if [[ ${GH_ACTION_REF_INPUT} ]]; then
-          echo "::warning::Using input 'gh_action_ref': Loading ansible-lint version ${action_ref}. This pins ansible-lint to this version.\
-          This input should only be used in composite actions where built-in $GH_ACTION_REF is set to the parent action version. If possible,\
+          echo "::warning::Using input 'gh_action_ref': Loading ansible-lint version ${action_ref}. This pins ansible-lint to this version.
+          This input should only be used in composite actions where built-in $GH_ACTION_REF is set to the parent action version. If possible,
           use the `uses: ansible-lint@<version>` syntax instead."
         else
           echo "Using ansible-lint ref: $action_ref"
-
+        fi
         echo "ACTION_REF=${action_ref}" >> "$GITHUB_ENV"
 
     # Due to GHA limitation, caching works only for files within GITHUB_WORKSPACE
