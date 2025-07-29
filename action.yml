@@ -27,7 +27,7 @@ inputs:
     required: false
     default: "0"
   gh_action_ref:
-    description: The branch, tag, or commit to use for ansible-lint. Only recommended for use with composite actions where $GH_ACTION_REF is set to the parent action version.
+    description: The branch, tag, or commit to use for ansible-lint. Only recommended for use with composite actions where `GH_ACTION_REF` is set to the parent action version.
     default: ""
     required: false
 runs:
@@ -53,7 +53,7 @@ runs:
       run: |
         action_ref="${GH_ACTION_REF_INPUT:-${GITHUB_ACTION_REF:-main}}"
         if [[ ${GH_ACTION_REF_INPUT} ]]; then
-          echo "::warning::Using input 'gh_action_ref': Loading ansible-lint version ${action_ref}. This input should only be used in composite actions where built-in '\$GH_ACTION_REF' is set to the parent action version. If possible, use the 'uses: ansible-lint@<version>' syntax instead."
+          echo "::warning::Using input 'gh_action_ref': Loading ansible-lint version ${action_ref}. This input should only be used in composite actions where built-in 'GH_ACTION_REF' is set to the parent action version. If possible, use the 'uses: ansible-lint@<version>' syntax instead."
         else
           echo "Using ansible-lint ref: $action_ref"
         fi

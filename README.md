@@ -46,7 +46,7 @@ All the arguments are optional:
 - `args`: Arguments to be passed to ansible-lint command.
 - `gh_action_ref`: The git branch, tag, or commit to use for ansible-lint.
   Not recommended for standard use - only use with composite actions where
-  $GH_ACTION_REF is set to the parent action version.
+  `GH_ACTION_REF` is set to the parent action version.
 - `requirements_file`: Path to the requirements.yml file to install role and
   collection dependencies.
 - `setup_python`: If python should be installed. Default is `true`.
