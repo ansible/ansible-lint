@@ -1344,7 +1344,7 @@ def parse_examples_from_plugin(lintable: Lintable) -> tuple[int, str]:
                 offset = child.lineno - 1
                 break
 
-    docs = read_docstring(str(lintable.path.resolve(strict=False))) # type: ignore[no-untyped-call]
+    docs = read_docstring(str(lintable.path.resolve(strict=False)))  # type: ignore[no-untyped-call]
     examples = docs["plainexamples"]
 
     # Ignore the leading newline and lack of document start
