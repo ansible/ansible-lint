@@ -428,4 +428,7 @@ def get_app(*, offline: bool | None = None, cached: bool = False) -> App:
         role_name_check=role_name_check,
     )
 
+    # Enable plugin loader now that collections are installed
+    app.runtime.enable_plugin_loader()
+
     return app
