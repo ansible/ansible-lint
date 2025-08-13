@@ -149,7 +149,7 @@ def ansible_templar(basedir: Path, templatevars: Any) -> Templar:
 
     dataloader = DataLoader()  # type: ignore[no-untyped-call]
     dataloader.set_basedir(str(basedir))
-    templar = Templar(dataloader, variables=templatevars)  # type: ignore[no-untyped-call]
+    templar = Templar(dataloader, variables=templatevars)
     return templar
 
 
@@ -239,7 +239,7 @@ def ansible_template(
         try:
             if TrustedAsTemplate and not isinstance(varname, TrustedAsTemplate):
                 varname = TrustedAsTemplate().tag(varname)
-            templated = templar.template(varname, **kwargs)  # type: ignore[no-untyped-call]
+            templated = templar.template(varname, **kwargs)
         except AnsibleError as exc:
             if lookup_error in exc.message:
                 return varname
@@ -329,7 +329,7 @@ def set_collections_basedir(basedir: Path) -> None:
     # produce weird errors if we use a relative one.
     # https://github.com/psf/black/issues/4519
     # fmt: off
-    AnsibleCollectionConfig.playbook_paths = (  # type: ignore[attr-defined] # pyright: ignore[reportAttributeAccessIssue]
+    AnsibleCollectionConfig.playbook_paths = (  # pyright: ignore[reportAttributeAccessIssue]
         str(basedir.resolve()))
     # fmt: on
 
@@ -1166,7 +1166,7 @@ def parse_yaml_linenumbers(
         # pyright: ignore[reportArgumentType]
         mapping: AnsibleMapping = AnsibleConstructor.construct_mapping(
             loader, node, deep=deep
-        )  # type: ignore[no-untyped-call]
+        )
         if hasattr(node, LINE_NUMBER_KEY):
             mapping[LINE_NUMBER_KEY] = getattr(node, LINE_NUMBER_KEY)
         else:
@@ -1181,16 +1181,16 @@ def parse_yaml_linenumbers(
             kwargs["vault_password"] = DEFAULT_VAULT_PASSWORD
         # WARNING: 'unused-ignore' is needed below in order to allow mypy to
         # be passing with both pre-2.19 and post-2.19 versions of Ansible core.
-        loader = AnsibleLoader(lintable.content, **kwargs)  # type: ignore[no-untyped-call]
+        loader = AnsibleLoader(lintable.content, **kwargs)
         # redefine Composer.compose_node
         loader.compose_node = compose_node  # type: ignore[attr-defined,unused-ignore]
         # redefine AnsibleConstructor.construct_mapping
-        loader.construct_mapping = construct_mapping  # type: ignore[method-assign]
+        loader.construct_mapping = construct_mapping
         # while Ansible only accepts single documents, we also need to load
         # multi-documents, as we attempt to load any YAML file, not only
         # Ansible managed ones.
         while True:
-            data = loader.get_data()  # type: ignore[no-untyped-call]
+            data = loader.get_data()
             if data is None:
                 break
             result.append(data)
@@ -1355,13 +1355,13 @@ def parse_examples_from_plugin(lintable: Lintable) -> tuple[int, str]:
 @lru_cache
 def load_plugin(name: str) -> PluginLoadContext:
     """Return loaded ansible plugin/module."""
-    loaded_module = action_loader.find_plugin_with_context(  # type: ignore[no-untyped-call]
+    loaded_module = action_loader.find_plugin_with_context(
         name,
         ignore_deprecated=True,
         check_aliases=True,
     )
     if not loaded_module.resolved:
-        loaded_module = module_loader.find_plugin_with_context(  # type: ignore[no-untyped-call]
+        loaded_module = module_loader.find_plugin_with_context(
             name,
             ignore_deprecated=True,
             check_aliases=True,
@@ -1370,7 +1370,7 @@ def load_plugin(name: str) -> PluginLoadContext:
         "ansible.builtin."
     ):  # pragma: no cover
         # fallback to core behavior of using legacy
-        loaded_module = module_loader.find_plugin_with_context(  # type: ignore[no-untyped-call]
+        loaded_module = module_loader.find_plugin_with_context(
             name.replace("ansible.builtin.", "ansible.legacy."),
             ignore_deprecated=True,
             check_aliases=True,

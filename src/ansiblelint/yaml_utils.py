@@ -38,7 +38,7 @@ from ansiblelint.utils import Task
 
 try:  # ansible 2.19 + data tagging
     # cspell: ignore datatag
-    from ansible._internal._datatag._tags import (  # type: ignore[import-not-found] # pyright: ignore[reportMissingImports]
+    from ansible._internal._datatag._tags import (  # pyright: ignore[reportMissingImports]
         Origin,
     )
 except ImportError:  # pragma: no cover

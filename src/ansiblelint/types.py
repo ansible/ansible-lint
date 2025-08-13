@@ -29,10 +29,10 @@ try:
 # core 2.19 + data tagging:
 except ImportError:  # pragma: no cover
     # cspell: ignore datatag
-    from ansible._internal._datatag._tags import (  # type: ignore[import-not-found,no-redef]
+    from ansible._internal._datatag._tags import (  # type: ignore[assignment]
         TrustedAsTemplate,
     )
-    from ansible._internal._yaml._constructor import (  # type: ignore[import-not-found,no-redef] # pyright: ignore[reportMissingImports] # pylint: disable=import-error,no-name-in-module
+    from ansible._internal._yaml._constructor import (  # pyright: ignore[reportMissingImports] # pylint: disable=import-error,no-name-in-module
         AnsibleConstructor,
     )
     from ansible.errors import (  # type: ignore[no-redef,attr-defined,unused-ignore]
