@@ -40,7 +40,7 @@ jobs:
             hook
             docs
             pre
-            py311-devel
+            py312-devel
             py310-lower
             py312-lower
             py313-devel
