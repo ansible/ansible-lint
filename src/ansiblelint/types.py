@@ -13,7 +13,7 @@ from ansible.parsing.yaml.objects import (  # pyright: ignore[reportMissingImpor
 )
 
 try:
-    from ansible.parsing.yaml.constructor import (  # pyright: ignore[reportMissingImports]
+    from ansible.parsing.yaml.constructor import (  # pyright: ignore[reportMissingImports] # type: ignore[import-not-found]
         AnsibleConstructor,
     )
     from ansible.parsing.yaml.objects import (  # pyright: ignore[reportMissingImports]
