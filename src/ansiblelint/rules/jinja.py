@@ -149,7 +149,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                     # ValueError RepresenterError
                     except (AnsibleError, ImportError) as exc:
                         bypass = False
-                        orig_exc = exc
+                        orig_exc: BaseException = exc
                         if (
                             isinstance(exc, AnsibleError)
                             and hasattr(exc, "orig_exc")
@@ -927,10 +927,10 @@ if "pytest" in sys.modules:
             data = args[1]
 
             if data != "{{ 12 | random(seed=inventory_hostname) }}":
-                return do_template(*args, **kwargs)  # type: ignore[no-untyped-call]
+                return do_template(*args, **kwargs)
 
             msg = "Unexpected templating type error occurred on (foo): bar"
-            raise AnsibleError(str(msg))  # type: ignore[no-untyped-call]
+            raise AnsibleError(str(msg))
 
         do_template = Templar.do_template
         collection = RulesCollection()
