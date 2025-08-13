@@ -89,11 +89,11 @@ from ansiblelint.file_utils import Lintable, discover_lintables
 from ansiblelint.skip_utils import is_nested_task
 from ansiblelint.text import has_jinja, is_fqcn, removeprefix
 from ansiblelint.types import (
-    AnsibleBaseYAMLObject,
+    AnsibleBaseYAMLObject,  # pyright: ignore[reportAttributeAccessIssue]
     AnsibleConstructor,  # pyright: ignore[reportAttributeAccessIssue]
     AnsibleJSON,
-    AnsibleMapping,
-    AnsibleSequence,
+    AnsibleMapping,  # pyright: ignore[reportAttributeAccessIssue]
+    AnsibleSequence,  # pyright: ignore[reportAttributeAccessIssue]
     TrustedAsTemplate,
 )
 
@@ -264,7 +264,7 @@ def ansible_template(
                 v = templar.environment.filters
                 if not hasattr(v, "_delegatee"):  # pragma: no cover
                     raise
-                v._delegatee[missing_filter] = mock_filter  # fmt: skip # noqa: SLF001
+                v._delegatee[missing_filter] = mock_filter  # fmt: skip # noqa: SLF001 # pyright: ignore[reportAttributeAccessIssue]
                 # Record the mocked filter so we can warn the user
                 if missing_filter not in options.mock_filters:
                     _logger.debug("Mocking missing filter %s", missing_filter)

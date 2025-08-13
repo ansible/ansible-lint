@@ -36,7 +36,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/molecule.json"
   },
   "pattern": {
-    "etag": "610494e0d08e20f6869475f3b479dcae3d90e92d632d825fa934e2beb5f931c0",
+    "etag": "9f427c883b1e069c1d9cb938f5c2d6d9d6412250ba781880cce3ae7b523bf035",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/pattern.json"
   },
   "play-argspec": {
@@ -56,7 +56,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/role-arg-spec.json"
   },
   "rulebook": {
-    "etag": "8113782a066a9a7aba1f3f42aeb7f8315fa49b5bf0b158a61e44a3eba22dd22f",
+    "etag": "97220101562e188be347041e762472ff339975c5d3336f6c210336bae5ed7128",
     "url": "https://raw.githubusercontent.com/ansible/ansible-rulebook/main/ansible_rulebook/schema/ruleset_schema.json"
   },
   "tasks": {

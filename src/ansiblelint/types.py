@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from typing import TypeAlias
 
-from ansible.parsing.yaml.objects import (  # pyright: ignore[reportMissingImports]
+from ansible.parsing.yaml.objects import (  # pyright: ignore[reportMissingImports] #pylint: disable=no-name-in-module
     AnsibleMapping,
     AnsibleSequence,
     AnsibleUnicode,
@@ -36,7 +36,7 @@ except ImportError:  # pragma: no cover
         AnsibleConstructor,
     )
     from ansible.errors import (  # type: ignore[assignment,no-redef,attr-defined,unused-ignore]
-        AnsibleTemplateSyntaxError,  # pyright: ignore[reportAttributeAccessIssue]
+        AnsibleTemplateSyntaxError,  # pyright: ignore[reportAttributeAccessIssue,reportAssignmentType]
     )
 
     AnsibleBaseYAMLObject: TypeAlias = (  # type: ignore[no-redef] # pyright: ignore[reportRedeclaration]

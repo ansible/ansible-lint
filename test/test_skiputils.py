@@ -20,7 +20,9 @@ from ansiblelint.utils import Task
 if TYPE_CHECKING:
     from ansiblelint.rules import RulesCollection
     from ansiblelint.testing import RunFromText
-    from ansiblelint.types import AnsibleBaseYAMLObject
+    from ansiblelint.types import (
+        AnsibleBaseYAMLObject,  # pyright: ignore[reportAttributeAccessIssue]
+    )
 
 PLAYBOOK_WITH_NOQA = """\
 ---
