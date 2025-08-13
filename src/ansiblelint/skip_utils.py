@@ -95,7 +95,7 @@ def get_rule_skips_from_line(
     return result
 
 
-def append_skipped_rules(
+def append_skipped_rules(  # type: ignore[no-any-unimported]
     pyyaml_data: AnsibleBaseYAMLObject,
     lintable: Lintable,
 ) -> AnsibleBaseYAMLObject:
@@ -143,7 +143,7 @@ def load_data(file_text: str) -> Any:
         return yaml.load_all(file_text)
 
 
-def _append_skipped_rules(
+def _append_skipped_rules(  # type: ignore[no-any-unimported]
     pyyaml_data: AnsibleBaseYAMLObject,
     lintable: Lintable,
 ) -> AnsibleBaseYAMLObject | None:

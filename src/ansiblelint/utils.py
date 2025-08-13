@@ -833,7 +833,7 @@ def normalize_task_v2(task: Task) -> MutableMapping[str, Any]:
 
 
 # pylint: disable=too-many-nested-blocks
-def extract_from_list(
+def extract_from_list(  # type: ignore[no-any-unimported]
     blocks: AnsibleBaseYAMLObject,
     candidates: list[str],
     *,
@@ -1061,7 +1061,7 @@ class Task(Mapping[str, Any]):
         return line
 
 
-def task_in_list(
+def task_in_list(  # type: ignore[no-any-unimported]
     data: AnsibleBaseYAMLObject,
     file: Lintable,
     kind: str,
@@ -1069,7 +1069,7 @@ def task_in_list(
 ) -> Iterator[Task]:
     """Get action tasks from block structures."""
 
-    def each_entry(
+    def each_entry(  # type: ignore[no-any-unimported]
         data: Sequence[Any] | AnsibleMapping, file: Lintable, kind: str, position: str
     ) -> Iterator[Task]:
         if not data or not isinstance(data, Iterable):
@@ -1118,7 +1118,7 @@ def task_in_list(
         yield from each_entry(data, file=file, position=position, kind=kind)
 
 
-def add_action_type(
+def add_action_type(  # type: ignore[no-any-unimported]
     actions: AnsibleBaseYAMLObject, action_type: str
 ) -> AnsibleSequence:
     """Add action markers to task objects."""
@@ -1136,14 +1136,14 @@ def add_action_type(
 
 
 @cache
-def parse_yaml_linenumbers(
+def parse_yaml_linenumbers(  # type: ignore[no-any-unimported]
     lintable: Lintable,
 ) -> AnsibleBaseYAMLObject | None:
     """Parse yaml as ansible.utils.parse_yaml but with linenumbers.
 
     The line numbers are stored in each node's LINE_NUMBER_KEY key.
     """
-    loader: AnsibleLoader
+    loader: AnsibleLoader  # type: ignore[valid-type]
     result = AnsibleSequence()
 
     # signature of Composer.compose_node
@@ -1154,17 +1154,17 @@ def parse_yaml_linenumbers(
             msg = "Unexpected yaml data."
             raise TypeError(msg)
         if hasattr(loader, "line"):  # pragma: no cover
-            line = loader.line
+            line = loader.line  # type: ignore[attr-defined]
             node.__line__ = line + 1  # type: ignore[attr-defined]
         return node
 
     # signature of AnsibleConstructor.construct_mapping
-    def construct_mapping(
+    def construct_mapping(  # type: ignore[no-any-unimported]
         node: yaml.MappingNode,
         deep: bool = False,  # noqa: FBT002
     ) -> AnsibleMapping:
         # pyright: ignore[reportArgumentType]
-        mapping: AnsibleMapping = AnsibleConstructor.construct_mapping(
+        mapping: AnsibleMapping = AnsibleConstructor.construct_mapping(  # type: ignore[no-any-unimported]
             loader, node, deep=deep
         )
         if hasattr(node, LINE_NUMBER_KEY):
@@ -1185,12 +1185,12 @@ def parse_yaml_linenumbers(
         # redefine Composer.compose_node
         loader.compose_node = compose_node  # type: ignore[attr-defined,unused-ignore]
         # redefine AnsibleConstructor.construct_mapping
-        loader.construct_mapping = construct_mapping
+        loader.construct_mapping = construct_mapping  # type: ignore[attr-defined]
         # while Ansible only accepts single documents, we also need to load
         # multi-documents, as we attempt to load any YAML file, not only
         # Ansible managed ones.
         while True:
-            data = loader.get_data()
+            data = loader.get_data()  # type: ignore[attr-defined]
             if data is None:
                 break
             result.append(data)

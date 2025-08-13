@@ -35,7 +35,7 @@ except ImportError:  # pragma: no cover
     from ansible._internal._yaml._constructor import (  # pyright: ignore[reportMissingImports] # pylint: disable=import-error,no-name-in-module
         AnsibleConstructor,
     )
-    from ansible.errors import (  # type: ignore[no-redef,attr-defined,unused-ignore]
+    from ansible.errors import (  # type: ignore[assignment,no-redef,attr-defined,unused-ignore]
         AnsibleTemplateSyntaxError,  # pyright: ignore[reportAttributeAccessIssue]
     )
 
@@ -46,7 +46,7 @@ except ImportError:  # pragma: no cover
 # temporary ignoring the type parameters for Sequence and Mapping because once
 # add them we can no longer use isinstance() to check for them and we will
 # need to implement a more complex runtime type checking.
-AnsibleJSON: TypeAlias = Sequence | Mapping | AnsibleUnicode | str | None  # type: ignore[type-arg]
+AnsibleJSON: TypeAlias = Sequence | Mapping | AnsibleUnicode | str | None  # type: ignore[no-any-unimported,type-arg]
 
 __all__ = [
     "AnsibleBaseYAMLObject",

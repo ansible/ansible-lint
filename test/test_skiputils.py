@@ -196,7 +196,7 @@ def test_var_noqa(default_text_runner: RunFromText) -> None:
         ),
     ),
 )
-def test_append_skipped_rules(
+def test_append_skipped_rules(  # type: ignore[no-any-unimported]
     lintable: Lintable,
     yaml: AnsibleBaseYAMLObject,
     expected_form: AnsibleBaseYAMLObject,
