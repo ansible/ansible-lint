@@ -203,7 +203,9 @@ class App:
         msg = ""
 
         summary = self.count_results(result.matches)
-        files_count, linted_files_count, changed_files_count = self.count_lintables(result.files)
+        files_count, linted_files_count, changed_files_count = self.count_lintables(
+            result.files
+        )
 
         matched_rules = self._get_matched_skippable_rules(result.matches)
 
