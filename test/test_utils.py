@@ -41,8 +41,8 @@ from ansiblelint.file_utils import Lintable, cwd
 from ansiblelint.runner import Runner
 from ansiblelint.testing import run_ansible_lint
 from ansiblelint.types import (  # pyright: ignore[reportAttributeAccessIssue]
-    AnsibleMapping,
-    AnsibleSequence,
+    AnsibleMapping,  # pyright: ignore[reportAttributeAccessIssue]
+    AnsibleSequence,  # pyright: ignore[reportAttributeAccessIssue]
 )
 
 if TYPE_CHECKING:
