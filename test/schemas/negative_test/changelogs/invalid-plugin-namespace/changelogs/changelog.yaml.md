@@ -25,7 +25,7 @@ stdout:
   "errors": [
     {
       "filename": "negative_test/changelogs/invalid-plugin-namespace/changelogs/changelog.yaml",
-      "path": "$.releases.1.0.0.plugins.lookup[0].namespace",
+      "path": "$.releases['1.0.0'].plugins.lookup[0].namespace",
       "message": "'foo' is not of type 'null'",
       "has_sub_errors": false
     }

@@ -42,7 +42,7 @@ from ansiblelint.rules.syntax_check import OUTPUT_PATTERNS
 from ansiblelint.text import strip_ansi_escape
 from ansiblelint.types import (  # pyright: ignore[reportAttributeAccessIssue]
     AnsibleJSON,
-    AnsibleMapping,
+    AnsibleMapping,  # pyright: ignore[reportAttributeAccessIssue]
 )
 from ansiblelint.utils import (
     PLAYBOOK_DIR,
