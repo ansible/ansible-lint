@@ -1,4 +1,8 @@
 ---
-- name: Sample
-  ansible.builtin.command: echo 123
+- name: Sample 1
+  command: echo 123
+  delegate_to: localhost
+- name: Sample 2
+  command:
+    cmd: echo 456
   delegate_to: localhost

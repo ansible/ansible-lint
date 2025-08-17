@@ -1,3 +1,7 @@
 ---
-- name: Sample
+- name: Sample 1
   local_action: command echo 123
+- name: Sample 2
+  local_action:
+    module: command
+    cmd: echo 456
