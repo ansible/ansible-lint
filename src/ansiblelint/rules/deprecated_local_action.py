@@ -16,6 +16,8 @@ from ansiblelint.runner import get_matches
 from ansiblelint.transformer import Transformer
 
 if TYPE_CHECKING:
+    from typing import Any
+
     from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
     from ansiblelint.config import Options
@@ -63,7 +65,7 @@ class TaskNoLocalActionRule(AnsibleLintRule, TransformMixin):
                 )
                 return
 
-            target_task = {}
+            target_task: dict[str, Any] = {}
 
             for k, v in original_target_task.items():
                 if k == "local_action":
