@@ -55,22 +55,36 @@ class TaskNoLocalActionRule(AnsibleLintRule, TransformMixin):
         if match.tag == self.id:
             # we do not want perform a partial modification accidentally
             original_target_task = self.seek(match.yaml_path, data)
-            target_task = copy.deepcopy(original_target_task)
-            for _ in range(len(target_task)):
-                k, v = target_task.popitem(False)
+
+            if "local_action" not in original_target_task:
+                _logger.debug(
+                    "Ignored unexpected data inside %s transform.",
+                    self.id,
+                )
+                return
+
+            target_task = {}
+
+            for k, v in original_target_task.items():
                 if k == "local_action":
                     if isinstance(v, dict):
-                        module_name = v["module"]
-                        target_task[module_name] = {}
-                        for param, val in v.items():
-                            if param != "module":
-                                target_task[module_name][param] = val
-                        if len(target_task[module_name]) == 0:
-                            target_task[module_name] = None
+                        if "module" not in v:
+                            _logger.debug(
+                                "Ignored unexpected data inside %s transform.",
+                                self.id,
+                            )
+                            return
+
+                        target_task[v["module"]] = copy.deepcopy(v)
+                        target_task[v["module"]].pop("module", None)
+
+                        if target_task[v["module"]] == {}:
+                            target_task[v["module"]] = None
+
                         target_task["delegate_to"] = "localhost"
                     elif isinstance(v, str):
-                        module_name, module_value = v.split(" ", 1)
-                        target_task[module_name] = module_value
+                        tokens = v.split(" ", 1)
+                        target_task[tokens[0]] = tokens[1] if len(tokens) > 1 else None
                         target_task["delegate_to"] = "localhost"
                     else:  # pragma: no cover
                         _logger.debug(
@@ -80,6 +94,7 @@ class TaskNoLocalActionRule(AnsibleLintRule, TransformMixin):
                         return
                 else:
                     target_task[k] = v
+
         match.fixed = True
         original_target_task.clear()
         original_target_task.update(target_task)
