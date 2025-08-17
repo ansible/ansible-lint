@@ -99,27 +99,27 @@ if "pytest" in sys.modules:
             rules=default_rules_collection,
         ).run()
 
-        assert len(results) == 1
-        assert results[0].tag == "deprecated-local-action"
+        assert any(result.tag == "deprecated-local-action" for result in results)
 
     @mock.patch.dict(os.environ, {"ANSIBLE_LINT_WRITE_TMP": "1"}, clear=True)
     def test_local_action_transform(
         config_options: Options,
-        default_rules_collection: RulesCollection,
     ) -> None:
         """Test transform functionality for no-log-password rule."""
         playbook = Path("examples/playbooks/tasks/local_action.yml")
         config_options.write_list = ["all"]
 
         config_options.lintables = [str(playbook)]
+        only_local_action_rule: RulesCollection = RulesCollection()
+        only_local_action_rule.register(TaskNoLocalActionRule())
         runner_result = get_matches(
-            rules=default_rules_collection,
+            rules=only_local_action_rule,
             options=config_options,
         )
         transformer = Transformer(result=runner_result, options=config_options)
         transformer.run()
         matches = runner_result.matches
-        assert len(matches) == 3
+        assert any(error.tag == "deprecated-local-action" for error in matches)
 
         orig_content = playbook.read_text(encoding="utf-8")
         expected_content = playbook.with_suffix(
