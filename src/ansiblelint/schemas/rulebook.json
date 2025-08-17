@@ -363,6 +363,9 @@
                         },
                         "extra_vars": {
                             "type": "object"
+                        },
+                        "lock": {
+                            "type": "string"
                         }
                     },
                     "required": [
@@ -420,6 +423,9 @@
                         },
                         "extra_vars": {
                             "type": "object"
+                        },
+                        "lock": {
+                            "type": "string"
                         }
                     },
                     "required": [
@@ -472,6 +478,9 @@
                         "include_events": {
                             "type": "boolean",
                             "default": true
+                        },
+                        "lock": {
+                            "type": "string"
                         }
                     },
                     "required": [
@@ -525,6 +534,9 @@
                         "include_events": {
                             "type": "boolean",
                             "default": true
+                        },
+                        "lock": {
+                            "type": "string"
                         }
                     },
                     "required": [
