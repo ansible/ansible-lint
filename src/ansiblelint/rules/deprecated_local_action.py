@@ -61,7 +61,12 @@ class TaskNoLocalActionRule(AnsibleLintRule, TransformMixin):
                 if k == "local_action":
                     if isinstance(v, dict):
                         module_name = v["module"]
-                        target_task[module_name] = None
+                        target_task[module_name] = {}
+                        for param, val in v.items():
+                            if param != "module":
+                                target_task[module_name][param] = val
+                        if len(target_task[module_name]) == 0:
+                            target_task[module_name] = None
                         target_task["delegate_to"] = "localhost"
                     elif isinstance(v, str):
                         module_name, module_value = v.split(" ", 1)
