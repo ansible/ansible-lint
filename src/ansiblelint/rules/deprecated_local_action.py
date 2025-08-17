@@ -55,28 +55,14 @@ class TaskNoLocalActionRule(AnsibleLintRule, TransformMixin):
         data: CommentedMap | CommentedSeq | str,
     ) -> None:
         if match.tag == self.id:
-            # we do not want perform a partial modification accidentally
             original_target_task = self.seek(match.yaml_path, data)
-
-            if "local_action" not in original_target_task:
-                _logger.debug(
-                    "Ignored unexpected data inside %s transform.",
-                    self.id,
-                )
-                return
-
+            assert "local_action" in original_target_task
             target_task: dict[str, Any] = {}
 
             for k, v in original_target_task.items():
                 if k == "local_action":
                     if isinstance(v, dict):
-                        if "module" not in v:
-                            _logger.debug(
-                                "Ignored unexpected data inside %s transform.",
-                                self.id,
-                            )
-                            return
-
+                        assert "module" in v
                         target_task[v["module"]] = copy.deepcopy(v)
                         target_task[v["module"]].pop("module", None)
 
