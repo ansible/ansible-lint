@@ -16,7 +16,7 @@ This rule recommends using `delegate_to: localhost` instead of the
 
 ```yaml
 - name: Task example
-    ansible.builtin.debug:
+  ansible.builtin.debug:
   delegate_to: localhost # <-- recommended way to run on localhost
 ```
 
