@@ -5,3 +5,5 @@
   local_action:
     module: command
     cmd: echo 456
+- name: Sample 3
+  local_action: ansible.builtin.debug

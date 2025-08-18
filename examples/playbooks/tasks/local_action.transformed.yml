@@ -6,3 +6,6 @@
   command:
     cmd: echo 456
   delegate_to: localhost
+- name: Sample 3
+  ansible.builtin.debug:
+  delegate_to: localhost

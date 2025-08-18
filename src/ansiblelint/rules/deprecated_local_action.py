@@ -70,7 +70,10 @@ class TaskNoLocalActionRule(AnsibleLintRule, TransformMixin):
                         target_task["delegate_to"] = "localhost"
                     elif isinstance(v, str):
                         tokens = v.split(" ", 1)
-                        target_task[tokens[0]] = tokens[1] if len(tokens) > 1 else None
+                        if len(tokens) > 1:
+                            target_task[tokens[0]] = tokens[1]
+                        else:
+                            target_task[tokens[0]] = None
                         target_task["delegate_to"] = "localhost"
                     else:  # pragma: no cover
                         _logger.debug(
