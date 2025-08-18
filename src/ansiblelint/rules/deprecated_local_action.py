@@ -9,15 +9,13 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.runner import get_matches
 from ansiblelint.transformer import Transformer
 
 if TYPE_CHECKING:
-    from typing import Any
-
     from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
     from ansiblelint.config import Options
