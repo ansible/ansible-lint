@@ -13,29 +13,24 @@
   user:
     name: alice
     state: present
+  delegate_to: localhost
   vars:
     foo: bar
-  delegate_to: localhost
 - name: Sample 5 - String-form local_action (all key=value)
-  file:
-    path: /tmp/foo
-    state: touch
-    mode: "0644"
-  tags: always
+  file: path=/tmp/foo state=touch mode=0644
   delegate_to: localhost
+  tags: always
 - name: Sample 6 - String-form local_action (positional arguments)
-  shell: echo hello world
+  shell: echo "hello world"
   delegate_to: localhost
 - name: Sample 7 - String-form local_action (single positional argument)
   command: hostname
   delegate_to: localhost
 - name: Sample 8 - Dict-form local_action with no params (only module)
-  ping:
+  ping: {}
   delegate_to: localhost
 - name: Sample 9 - Args copied over
-  copy:
-    src: /etc/hosts
-    dest: /tmp/hosts
+  copy: src=/etc/hosts dest=/tmp/hosts
+  delegate_to: localhost
   args:
     remote_src: true
-  delegate_to: localhost
