@@ -42,5 +42,4 @@
   "yaml.customTags": ["!encrypted/pkcs1-oaep scalar", "!vault scalar"],
   "yaml.format.enable": false,
   "yaml.validate": true,
-  "mypy-type-checker.importStrategy": "fromEnvironment"
 }
