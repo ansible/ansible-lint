@@ -180,8 +180,9 @@ if "pytest" in sys.modules:
         match_error: MatchError
         lintable: Lintable
 
-    @pytest.fixture(name="args")
-    def _args() -> Args:
+    # pylint: disable=redefined-outer-name
+    @pytest.fixture
+    def args() -> Args:
         """Fixture to provide common parameters for transform tests."""
         file = "site.yml"
         rule = TaskNoLocalActionRule()
@@ -194,7 +195,7 @@ if "pytest" in sys.modules:
         return Args(rule=rule, match_error=match_error, lintable=lintable)
 
     def test_local_action_transform_unsupported_type(args: Args) -> None:
-        """Test transform functionality for no-log-password rule.
+        """Test transform functionality for unsupported type.
 
         Args:
             args: The args for the transform.
@@ -206,7 +207,7 @@ if "pytest" in sys.modules:
         assert str(exc.value) == expected
 
     def test_local_action_transform_dict_no_module(args: Args) -> None:
-        """Test transform functionality for no-log-password rule.
+        """Test transform functionality for missing module.
 
         Args:
             args: The parameters for the test.
@@ -218,7 +219,7 @@ if "pytest" in sys.modules:
         assert str(exc.value) == expected
 
     def test_local_action_transform_str_empty(args: Args) -> None:
-        """Test transform functionality for no-log-password rule.
+        """Test transform functionality for empty string.
 
         Args:
             args: The parameters for the test.
@@ -228,6 +229,8 @@ if "pytest" in sys.modules:
             args.rule.perform_transform(args.match_error, args.lintable, data)
         expected = "Empty local_action string for task at site.yml:1"
         assert str(exc.value) == expected
+
+    # pylint: enable=redefined-outer-name
 
     @mock.patch.dict(os.environ, {"ANSIBLE_LINT_WRITE_TMP": "1"}, clear=True)
     def test_local_action_transform(
