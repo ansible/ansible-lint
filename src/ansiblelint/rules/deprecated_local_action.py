@@ -5,10 +5,9 @@
 from __future__ import annotations
 
 import logging
-import os
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, NamedTuple
+from typing import TYPE_CHECKING, Any
 
 from ruamel.yaml.comments import CommentedMap
 
@@ -30,6 +29,10 @@ _logger = logging.getLogger(__name__)
 
 class LocalActionTransformError(Exception):
     """Exception raised when a local_action is not processed correctly."""
+
+    def __init__(self, message: str) -> None:
+        """Initialize the LocalActionTransformError with a message."""
+        _logger.error(message)
 
 
 class TaskNoLocalActionRule(AnsibleLintRule, TransformMixin):
@@ -85,7 +88,7 @@ class TaskNoLocalActionRule(AnsibleLintRule, TransformMixin):
             data: The data to transform.
 
         Raises:
-            LocalActionTransformError: If the local_action is not processed correctly.
+            LocalActionTransformError: If the local_action is not dict | str.
         """
         original_task = self.seek(match.yaml_path, data)
         task_location = f"{lintable.name}:{match.lineno}"
@@ -125,7 +128,7 @@ class TaskNoLocalActionRule(AnsibleLintRule, TransformMixin):
             LocalActionTransformError: If the local_action dictionary is missing a 'module' key.
         """
         if "module" not in local_action:
-            err = f"No 'module' key in local_action dict for task at {task_location}"
+            err = f"No 'module' key in local_action in task at {task_location}"
             raise LocalActionTransformError(err)
         return {
             local_action["module"]: {
@@ -146,10 +149,10 @@ class TaskNoLocalActionRule(AnsibleLintRule, TransformMixin):
             A dictionary with the module and parameters.
 
         Raises:
-            LocalActionTransformError: If the local_action string is empty.
+            LocalActionTransformError: If the local_action string is empty or whitespace.
         """
         if not local_action or not local_action.strip():
-            err = f"Empty local_action string for task at {task_location}"
+            err = f"Empty local_action string in task at {task_location}"
             raise LocalActionTransformError(err)
         parts = local_action.split(" ", 1)
         return {parts[0]: parts[1] if len(parts) > 1 else None}
@@ -157,8 +160,6 @@ class TaskNoLocalActionRule(AnsibleLintRule, TransformMixin):
 
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
-    from unittest import mock
-
     import pytest
 
     from ansiblelint.rules import RulesCollection
@@ -173,70 +174,64 @@ if "pytest" in sys.modules:
 
         assert any(result.tag == "deprecated-local-action" for result in results)
 
-    class Args(NamedTuple):
-        """Parameters for the tests."""
+    @pytest.mark.parametrize(
+        ("data", "prefix"),
+        (
+            (
+                CommentedMap({"local_action": True}),
+                "Unsupported local_action type 'bool'",
+            ),
+            (
+                CommentedMap({"local_action": 123}),
+                "Unsupported local_action type 'int'",
+            ),
+            (
+                CommentedMap({"local_action": 12.34}),
+                "Unsupported local_action type 'float'",
+            ),
+            (
+                CommentedMap({"local_action": []}),
+                "Unsupported local_action type 'list'",
+            ),
+            (CommentedMap({"local_action": {}}), "No 'module' key in local_action"),
+            (CommentedMap({"local_action": ""}), "Empty local_action string"),
+            (CommentedMap({"local_action": "  "}), "Empty local_action string"),
+        ),
+        ids=[
+            "bool",
+            "int",
+            "float",
+            "list",
+            "empty_dict",
+            "empty_string",
+            "whitespace_string",
+        ],
+    )
+    def test_local_action_transform_fail(
+        caplog: pytest.LogCaptureFixture, data: CommentedMap, prefix: str
+    ) -> None:
+        """Test transform functionality for a failure.
 
-        rule: TaskNoLocalActionRule
-        match_error: MatchError
-        lintable: Lintable
-
-    # pylint: disable=redefined-outer-name
-    @pytest.fixture
-    def args() -> Args:
-        """Fixture to provide common parameters for transform tests."""
+        Args:
+            caplog: The pytest fixture for capturing logs.
+            data: The data to test.
+            prefix: The expected error prefix.
+        """
         file = "site.yml"
         rule = TaskNoLocalActionRule()
-        match_error = MatchError(
-            message="error message",
-            lintable=Lintable(name=file),
-            lineno=1,
-        )
         lintable = Lintable(name=file)
-        return Args(rule=rule, match_error=match_error, lintable=lintable)
+        match_error = MatchError(message="error", lintable=lintable, lineno=1)
+        with pytest.raises(LocalActionTransformError):
+            rule.perform_transform(match_error, lintable, data)
+        assert f"{prefix} in task at {file}:1" in caplog.text
 
-    def test_local_action_transform_unsupported_type(args: Args) -> None:
-        """Test transform functionality for unsupported type.
-
-        Args:
-            args: The args for the transform.
-        """
-        data = CommentedMap({"local_action": True})
-        with pytest.raises(LocalActionTransformError) as exc:
-            args.rule.perform_transform(args.match_error, args.lintable, data)
-        expected = "Unsupported local_action type 'bool' in task at site.yml:1"
-        assert str(exc.value) == expected
-
-    def test_local_action_transform_dict_no_module(args: Args) -> None:
-        """Test transform functionality for missing module.
-
-        Args:
-            args: The parameters for the test.
-        """
-        data = CommentedMap({"local_action": {}})
-        with pytest.raises(LocalActionTransformError) as exc:
-            args.rule.perform_transform(args.match_error, args.lintable, data)
-        expected = "No 'module' key in local_action dict for task at site.yml:1"
-        assert str(exc.value) == expected
-
-    def test_local_action_transform_str_empty(args: Args) -> None:
-        """Test transform functionality for empty string.
-
-        Args:
-            args: The parameters for the test.
-        """
-        data = CommentedMap({"local_action": "  "})
-        with pytest.raises(LocalActionTransformError) as exc:
-            args.rule.perform_transform(args.match_error, args.lintable, data)
-        expected = "Empty local_action string for task at site.yml:1"
-        assert str(exc.value) == expected
-
-    # pylint: enable=redefined-outer-name
-
-    @mock.patch.dict(os.environ, {"ANSIBLE_LINT_WRITE_TMP": "1"}, clear=True)
     def test_local_action_transform(
         config_options: Options,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Test transform functionality for no-log-password rule."""
+        monkeypatch.setenv("ANSIBLE_LINT_WRITE_TMP", "1")
+
         playbook = Path("examples/playbooks/tasks/local_action.yml")
         config_options.write_list = ["all"]
 
