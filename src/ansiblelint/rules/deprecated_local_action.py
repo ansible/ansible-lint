@@ -4,12 +4,12 @@
 # Copyright (c) 2018, Ansible Project
 from __future__ import annotations
 
-import copy
 import logging
 import os
+import shlex
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
 from ansiblelint.runner import get_matches
@@ -52,41 +52,84 @@ class TaskNoLocalActionRule(AnsibleLintRule, TransformMixin):
         lintable: Lintable,
         data: CommentedMap | CommentedSeq | str,
     ) -> None:
-        if match.tag == self.id:
-            original_target_task = self.seek(match.yaml_path, data)
-            assert "local_action" in original_target_task
-            target_task: dict[str, Any] = {}
+        """Transform the task to use delegate_to: localhost.
 
-            for k, v in original_target_task.items():
-                if k == "local_action":
-                    if isinstance(v, dict):
-                        assert "module" in v
-                        target_task[v["module"]] = copy.deepcopy(v)
-                        target_task[v["module"]].pop("module", None)
+        Args:
+            match: The match object.
+            lintable: The lintable object.
+            data: The data to transform.
+        """
+        original_task = self.seek(match.yaml_path, data)
+        if not isinstance(original_task, dict):
+            msg = f"Ignored unexpected data inside {getattr(match, 'id', 'unknown')} transform: not a dict."
+            _logger.debug(msg)
+            return
 
-                        if target_task[v["module"]] == {}:
-                            target_task[v["module"]] = None
+        if "local_action" not in original_task:
+            return
 
-                        target_task["delegate_to"] = "localhost"
-                    elif isinstance(v, str):
-                        tokens = v.split(" ", 1)
-                        if len(tokens) > 1:
-                            target_task[tokens[0]] = tokens[1]
-                        else:
-                            target_task[tokens[0]] = None
-                        target_task["delegate_to"] = "localhost"
-                    else:  # pragma: no cover
-                        _logger.debug(
-                            "Ignored unexpected data inside %s transform.",
-                            self.id,
-                        )
-                        return
-                else:
-                    target_task[k] = v
+        # Copy all keys except "local_action"
+        target_task = {}
+
+        # task name first
+        if name := original_task.pop("name", None):
+            target_task["name"] = name
+
+        local_action = original_task.pop("local_action")
+
+        # Handle dict-form local_action
+        if isinstance(local_action, dict):
+            if "module" not in local_action:
+                msg = f"No 'module' key in local_action dict for task {getattr(match, 'id', 'unknown')}"
+                _logger.warning(msg)
+                return
+            plugin_details = {k: v for k, v in local_action.items() if k != "module"}
+            target_task[local_action["module"]] = (
+                plugin_details if plugin_details else None
+            )
+
+        # Handle string-form local_action
+        elif isinstance(local_action, str):
+            try:
+                tokens = shlex.split(local_action)
+            except ValueError as exc:
+                msg = f"Failed to split local_action string for task {getattr(match, 'id', 'unknown')}: {exc}"
+                _logger.warning(msg)
+                return
+
+            if not tokens:
+                msg = f"Empty local_action string for task {getattr(match, 'id', 'unknown')}"
+                _logger.warning(msg)
+                return
+
+            plugin, *args = tokens
+
+            # If all args are key=value, build a dict
+            if args and all("=" in a for a in args):
+                dict_params = {}
+                for a in args:
+                    k, v = a.split("=", 1)
+                    dict_params[k] = v
+                target_task[plugin] = dict_params
+            # Otherwise, treat as positional arguments (join into a single string, if present)
+            elif args:
+                string_params = " ".join(args) if len(args) > 1 else args[0]
+                target_task[plugin] = string_params
+            else:
+                target_task[plugin] = None
+
+        else:
+            msg = f"Unsupported local_action type ({type(local_action)}) in task {getattr(match, 'id', 'unknown')}"
+            _logger.warning(msg)
+            return
+
+        # Copy over all other keys
+        target_task.update(original_task)
+        target_task["delegate_to"] = "localhost"
 
         match.fixed = True
-        original_target_task.clear()
-        original_target_task.update(target_task)
+        original_task.clear()
+        original_task.update(target_task)
 
 
 # testing code to be loaded only with pytest or when executed the rule file
