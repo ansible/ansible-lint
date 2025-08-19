@@ -68,7 +68,6 @@ class TaskNoLocalActionRule(AnsibleLintRule, TransformMixin):
         if "local_action" not in original_task:
             return
 
-        # Copy all keys except "local_action"
         target_task = {}
 
         # task name first
