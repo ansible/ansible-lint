@@ -6,7 +6,6 @@ import logging
 import os
 import re
 import sys
-import tempfile
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
