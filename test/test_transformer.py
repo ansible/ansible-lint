@@ -251,7 +251,7 @@ def test_transformer(  # pylint: disable=too-many-arguments,too-many-positional-
         try:
             assert orig_content != transformed_content
             assert expected_content == transformed_content
-        except AssertionError as exc:
+        except AssertionError:
             breakpoint()
         playbook.with_suffix(f".tmp{playbook.suffix}").unlink()
 
