@@ -944,6 +944,7 @@ if "pytest" in sys.modules:
 
     def test_jinja_ansible_tagged_str_concatenation() -> None:
         """Tests handling of _AnsibleTaggedStr concatenation errors from ansible-core 2.19."""
+
         def _mock_template_error(*args, **kwargs):  # type: ignore[no-untyped-def]
             msg = 'can only concatenate list (not "_AnsibleTaggedStr") to list'
             raise AnsibleError(msg)
