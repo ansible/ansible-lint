@@ -3,5 +3,5 @@
   hosts: localhost
   tasks:
     - name: Task example
-      ansible.builtin.debug:
+      ansible.builtin.debug: {}
       delegate_to: localhost
