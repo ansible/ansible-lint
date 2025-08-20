@@ -247,12 +247,8 @@ def test_transformer(  # pylint: disable=too-many-arguments,too-many-positional-
         transformed_content = playbook.with_suffix(f".tmp{playbook.suffix}").read_text(
             encoding="utf-8",
         )
-
-        try:
-            assert orig_content != transformed_content
-            assert expected_content == transformed_content
-        except AssertionError:
-            breakpoint()
+        assert orig_content != transformed_content
+        assert expected_content == transformed_content
         playbook.with_suffix(f".tmp{playbook.suffix}").unlink()
 
 
