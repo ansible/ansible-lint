@@ -27,7 +27,7 @@
   command: hostname
   delegate_to: localhost
 - name: Sample 8 - Dict-form local_action with no params (only module)
-  ping: {}
+  ping:
   delegate_to: localhost
 - name: Sample 9 - Args copied over
   copy: src=/etc/hosts dest=/tmp/hosts

@@ -134,6 +134,7 @@ class TaskNoLocalActionRule(AnsibleLintRule, TransformMixin):
             local_action["module"]: {
                 k: v for k, v in local_action.items() if k != "module"
             }
+            or None
         }
 
     def process_string(
