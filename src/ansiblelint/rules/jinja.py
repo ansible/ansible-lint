@@ -943,7 +943,6 @@ if "pytest" in sys.modules:
             assert len(results) == 0
 
     def test_jinja_ansible_tagged_str_concatenation() -> None:
-        
         def _mock_template_error(*args, **kwargs):  # type: ignore[no-untyped-def]
             msg = 'can only concatenate list (not "_AnsibleTaggedStr") to list'
             raise AnsibleError(msg)
@@ -951,8 +950,8 @@ if "pytest" in sys.modules:
         do_template = Templar.do_template
         collection = RulesCollection()
         collection.register(JinjaRule())
-        
-        test_content = '''---
+
+        test_content = """---
 - name: Test _AnsibleTaggedStr concatenation
   hosts: localhost
   tasks:
@@ -962,20 +961,22 @@ if "pytest" in sys.modules:
       vars:
         __excludes: "{{ ['--exclude'] | product(packages) | flatten }}"
         packages: ["pkg1", "pkg2"]
-'''
-        
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.yml', delete=False) as f:
+"""
+
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", delete=False) as f:
             f.write(test_content)
             f.flush()
             lintable = Lintable(f.name)
-        
+
         try:
             with mock.patch.object(Templar, "do_template", _mock_template_error):
                 results = Runner(lintable, rules=collection).run()
                 jinja_errors = [r for r in results if r.rule.id == "jinja"]
-                assert len(jinja_errors) == 0, f"Expected no jinja errors, got: {jinja_errors}"
+                assert len(jinja_errors) == 0, (
+                    f"Expected no jinja errors, got: {jinja_errors}"
+                )
         finally:
-            os.unlink(f.name)
+            Path(f.name).unlink()
 
     @pytest.mark.parametrize(
         ("nodeps", "expected_results"),
