@@ -944,11 +944,10 @@ if "pytest" in sys.modules:
 
     def test_jinja_ansible_tagged_str_concatenation() -> None:
         """Tests handling of _AnsibleTaggedStr concatenation errors from ansible-core 2.19."""
-        def _mock_template_error(*args, **kwargs):  # type: ignore[no-untyped-def]
+        def _mock_template_error(*_args, **_kwargs):  # type: ignore[no-untyped-def]
             msg = 'can only concatenate list (not "_AnsibleTaggedStr") to list'
             raise AnsibleError(msg)
 
-        do_template = Templar.do_template
         collection = RulesCollection()
         collection.register(JinjaRule())
 
@@ -964,7 +963,7 @@ if "pytest" in sys.modules:
         packages: ["pkg1", "pkg2"]
 """
 
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", delete=False, encoding="utf-8") as f:
             f.write(test_content)
             f.flush()
             lintable = Lintable(f.name)
