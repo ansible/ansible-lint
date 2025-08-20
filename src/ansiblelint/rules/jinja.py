@@ -152,6 +152,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                     # ValueError RepresenterError
                     except (AnsibleError, ImportError) as exc:
                         bypass = False
+                        orig_exc: BaseException = exc
                         if (
                             isinstance(exc, AnsibleError)
                             and hasattr(exc, "orig_exc")
