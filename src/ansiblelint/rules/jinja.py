@@ -6,6 +6,7 @@ import logging
 import os
 import re
 import sys
+import tempfile
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
@@ -69,6 +70,8 @@ ignored_re = re.compile(
             r"^The '(.*)' test expects a dictionary$",
             # https://github.com/ansible/ansible-lint/issues/4338
             r"An unhandled exception occurred while templating (.*). Error was a <class 'ansible.errors.AnsibleFilterError'>, original message: The (.*) test expects a dictionary$",
+            r"can only concatenate list \(not \"_AnsibleTaggedStr\"\) to list",
+            r"can only concatenate str \(not \"_AnsibleTaggedStr\"\) to str",
         ],
     ),
     flags=re.MULTILINE | re.DOTALL,
@@ -939,6 +942,41 @@ if "pytest" in sys.modules:
         with mock.patch.object(Templar, "do_template", _do_template):
             results = Runner(lintable, rules=collection).run()
             assert len(results) == 0
+
+    def test_jinja_ansible_tagged_str_concatenation() -> None:
+        
+        def _mock_template_error(*args, **kwargs):  # type: ignore[no-untyped-def]
+            msg = 'can only concatenate list (not "_AnsibleTaggedStr") to list'
+            raise AnsibleError(msg)
+
+        do_template = Templar.do_template
+        collection = RulesCollection()
+        collection.register(JinjaRule())
+        
+        test_content = '''---
+- name: Test _AnsibleTaggedStr concatenation
+  hosts: localhost
+  tasks:
+    - name: Task with problematic template
+      ansible.builtin.debug:
+        msg: "{{ ['dnf', '-y', 'install'] + __excludes }}"
+      vars:
+        __excludes: "{{ ['--exclude'] | product(packages) | flatten }}"
+        packages: ["pkg1", "pkg2"]
+'''
+        
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.yml', delete=False) as f:
+            f.write(test_content)
+            f.flush()
+            lintable = Lintable(f.name)
+        
+        try:
+            with mock.patch.object(Templar, "do_template", _mock_template_error):
+                results = Runner(lintable, rules=collection).run()
+                jinja_errors = [r for r in results if r.rule.id == "jinja"]
+                assert len(jinja_errors) == 0, f"Expected no jinja errors, got: {jinja_errors}"
+        finally:
+            os.unlink(f.name)
 
     @pytest.mark.parametrize(
         ("nodeps", "expected_results"),
