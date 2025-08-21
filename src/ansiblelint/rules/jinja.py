@@ -979,8 +979,8 @@ def test_ansible_core_2_19_supported_version() -> None:
 
 
 @pytest.mark.parametrize(
-    "error_message,should_be_ignored",
-    [
+    ("error_message", "should_be_ignored"),
+    (
         # ansible-core 2.19 _AnsibleTaggedStr errors that should be ignored
         ('can only concatenate list (not "_AnsibleTaggedStr") to list', True),
         ('can only concatenate str (not "_AnsibleTaggedStr") to str', True),
@@ -994,7 +994,7 @@ def test_ansible_core_2_19_supported_version() -> None:
         ("TemplateSyntaxError: unexpected token", False),
         ("UndefinedError: variable not defined", False),
         ("can only concatenate list (not AnsibleTaggedStr) to list", False),  # Missing quotes
-    ],
+    ),
 )
 def test_jinja_ignore_patterns(error_message: str, should_be_ignored: bool) -> None:
     """Test that ignore patterns correctly handle ansible-core 2.19 _AnsibleTaggedStr errors."""
