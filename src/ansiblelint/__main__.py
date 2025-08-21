@@ -231,7 +231,7 @@ def fix(runtime_options: Options, result: LintResult, rules: RulesCollection) ->
 
     if unknown_tags:  # pragma: no cover
         _logger.error(
-            "Found invalid value(s) (%s) for --fix arguments, must be one of: %s. You may be able to use more values if you change your profile.",
+            "Found invalid value(s) (%s) for --fix arguments, must be one of: %s. Valid values are limited by the configured profile.",
             ", ".join(unknown_tags),
             ", ".join(acceptable_tags),
         )
