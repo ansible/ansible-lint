@@ -333,7 +333,7 @@ class App:
         msg += f": {summary.failures} failure(s), {summary.warnings} warning(s)"
         if summary.fixed:
             msg += f", and fixed {summary.fixed} issue(s)"
-        msg += f" on {linted_files_count} files."
+        msg += f" in {linted_files_count} files processed of {files_count} encountered."
 
         # Now we add some information about required and passed profile
         if self.options.profile:
