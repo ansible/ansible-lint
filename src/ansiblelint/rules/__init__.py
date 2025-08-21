@@ -535,7 +535,6 @@ class RulesCollection:
         """Return a list of known tags of rules that implement transform(),
         without returning no sub-tags.
         """
-
         tags = set()
         for rule in self.rules:
             if issubclass(rule.__class__, TransformMixin):
