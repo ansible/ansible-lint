@@ -531,12 +531,13 @@ class RulesCollection:
 
         return matches
 
-    def known_tags(self) -> list[str]:
-        """Return a list of known tags, without returning no sub-tags."""
+    def known_transform_tags(self) -> list[str]:
+        """Return a list of known tags of rules that implement transform()."""
         tags = set()
         for rule in self.rules:
-            tags.add(rule.id)
-            tags.update(rule.tags)
+            if issubclass(rule.__class__, TransformMixin):
+                tags.add(rule.id)
+                tags.update(rule.tags)
         return sorted(tags)
 
     def list_tags(self) -> str:
