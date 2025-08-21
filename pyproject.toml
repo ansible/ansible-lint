@@ -104,6 +104,7 @@ warn_unused_configs = true
 ignore_errors = true
 ignore_missing_imports = true
 module = [
+  "ansible.parsing.yaml.constructor",
   "ansiblelint._version", # generated
   "license_expression",
   "ruamel.yaml"

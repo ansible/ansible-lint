@@ -101,6 +101,13 @@
                         "once_after",
                         "group_by_attributes"
                     ]
+                },
+                {
+                    "required": [
+                        "accumulate_within",
+                        "threshold",
+                        "group_by_attributes"
+                    ]
                 }
             ],
             "properties": {
@@ -111,6 +118,14 @@
                 "once_after": {
                     "type": "string",
                     "pattern": "^\\d+\\s(milliseconds?|seconds?|minutes?|hours?|days?)$"
+                },
+                "accumulate_within": {
+                    "type": "string",
+                    "pattern": "^\\d+\\s(milliseconds?|seconds?|minutes?|hours?|days?)$"
+                },
+                "threshold": {
+                    "type": "integer",
+                    "minimum": 1
                 },
                 "group_by_attributes": {
                     "type": "array",
@@ -348,6 +363,9 @@
                         },
                         "extra_vars": {
                             "type": "object"
+                        },
+                        "lock": {
+                            "type": "string"
                         }
                     },
                     "required": [
@@ -405,6 +423,9 @@
                         },
                         "extra_vars": {
                             "type": "object"
+                        },
+                        "lock": {
+                            "type": "string"
                         }
                     },
                     "required": [
@@ -457,6 +478,15 @@
                         "include_events": {
                             "type": "boolean",
                             "default": true
+                        },
+                        "lock": {
+                            "type": "string"
+                        },
+                        "labels": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     },
                     "required": [
@@ -510,6 +540,15 @@
                         "include_events": {
                             "type": "boolean",
                             "default": true
+                        },
+                        "lock": {
+                            "type": "string"
+                        },
+                        "labels": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     },
                     "required": [

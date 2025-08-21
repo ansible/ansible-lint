@@ -38,11 +38,11 @@ from ansiblelint.utils import Task
 
 try:  # ansible 2.19 + data tagging
     # cspell: ignore datatag
-    from ansible._internal._datatag._tags import (  # type: ignore[import-not-found] # pyright: ignore[reportMissingImports]
+    from ansible._internal._datatag._tags import (  # pyright: ignore[reportMissingImports]
         Origin,
     )
 except ImportError:  # pragma: no cover
-    Origin = None
+    Origin = None  # type: ignore[misc,assignment]
 
 if TYPE_CHECKING:
     # noinspection PyProtectedMember
@@ -1306,10 +1306,10 @@ def get_line_column(data: object, default_line: int = 1) -> tuple[int, int | Non
         line = int(data[LINE_NUMBER_KEY])
     if not line:
         # ansible 2.19+
-        if Origin:  # pragma: no cover
+        if Origin:  # type: ignore[truthy-function]  # pragma: no cover
             tag = Origin.get_tag(data)
-            line = tag.line_num
-            column = tag.col_num
+            line = tag.line_num  # type: ignore[union-attr,assignment]
+            column = tag.col_num  # type: ignore[union-attr]
         else:  # pre-ansible 2.19
             if hasattr(data, "ansible_pos"):  # AnsibleUnicode object
                 _, line, column = data.ansible_pos  # pyright: ignore[reportAttributeAccessIssue]

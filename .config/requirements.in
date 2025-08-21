@@ -1,6 +1,6 @@
 # Special order section for helping pip:
 ansible-core>=2.16.11 # GPLv3
-ansible-compat>=25.1.5 # GPLv3
+ansible-compat>=25.8.0 # GPLv3
 # alphabetically sorted:
 black>=24.3.0 # MIT (security)
 filelock>=3.8.2 # The Unlicense

@@ -181,7 +181,7 @@ class Options:  # pylint: disable=too-many-instance-attributes
     max_tasks: int = 100
     max_block_depth: int = 20
     # Refer to https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix
-    _default_supported = ["2.15.", "2.16.", "2.17.", "2.18."]
+    _default_supported = ["2.15.", "2.16.", "2.17.", "2.18.", "2.19."]
     supported_ansible_also: list[str] = field(default_factory=list)
 
     @property
