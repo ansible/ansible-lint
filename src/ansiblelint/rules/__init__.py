@@ -536,7 +536,6 @@ class RulesCollection:
         without returning no sub-tags.
 
         """
-        
         tags = set()
         for rule in self.rules:
             if issubclass(rule.__class__, TransformMixin):
