@@ -532,9 +532,8 @@ class RulesCollection:
         return matches
 
     def known_transform_tags(self) -> list[str]:
-        """Return a list of known tags of rules that implement transform(),
-        without returning no sub-tags.
-        """
+        """Return a list of known tags of rules that implement transform()."""
+        
         tags = set()
         for rule in self.rules:
             if issubclass(rule.__class__, TransformMixin):
