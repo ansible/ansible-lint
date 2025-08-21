@@ -481,6 +481,12 @@
                         },
                         "lock": {
                             "type": "string"
+                        },
+                        "labels": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     },
                     "required": [
@@ -537,6 +543,12 @@
                         },
                         "lock": {
                             "type": "string"
+                        },
+                        "labels": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     },
                     "required": [
