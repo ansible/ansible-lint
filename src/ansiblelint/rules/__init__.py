@@ -532,8 +532,7 @@ class RulesCollection:
         return matches
 
     def known_transform_tags(self) -> list[str]:
-        """
-        Return a list of known tags of rules that implement transform(),
+        """Return a list of known tags of rules that implement transform(),
         without returning no sub-tags.
         """
         tags = set()
