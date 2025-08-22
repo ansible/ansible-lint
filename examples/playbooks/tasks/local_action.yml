@@ -1,3 +1,30 @@
 ---
-- name: Sample
+- name: Sample 1
   local_action: command echo 123
+- name: Sample 2
+  local_action:
+    module: command
+    cmd: echo 456
+- name: Sample 3
+  local_action: ansible.builtin.debug
+- name: Sample 4 - Dict-form local_action
+  local_action:
+    module: user
+    name: alice
+    state: present
+  vars:
+    foo: bar
+- name: Sample 5 - String-form local_action (all key=value)
+  local_action: file path=/tmp/foo state=touch mode=0644
+  tags: always
+- name: Sample 6 - String-form local_action (positional arguments)
+  local_action: shell echo "hello world"
+- name: Sample 7 - String-form local_action (single positional argument)
+  local_action: command hostname
+- name: Sample 8 - Dict-form local_action with no params (only module)
+  local_action:
+    module: ping
+- name: Sample 9 - Args copied over
+  local_action: copy src=/etc/hosts dest=/tmp/hosts
+  args:
+    remote_src: yes

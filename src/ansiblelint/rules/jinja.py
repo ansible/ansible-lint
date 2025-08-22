@@ -69,6 +69,8 @@ ignored_re = re.compile(
             r"^The '(.*)' test expects a dictionary$",
             # https://github.com/ansible/ansible-lint/issues/4338
             r"An unhandled exception occurred while templating (.*). Error was a <class 'ansible.errors.AnsibleFilterError'>, original message: The (.*) test expects a dictionary$",
+            r"can only concatenate list \(not \"_AnsibleTaggedStr\"\) to list",
+            r"can only concatenate str \(not \"_AnsibleTaggedStr\"\) to str",
         ],
     ),
     flags=re.MULTILINE | re.DOTALL,
@@ -149,7 +151,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                     # ValueError RepresenterError
                     except (AnsibleError, ImportError) as exc:
                         bypass = False
-                        orig_exc = exc
+                        orig_exc: BaseException = exc
                         if (
                             isinstance(exc, AnsibleError)
                             and hasattr(exc, "orig_exc")
@@ -927,10 +929,10 @@ if "pytest" in sys.modules:
             data = args[1]
 
             if data != "{{ 12 | random(seed=inventory_hostname) }}":
-                return do_template(*args, **kwargs)  # type: ignore[no-untyped-call]
+                return do_template(*args, **kwargs)
 
             msg = "Unexpected templating type error occurred on (foo): bar"
-            raise AnsibleError(str(msg))  # type: ignore[no-untyped-call]
+            raise AnsibleError(str(msg))
 
         do_template = Templar.do_template
         collection = RulesCollection()
@@ -961,3 +963,36 @@ if "pytest" in sys.modules:
         lintable = Lintable("examples/playbooks/test_filter_with_importerror.yml")
         results = Runner(lintable, rules=collection).run()
         assert len(results) == expected_results
+
+    def test_ansible_core_2_19_supported_version() -> None:
+        """Test that ansible-core 2.19 is in the supported versions list."""
+        from ansiblelint.config import Options
+
+        options = Options()
+        supported_versions = options.supported_ansible
+
+        # Check that 2.19 is in the supported versions
+        assert any("2.19" in version for version in supported_versions), (
+            f"ansible-core 2.19 not found in supported versions: {supported_versions}"
+        )
+
+    @pytest.mark.parametrize(
+        ("error_message", "should_be_ignored"),
+        (
+            ('can only concatenate list (not "_AnsibleTaggedStr") to list', True),
+            ('can only concatenate str (not "_AnsibleTaggedStr") to str', True),
+            ("Unexpected templating type error occurred on (var): details", True),
+            ("Object of type method is not JSON serializable", True),
+            ('can only concatenate list (not "int") to list', False),
+            ("TemplateSyntaxError: unexpected token", False),
+            ("UndefinedError: variable not defined", False),
+            ("can only concatenate list (not AnsibleTaggedStr) to list", False),
+        ),
+    )
+    def test_jinja_ignore_patterns(error_message: str, should_be_ignored: bool) -> None:
+        """Test that ignore patterns correctly handle ansible-core 2.19 _AnsibleTaggedStr errors."""
+        matches = bool(ignored_re.search(error_message))
+        assert matches == should_be_ignored, (
+            f"Error message '{error_message}' should {'be ignored' if should_be_ignored else 'not be ignored'} "
+            f"but {'was' if matches else 'was not'} matched by ignore pattern"
+        )
