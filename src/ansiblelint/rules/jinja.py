@@ -628,9 +628,6 @@ if "pytest" in sys.modules:
             ),
             pytest.param("{{foo(123)}}", "{{ foo(123) }}", "spacing", id="11"),
             pytest.param("{{ foo(a.b.c) }}", "{{ foo(a.b.c) }}", "spacing", id="12"),
-            # pytest.param(
-            #     "spacing",
-            # ),
             pytest.param(
                 "{{foo(x =['server_options'])}}",
                 "{{ foo(x=['server_options']) }}",
@@ -912,12 +909,11 @@ if "pytest" in sys.modules:
 
         orig_content = playbook.read_text(encoding="utf-8")
         expected_content = playbook.with_suffix(
-            f".transformed{playbook.suffix}",
+            f".transformed{playbook.suffix}"
         ).read_text(encoding="utf-8")
         transformed_content = playbook.with_suffix(f".tmp{playbook.suffix}").read_text(
-            encoding="utf-8",
+            encoding="utf-8"
         )
-
         assert orig_content != transformed_content
         assert expected_content == transformed_content
         playbook.with_suffix(f".tmp{playbook.suffix}").unlink()
@@ -969,9 +965,8 @@ if "pytest" in sys.modules:
         import tempfile
 
         def _mock_tagged_str_error(*_args, **_kwargs):  # type: ignore[no-untyped-def]
-            raise AnsibleError(
-                'can only concatenate list (not "_AnsibleTaggedStr") to list'
-            )
+            msg = 'can only concatenate list (not "_AnsibleTaggedStr") to list'
+            raise AnsibleError(msg)
 
         collection = RulesCollection()
         collection.register(JinjaRule())
@@ -982,7 +977,6 @@ if "pytest" in sys.modules:
             f.write(test_content)
             f.flush()
             lintable = Lintable(f.name)
-
         try:
             with mock.patch.object(Templar, "do_template", _mock_tagged_str_error):
                 results = Runner(lintable, rules=collection).run()
@@ -993,7 +987,8 @@ if "pytest" in sys.modules:
 
             # Test legitimate errors are caught
             def _mock_real_error(*_args, **_kwargs):  # type: ignore[no-untyped-def]
-                raise AnsibleError('can only concatenate list (not "int") to list')
+                msg = 'can only concatenate list (not "int") to list'
+                raise AnsibleError(msg)
 
             with mock.patch.object(Templar, "do_template", _mock_real_error):
                 results = Runner(lintable, rules=collection).run()
