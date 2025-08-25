@@ -37,14 +37,14 @@ class TestAnsibleTaggedStrErrorHandling:
 
     @pytest.mark.parametrize(
         ("error_message", "should_be_ignored"),
-        [
+        (
             ('can only concatenate list (not "_AnsibleTaggedStr") to list', True),
             ('can only concatenate str (not "_AnsibleTaggedStr") to str', True),
             ("Unexpected templating type error occurred on", True),
             ("Object of type method is not JSON serializable", True),
             ('can only concatenate list (not "int") to list', False),
             ("TemplateSyntaxError: unexpected char '!' at 5", False),
-        ],
+        ),
     )
     def test_jinja_ignore_patterns_comprehensive(
         self, error_message: str, should_be_ignored: bool
