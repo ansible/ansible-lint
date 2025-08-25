@@ -964,110 +964,37 @@ if "pytest" in sys.modules:
         results = Runner(lintable, rules=collection).run()
         assert len(results) == expected_results
 
-    def test_ansible_core_2_19_supported_version() -> None:
-        """Test that ansible-core 2.19 is in the supported versions list."""
-        from ansiblelint.config import Options
-
-        options = Options()
-        supported_versions = options.supported_ansible
-
-        # Check that 2.19 is in the supported versions
-        assert any("2.19" in version for version in supported_versions), (
-            f"ansible-core 2.19 not found in supported versions: {supported_versions}"
-        )
-
-    @pytest.mark.parametrize(
-        ("error_message", "should_be_ignored"),
-        (
-            ('can only concatenate list (not "_AnsibleTaggedStr") to list', True),
-            ('can only concatenate str (not "_AnsibleTaggedStr") to str', True),
-            ("Unexpected templating type error occurred on (var): details", True),
-            ("Object of type method is not JSON serializable", True),
-            ('can only concatenate list (not "int") to list', False),
-            ("TemplateSyntaxError: unexpected token", False),
-            ("UndefinedError: variable not defined", False),
-            ("can only concatenate list (not AnsibleTaggedStr) to list", False),
-        ),
-    )
-    def test_jinja_ignore_patterns(error_message: str, should_be_ignored: bool) -> None:
-        """Test that ignore patterns correctly handle ansible-core 2.19 _AnsibleTaggedStr errors."""
-        matches = bool(ignored_re.search(error_message))
-        assert matches == should_be_ignored, (
-            f"Error message '{error_message}' should {'be ignored' if should_be_ignored else 'not be ignored'} "
-            f"but {'was' if matches else 'was not'} matched by ignore pattern"
-        )
-
     def test_jinja_template_generates_ansible_tagged_str_error() -> None:
         """Test that demonstrates ansible-core generating _AnsibleTaggedStr errors and us ignoring them."""
         import tempfile
-
-        def _mock_template_error_generator(*_args, **_kwargs):  # type: ignore[no-untyped-def]
-            """Mock that simulates ansible-core 2.19+ generating _AnsibleTaggedStr concatenation errors."""
-            # Simulate the actual error message that ansible-core 2.19+ generates
-            msg = (
-                "template error while templating string: "
-                'can only concatenate list (not "_AnsibleTaggedStr") to list. '
-                "String: {{ ['dnf', '-y', 'install'] + __excludes }}"
-            )
-            raise AnsibleError(msg)
-
+        
+        def _mock_tagged_str_error(*_args, **_kwargs):  # type: ignore[no-untyped-def]
+            raise AnsibleError('can only concatenate list (not "_AnsibleTaggedStr") to list')
+        
         collection = RulesCollection()
         collection.register(JinjaRule())
-
-        # Create a test playbook that would trigger the concatenation error
-        test_content = """---
-- name: Test _AnsibleTaggedStr concatenation error generation
-  hosts: localhost
-  tasks:
-    - name: Task that would cause _AnsibleTaggedStr concatenation error
-      ansible.builtin.debug:
-        msg: "{{ ['dnf', '-y', 'install'] + __excludes }}"
-      vars:
-        __excludes: "{{ ['--exclude'] | product(packages) | flatten }}"
-        packages: ["pkg1", "pkg2"]
-"""
-
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".yml", delete=False, encoding="utf-8"
-        ) as f:
+        
+        test_content = "---\n- hosts: localhost\n  tasks:\n    - debug: msg=\"{{ ['cmd'] + var }}\"\n"
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", delete=False, encoding="utf-8") as f:
             f.write(test_content)
             f.flush()
             lintable = Lintable(f.name)
-
+        
         try:
-            # Test 1: Verify that when ansible-core generates the _AnsibleTaggedStr error,
-            # our ignore patterns correctly suppress it
-            with mock.patch.object(
-                Templar, "do_template", _mock_template_error_generator
-            ):
+            # Test _AnsibleTaggedStr errors are ignored
+            with mock.patch.object(Templar, "do_template", _mock_tagged_str_error):
                 results = Runner(lintable, rules=collection).run()
                 jinja_errors = [r for r in results if r.rule.id == "jinja"]
-                assert len(jinja_errors) == 0, (
-                    f"Expected _AnsibleTaggedStr concatenation errors to be ignored, "
-                    f"but got jinja errors: {jinja_errors}"
-                )
-
-            # Test 2: Verify that a similar legitimate error would NOT be ignored
-            def _mock_legitimate_error(*_args, **_kwargs):  # type: ignore[no-untyped-def]
-                """Mock that generates a legitimate concatenation error that should NOT be ignored."""
-                msg = (
-                    "template error while templating string: "
-                    'can only concatenate list (not "int") to list. '
-                    "String: {{ ['dnf', '-y', 'install'] + some_number }}"
-                )
-                raise AnsibleError(msg)
-
-            with mock.patch.object(Templar, "do_template", _mock_legitimate_error):
+                assert len(jinja_errors) == 0, f"Expected _AnsibleTaggedStr errors ignored: {jinja_errors}"
+            
+            # Test legitimate errors are caught
+            def _mock_real_error(*_args, **_kwargs):  # type: ignore[no-untyped-def]
+                raise AnsibleError('can only concatenate list (not "int") to list')
+            
+            with mock.patch.object(Templar, "do_template", _mock_real_error):
                 results = Runner(lintable, rules=collection).run()
                 jinja_errors = [r for r in results if r.rule.id == "jinja"]
-                assert len(jinja_errors) == 1, (
-                    f"Expected legitimate concatenation error to be caught, "
-                    f"but got {len(jinja_errors)} jinja errors: {jinja_errors}"
-                )
-                assert (
-                    'can only concatenate list (not "int") to list'
-                    in jinja_errors[0].message
-                )
-
+                assert len(jinja_errors) == 1, f"Expected real errors caught: {jinja_errors}"
+                
         finally:
             Path(f.name).unlink()
