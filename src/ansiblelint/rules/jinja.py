@@ -969,11 +969,11 @@ if "pytest" in sys.modules:
         import tempfile
         
         def _mock_tagged_str_error(*_args, **_kwargs):  # type: ignore[no-untyped-def]
-            raise AnsibleError('can only concatenate list (not "_AnsibleTaggedStr") to list')
+            msg = 'can only concatenate list (not "_AnsibleTaggedStr") to list'
+            raise AnsibleError(msg)
         
         collection = RulesCollection()
         collection.register(JinjaRule())
-        
         test_content = "---\n- hosts: localhost\n  tasks:\n    - debug: msg=\"{{ ['cmd'] + var }}\"\n"
         with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", delete=False, encoding="utf-8") as f:
             f.write(test_content)
@@ -981,20 +981,18 @@ if "pytest" in sys.modules:
             lintable = Lintable(f.name)
         
         try:
-            # Test _AnsibleTaggedStr errors are ignored
             with mock.patch.object(Templar, "do_template", _mock_tagged_str_error):
                 results = Runner(lintable, rules=collection).run()
                 jinja_errors = [r for r in results if r.rule.id == "jinja"]
                 assert len(jinja_errors) == 0, f"Expected _AnsibleTaggedStr errors ignored: {jinja_errors}"
             
-            # Test legitimate errors are caught
             def _mock_real_error(*_args, **_kwargs):  # type: ignore[no-untyped-def]
-                raise AnsibleError('can only concatenate list (not "int") to list')
+                msg = 'can only concatenate list (not "int") to list'
+                raise AnsibleError(msg)
             
             with mock.patch.object(Templar, "do_template", _mock_real_error):
                 results = Runner(lintable, rules=collection).run()
                 jinja_errors = [r for r in results if r.rule.id == "jinja"]
                 assert len(jinja_errors) == 1, f"Expected real errors caught: {jinja_errors}"
-                
         finally:
             Path(f.name).unlink()
