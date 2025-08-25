@@ -1000,7 +1000,7 @@ if "pytest" in sys.modules:
     def test_jinja_template_generates_ansible_tagged_str_error() -> None:
         """Test that demonstrates ansible-core generating _AnsibleTaggedStr errors and us ignoring them."""
         import tempfile
-        
+
         def _mock_template_error_generator(*_args, **_kwargs):  # type: ignore[no-untyped-def]
             """Mock that simulates ansible-core 2.19+ generating _AnsibleTaggedStr concatenation errors."""
             # Simulate the actual error message that ansible-core 2.19+ generates
@@ -1026,8 +1026,10 @@ if "pytest" in sys.modules:
         __excludes: "{{ ['--exclude'] | product(packages) | flatten }}"
         packages: ["pkg1", "pkg2"]
 """
-        
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", delete=False, encoding="utf-8") as f:
+
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".yml", delete=False, encoding="utf-8"
+        ) as f:
             f.write(test_content)
             f.flush()
             lintable = Lintable(f.name)
@@ -1035,7 +1037,9 @@ if "pytest" in sys.modules:
         try:
             # Test 1: Verify that when ansible-core generates the _AnsibleTaggedStr error,
             # our ignore patterns correctly suppress it
-            with mock.patch.object(Templar, "do_template", _mock_template_error_generator):
+            with mock.patch.object(
+                Templar, "do_template", _mock_template_error_generator
+            ):
                 results = Runner(lintable, rules=collection).run()
                 jinja_errors = [r for r in results if r.rule.id == "jinja"]
                 assert len(jinja_errors) == 0, (
