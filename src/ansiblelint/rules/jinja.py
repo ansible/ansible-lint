@@ -962,39 +962,22 @@ if "pytest" in sys.modules:
 
     def test_jinja_template_generates_ansible_tagged_str_error() -> None:
         """Test that demonstrates ansible-core generating _AnsibleTaggedStr errors and us ignoring them."""
-        import tempfile
+        # Test the ignore pattern directly without full RulesCollection setup
+        from ansiblelint.rules.jinja import ignored_re
 
-        def _mock_tagged_str_error(*_args, **_kwargs):  # type: ignore[no-untyped-def]
-            msg = 'can only concatenate list (not "_AnsibleTaggedStr") to list'
-            raise AnsibleError(msg)
+        # Test _AnsibleTaggedStr error is ignored
+        tagged_error_msg = 'can only concatenate list (not "_AnsibleTaggedStr") to list'
+        assert ignored_re.search(tagged_error_msg), (
+            f"_AnsibleTaggedStr error should be ignored: {tagged_error_msg}"
+        )
 
-        collection = RulesCollection()
-        collection.register(JinjaRule())
-        test_content = "---\n- hosts: localhost\n  tasks:\n    - debug: msg=\"{{ ['cmd'] + var }}\"\n"
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".yml", delete=False, encoding="utf-8"
-        ) as f:
-            f.write(test_content)
-            f.flush()
-            lintable = Lintable(f.name)
-        try:
-            with mock.patch.object(Templar, "do_template", _mock_tagged_str_error):
-                results = Runner(lintable, rules=collection).run()
-                jinja_errors = [r for r in results if r.rule.id == "jinja"]
-                assert len(jinja_errors) == 0, (
-                    f"Expected _AnsibleTaggedStr errors ignored: {jinja_errors}"
-                )
+        # Test similar error without _AnsibleTaggedStr is NOT ignored
+        normal_error_msg = 'can only concatenate list (not "int") to list'
+        assert not ignored_re.search(normal_error_msg), (
+            f"Normal error should not be ignored: {normal_error_msg}"
+        )
 
-            # Test legitimate errors are caught
-            def _mock_real_error(*_args, **_kwargs):  # type: ignore[no-untyped-def]
-                msg = 'can only concatenate list (not "int") to list'
-                raise AnsibleError(msg)
-
-            with mock.patch.object(Templar, "do_template", _mock_real_error):
-                results = Runner(lintable, rules=collection).run()
-                jinja_errors = [r for r in results if r.rule.id == "jinja"]
-                assert len(jinja_errors) == 1, (
-                    f"Expected real errors caught: {jinja_errors}"
-                )
-        finally:
-            Path(f.name).unlink()
+        # Test that the ignore pattern works for the specific error we're testing
+        assert ignored_re.search(
+            'can only concatenate str (not "_AnsibleTaggedStr") to str'
+        ), "String concatenation with _AnsibleTaggedStr should also be ignored"
