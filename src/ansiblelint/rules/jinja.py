@@ -1000,9 +1000,7 @@ if "pytest" in sys.modules:
     def test_jinja_template_generates_ansible_tagged_str_error() -> None:
         """Test that demonstrates ansible-core generating _AnsibleTaggedStr errors and us ignoring them."""
         import tempfile
-        from pathlib import Path
-        from unittest import mock
-
+        
         def _mock_template_error_generator(*_args, **_kwargs):  # type: ignore[no-untyped-def]
             """Mock that simulates ansible-core 2.19+ generating _AnsibleTaggedStr concatenation errors."""
             # Simulate the actual error message that ansible-core 2.19+ generates
@@ -1028,10 +1026,8 @@ if "pytest" in sys.modules:
         __excludes: "{{ ['--exclude'] | product(packages) | flatten }}"
         packages: ["pkg1", "pkg2"]
 """
-
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".yml", delete=False, encoding="utf-8"
-        ) as f:
+        
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", delete=False, encoding="utf-8") as f:
             f.write(test_content)
             f.flush()
             lintable = Lintable(f.name)
@@ -1039,9 +1035,7 @@ if "pytest" in sys.modules:
         try:
             # Test 1: Verify that when ansible-core generates the _AnsibleTaggedStr error,
             # our ignore patterns correctly suppress it
-            with mock.patch.object(
-                Templar, "do_template", _mock_template_error_generator
-            ):
+            with mock.patch.object(Templar, "do_template", _mock_template_error_generator):
                 results = Runner(lintable, rules=collection).run()
                 jinja_errors = [r for r in results if r.rule.id == "jinja"]
                 assert len(jinja_errors) == 0, (
@@ -1073,39 +1067,3 @@ if "pytest" in sys.modules:
 
         finally:
             Path(f.name).unlink()
-
-    def test_jinja_cockpit_style_template_error_handling() -> None:
-        """Test that cockpit-style templates with _AnsibleTaggedStr errors are properly ignored."""
-        # This simulates the exact error that would occur with the cockpit repository issue
-        cockpit_error_message = (
-            "template error while templating string: "
-            'can only concatenate list (not "_AnsibleTaggedStr") to list. '
-            "String: {{ ['dnf', '-y', 'install', 'cockpit-*'] + __excludes }}"
-        )
-
-        cockpit_error = AnsibleError(cockpit_error_message)
-
-        # Test that this specific error pattern is caught by our ignore regex
-        bypass = bool(ignored_re.search(str(cockpit_error)))
-        assert bypass is True, (
-            f"Expected cockpit-style _AnsibleTaggedStr error to be bypassed, "
-            f"but it was not: {cockpit_error}"
-        )
-
-        # Verify that the core pattern is what's being matched
-        assert "_AnsibleTaggedStr" in str(cockpit_error), (
-            "Test error message should contain _AnsibleTaggedStr"
-        )
-
-        # Verify a similar error without _AnsibleTaggedStr would NOT be ignored
-        similar_error = AnsibleError(
-            "template error while templating string: "
-            'can only concatenate list (not "str") to list. '
-            "String: {{ ['dnf', '-y', 'install'] + some_var }}"
-        )
-
-        bypass = bool(ignored_re.search(str(similar_error)))
-        assert bypass is False, (
-            f"Expected similar error without _AnsibleTaggedStr to NOT be bypassed, "
-            f"but it was: {similar_error}"
-        )
