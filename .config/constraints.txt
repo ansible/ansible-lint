@@ -6,13 +6,13 @@ astroid==3.3.11           # via pylint
 asttokens==3.0.0          # via stack-data
 attrs==25.3.0             # via jsonschema, referencing, ansible-lint (pyproject.toml)
 babel==2.17.0             # via mkdocs-material
-backrefs==5.9             # via mkdocs-material
-beautifulsoup4==4.13.4    # via linkchecker, mkdocs-htmlproofer-plugin
+backrefs==6.0.1             # via mkdocs-material
+beautifulsoup4==4.13.5    # via linkchecker, mkdocs-htmlproofer-plugin
 bindep==2.13.0            # via tox-extra
 black==25.1.0             # via ansible-lint (pyproject.toml)
 boolean-py==5.0           # via license-expression
 bracex==2.6               # via wcmatch, ansible-lint (pyproject.toml)
-cachetools==6.1.0         # via tox
+cachetools==6.2.0         # via tox
 cairocffi==1.7.1          # via cairosvg
 cairosvg==2.7.1           # via mkdocs-ansible
 certifi==2025.8.3         # via requests
@@ -21,7 +21,7 @@ chardet==5.2.0            # via tox
 charset-normalizer==3.4.3  # via requests
 click==8.2.1              # via black, mkdocs, mkdocs-material, ansible-lint (pyproject.toml)
 colorama==0.4.6           # via griffe, mkdocs-material, tox
-coverage==7.10.4          # via coverage-enable-subprocess, ansible-lint (pyproject.toml)
+coverage==7.10.6          # via coverage-enable-subprocess, ansible-lint (pyproject.toml)
 coverage-enable-subprocess==1.0  # via ansible-lint (pyproject.toml)
 cryptography==45.0.6      # via ansible-core, ansible-lint (pyproject.toml)
 csscompressor==0.9.5      # via mkdocs-minify-plugin
@@ -38,7 +38,7 @@ filelock==3.19.1          # via tox, virtualenv, ansible-lint (pyproject.toml)
 ghp-import==2.1.0         # via mkdocs
 gitdb==4.0.12             # via gitpython
 gitpython==3.1.45         # via tox-extra
-griffe==1.12.1            # via mkdocstrings-python
+griffe==1.13.0            # via mkdocstrings-python
 hjson==3.1.0              # via mkdocs-macros-plugin, super-collections
 htmlmin2==0.1.13          # via mkdocs-minify-plugin
 idna==3.10                # via requests
@@ -64,30 +64,30 @@ mccabe==0.7.0             # via pylint
 mergedeep==1.3.4          # via mkdocs, mkdocs-get-deps
 mkdocs==1.6.1             # via mkdocs-ansible, mkdocs-autorefs, mkdocs-gen-files, mkdocs-htmlproofer-plugin, mkdocs-macros-plugin, mkdocs-material, mkdocs-minify-plugin, mkdocstrings
 mkdocs-ansible==25.5.0    # via ansible-lint (pyproject.toml)
-mkdocs-autorefs==1.4.2    # via mkdocstrings, mkdocstrings-python
+mkdocs-autorefs==1.4.3    # via mkdocstrings, mkdocstrings-python
 mkdocs-gen-files==0.5.0   # via mkdocs-ansible
 mkdocs-get-deps==0.2.0    # via mkdocs
 mkdocs-htmlproofer-plugin==1.3.0  # via mkdocs-ansible
 mkdocs-macros-plugin==1.3.9  # via mkdocs-ansible
-mkdocs-material==9.6.17   # via mkdocs-ansible
+mkdocs-material==9.6.18   # via mkdocs-ansible
 mkdocs-material-extensions==1.3.1  # via mkdocs-ansible, mkdocs-material
 mkdocs-minify-plugin==0.8.0  # via mkdocs-ansible
 mkdocstrings==0.30.0      # via mkdocs-ansible, mkdocstrings-python
-mkdocstrings-python==1.17.0  # via mkdocs-ansible
+mkdocstrings-python==1.18.2  # via mkdocs-ansible
 mypy==1.17.1              # via ansible-lint (pyproject.toml)
 mypy-extensions==1.1.0    # via black, mypy, ansible-lint (pyproject.toml)
 netaddr==1.3.0            # via ansible-lint (pyproject.toml)
 packaging==25.0           # via ansible-compat, ansible-core, bindep, black, mkdocs, mkdocs-macros-plugin, pyproject-api, pytest, tox, tox-extra, tox-uv, ansible-lint (pyproject.toml)
 paginate==0.5.7           # via mkdocs-material
 parsley==1.3              # via bindep
-parso==0.8.4              # via jedi
+parso==0.8.5              # via jedi
 pathspec==0.12.1          # via black, mkdocs, mkdocs-macros-plugin, mypy, yamllint, ansible-lint (pyproject.toml)
-pbr==7.0.0                # via bindep
+pbr==7.0.1                # via bindep
 pexpect==4.9.0            # via ipython
 pillow==11.3.0            # via cairosvg, mkdocs-ansible
-platformdirs==4.3.8       # via black, mkdocs-get-deps, pylint, tox, virtualenv, ansible-lint (pyproject.toml)
+platformdirs==4.4.0       # via black, mkdocs-get-deps, pylint, tox, virtualenv, ansible-lint (pyproject.toml)
 pluggy==1.6.0             # via pytest, tox
-prompt-toolkit==3.0.51    # via ipython
+prompt-toolkit==3.0.52    # via ipython
 psutil==7.0.0             # via pytest-xdist, ansible-lint (pyproject.toml)
 ptyprocess==0.7.0         # via pexpect
 pure-eval==0.2.3          # via stack-data
@@ -106,14 +106,14 @@ python-dateutil==2.9.0.post0  # via ghp-import, mkdocs-macros-plugin
 pyyaml==6.0.2             # via ansible-compat, ansible-core, ansible-creator, mkdocs, mkdocs-get-deps, mkdocs-macros-plugin, pymdown-extensions, pyyaml-env-tag, yamllint, ansible-lint (pyproject.toml)
 pyyaml-env-tag==1.1       # via mkdocs
 referencing==0.36.2       # via jsonschema, jsonschema-specifications, types-jsonschema, ansible-lint (pyproject.toml)
-requests==2.32.4          # via linkchecker, mkdocs-htmlproofer-plugin, mkdocs-material
-rpds-py==0.27.0           # via jsonschema, referencing, ansible-lint (pyproject.toml)
+requests==2.32.5          # via linkchecker, mkdocs-htmlproofer-plugin, mkdocs-material
+rpds-py==0.27.1           # via jsonschema, referencing, ansible-lint (pyproject.toml)
 ruamel-yaml==0.18.14      # via ansible-lint (pyproject.toml)
 setproctitle==1.3.6       # via pytest-xdist
 setuptools==80.9.0        # via pbr
 six==1.17.0               # via python-dateutil
 smmap==5.0.2              # via gitdb
-soupsieve==2.7            # via beautifulsoup4
+soupsieve==2.8            # via beautifulsoup4
 stack-data==0.6.3         # via ipython
 subprocess-tee==0.4.2     # via ansible-compat, ansible-lint (pyproject.toml)
 super-collections==0.5.3  # via mkdocs-macros-plugin

@@ -16,11 +16,11 @@ markupsafe==3.0.2         # via jinja2
 mypy-extensions==1.1.0    # via black
 packaging==25.0           # via ansible-compat, ansible-core, black, ansible-lint (pyproject.toml)
 pathspec==0.12.1          # via black, yamllint, ansible-lint (pyproject.toml)
-platformdirs==4.3.8       # via black
+platformdirs==4.4.0       # via black
 pycparser==2.22           # via cffi
 pyyaml==6.0.2             # via ansible-compat, ansible-core, yamllint, ansible-lint (pyproject.toml)
 referencing==0.36.2       # via jsonschema, jsonschema-specifications, ansible-lint (pyproject.toml)
-rpds-py==0.27.0           # via jsonschema, referencing
+rpds-py==0.27.1           # via jsonschema, referencing
 ruamel-yaml==0.18.14      # via ansible-lint (pyproject.toml)
 subprocess-tee==0.4.2     # via ansible-compat, ansible-lint (pyproject.toml)
 wcmatch==10.1             # via ansible-lint (pyproject.toml)
