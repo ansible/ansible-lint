@@ -75,7 +75,7 @@ repos:
           ]
         name: cspell + remove unused and sort dictionary
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.33.2
+    rev: 0.33.3
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
@@ -152,7 +152,7 @@ repos:
       - id: tox-ini-fmt
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.8
+    rev: v0.12.11
     hooks:
       - id: ruff-format
         alias: ruff
@@ -185,7 +185,7 @@ repos:
           - wcmatch
           - yamllint>=1.34.0
   - repo: https://github.com/RobertCraigie/pyright-python
-    rev: v1.1.403
+    rev: v1.1.404
     hooks:
       - id: pyright
         additional_dependencies: *deps
