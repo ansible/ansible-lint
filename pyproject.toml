@@ -87,7 +87,8 @@ disallow_untyped_calls = true
 disallow_untyped_defs = true
 error_summary = true
 # site-packages is here to help vscode mypy integration getting confused
-exclude = "(.cache|.config|.eggs|.tox|_readthedocs|build|dist|test/local-content|site|site-packages|~/.pyenv|examples|plugins/modules).*"
+exclude = "(.config|test/local-content|site-packages|~/.pyenv|examples|plugins/modules).*"
+exclude_gitignore = true
 # https://github.com/python/mypy/issues/12664
 follow_untyped_imports = true
 incremental = false

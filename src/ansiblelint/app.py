@@ -167,11 +167,12 @@ class App:
         return result
 
     @staticmethod
-    def count_lintables(files: set[Lintable]) -> tuple[int, int]:
+    def count_lintables(files: set[Lintable]) -> tuple[int, int, int]:
         """Count total and modified files."""
         files_count = len(files)
+        linted_files_count = len([file for file in files if file.kind])
         changed_files_count = len([file for file in files if file.updated])
-        return files_count, changed_files_count
+        return files_count, linted_files_count, changed_files_count
 
     @staticmethod
     def _get_matched_skippable_rules(
@@ -202,7 +203,9 @@ class App:
         msg = ""
 
         summary = self.count_results(result.matches)
-        files_count, changed_files_count = self.count_lintables(result.files)
+        files_count, linted_files_count, changed_files_count = self.count_lintables(
+            result.files
+        )
 
         matched_rules = self._get_matched_skippable_rules(result.matches)
 
@@ -253,6 +256,7 @@ class App:
             self.report_summary(
                 summary,
                 changed_files_count,
+                linted_files_count,
                 files_count,
                 is_success=mark_as_success,
             )
@@ -272,6 +276,7 @@ class App:
         self,
         summary: SummarizedResults,
         changed_files_count: int,
+        linted_files_count: int,
         files_count: int,
         is_success: bool,
     ) -> None:
@@ -328,7 +333,7 @@ class App:
         msg += f": {summary.failures} failure(s), {summary.warnings} warning(s)"
         if summary.fixed:
             msg += f", and fixed {summary.fixed} issue(s)"
-        msg += f" on {files_count} files."
+        msg += f" in {linted_files_count} files processed of {files_count} encountered."
 
         # Now we add some information about required and passed profile
         if self.options.profile:

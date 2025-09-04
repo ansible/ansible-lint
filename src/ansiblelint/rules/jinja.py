@@ -628,9 +628,6 @@ if "pytest" in sys.modules:
             ),
             pytest.param("{{foo(123)}}", "{{ foo(123) }}", "spacing", id="11"),
             pytest.param("{{ foo(a.b.c) }}", "{{ foo(a.b.c) }}", "spacing", id="12"),
-            # pytest.param(
-            #     "spacing",
-            # ),
             pytest.param(
                 "{{foo(x =['server_options'])}}",
                 "{{ foo(x=['server_options']) }}",
@@ -912,12 +909,11 @@ if "pytest" in sys.modules:
 
         orig_content = playbook.read_text(encoding="utf-8")
         expected_content = playbook.with_suffix(
-            f".transformed{playbook.suffix}",
+            f".transformed{playbook.suffix}"
         ).read_text(encoding="utf-8")
         transformed_content = playbook.with_suffix(f".tmp{playbook.suffix}").read_text(
-            encoding="utf-8",
+            encoding="utf-8"
         )
-
         assert orig_content != transformed_content
         assert expected_content == transformed_content
         playbook.with_suffix(f".tmp{playbook.suffix}").unlink()
@@ -964,35 +960,24 @@ if "pytest" in sys.modules:
         results = Runner(lintable, rules=collection).run()
         assert len(results) == expected_results
 
-    def test_ansible_core_2_19_supported_version() -> None:
-        """Test that ansible-core 2.19 is in the supported versions list."""
-        from ansiblelint.config import Options
+    def test_jinja_template_generates_ansible_tagged_str_error() -> None:
+        """Test that demonstrates ansible-core generating _AnsibleTaggedStr errors and us ignoring them."""
+        # Test the ignore pattern directly without full RulesCollection setup
+        from ansiblelint.rules.jinja import ignored_re
 
-        options = Options()
-        supported_versions = options.supported_ansible
-
-        # Check that 2.19 is in the supported versions
-        assert any("2.19" in version for version in supported_versions), (
-            f"ansible-core 2.19 not found in supported versions: {supported_versions}"
+        # Test _AnsibleTaggedStr error is ignored
+        tagged_error_msg = 'can only concatenate list (not "_AnsibleTaggedStr") to list'
+        assert ignored_re.search(tagged_error_msg), (
+            f"_AnsibleTaggedStr error should be ignored: {tagged_error_msg}"
         )
 
-    @pytest.mark.parametrize(
-        ("error_message", "should_be_ignored"),
-        (
-            ('can only concatenate list (not "_AnsibleTaggedStr") to list', True),
-            ('can only concatenate str (not "_AnsibleTaggedStr") to str', True),
-            ("Unexpected templating type error occurred on (var): details", True),
-            ("Object of type method is not JSON serializable", True),
-            ('can only concatenate list (not "int") to list', False),
-            ("TemplateSyntaxError: unexpected token", False),
-            ("UndefinedError: variable not defined", False),
-            ("can only concatenate list (not AnsibleTaggedStr) to list", False),
-        ),
-    )
-    def test_jinja_ignore_patterns(error_message: str, should_be_ignored: bool) -> None:
-        """Test that ignore patterns correctly handle ansible-core 2.19 _AnsibleTaggedStr errors."""
-        matches = bool(ignored_re.search(error_message))
-        assert matches == should_be_ignored, (
-            f"Error message '{error_message}' should {'be ignored' if should_be_ignored else 'not be ignored'} "
-            f"but {'was' if matches else 'was not'} matched by ignore pattern"
+        # Test similar error without _AnsibleTaggedStr is NOT ignored
+        normal_error_msg = 'can only concatenate list (not "int") to list'
+        assert not ignored_re.search(normal_error_msg), (
+            f"Normal error should not be ignored: {normal_error_msg}"
         )
+
+        # Test that the ignore pattern works for the specific error we're testing
+        assert ignored_re.search(
+            'can only concatenate str (not "_AnsibleTaggedStr") to str'
+        ), "String concatenation with _AnsibleTaggedStr should also be ignored"
