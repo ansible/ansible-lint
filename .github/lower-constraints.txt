@@ -1,6 +1,5 @@
-# This file is kept in a different directory than .config in order to not be
-# automatically updated by dependabot. This should be kept in sync with
-# minimal requirements configured inside .config/requirements.in
+# This should be kept in sync with minimal requirements configured inside
+# .config/requirements.in
 ansible-core==2.16.11
 ansible-compat==25.8.0 # GPLv3
 black==24.3.0 # MIT (security)
