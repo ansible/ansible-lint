@@ -57,7 +57,7 @@ repos:
             examples/playbooks/with-skip-tag-id.yml|
             examples/playbooks/with-umlaut-.*|
             examples/yamllint/.*|
-            src/ansiblelint/schemas/(molecule|tasks|playbook|rulebook).json|
+            src/ansiblelint/schemas/(molecule|tasks|playbook|rulebook|pattern).json|
             test/fixtures/formatting-before/.*|
             test/schemas/(negative_test|test)/.*\.md|
             test/schemas/data/.*|
