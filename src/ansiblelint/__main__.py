@@ -495,7 +495,10 @@ def path_inject(own_location: str = "") -> None:
             inject_paths.append(str(parent))
 
     if not os.environ.get("PYENV_VIRTUAL_ENV", None):
-        if inject_paths and not all("pipx" in p for p in inject_paths):
+        if inject_paths and not any((
+            all("pipx" in p for p in inject_paths),
+            all("uv/tools" in p for p in inject_paths),
+        )):
             print(  # noqa: T201
                 f"WARNING: PATH altered to include {', '.join(inject_paths)} :: This is usually a sign of broken local setup, which can cause unexpected behaviors.",
                 file=sys.stderr,
