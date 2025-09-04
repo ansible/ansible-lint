@@ -87,7 +87,8 @@ disallow_untyped_calls = true
 disallow_untyped_defs = true
 error_summary = true
 # site-packages is here to help vscode mypy integration getting confused
-exclude = "(.cache|.config|.eggs|.tox|_readthedocs|build|dist|test/local-content|site|site-packages|~/.pyenv|examples|plugins/modules).*"
+exclude = "(.config|test/local-content|site-packages|~/.pyenv|examples|plugins/modules).*"
+exclude_gitignore = true
 # https://github.com/python/mypy/issues/12664
 follow_untyped_imports = true
 incremental = false
@@ -104,6 +105,7 @@ warn_unused_configs = true
 ignore_errors = true
 ignore_missing_imports = true
 module = [
+  "ansible.parsing.yaml.constructor",
   "ansiblelint._version", # generated
   "license_expression",
   "ruamel.yaml"
@@ -534,6 +536,9 @@ convention = "google"
 [tool.setuptools.dynamic]
 dependencies = {file = [".config/requirements.in"]}
 optional-dependencies.docs = {file = [".config/requirements-docs.in"]}
+# 'lock' will work only if you use a python version supported by the latest
+# release of ansible-core, otherwise installation will fail
+optional-dependencies.lock = {file = [".config/requirements-lock.txt"]}
 optional-dependencies.test = {file = [".config/requirements-test.in"]}
 
 [tool.setuptools_scm]

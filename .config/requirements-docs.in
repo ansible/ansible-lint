@@ -1,1 +1,1 @@
-mkdocs-ansible>=25.5.0  # do not use lock extra because it would break dependabot updates
+mkdocs-ansible>=25.5.0

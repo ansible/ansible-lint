@@ -38,11 +38,11 @@ from ansiblelint.utils import Task
 
 try:  # ansible 2.19 + data tagging
     # cspell: ignore datatag
-    from ansible._internal._datatag._tags import (  # type: ignore[import-not-found] # pyright: ignore[reportMissingImports]
+    from ansible._internal._datatag._tags import (  # pyright: ignore[reportMissingImports]
         Origin,
     )
 except ImportError:  # pragma: no cover
-    Origin = None
+    Origin = None  # type: ignore[misc,assignment]
 
 if TYPE_CHECKING:
     # noinspection PyProtectedMember
@@ -86,19 +86,25 @@ def deannotate(data: Any) -> Any:
     return data
 
 
-def load_yamllint_config() -> CustomYamlLintConfig:
+def load_yamllint_config(yamllint_file: Path | None = None) -> CustomYamlLintConfig:
     """Load our default yamllint config and any customized override file."""
     config = CustomYamlLintConfig(file=Path(__file__).parent / "data" / ".yamllint")
     config.incompatible = ""
-    # if we detect local yamllint config we use it but raise a warning
+    # Declare local yamllint config file locations.
+    # If we detect local yamllint config we use it but raise a warning
     # as this is likely to get out of sync with our internal config.
-    for path in [
+    yamllint_config_locations = [
         ".yamllint",
         ".yamllint.yaml",
         ".yamllint.yml",
         os.getenv("YAMLLINT_CONFIG_FILE", ""),
         os.getenv("XDG_CONFIG_HOME", "~/.config") + "/yamllint/config",
-    ]:
+    ]
+    if yamllint_file:
+        # Ensure the CLI option yamllint_file config is the first
+        # file to be loaded
+        yamllint_config_locations.insert(0, str(yamllint_file))
+    for path in yamllint_config_locations:
         file = Path(path).expanduser()
         if file.is_file():
             _logger.debug(
@@ -1300,10 +1306,10 @@ def get_line_column(data: object, default_line: int = 1) -> tuple[int, int | Non
         line = int(data[LINE_NUMBER_KEY])
     if not line:
         # ansible 2.19+
-        if Origin:  # pragma: no cover
+        if Origin:  # type: ignore[truthy-function]  # pragma: no cover
             tag = Origin.get_tag(data)
-            line = tag.line_num
-            column = tag.col_num
+            line = tag.line_num  # type: ignore[union-attr,assignment]
+            column = tag.col_num  # type: ignore[union-attr]
         else:  # pre-ansible 2.19
             if hasattr(data, "ansible_pos"):  # AnsibleUnicode object
                 _, line, column = data.ansible_pos  # pyright: ignore[reportAttributeAccessIssue]

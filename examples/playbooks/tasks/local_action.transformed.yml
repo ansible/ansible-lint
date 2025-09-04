@@ -1,4 +1,36 @@
 ---
-- name: Sample
-  ansible.builtin.command: echo 123
+- name: Sample 1
+  command: echo 123
   delegate_to: localhost
+- name: Sample 2
+  command:
+    cmd: echo 456
+  delegate_to: localhost
+- name: Sample 3
+  ansible.builtin.debug:
+  delegate_to: localhost
+- name: Sample 4 - Dict-form local_action
+  user:
+    name: alice
+    state: present
+  delegate_to: localhost
+  vars:
+    foo: bar
+- name: Sample 5 - String-form local_action (all key=value)
+  file: path=/tmp/foo state=touch mode=0644
+  delegate_to: localhost
+  tags: always
+- name: Sample 6 - String-form local_action (positional arguments)
+  shell: echo "hello world"
+  delegate_to: localhost
+- name: Sample 7 - String-form local_action (single positional argument)
+  command: hostname
+  delegate_to: localhost
+- name: Sample 8 - Dict-form local_action with no params (only module)
+  ping:
+  delegate_to: localhost
+- name: Sample 9 - Args copied over
+  copy: src=/etc/hosts dest=/tmp/hosts
+  delegate_to: localhost
+  args:
+    remote_src: true

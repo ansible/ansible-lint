@@ -33,6 +33,9 @@ Possible errors messages:
     with this rule yet, you might need to temporarily disable this rule using
     a `# noqa: var-naming[no-role-prefix]` comment.
 
+    In all other task types variable names defined in `vars` are considered
+    task-scoped and do not require the role prefix.
+
 ## Settings
 
 This rule behavior can be changed by altering the below settings:

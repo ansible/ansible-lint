@@ -77,6 +77,12 @@ them and it does not install them by default.
 [pre-commit.ci] is a hosted service that can run pre-commit for you
 on each change but you can also run the tool yourself using the CI of your choice.
 
+!!! warning
+
+    We only support using latest version of ansible-core when running as
+    a pre-commit hook. Still, you can bypass this by changing the
+    `additional_dependencies`.
+
 Change **rev:** to either a commit sha or tag of Ansible-lint that contains
 `.pre-commit-hooks.yaml`.
 

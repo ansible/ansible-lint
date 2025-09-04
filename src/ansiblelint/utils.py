@@ -63,17 +63,17 @@ from ansible.plugins.loader import (
 )
 from ansible.template import Templar
 from ansible.utils.collection_loader import AnsibleCollectionConfig
+from jinja2 import Environment, nodes
+from jinja2.exceptions import TemplateError, TemplateSyntaxError
+from packaging.version import Version
 from yaml.composer import Composer
 from yaml.parser import ParserError
 from yaml.representer import RepresenterError
 from yaml.scanner import ScannerError
 
-from ansiblelint._internal.rules import (
-    AnsibleParserErrorRule,
-    RuntimeErrorRule,
-)
+from ansiblelint._internal.rules import AnsibleParserErrorRule, RuntimeErrorRule
 from ansiblelint.app import App, get_app
-from ansiblelint.config import Options, options
+from ansiblelint.config import Options, get_deps_versions, options
 from ansiblelint.constants import (
     ANNOTATION_KEYS,
     FILENAME_KEY,
@@ -89,11 +89,11 @@ from ansiblelint.file_utils import Lintable, discover_lintables
 from ansiblelint.skip_utils import is_nested_task
 from ansiblelint.text import has_jinja, is_fqcn, removeprefix
 from ansiblelint.types import (
-    AnsibleBaseYAMLObject,
+    AnsibleBaseYAMLObject,  # pyright: ignore[reportAttributeAccessIssue]
     AnsibleConstructor,  # pyright: ignore[reportAttributeAccessIssue]
     AnsibleJSON,
-    AnsibleMapping,
-    AnsibleSequence,
+    AnsibleMapping,  # pyright: ignore[reportAttributeAccessIssue]
+    AnsibleSequence,  # pyright: ignore[reportAttributeAccessIssue]
     TrustedAsTemplate,
 )
 
@@ -149,7 +149,7 @@ def ansible_templar(basedir: Path, templatevars: Any) -> Templar:
 
     dataloader = DataLoader()  # type: ignore[no-untyped-call]
     dataloader.set_basedir(str(basedir))
-    templar = Templar(dataloader, variables=templatevars)  # type: ignore[no-untyped-call]
+    templar = Templar(dataloader, variables=templatevars)
     return templar
 
 
@@ -166,6 +166,32 @@ def mock_filter(left: Any, *args: Any, **kwargs: Any) -> Any:  # noqa: ARG001
     """
     # pylint: disable=unused-argument
     return left
+
+
+def has_lookup_function_calls(varname: str) -> bool:
+    """Check if a template string contains lookup, query, or q function calls using AST parsing.
+
+    This function parses Jinja2 templates and looks for function calls to
+    'lookup', 'query', or 'q' by examining the AST).
+
+    :param varname: The template string to analyze
+    :return: True if lookup functions are found, False otherwise
+    """
+    lookup_names = {"lookup", "query", "q"}
+
+    try:
+        env = Environment(autoescape=True)
+        ast_tree = env.parse(varname)
+
+        for node in ast_tree.find_all(nodes.Call):
+            if isinstance(node.node, nodes.Name) and node.node.name in lookup_names:
+                return True
+    except (TemplateSyntaxError, TemplateError, AttributeError):
+        # Fallback to regex for edge cases where Jinja2 parsing fails
+        fallback_pattern = re.compile(r"\(?(lookup|query|q)\)?\s*\(")
+        return bool(fallback_pattern.search(varname))
+    else:
+        return False
 
 
 def ansible_template(
@@ -200,13 +226,20 @@ def ansible_template(
     re_filter_in_err = re.compile(r"Could not load \"(\w+)\"")
     re_valid_filter = re.compile(r"^\w+(\.\w+\.\w+)?$")
     templar = ansible_templar(basedir=basedir, templatevars=templatevars)
+    ansible_core_2_19 = Version("2.19")
+    deps = get_deps_versions()
 
-    kwargs["disable_lookups"] = True
+    # Skip lookups for ansible-core >= 2.19; use disable_lookups for older versions
+    if has_lookup_function_calls(str(varname)):
+        if deps["ansible-core"] and deps["ansible-core"] >= ansible_core_2_19:
+            return varname
+        kwargs["disable_lookups"] = True
+
     for _i in range(10):
         try:
             if TrustedAsTemplate and not isinstance(varname, TrustedAsTemplate):
                 varname = TrustedAsTemplate().tag(varname)
-            templated = templar.template(varname, **kwargs)  # type: ignore[no-untyped-call]
+            templated = templar.template(varname, **kwargs)
         except AnsibleError as exc:
             if lookup_error in exc.message:
                 return varname
@@ -231,7 +264,7 @@ def ansible_template(
                 v = templar.environment.filters
                 if not hasattr(v, "_delegatee"):  # pragma: no cover
                     raise
-                v._delegatee[missing_filter] = mock_filter  # fmt: skip # noqa: SLF001
+                v._delegatee[missing_filter] = mock_filter  # fmt: skip # noqa: SLF001 # pyright: ignore[reportAttributeAccessIssue]
                 # Record the mocked filter so we can warn the user
                 if missing_filter not in options.mock_filters:
                     _logger.debug("Mocking missing filter %s", missing_filter)
@@ -296,7 +329,7 @@ def set_collections_basedir(basedir: Path) -> None:
     # produce weird errors if we use a relative one.
     # https://github.com/psf/black/issues/4519
     # fmt: off
-    AnsibleCollectionConfig.playbook_paths = (  # type: ignore[attr-defined] # pyright: ignore[reportAttributeAccessIssue]
+    AnsibleCollectionConfig.playbook_paths = (  # pyright: ignore[reportAttributeAccessIssue]
         str(basedir.resolve()))
     # fmt: on
 
@@ -800,7 +833,7 @@ def normalize_task_v2(task: Task) -> MutableMapping[str, Any]:
 
 
 # pylint: disable=too-many-nested-blocks
-def extract_from_list(
+def extract_from_list(  # type: ignore[no-any-unimported]
     blocks: AnsibleBaseYAMLObject,
     candidates: list[str],
     *,
@@ -1028,7 +1061,7 @@ class Task(Mapping[str, Any]):
         return line
 
 
-def task_in_list(
+def task_in_list(  # type: ignore[no-any-unimported]
     data: AnsibleBaseYAMLObject,
     file: Lintable,
     kind: str,
@@ -1036,7 +1069,7 @@ def task_in_list(
 ) -> Iterator[Task]:
     """Get action tasks from block structures."""
 
-    def each_entry(
+    def each_entry(  # type: ignore[no-any-unimported]
         data: Sequence[Any] | AnsibleMapping, file: Lintable, kind: str, position: str
     ) -> Iterator[Task]:
         if not data or not isinstance(data, Iterable):
@@ -1085,7 +1118,7 @@ def task_in_list(
         yield from each_entry(data, file=file, position=position, kind=kind)
 
 
-def add_action_type(
+def add_action_type(  # type: ignore[no-any-unimported]
     actions: AnsibleBaseYAMLObject, action_type: str
 ) -> AnsibleSequence:
     """Add action markers to task objects."""
@@ -1103,14 +1136,14 @@ def add_action_type(
 
 
 @cache
-def parse_yaml_linenumbers(
+def parse_yaml_linenumbers(  # type: ignore[no-any-unimported]
     lintable: Lintable,
 ) -> AnsibleBaseYAMLObject | None:
     """Parse yaml as ansible.utils.parse_yaml but with linenumbers.
 
     The line numbers are stored in each node's LINE_NUMBER_KEY key.
     """
-    loader: AnsibleLoader
+    loader: AnsibleLoader  # type: ignore[valid-type]
     result = AnsibleSequence()
 
     # signature of Composer.compose_node
@@ -1121,19 +1154,19 @@ def parse_yaml_linenumbers(
             msg = "Unexpected yaml data."
             raise TypeError(msg)
         if hasattr(loader, "line"):  # pragma: no cover
-            line = loader.line
+            line = loader.line  # type: ignore[attr-defined]
             node.__line__ = line + 1  # type: ignore[attr-defined]
         return node
 
     # signature of AnsibleConstructor.construct_mapping
-    def construct_mapping(
+    def construct_mapping(  # type: ignore[no-any-unimported]
         node: yaml.MappingNode,
         deep: bool = False,  # noqa: FBT002
     ) -> AnsibleMapping:
         # pyright: ignore[reportArgumentType]
-        mapping: AnsibleMapping = AnsibleConstructor.construct_mapping(
+        mapping: AnsibleMapping = AnsibleConstructor.construct_mapping(  # type: ignore[no-any-unimported]
             loader, node, deep=deep
-        )  # type: ignore[no-untyped-call]
+        )
         if hasattr(node, LINE_NUMBER_KEY):
             mapping[LINE_NUMBER_KEY] = getattr(node, LINE_NUMBER_KEY)
         else:
@@ -1148,16 +1181,16 @@ def parse_yaml_linenumbers(
             kwargs["vault_password"] = DEFAULT_VAULT_PASSWORD
         # WARNING: 'unused-ignore' is needed below in order to allow mypy to
         # be passing with both pre-2.19 and post-2.19 versions of Ansible core.
-        loader = AnsibleLoader(lintable.content, **kwargs)  # type: ignore[no-untyped-call]
+        loader = AnsibleLoader(lintable.content, **kwargs)
         # redefine Composer.compose_node
         loader.compose_node = compose_node  # type: ignore[attr-defined,unused-ignore]
         # redefine AnsibleConstructor.construct_mapping
-        loader.construct_mapping = construct_mapping  # type: ignore[method-assign]
+        loader.construct_mapping = construct_mapping  # type: ignore[attr-defined]
         # while Ansible only accepts single documents, we also need to load
         # multi-documents, as we attempt to load any YAML file, not only
         # Ansible managed ones.
         while True:
-            data = loader.get_data()  # type: ignore[no-untyped-call]
+            data = loader.get_data()  # type: ignore[attr-defined]
             if data is None:
                 break
             result.append(data)
@@ -1311,7 +1344,7 @@ def parse_examples_from_plugin(lintable: Lintable) -> tuple[int, str]:
                 offset = child.lineno - 1
                 break
 
-    docs = read_docstring(str(lintable.path))  # type: ignore[no-untyped-call]
+    docs = read_docstring(str(lintable.path.resolve(strict=False)))  # type: ignore[no-untyped-call]
     examples = docs["plainexamples"]
 
     # Ignore the leading newline and lack of document start
@@ -1322,13 +1355,13 @@ def parse_examples_from_plugin(lintable: Lintable) -> tuple[int, str]:
 @lru_cache
 def load_plugin(name: str) -> PluginLoadContext:
     """Return loaded ansible plugin/module."""
-    loaded_module = action_loader.find_plugin_with_context(  # type: ignore[no-untyped-call]
+    loaded_module = action_loader.find_plugin_with_context(
         name,
         ignore_deprecated=True,
         check_aliases=True,
     )
     if not loaded_module.resolved:
-        loaded_module = module_loader.find_plugin_with_context(  # type: ignore[no-untyped-call]
+        loaded_module = module_loader.find_plugin_with_context(
             name,
             ignore_deprecated=True,
             check_aliases=True,
@@ -1337,7 +1370,7 @@ def load_plugin(name: str) -> PluginLoadContext:
         "ansible.builtin."
     ):  # pragma: no cover
         # fallback to core behavior of using legacy
-        loaded_module = module_loader.find_plugin_with_context(  # type: ignore[no-untyped-call]
+        loaded_module = module_loader.find_plugin_with_context(
             name.replace("ansible.builtin.", "ansible.legacy."),
             ignore_deprecated=True,
             check_aliases=True,

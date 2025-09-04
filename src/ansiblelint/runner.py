@@ -40,7 +40,10 @@ from ansiblelint.file_utils import (
 from ansiblelint.logger import timed_info
 from ansiblelint.rules.syntax_check import OUTPUT_PATTERNS
 from ansiblelint.text import strip_ansi_escape
-from ansiblelint.types import AnsibleJSON, AnsibleMapping
+from ansiblelint.types import (  # pyright: ignore[reportAttributeAccessIssue]
+    AnsibleJSON,
+    AnsibleMapping,  # pyright: ignore[reportAttributeAccessIssue]
+)
 from ansiblelint.utils import (
     PLAYBOOK_DIR,
     HandleChildren,
