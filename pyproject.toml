@@ -7,6 +7,66 @@ requires = [
   "setuptools_scm[toml] >= 7.0.5" # required for "no-local-version" scheme
 ]
 
+[dependency-groups]
+dev = [
+  "ansible-creator>=24.6.0",
+  "black>=25.1.0",
+  "coverage-enable-subprocess>=1.0",
+  "coverage[toml]>=6.4.4",
+  "ipdb>=0.13.13",
+  "ipython>=8.37.0",
+  "jmespath>=1.0.1",
+  "license-expression>=30.3.0",
+  "mypy>=1.17.1",
+  "netaddr>=1.3.0",
+  "pip>=25.2",
+  "psutil>=7.0.0",
+  "pylint>=3.3.8",
+  "pytest>=7.2.2",
+  "pytest-instafail>=0.5.0",
+  "pytest-mock>=3.15.0",
+  "pytest-plus>=0.6",
+  "pytest-sugar>=1.1.1",
+  "pytest-xdist[psutil,setproctitle]>=2.1.0",
+  "ruamel-yaml>=0.18.11",
+  "ruamel-yaml-clib>=0.2.12 ; python_full_version < '3.14'",
+  "tox>=4.24.2",
+  "tox-extra>=2.1",
+  "tox-uv>=1.25",
+  "types-jsonschema>=4.25.1.20250822",
+  "types-pyyaml>=6.0.12.20250822"
+]
+docs = [
+  "mkdocs-ansible>=25.5.0"
+]
+lint = [
+  "pre-commit>=4.1",
+  "pre-commit-uv>=4.1.4",
+  "pytest>=7.2.2",
+  "setuptools>=51.1.1"
+]
+lower = [
+  "ansible-compat==25.8.0",
+  "ansible-core==2.16.11",
+  "black==25.1.0",
+  "filelock==3.16.1",
+  "jsonschema==4.10.0",
+  "packaging==24.2",
+  "pathspec==0.11.1",
+  "pyyaml==6.0.2",
+  "ruamel-yaml==0.18.11",
+  "subprocess-tee==0.4.1",
+  "wcmatch==8.1.2 ; python_full_version < '3.12'",
+  "wcmatch==8.5.0 ; python_full_version >= '3.12'",
+  "yamllint==1.34.0"
+]
+pkg = [
+  "build>=0.9",
+  "pip>=25.2",
+  "pipx>=1.7.1",
+  "twine>=4.0.1"
+]
+
 [project]
 authors = [{"email" = "will@thames.id.au", "name" = "Will Thames"}]
 classifiers = [
@@ -30,8 +90,25 @@ classifiers = [
   "Topic :: Software Development :: Testing",
   "Topic :: Utilities"
 ]
+dependencies = [
+  "ansible-compat>=25.8.0",
+  "ansible-core>=2.16.11",
+  "black>=24.3.0",
+  "filelock>=3.8.2",
+  "importlib-metadata>=8.7.0",
+  "jsonschema>=4.10.0",
+  "packaging>=22.0",
+  "pathspec>=0.10.3",
+  "pyyaml>=6.0.2",
+  "referencing>=0.36.2",
+  "ruamel-yaml>=0.18.11",
+  "subprocess-tee>=0.4.1",
+  "wcmatch>=8.1.2 ; python_full_version < '3.12'",
+  "wcmatch>=8.5.0 ; python_full_version >= '3.12'",
+  "yamllint>=1.34.0"
+]
 description = "Checks playbooks for practices and behavior that could potentially be improved"
-dynamic = ["version", "dependencies", "optional-dependencies"]
+dynamic = ["version"]
 keywords = ["ansible", "lint"]
 license = "GPL-3.0-or-later"
 maintainers = [{"email" = "info@ansible.com", "name" = "Ansible by Red Hat"}]
@@ -532,14 +609,6 @@ max-complexity = 20
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
-
-[tool.setuptools.dynamic]
-dependencies = {file = [".config/requirements.in"]}
-optional-dependencies.docs = {file = [".config/requirements-docs.in"]}
-# 'lock' will work only if you use a python version supported by the latest
-# release of ansible-core, otherwise installation will fail
-optional-dependencies.lock = {file = [".config/requirements-lock.txt"]}
-optional-dependencies.test = {file = [".config/requirements-test.in"]}
 
 [tool.setuptools_scm]
 # To prevent accidental pick of mobile version tags such 'v6'
