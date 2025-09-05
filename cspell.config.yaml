@@ -16,10 +16,7 @@ enabled: true
 useGitignore: true
 ignorePaths:
   - cspell.config.yaml
-  # The requirements file
-  - .config/constraints.txt
-  - docs/requirements.txt
-  - docs/requirements.in
+  - uv.lock
   # Test fixtures generated from outside
   - test/**/*.result
   - src/ansiblelint/schemas/*.json

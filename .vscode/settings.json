@@ -11,7 +11,7 @@
     "editor.formatOnSave": true
   },
   "[toml]": {
-    "editor.defaultFormatter": "panekj.even-betterer-toml"
+    "editor.defaultFormatter": "tombi-toml.tombi"
   },
   "editor.formatOnSave": true,
   "evenBetterToml.formatter.alignComments": false,
