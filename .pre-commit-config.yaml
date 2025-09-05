@@ -6,15 +6,12 @@ ci:
   autofix_commit_msg: "chore: auto fixes from pre-commit.com hooks"
   skip:
     # https://github.com/pre-commit-ci/issues/issues/55
-    - pip-compile
     - pyright
     - renovate-config-validator # container limits
     - schemas
   submodules: true
 exclude: >
   (?x)^(
-    .config/constraints.txt|
-    .config/.*requirements.*|
     examples/broken/encoding.yml|
     examples/broken/encoding.j2|
     examples/broken/yaml-with-tabs/invalid-due-tabs.yaml|
@@ -217,33 +214,3 @@ repos:
         pass_filenames: false
         always_run: true
         # stages: [manual]
-      - id: deps
-        name: Upgrade constraints files and requirements
-        files: ^(pyproject\.toml|.config/.*)$
-        always_run: true
-        language: python
-        entry: python3 -m uv pip compile -q --all-extras --python-version=3.10 --output-file=.config/constraints.txt pyproject.toml --upgrade
-        pass_filenames: false
-        stages:
-          - manual
-        additional_dependencies:
-          - uv>=0.6.6
-      - id: pip-compile
-        name: Check constraints files and requirements
-        files: ^(pyproject\.toml|\.config/.*)$
-        language: python
-        entry: uv pip compile -q --all-extras --python-version=3.10 --output-file=.config/constraints.txt pyproject.toml
-        pass_filenames: false
-        additional_dependencies:
-          - uv>=0.6.6
-      - id: lock
-        name: Update requirements-lock.txt
-        alias: lock
-        always_run: true
-        entry: python3 -m uv pip compile -q --python-version=3.10 --upgrade --output-file=.config/requirements-lock.txt pyproject.toml --strip-extras
-        files: ^(pyproject\.toml|\.config/.*)$
-        language: python
-        pass_filenames: false
-        stages: [manual]
-        additional_dependencies:
-          - uv>=0.6.6

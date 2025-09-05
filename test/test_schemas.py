@@ -6,7 +6,6 @@ import os
 import subprocess
 import sys
 import urllib
-import warnings
 from pathlib import Path
 from typing import Any
 from unittest.mock import DEFAULT, MagicMock, patch
@@ -95,16 +94,16 @@ def test_spdx() -> None:
         spx_enum = schema["$defs"]["SPDXLicenseEnum"]["enum"]
     if set(spx_enum) != license_ids:
         constraints = os.environ.get("PIP_CONSTRAINT", "/dev/null")
-        if constraints.endswith(".config/constraints.txt"):
-            with galaxy_json.open("w", encoding="utf-8") as f:
-                schema["$defs"]["SPDXLicenseEnum"]["enum"] = sorted(license_ids)
-                json.dump(schema, f, indent=2)
-            pytest.fail(
-                f"SPDX license list inside galaxy.json JSON Schema file was updated. {constraints}",
-            )
-        else:
-            warnings.warn(
-                f"test_spdx failure was ignored because constraints were not pinned (PIP_CONSTRAINT={constraints}). This is expected for py310 and py-devel, lower jobs.",
-                category=pytest.PytestWarning,
-                stacklevel=1,
-            )
+        # if constraints.endswith(".config/constraints.txt"):
+        #     with galaxy_json.open("w", encoding="utf-8") as f:
+        #         schema["$defs"]["SPDXLicenseEnum"]["enum"] = sorted(license_ids)
+        #         json.dump(schema, f, indent=2)
+        pytest.fail(
+            f"SPDX license list inside galaxy.json JSON Schema file was updated. {constraints}",
+        )
+        # else:
+        #     warnings.warn(
+        #         f"test_spdx failure was ignored because constraints were not pinned (PIP_CONSTRAINT={constraints}). This is expected for py310 and py-devel, lower jobs.",
+        #         category=pytest.PytestWarning,
+        #         stacklevel=1,
+        #     )
