@@ -38,7 +38,7 @@ repos:
         args: ["--upgrade"]
         stages: [manual]
       - id: uv-export
-        name: "deps: sunchronize requirements-lock.txt for actions"
+        name: "deps: regenerate requirements-lock.txt for actions"
         args:
           - "--no-dev"
           - "--no-emit-package"
