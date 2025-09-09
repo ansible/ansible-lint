@@ -1,0 +1,17 @@
+# Special order section for helping pip:
+ansible-core>=2.16.11 # GPLv3
+ansible-compat>=25.8.0 # GPLv3
+# alphabetically sorted:
+black>=24.3.0 # MIT (security)
+filelock>=3.8.2 # The Unlicense
+importlib-metadata # Apache
+jsonschema>=4.10.0 # MIT, version needed for improved errors
+packaging>=22.0 # Apache-2.0,BSD-2-Clause
+pathspec>=0.10.3 # Mozilla Public License 2.0 (MPL 2.0)
+pyyaml>=6.0.2 # MIT (compilation probles with older versions)
+ruamel.yaml>=0.18.11 # MIT (https://sourceforge.net/p/ruamel-yaml/tickets/545/)
+referencing>=0.36.2 # MIT, https://github.com/python-jsonschema/referencing/issues/216
+subprocess-tee>=0.4.1 # MIT, used by ansible-compat
+yamllint >= 1.34.0 # GPLv3
+wcmatch>=8.1.2; python_version < '3.12' # MIT
+wcmatch>=8.5.0; python_version >= '3.12' # MIT

@@ -13,9 +13,8 @@
     "redhat.vscode-yaml",
     "ryanluker.vscode-coverage-gutters",
     "shardulm94.trailing-spaces",
-    "tombi-toml.tombi",
+    "tamasfe.even-better-toml",
     "timonwong.shellcheck",
     "znck.grammarly"
-  ],
-  "unwantedRecommendations": ["tamasfe.even-better-toml"]
+  ]
 }
