@@ -25,13 +25,13 @@ stdout:
   "errors": [
     {
       "filename": "negative_test/changelogs/invalid-date/changelogs/changelog.yaml",
-      "path": "$.releases.1.0.0.release_date",
+      "path": "$.releases['1.0.0'].release_date",
       "message": "'01-01-2020' is not a 'date'",
       "has_sub_errors": false
     },
     {
       "filename": "negative_test/changelogs/invalid-date/changelogs/changelog.yaml",
-      "path": "$.releases.1.0.0.release_date",
+      "path": "$.releases['1.0.0'].release_date",
       "message": "'01-01-2020' does not match '\\\\d\\\\d\\\\d\\\\d-\\\\d\\\\d-\\\\d\\\\d'",
       "has_sub_errors": false
     }

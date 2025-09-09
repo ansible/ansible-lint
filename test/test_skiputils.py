@@ -20,7 +20,9 @@ from ansiblelint.utils import Task
 if TYPE_CHECKING:
     from ansiblelint.rules import RulesCollection
     from ansiblelint.testing import RunFromText
-    from ansiblelint.types import AnsibleBaseYAMLObject
+    from ansiblelint.types import (
+        AnsibleBaseYAMLObject,  # pyright: ignore[reportAttributeAccessIssue]
+    )
 
 PLAYBOOK_WITH_NOQA = """\
 ---
@@ -196,7 +198,7 @@ def test_var_noqa(default_text_runner: RunFromText) -> None:
         ),
     ),
 )
-def test_append_skipped_rules(
+def test_append_skipped_rules(  # type: ignore[no-any-unimported]
     lintable: Lintable,
     yaml: AnsibleBaseYAMLObject,
     expected_form: AnsibleBaseYAMLObject,

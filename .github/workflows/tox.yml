@@ -40,7 +40,7 @@ jobs:
             hook
             docs
             pre
-            py311-devel
+            py312-devel
             py310-lower
             py312-lower
             py313-devel
@@ -52,7 +52,7 @@ jobs:
       # which might confuse users.
       GITHUB_ACTIONS_TEST: "true"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Self test 1 # Test without explicit ref - fallback to main
         uses: ./
         with:
@@ -95,7 +95,7 @@ jobs:
       # proof that we failed to catch a bug by not running it. Using
       # distribution should be preferred instead of custom builds.
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0 # needed by setuptools-scm
           submodules: true
@@ -185,7 +185,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
@@ -221,7 +221,7 @@ jobs:
 
     steps:
       # checkout needed for codecov action which needs codecov.yml file
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Python # likely needed for coverage
         uses: actions/setup-python@v5
@@ -240,7 +240,7 @@ jobs:
           separate-directories: true
 
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         continue-on-error: true # to allow rerunning this job
         with:
           name: logs.zip
@@ -255,7 +255,7 @@ jobs:
           fi
 
       - name: Upload coverage data
-        uses: codecov/codecov-action@v5.4.3
+        uses: codecov/codecov-action@v5.5.0
         with:
           name: ${{ matrix.name }}
           # verbose: true # optional (default = false)

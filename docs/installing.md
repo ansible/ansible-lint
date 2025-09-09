@@ -139,14 +139,6 @@ plan to provide extra options. You will have to make use of
 [ansible-lint own configuration file](https://ansible.readthedocs.io/projects/lint/configuring/)
 to alter its behavior.
 
-To also enable [dependabot][dependabot] automatic updates, the newer versions of
-ansible-lint action you should create a file similar to
-[.github/dependabot.yml][.github/dependabot.yml]
-
-[dependabot]: https://docs.github.com/en/code-security/dependabot
-[.github/dependabot.yml]:
-  https://github.com/ansible/ansible-lint/blob/main/.github/dependabot.yml#L13-L19
-
 ### Installing roles and collections from private repositories
 
 To install roles and collections from private repositories, you can:

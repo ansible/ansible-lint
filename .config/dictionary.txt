@@ -92,7 +92,6 @@ switchport
 sysvinit
 taskshandlers
 testinfra
-testns
 timesyncd
 tmpfs
 tomlsort

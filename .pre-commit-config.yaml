@@ -8,6 +8,7 @@ ci:
     # https://github.com/pre-commit-ci/issues/issues/55
     - pip-compile
     - pyright
+    - renovate-config-validator # container limits
     - schemas
   submodules: true
 exclude: >
@@ -30,6 +31,12 @@ repos:
   - repo: meta
     hooks:
       - id: check-useless-excludes
+  - repo: https://github.com/renovatebot/pre-commit-hooks
+    rev: 41.91.1
+    hooks:
+      - id: renovate-config-validator
+        alias: renovate
+        args: [--strict]
   - repo: https://github.com/rbubley/mirrors-prettier
     # keep it before yamllint
     rev: v3.6.2
@@ -50,7 +57,7 @@ repos:
             examples/playbooks/with-skip-tag-id.yml|
             examples/playbooks/with-umlaut-.*|
             examples/yamllint/.*|
-            src/ansiblelint/schemas/(molecule|tasks|playbook|rulebook).json|
+            src/ansiblelint/schemas/(molecule|tasks|playbook|rulebook|pattern).json|
             test/fixtures/formatting-before/.*|
             test/schemas/(negative_test|test)/.*\.md|
             test/schemas/data/.*|
@@ -61,7 +68,7 @@ repos:
           - prettier@3.2.4
           - prettier-plugin-sort-json@3.1.0
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v9.0.1
+    rev: v9.2.0
     hooks:
       - id: cspell
         entry: bash
@@ -75,11 +82,11 @@ repos:
           ]
         name: cspell + remove unused and sort dictionary
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.33.2
+    rev: 0.33.3
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: check-added-large-files
       - id: check-merge-conflict
@@ -147,26 +154,26 @@ repos:
         alias: toml
 
   - repo: https://github.com/tox-dev/tox-ini-fmt
-    rev: 1.5.0
+    rev: 1.6.0
     hooks:
       - id: tox-ini-fmt
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.2
+    rev: v0.12.11
     hooks:
       - id: ruff-format
         alias: ruff
       - id: ruff-check
         alias: ruff
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.16.1
+    rev: v1.17.1
     hooks:
       - id: mypy
         # "." and pass_files are used to make pre-commit mypy behave the same as standalone mypy
         args: ["."]
         pass_filenames: false
         additional_dependencies: &deps
-          - ansible-compat>=25.1.5
+          - ansible-compat>=25.8.0
           - black>=22.10.0
           - cryptography>=39.0.1
           - filelock>=3.12.2
@@ -185,12 +192,12 @@ repos:
           - wcmatch
           - yamllint>=1.34.0
   - repo: https://github.com/RobertCraigie/pyright-python
-    rev: v1.1.402
+    rev: v1.1.404
     hooks:
       - id: pyright
         additional_dependencies: *deps
   - repo: https://github.com/pycqa/pylint
-    rev: v3.3.7
+    rev: v3.3.8
     hooks:
       - id: pylint
         args:

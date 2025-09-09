@@ -89,11 +89,11 @@ from ansiblelint.file_utils import Lintable, discover_lintables
 from ansiblelint.skip_utils import is_nested_task
 from ansiblelint.text import has_jinja, is_fqcn, removeprefix
 from ansiblelint.types import (
-    AnsibleBaseYAMLObject,
+    AnsibleBaseYAMLObject,  # pyright: ignore[reportAttributeAccessIssue]
     AnsibleConstructor,  # pyright: ignore[reportAttributeAccessIssue]
     AnsibleJSON,
-    AnsibleMapping,
-    AnsibleSequence,
+    AnsibleMapping,  # pyright: ignore[reportAttributeAccessIssue]
+    AnsibleSequence,  # pyright: ignore[reportAttributeAccessIssue]
     TrustedAsTemplate,
 )
 
@@ -149,7 +149,7 @@ def ansible_templar(basedir: Path, templatevars: Any) -> Templar:
 
     dataloader = DataLoader()  # type: ignore[no-untyped-call]
     dataloader.set_basedir(str(basedir))
-    templar = Templar(dataloader, variables=templatevars)  # type: ignore[no-untyped-call]
+    templar = Templar(dataloader, variables=templatevars)
     return templar
 
 
@@ -239,7 +239,7 @@ def ansible_template(
         try:
             if TrustedAsTemplate and not isinstance(varname, TrustedAsTemplate):
                 varname = TrustedAsTemplate().tag(varname)
-            templated = templar.template(varname, **kwargs)  # type: ignore[no-untyped-call]
+            templated = templar.template(varname, **kwargs)
         except AnsibleError as exc:
             if lookup_error in exc.message:
                 return varname
@@ -264,7 +264,7 @@ def ansible_template(
                 v = templar.environment.filters
                 if not hasattr(v, "_delegatee"):  # pragma: no cover
                     raise
-                v._delegatee[missing_filter] = mock_filter  # fmt: skip # noqa: SLF001
+                v._delegatee[missing_filter] = mock_filter  # fmt: skip # noqa: SLF001 # pyright: ignore[reportAttributeAccessIssue]
                 # Record the mocked filter so we can warn the user
                 if missing_filter not in options.mock_filters:
                     _logger.debug("Mocking missing filter %s", missing_filter)
@@ -329,7 +329,7 @@ def set_collections_basedir(basedir: Path) -> None:
     # produce weird errors if we use a relative one.
     # https://github.com/psf/black/issues/4519
     # fmt: off
-    AnsibleCollectionConfig.playbook_paths = (  # type: ignore[attr-defined] # pyright: ignore[reportAttributeAccessIssue]
+    AnsibleCollectionConfig.playbook_paths = (  # pyright: ignore[reportAttributeAccessIssue]
         str(basedir.resolve()))
     # fmt: on
 
@@ -833,7 +833,7 @@ def normalize_task_v2(task: Task) -> MutableMapping[str, Any]:
 
 
 # pylint: disable=too-many-nested-blocks
-def extract_from_list(
+def extract_from_list(  # type: ignore[no-any-unimported]
     blocks: AnsibleBaseYAMLObject,
     candidates: list[str],
     *,
@@ -1061,7 +1061,7 @@ class Task(Mapping[str, Any]):
         return line
 
 
-def task_in_list(
+def task_in_list(  # type: ignore[no-any-unimported]
     data: AnsibleBaseYAMLObject,
     file: Lintable,
     kind: str,
@@ -1069,7 +1069,7 @@ def task_in_list(
 ) -> Iterator[Task]:
     """Get action tasks from block structures."""
 
-    def each_entry(
+    def each_entry(  # type: ignore[no-any-unimported]
         data: Sequence[Any] | AnsibleMapping, file: Lintable, kind: str, position: str
     ) -> Iterator[Task]:
         if not data or not isinstance(data, Iterable):
@@ -1118,7 +1118,7 @@ def task_in_list(
         yield from each_entry(data, file=file, position=position, kind=kind)
 
 
-def add_action_type(
+def add_action_type(  # type: ignore[no-any-unimported]
     actions: AnsibleBaseYAMLObject, action_type: str
 ) -> AnsibleSequence:
     """Add action markers to task objects."""
@@ -1136,14 +1136,14 @@ def add_action_type(
 
 
 @cache
-def parse_yaml_linenumbers(
+def parse_yaml_linenumbers(  # type: ignore[no-any-unimported]
     lintable: Lintable,
 ) -> AnsibleBaseYAMLObject | None:
     """Parse yaml as ansible.utils.parse_yaml but with linenumbers.
 
     The line numbers are stored in each node's LINE_NUMBER_KEY key.
     """
-    loader: AnsibleLoader
+    loader: AnsibleLoader  # type: ignore[valid-type]
     result = AnsibleSequence()
 
     # signature of Composer.compose_node
@@ -1154,19 +1154,19 @@ def parse_yaml_linenumbers(
             msg = "Unexpected yaml data."
             raise TypeError(msg)
         if hasattr(loader, "line"):  # pragma: no cover
-            line = loader.line
+            line = loader.line  # type: ignore[attr-defined]
             node.__line__ = line + 1  # type: ignore[attr-defined]
         return node
 
     # signature of AnsibleConstructor.construct_mapping
-    def construct_mapping(
+    def construct_mapping(  # type: ignore[no-any-unimported]
         node: yaml.MappingNode,
         deep: bool = False,  # noqa: FBT002
     ) -> AnsibleMapping:
         # pyright: ignore[reportArgumentType]
-        mapping: AnsibleMapping = AnsibleConstructor.construct_mapping(
+        mapping: AnsibleMapping = AnsibleConstructor.construct_mapping(  # type: ignore[no-any-unimported]
             loader, node, deep=deep
-        )  # type: ignore[no-untyped-call]
+        )
         if hasattr(node, LINE_NUMBER_KEY):
             mapping[LINE_NUMBER_KEY] = getattr(node, LINE_NUMBER_KEY)
         else:
@@ -1181,16 +1181,16 @@ def parse_yaml_linenumbers(
             kwargs["vault_password"] = DEFAULT_VAULT_PASSWORD
         # WARNING: 'unused-ignore' is needed below in order to allow mypy to
         # be passing with both pre-2.19 and post-2.19 versions of Ansible core.
-        loader = AnsibleLoader(lintable.content, **kwargs)  # type: ignore[no-untyped-call]
+        loader = AnsibleLoader(lintable.content, **kwargs)
         # redefine Composer.compose_node
         loader.compose_node = compose_node  # type: ignore[attr-defined,unused-ignore]
         # redefine AnsibleConstructor.construct_mapping
-        loader.construct_mapping = construct_mapping  # type: ignore[method-assign]
+        loader.construct_mapping = construct_mapping  # type: ignore[attr-defined]
         # while Ansible only accepts single documents, we also need to load
         # multi-documents, as we attempt to load any YAML file, not only
         # Ansible managed ones.
         while True:
-            data = loader.get_data()  # type: ignore[no-untyped-call]
+            data = loader.get_data()  # type: ignore[attr-defined]
             if data is None:
                 break
             result.append(data)
@@ -1344,7 +1344,7 @@ def parse_examples_from_plugin(lintable: Lintable) -> tuple[int, str]:
                 offset = child.lineno - 1
                 break
 
-    docs = read_docstring(str(lintable.path))  # type: ignore[no-untyped-call]
+    docs = read_docstring(str(lintable.path.resolve(strict=False)))  # type: ignore[no-untyped-call]
     examples = docs["plainexamples"]
 
     # Ignore the leading newline and lack of document start
@@ -1355,13 +1355,13 @@ def parse_examples_from_plugin(lintable: Lintable) -> tuple[int, str]:
 @lru_cache
 def load_plugin(name: str) -> PluginLoadContext:
     """Return loaded ansible plugin/module."""
-    loaded_module = action_loader.find_plugin_with_context(  # type: ignore[no-untyped-call]
+    loaded_module = action_loader.find_plugin_with_context(
         name,
         ignore_deprecated=True,
         check_aliases=True,
     )
     if not loaded_module.resolved:
-        loaded_module = module_loader.find_plugin_with_context(  # type: ignore[no-untyped-call]
+        loaded_module = module_loader.find_plugin_with_context(
             name,
             ignore_deprecated=True,
             check_aliases=True,
@@ -1370,7 +1370,7 @@ def load_plugin(name: str) -> PluginLoadContext:
         "ansible.builtin."
     ):  # pragma: no cover
         # fallback to core behavior of using legacy
-        loaded_module = module_loader.find_plugin_with_context(  # type: ignore[no-untyped-call]
+        loaded_module = module_loader.find_plugin_with_context(
             name.replace("ansible.builtin.", "ansible.legacy."),
             ignore_deprecated=True,
             check_aliases=True,

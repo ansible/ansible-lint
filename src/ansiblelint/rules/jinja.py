@@ -69,6 +69,8 @@ ignored_re = re.compile(
             r"^The '(.*)' test expects a dictionary$",
             # https://github.com/ansible/ansible-lint/issues/4338
             r"An unhandled exception occurred while templating (.*). Error was a <class 'ansible.errors.AnsibleFilterError'>, original message: The (.*) test expects a dictionary$",
+            r"can only concatenate list \(not \"_AnsibleTaggedStr\"\) to list",
+            r"can only concatenate str \(not \"_AnsibleTaggedStr\"\) to str",
         ],
     ),
     flags=re.MULTILINE | re.DOTALL,
@@ -149,7 +151,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                     # ValueError RepresenterError
                     except (AnsibleError, ImportError) as exc:
                         bypass = False
-                        orig_exc = exc
+                        orig_exc: BaseException = exc
                         if (
                             isinstance(exc, AnsibleError)
                             and hasattr(exc, "orig_exc")
@@ -626,9 +628,6 @@ if "pytest" in sys.modules:
             ),
             pytest.param("{{foo(123)}}", "{{ foo(123) }}", "spacing", id="11"),
             pytest.param("{{ foo(a.b.c) }}", "{{ foo(a.b.c) }}", "spacing", id="12"),
-            # pytest.param(
-            #     "spacing",
-            # ),
             pytest.param(
                 "{{foo(x =['server_options'])}}",
                 "{{ foo(x=['server_options']) }}",
@@ -910,12 +909,11 @@ if "pytest" in sys.modules:
 
         orig_content = playbook.read_text(encoding="utf-8")
         expected_content = playbook.with_suffix(
-            f".transformed{playbook.suffix}",
+            f".transformed{playbook.suffix}"
         ).read_text(encoding="utf-8")
         transformed_content = playbook.with_suffix(f".tmp{playbook.suffix}").read_text(
-            encoding="utf-8",
+            encoding="utf-8"
         )
-
         assert orig_content != transformed_content
         assert expected_content == transformed_content
         playbook.with_suffix(f".tmp{playbook.suffix}").unlink()
@@ -927,10 +925,10 @@ if "pytest" in sys.modules:
             data = args[1]
 
             if data != "{{ 12 | random(seed=inventory_hostname) }}":
-                return do_template(*args, **kwargs)  # type: ignore[no-untyped-call]
+                return do_template(*args, **kwargs)
 
             msg = "Unexpected templating type error occurred on (foo): bar"
-            raise AnsibleError(str(msg))  # type: ignore[no-untyped-call]
+            raise AnsibleError(str(msg))
 
         do_template = Templar.do_template
         collection = RulesCollection()
@@ -961,3 +959,25 @@ if "pytest" in sys.modules:
         lintable = Lintable("examples/playbooks/test_filter_with_importerror.yml")
         results = Runner(lintable, rules=collection).run()
         assert len(results) == expected_results
+
+    def test_jinja_template_generates_ansible_tagged_str_error() -> None:
+        """Test that demonstrates ansible-core generating _AnsibleTaggedStr errors and us ignoring them."""
+        # Test the ignore pattern directly without full RulesCollection setup
+        from ansiblelint.rules.jinja import ignored_re
+
+        # Test _AnsibleTaggedStr error is ignored
+        tagged_error_msg = 'can only concatenate list (not "_AnsibleTaggedStr") to list'
+        assert ignored_re.search(tagged_error_msg), (
+            f"_AnsibleTaggedStr error should be ignored: {tagged_error_msg}"
+        )
+
+        # Test similar error without _AnsibleTaggedStr is NOT ignored
+        normal_error_msg = 'can only concatenate list (not "int") to list'
+        assert not ignored_re.search(normal_error_msg), (
+            f"Normal error should not be ignored: {normal_error_msg}"
+        )
+
+        # Test that the ignore pattern works for the specific error we're testing
+        assert ignored_re.search(
+            'can only concatenate str (not "_AnsibleTaggedStr") to str'
+        ), "String concatenation with _AnsibleTaggedStr should also be ignored"

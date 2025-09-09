@@ -226,12 +226,12 @@ def fix(runtime_options: Options, result: LintResult, rules: RulesCollection) ->
             ruamel_yaml_version_str,
             ruamel_safe_version,
         )
-    acceptable_tags = {"all", "none", *rules.known_tags()}
+    acceptable_tags = {"all", "none", *rules.known_transform_tags()}
     unknown_tags = set(options.write_list).difference(acceptable_tags)
 
     if unknown_tags:  # pragma: no cover
         _logger.error(
-            "Found invalid value(s) (%s) for --fix arguments, must be one of: %s",
+            "Found invalid value(s) (%s) for --fix arguments, must be one of: %s. Valid values are limited by the configured profile.",
             ", ".join(unknown_tags),
             ", ".join(acceptable_tags),
         )
