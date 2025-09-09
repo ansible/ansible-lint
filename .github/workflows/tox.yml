@@ -76,6 +76,11 @@ jobs:
         with:
           args: .ansible-lint
           gh_action_ref: "v25.5.0"
+      - name: Self test 5 # Test explicit ref to be own ref
+        uses: ./
+        with:
+          args: .ansible-lint
+          gh_action_ref: "$GITHUB_REF"
 
   build:
     name: ${{ matrix.name }}
