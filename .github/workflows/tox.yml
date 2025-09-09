@@ -80,7 +80,7 @@ jobs:
         uses: ./
         with:
           args: .ansible-lint
-          gh_action_ref: "$GITHUB_REF"
+          gh_action_ref: ${{ github.ref }}
 
   build:
     name: ${{ matrix.name }}
