@@ -1,8 +1,9 @@
 {
   "recommendations": [
+    "biomejs.biome",
     "Tyriar.sort-lines",
     "charliermarsh.ruff",
-    "esbenp.prettier-vscode",
+    "github.vscode-github-actions",
     "hbenl.vscode-test-explorer",
     "ms-python.mypy-type-checker",
     "ms-python.pylint",
@@ -17,5 +18,8 @@
     "timonwong.shellcheck",
     "znck.grammarly"
   ],
-  "unwantedRecommendations": ["tamasfe.even-better-toml"]
+  "unwantedRecommendations": [
+    "esbenp.prettier-vscode",
+    "tamasfe.even-better-toml"
+  ]
 }

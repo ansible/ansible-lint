@@ -1,6 +1,9 @@
 {
+  "[json]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
   "[markdown]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "biomejs.biome"
   },
   "[python]": {
     "editor.codeActionsOnSave": {
@@ -13,14 +16,20 @@
   "[toml]": {
     "editor.defaultFormatter": "tombi-toml.tombi"
   },
+  "editor.codeActionsOnSave": {
+    "source.action.useSortedKeys.biome": "explicit",
+    "source.fixAll.biome": "always",
+    "source.organizeImports.biome": "explicit"
+  },
+  "editor.defaultFormatter": "biomejs.biome",
   "editor.formatOnSave": true,
   "evenBetterToml.formatter.alignComments": false,
   "evenBetterToml.formatter.arrayTrailingComma": true,
   "files.exclude": {
-    "*.egg-info": true,
+    "__pycache__": true,
     ".pytest_cache": true,
     ".tox": true,
-    "__pycache__": true,
+    "*.egg-info": true,
     "build": true
   },
   "git.ignoreLimitWarning": true,

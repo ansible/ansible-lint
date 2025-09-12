@@ -61,36 +61,13 @@ repos:
       - id: renovate-config-validator
         alias: renovate
         args: [--strict]
-  - repo: https://github.com/rbubley/mirrors-prettier
-    # keep it before yamllint
-    rev: v3.6.2
+  - repo: https://github.com/biomejs/pre-commit
+    rev: "v2.2.3"
     hooks:
-      - id: prettier
-        # Temporary excludes so we can gradually normalize the formatting
-        exclude: >
-          (?x)^(
-            .*\.md$|
-            examples/other/some.j2.yaml|
-            examples/playbooks/collections/.*|
-            examples/playbooks/example.yml|
-            examples/playbooks/invalid-transform.yml|
-            examples/playbooks/multiline-brackets.*|
-            examples/playbooks/templates/not-valid.yaml|
-            examples/playbooks/vars/empty.transformed.yml|
-            examples/playbooks/vars/empty.yml|
-            examples/playbooks/with-skip-tag-id.yml|
-            examples/playbooks/with-umlaut-.*|
-            examples/yamllint/.*|
-            src/ansiblelint/schemas/(molecule|tasks|playbook|rulebook|pattern).json|
-            test/fixtures/formatting-before/.*|
-            test/schemas/(negative_test|test)/.*\.md|
-            test/schemas/data/.*|
-            src/ansiblelint/schemas/ansible-navigator-config.json
-          )$
-        always_run: true
-        additional_dependencies:
-          - prettier@3.2.4
-          - prettier-plugin-sort-json@3.1.0
+      - id: biome-check
+        name: biome
+        alias: biome
+        args: [--unsafe]
   - repo: https://github.com/streetsidesoftware/cspell-cli
     rev: v9.2.0
     hooks:
@@ -176,11 +153,6 @@ repos:
     hooks:
       - id: toml-sort-fix
         alias: toml
-
-  - repo: https://github.com/tox-dev/tox-ini-fmt
-    rev: 1.6.0
-    hooks:
-      - id: tox-ini-fmt
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.12.11
