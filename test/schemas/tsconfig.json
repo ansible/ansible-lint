@@ -10,8 +10,8 @@
     "sourceMap": true,
     "strict": true,
     "stripInternal": true,
-    "target": "ESNext",
+    "target": "ESNext"
   },
   "exclude": ["node_modules"],
-  "include": ["src/**/*"],
+  "include": ["src/**/*"]
 }

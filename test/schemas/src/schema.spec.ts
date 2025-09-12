@@ -1,12 +1,14 @@
-import * as path from "path";
-import fs from "fs";
-import { minimatch } from "minimatch";
-import yaml from "js-yaml";
-import { assert } from "chai";
-import stringify from "safe-stable-stringify";
-import { spawnSync } from "child_process";
+import { spawnSync } from "node:child_process";
+import fs from "node:fs";
+import * as path from "node:path";
 import Ajv2020 from "ajv/dist/2020";
-import draft7MetaSchema from "ajv/dist/refs/json-schema-draft-07.json" with { type: "json" };
+import draft7MetaSchema from "ajv/dist/refs/json-schema-draft-07.json" with {
+  type: "json",
+};
+import { assert } from "chai";
+import yaml from "js-yaml";
+import { minimatch } from "minimatch";
+import stringify from "safe-stable-stringify";
 
 function ansiRegex({ onlyFirst = false } = {}) {
   const pattern = [
@@ -20,17 +22,17 @@ function ansiRegex({ onlyFirst = false } = {}) {
 function stripAnsi(data: string) {
   if (typeof data !== "string") {
     throw new TypeError(
-      `Expected a \`string\`, got \`${typeof data}\ = ${data}`,
+      `Expected a \`string\`, got \`${typeof data} = ${data}`,
     );
   }
   return data.replace(ansiRegex(), "");
 }
 
 const ajv = new Ajv2020({
-  strictTypes: false,
-  strict: false,
-  inlineRefs: true, // https://github.com/ajv-validator/ajv/issues/1581#issuecomment-832211568
   allErrors: true, // https://github.com/ajv-validator/ajv/issues/1581#issuecomment-832211568
+  inlineRefs: true, // https://github.com/ajv-validator/ajv/issues/1581#issuecomment-832211568
+  strict: false,
+  strictTypes: false,
 });
 ajv.addMetaSchema(draft7MetaSchema);
 
@@ -44,7 +46,7 @@ const schema_files = fs
   .filter((el) => path.extname(el) === ".json");
 console.log(`Schemas: ${schema_files}`);
 
-describe("schemas under f/", function () {
+describe("schemas under f/", () => {
   schema_files.forEach((schema_file) => {
     if (
       schema_file.startsWith("_") ||
@@ -56,20 +58,21 @@ describe("schemas under f/", function () {
     ajv.addSchema(schema_json);
     const validator = ajv.compile(schema_json);
     if (
-      schema_json["examples"] == undefined &&
-      schema_json["x-ansible-lint"] == undefined
+      schema_json.examples === undefined &&
+      schema_json["x-ansible-lint"] === undefined
     ) {
       console.error(
         `Schema file ${schema_file} is missing an 'examples' or 'x-ansible-lint' key that we need for documenting file matching patterns.`,
       );
-      return process.exit(1);
+      process.exit(1);
+      return;
     }
-    describe(schema_file, function () {
+    describe(schema_file, () => {
       const file_path_key =
-        schema_json["x-ansible-lint"] || schema_json["examples"];
+        schema_json["x-ansible-lint"] || schema_json.examples;
       getTestFiles(file_path_key).forEach(
         ({ file: test_file, expect_fail }) => {
-          it(`linting ${test_file} using ${schema_file}`, function () {
+          it(`linting ${test_file} using ${schema_file}`, () => {
             var errors_md = "";
             const result = validator(
               yaml.load(fs.readFileSync(test_file, "utf8")),
@@ -86,9 +89,9 @@ describe("schemas under f/", function () {
             // and breaks usage from inside virtualenvs.
             const proc = spawnSync(
               `${process.env.VIRTUAL_ENV}/bin/check-jsonschema -v -o json --schemafile f/${schema_file} ${test_file}`,
-              { shell: true, encoding: "utf-8", stdio: "pipe" },
+              { encoding: "utf-8", shell: true, stdio: "pipe" },
             );
-            if (proc.status != 0) {
+            if (proc.status !== 0) {
               // real errors are sent to stderr due to https://github.com/python-jsonschema/check-jsonschema/issues/88
               errors_md += "# check-jsonschema\n\nstdout:\n\n```json\n";
               errors_md += stripAnsi(proc.output[1] || "");
@@ -106,8 +109,8 @@ describe("schemas under f/", function () {
               fs.writeFileSync(md_filename, errors_md);
             } else {
               // if no error occurs, we should ensure there is no md file present
-              fs.unlink(md_filename, function (err) {
-                if (err && err.code != "ENOENT") {
+              fs.unlink(md_filename, (err) => {
+                if (err && err.code !== "ENOENT") {
                   console.error(`Failed to remove ${md_filename}.`);
                 }
               });
@@ -123,17 +126,18 @@ describe("schemas under f/", function () {
       // All /$defs/ that have examples property are assumed to be
       // subschemas, "tasks" being the primary such case, which is also used
       // for validating separated files.
-      for (var definition in schema_json["$defs"]) {
-        if (schema_json["$defs"][definition].examples) {
-          const subschema_uri = `${schema_json["$id"]}#/$defs/${definition}`;
+      for (var definition in schema_json.$defs) {
+        if (schema_json.$defs[definition].examples) {
+          const subschema_uri = `${schema_json.$id}#/$defs/${definition}`;
           const subschema_validator = ajv.getSchema(subschema_uri);
           if (!subschema_validator) {
             console.error(`Failed to load subschema ${subschema_uri}`);
-            return process.exit(1);
+            process.exit(1);
+            return;
           }
-          getTestFiles(schema_json["$defs"][definition].examples).forEach(
+          getTestFiles(schema_json.$defs[definition].examples).forEach(
             ({ file: test_file, expect_fail }) => {
-              it(`linting ${test_file} using ${subschema_uri}`, function () {
+              it(`linting ${test_file} using ${subschema_uri}`, () => {
                 const result = subschema_validator(
                   yaml.load(fs.readFileSync(test_file, "utf8")),
                 );
@@ -157,25 +161,23 @@ function getTestFiles(
 ): { file: string; expect_fail: boolean }[] {
   const files = Array.from(
     new Set(
-      globs
-        .map((glob: any) => minimatch.match(test_files, path.join("**", glob)))
-        .flat(),
+      globs.flatMap((glob: any) =>
+        minimatch.match(test_files, path.join("**", glob)),
+      ),
     ),
   );
   const negative_files = Array.from(
     new Set(
-      globs
-        .map((glob: any) =>
-          minimatch.match(negative_test_files, path.join("**", glob)),
-        )
-        .flat(),
+      globs.flatMap((glob: any) =>
+        minimatch.match(negative_test_files, path.join("**", glob)),
+      ),
     ),
   );
 
   // All fails ending with fail, like `foo.fail.yml` are expected to fail validation
-  let result = files.map((f) => ({ file: f, expect_fail: false }));
+  let result = files.map((f) => ({ expect_fail: false, file: f }));
   result = result.concat(
-    negative_files.map((f) => ({ file: f, expect_fail: true })),
+    negative_files.map((f) => ({ expect_fail: true, file: f })),
   );
   return result;
 }
