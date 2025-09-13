@@ -77,11 +77,11 @@ runs:
 
     - name: Set up Python
       if: inputs.setup_python == 'true'
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         cache: pip
         cache-dependency-path: ${{ steps.get_reqs.outputs.reqs_file }}
-        python-version: "3.11"
+        python-version: "3.13"
 
     - name: Install ansible-lint
       shell: bash
