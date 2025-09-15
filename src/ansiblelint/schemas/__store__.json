@@ -35,10 +35,6 @@
     "etag": "3b625438c28e884ac42a14c09ca542fc3e1b4466abaf47d0c28646e0857d3fb5",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/molecule.json"
   },
-  "pattern": {
-    "etag": "3c91293eaa0bd9b84eee2c3f34c2619194acc6f9073164332c17b9cc384b350d",
-    "url": "https://raw.githubusercontent.com/ansible/pattern-service/main/specifications/pattern-schema/pattern-schema-latest.json"
-  },
   "play-argspec": {
     "etag": "b418c4edcf2a44f0534321e0b38b6b7fb3f73a87c4f6ea18cab15e4b3f53bd20",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/play-argspec.json"
