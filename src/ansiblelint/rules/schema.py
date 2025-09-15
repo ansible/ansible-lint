@@ -62,7 +62,7 @@ class ValidateSchemaRule(AnsibleLintRule):
     id = "schema"
     severity = "VERY_HIGH"
     tags = ["core"]
-    version_changed = "25.7.0"
+    version_changed = "25.9.0"
     _ids = {
         "schema[ansible-lint-config]": "",
         "schema[ansible-navigator-config]": "",
@@ -73,7 +73,6 @@ class ValidateSchemaRule(AnsibleLintRule):
         "schema[meta]": "",
         "schema[meta-runtime]": "",
         "schema[molecule]": "",
-        "schema[pattern]": "",
         "schema[play-argspec]": "",
         "schema[playbook]": "",
         "schema[requirements]": "",
@@ -368,20 +367,6 @@ if "pytest" in sys.modules:
                     "'become_method' must be one of the currently available values",
                 ],
                 id="playbook2",
-            ),
-            pytest.param(
-                "examples/patterns/correct_pattern/meta/pattern.json",
-                "pattern",
-                [],
-                id="pattern_positive",
-            ),
-            pytest.param(
-                "examples/patterns/incorrect_pattern/meta/pattern.json",
-                "pattern",
-                [
-                    r"\$ 'name' is a required property",
-                ],
-                id="pattern_negative",
             ),
             pytest.param(
                 "examples/play_argspecs/correct_play_argspec/patterns/example_pattern/playbooks/site.meta.yml",

@@ -104,8 +104,6 @@ production:
     as validated or certified content.
   extends: shared
   rules:
-    pattern:
-      url: https://github.com/ansible/ansible-lint/issues/123
     avoid-dot-notation:
       url: https://github.com/ansible/ansible-lint/issues/2174
     sanity:
