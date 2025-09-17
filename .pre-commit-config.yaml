@@ -56,7 +56,7 @@ repos:
           - "-o"
           - ".config/requirements-lock.txt"
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 41.113.6
+    rev: 41.113.7
     hooks:
       - id: renovate-config-validator
         alias: renovate
