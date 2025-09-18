@@ -76,6 +76,8 @@ class CommandsInsteadOfModulesRule(AnsibleLintRule):
             "kill",
             "set-default",
             "set-property",
+            "set-environment",
+            "unset-environment",
             "show-environment",
             "status",
             "reset-failed",
