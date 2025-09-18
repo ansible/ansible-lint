@@ -10,7 +10,6 @@ from yamllint.linter import run as run_yamllint
 
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin
-from ansiblelint.yaml_utils import load_yamllint_config
 
 if TYPE_CHECKING:
     from collections.abc import MutableMapping, MutableSequence
@@ -29,7 +28,6 @@ class YamllintRule(AnsibleLintRule, TransformMixin):
     severity = "VERY_LOW"
     tags = ["formatting", "yaml"]
     version_changed = "5.0.0"
-    config = load_yamllint_config()
     has_dynamic_tags = True
     link = "https://yamllint.readthedocs.io/en/stable/rules.html"
     # ensure this rule runs before most of other common rules
@@ -68,7 +66,7 @@ class YamllintRule(AnsibleLintRule, TransformMixin):
 
         for problem in run_yamllint(  # type: ignore[no-untyped-call]
             file.content,
-            YamllintRule.config,
+            self._collection.app.yamllint_config,
             filepath=file.path,
         ):
             self.severity = "VERY_LOW"
