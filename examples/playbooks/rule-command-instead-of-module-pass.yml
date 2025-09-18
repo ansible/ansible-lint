@@ -26,6 +26,14 @@
       ansible.builtin.command: systemctl show-environment
       changed_when: false
 
+    - name: Set systemd environment
+      ansible.builtin.command: systemctl set-environment MYSQLD_OPTS="--skip-grant-tables"
+      changed_when: false
+
+    - name: Unset systemd environment
+      ansible.builtin.command: systemctl unset-environment MYSQLD_OPTS
+      changed_when: false
+
     - name: Get systemd runlevel
       ansible.builtin.command: systemctl get-default
       changed_when: false
