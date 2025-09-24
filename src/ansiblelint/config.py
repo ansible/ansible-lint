@@ -158,6 +158,7 @@ class Options:  # pylint: disable=too-many-instance-attributes
     only_builtins_allow_collections: list[str] = field(default_factory=list)
     only_builtins_allow_modules: list[str] = field(default_factory=list)
     var_naming_pattern: str | None = None
+    role_var_separator: str | None = None
     offline: bool = False
     project_dir: str = "."  # default should be valid folder (do not use None here)
     extra_vars: dict[str, Any] | None = None
