@@ -8,6 +8,8 @@ ci:
     # https://github.com/pre-commit-ci/issues/issues/55
     - pyright
     - renovate-config-validator # container limits
+    - tombi-format
+    - tombi-lint
     - schemas
   submodules: true
 exclude: >
@@ -148,10 +150,12 @@ repos:
         types: [file, yaml]
         entry: yamllint --strict
 
-  - repo: https://github.com/pappasam/toml-sort
-    rev: v0.24.3
+  - repo: https://github.com/tombi-toml/tombi-pre-commit
+    rev: v0.6.17
     hooks:
-      - id: toml-sort-fix
+      - id: tombi-format
+        alias: toml
+      - id: tombi-lint
         alias: toml
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
