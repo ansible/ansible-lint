@@ -47,7 +47,11 @@ from typing import TYPE_CHECKING, Any
 import ruamel.yaml.parser
 import yaml
 from ansible.errors import AnsibleError, AnsibleParserError
-from ansible.module_utils._text import to_bytes
+
+try:
+    from ansible.module_utils.common.text.converters import to_bytes
+except ImportError:  # pragma: no branch
+    from ansible.module_utils._text import to_bytes
 from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.mod_args import ModuleArgsParser
