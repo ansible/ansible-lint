@@ -34,6 +34,7 @@ classifiers = [
 dependencies = [
   "ansible-compat>=25.8.0",  # indirect dependency of cryptography
   "ansible-core>=2.16.11",  # indirect dependency of ansible-core
+  "ansible-core>=2.20.0b1 ; python_full_version >= '3.14'",  # indirect dependency of ansible-core
   "black>=24.3.0",  # indirect dependency of ansible-core
   "cffi>=1.17.1",  # indirect dependency of ruamel-yaml
   "cryptography>=38",
@@ -44,6 +45,7 @@ dependencies = [
   "packaging>=22.0",
   "pathspec>=0.10.3",
   "pyyaml>=6.0.2",
+  "pyyaml>=6.0.3 ; python_full_version < '3.14'",  # py314 support
   "referencing>=0.36.2",
   "ruamel-yaml>=0.18.11",
   "ruamel-yaml-clib>=0.2.12 ; python_full_version < '3.14'",
@@ -754,6 +756,17 @@ dependency_groups = ["dev"]
 deps = [
   "ansible-compat @ git+https://github.com/ansible/ansible-compat.git  # GPLv3+",
   "ansible-core @ git+https://github.com/ansible/ansible.git  # GPLv3+",
+]
+description = "Run the tests with newest dependencies (no lock and allowing prereleases)"
+runner = "uv-venv-runner"
+uv_sync_flags = ["--upgrade", "--prerelease=allow"]
+uv_sync_locked = false
+
+[tool.tox.env.py314-devel]
+dependency_groups = ["dev"]
+deps = [
+  "ansible-compat @ git+https://github.com/ansible/ansible-compat.git",
+  "ansible-core @ git+https://github.com/ansible/ansible.git",
 ]
 description = "Run the tests with newest dependencies (no lock and allowing prereleases)"
 runner = "uv-venv-runner"

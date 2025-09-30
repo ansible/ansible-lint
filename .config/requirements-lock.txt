@@ -55,7 +55,7 @@ platformdirs==4.4.0
     # via black
 pycparser==2.23 ; implementation_name != 'PyPy'
     # via cffi
-pyyaml==6.0.2
+pyyaml==6.0.3
     # via
     #   ansible-compat
     #   ansible-core
