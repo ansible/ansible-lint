@@ -7,7 +7,6 @@ ci:
   skip:
     # https://github.com/pre-commit-ci/issues/issues/55
     - pyright
-    - renovate-config-validator # container limits
     - tombi-format
     - tombi-lint
     - schemas
@@ -31,7 +30,7 @@ repos:
     hooks:
       - id: check-useless-excludes
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.8.17
+    rev: 0.8.22
     hooks:
       - id: uv-sync
       - id: uv-lock
@@ -57,12 +56,6 @@ repos:
           - "--no-hashes"
           - "-o"
           - ".config/requirements-lock.txt"
-  - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 41.115.2
-    hooks:
-      - id: renovate-config-validator
-        alias: renovate
-        args: [--strict]
   - repo: https://github.com/biomejs/pre-commit
     rev: "v2.2.4"
     hooks:
@@ -85,7 +78,7 @@ repos:
           ]
         name: cspell + remove unused and sort dictionary
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.33.3
+    rev: 0.34.0
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
@@ -151,7 +144,7 @@ repos:
         entry: yamllint --strict
 
   - repo: https://github.com/tombi-toml/tombi-pre-commit
-    rev: v0.6.17
+    rev: v0.6.19
     hooks:
       - id: tombi-format
         alias: toml
@@ -159,14 +152,14 @@ repos:
         alias: toml
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.13.0
+    rev: v0.13.2
     hooks:
       - id: ruff-format
         alias: ruff
       - id: ruff-check
         alias: ruff
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.18.1
+    rev: v1.18.2
     hooks:
       - id: mypy
         # "." and pass_files are used to make pre-commit mypy behave the same as standalone mypy

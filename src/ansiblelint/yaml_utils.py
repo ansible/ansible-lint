@@ -492,7 +492,7 @@ def _get_path_to_task_in_nested_tasks_block(
         nested_task_block = task[task_key]
         if task_key not in nested_task_keys or not nested_task_block:
             continue
-        next_task_key = task_keys_by_index.get(task_index + 1, None)
+        next_task_key = task_keys_by_index.get(task_index + 1)
         if next_task_key is not None:
             if task.lc.data[next_task_key][2] < lineno:
                 continue
