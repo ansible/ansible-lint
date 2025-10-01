@@ -18,7 +18,7 @@ click==8.3.0
     # via black
 colorama==0.4.6 ; sys_platform == 'win32'
     # via click
-cryptography==46.0.1
+cryptography==46.0.2
     # via
     #   ansible-core
     #   ansible-lint
@@ -55,6 +55,8 @@ platformdirs==4.4.0
     # via black
 pycparser==2.23 ; implementation_name != 'PyPy'
     # via cffi
+pytokens==0.1.10
+    # via black
 pyyaml==6.0.3
     # via
     #   ansible-compat
