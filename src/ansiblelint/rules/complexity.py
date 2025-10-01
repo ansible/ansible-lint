@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import re
 import sys
 from typing import TYPE_CHECKING, Any
 
@@ -74,26 +73,29 @@ class ComplexityRule(AnsibleLintRule):
     def matchtasks(self, file: Lintable) -> list[MatchError]:
         """Call matchtask for each task and check total task count."""
         matches: list[MatchError] = []
-        
+
         if not isinstance(self._collection, RulesCollection):  # pragma: no cover
             msg = "Rules cannot be run outside a rule collection."
             raise TypeError(msg)
 
         # Call parent's matchtasks to get all individual task violations
         matches = super().matchtasks(file)
-        
+
         # Only check total task count for task files and handler files
         # Playbooks use the complexity[play] check instead
         if file.kind in ["handlers", "tasks"]:
             # pylint: disable=import-outside-toplevel
             from ansiblelint.utils import task_in_list
-            
-            task_count = sum(1 for _ in task_in_list(
-                data=file.data,
-                file=file,
-                kind=file.kind,
-            ))
-            
+
+            task_count = sum(
+                1
+                for _ in task_in_list(
+                    data=file.data,
+                    file=file,
+                    kind=file.kind,
+                )
+            )
+
             # Check if total task count exceeds limit
             if task_count > self._collection.options.max_tasks:
                 matches.append(
@@ -103,7 +105,7 @@ class ComplexityRule(AnsibleLintRule):
                         filename=file,
                     ),
                 )
-        
+
         return matches
 
     def calculate_block_depth(self, task: Task) -> int:
