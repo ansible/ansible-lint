@@ -37,6 +37,11 @@ loop_var_prefix: "^(__|{role}_)"
 # to skip_list.
 var_naming_pattern: "^[a-z_][a-z0-9_]*$"
 
+# Use an underscore as separator between the role and variable name.
+# Default: "_"
+# Example with role_var_separator="__": role__some_var
+role_var_separator: "_"
+
 use_default_rules: true
 # Load custom rules from this specific folder
 # rulesdir:

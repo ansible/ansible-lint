@@ -134,6 +134,12 @@
       "title": "Quiet",
       "type": "boolean"
     },
+    "role_var_separator": {
+      "default": "_",
+      "title": "Role Variable Namespace Separator",
+      "description": "Defines the separator used to distinguish between role namespace and variable name in Ansible role variables.",
+      "type": "string"
+    },
     "rules": {
       "additionalProperties": {
         "$ref": "#/$defs/rule"

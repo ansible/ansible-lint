@@ -44,6 +44,7 @@ class VariableNamingRule(AnsibleLintRule):
     needs_raw_task = True
     re_pattern_str = options.var_naming_pattern or "^[a-z_][a-z0-9_]*$"
     re_pattern = re.compile(re_pattern_str)
+    role_var_separator = options.role_var_separator or "_"
     reserved_names = get_reserved_names()
     # List of special variables that should be treated as read-only. This list
     # does not include connection variables, which we expect users to tune in
@@ -178,13 +179,15 @@ class VariableNamingRule(AnsibleLintRule):
 
         if (
             prefix
-            and not ident.lstrip("_").startswith(f"{prefix.value}_")
+            and not ident.lstrip("_").startswith(
+                f"{prefix.value}{self.role_var_separator}"
+            )
             and not has_jinja(prefix.value)
             and is_fqcn_or_name(prefix.value)
         ):
             return self.create_matcherror(
                 tag="var-naming[no-role-prefix]",
-                message=f"Variables names from within roles should use {prefix.value}_ as a prefix.",
+                message=f"Variables names from within roles should use {prefix.value}{self.role_var_separator} as a prefix.",
                 filename=file,
                 data=ident,
             )
