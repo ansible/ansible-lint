@@ -10,20 +10,19 @@ resolution-markers = [
 
 [[package]]
 name = "ansible-compat"
-version = "25.8.1"
+version = "25.8.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ansible-core", version = "2.17.14", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "ansible-core", version = "2.19.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' and python_full_version < '3.14'" },
-    { name = "ansible-core", version = "2.20.0b1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14'" },
+    { name = "ansible-core", version = "2.19.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "jsonschema" },
     { name = "packaging" },
     { name = "pyyaml" },
     { name = "subprocess-tee" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ea/96/d5bcbd652dbcbf8611b32457d67b10e41e5e596e34460c25511ccfa6fbf1/ansible_compat-25.8.1.tar.gz", hash = "sha256:f29ab81264b3f04fb94ac2d7f68fe73efc2eb3cbe4ecf00f9b4742e77c41756f", size = 90142, upload-time = "2025-08-14T15:59:57.215Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e3/06/5e66f1f0d482b21b0dc03c9b9e47cab58dd4efc770f41029bb244e86b608/ansible_compat-25.8.2.tar.gz", hash = "sha256:c5ae1ff70938f1e009cfc7df66c9faad223a3ccd0ad6b57400de53b2459a6164", size = 190581, upload-time = "2025-10-06T12:41:17.415Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/32/29/c73b6d6d5ecdaf51ee4210e6fbf95de0a24b87f2b5df83155ac0c753513e/ansible_compat-25.8.1-py3-none-any.whl", hash = "sha256:5bb843838414b75efff24dae5ff5b332cd503a596143d471980243cec4b46c9c", size = 27523, upload-time = "2025-08-14T15:59:55.866Z" },
+    { url = "https://files.pythonhosted.org/packages/ed/2e/e4c739e396914301698356ff058f904a5b9c9557e188c5f72b701f6ec66a/ansible_compat-25.8.2-py3-none-any.whl", hash = "sha256:c35fd18f3a8320123f881ad6a23c4125e323e7e559ae09b6279568690a583b8f", size = 27717, upload-time = "2025-10-06T12:41:14.857Z" },
 ]
 
 [[package]]
@@ -50,38 +49,20 @@ name = "ansible-core"
 version = "2.19.2"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
+    "python_full_version >= '3.14'",
     "python_full_version >= '3.12' and python_full_version < '3.14'",
     "python_full_version == '3.11.*'",
 ]
 dependencies = [
-    { name = "cryptography", marker = "python_full_version >= '3.11' and python_full_version < '3.14'" },
-    { name = "jinja2", marker = "python_full_version >= '3.11' and python_full_version < '3.14'" },
-    { name = "packaging", marker = "python_full_version >= '3.11' and python_full_version < '3.14'" },
-    { name = "pyyaml", marker = "python_full_version >= '3.11' and python_full_version < '3.14'" },
-    { name = "resolvelib", version = "1.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' and python_full_version < '3.14'" },
+    { name = "cryptography", marker = "python_full_version >= '3.11'" },
+    { name = "jinja2", marker = "python_full_version >= '3.11'" },
+    { name = "packaging", marker = "python_full_version >= '3.11'" },
+    { name = "pyyaml", marker = "python_full_version >= '3.11'" },
+    { name = "resolvelib", version = "1.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/16/f1/1c21d3bff03fe9a5b51515307db7a76ec8b8972c70d5702cc3027c988a99/ansible_core-2.19.2.tar.gz", hash = "sha256:87fcbbc492ed16eb6adb0379bae0adbf69f3ce88a8440e7e88e0dcefa9f8a54c", size = 3408325, upload-time = "2025-09-08T18:11:33.666Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f5/49/f0ae13c228ae31613a27f9a06e55fdaa76ee45fce3d35c9f6e1ef423a6c0/ansible_core-2.19.2-py3-none-any.whl", hash = "sha256:1fe6ca533951b5ba4a619e763ea4f6725f68c36677c7d5aaa467b59aa449bdc8", size = 2403942, upload-time = "2025-09-08T18:11:31.341Z" },
-]
-
-[[package]]
-name = "ansible-core"
-version = "2.20.0b1"
-source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version >= '3.14'",
-]
-dependencies = [
-    { name = "cryptography", marker = "python_full_version >= '3.14'" },
-    { name = "jinja2", marker = "python_full_version >= '3.14'" },
-    { name = "packaging", marker = "python_full_version >= '3.14'" },
-    { name = "pyyaml", marker = "python_full_version >= '3.14'" },
-    { name = "resolvelib", version = "1.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/05/a2/0b0ba19cbad7e8ce3dbed536390c1eaacbd323fc4a0213f8296b48b6ba98/ansible_core-2.20.0b1.tar.gz", hash = "sha256:b4db52af2b64d87518176a6f20923bdce523eae0ee73402576f3910bee12466a", size = 3315180, upload-time = "2025-09-23T18:21:50.979Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/14/82/5d855010ae572149e51d5b412a65dfa0c0857c602011c23692e72750001e/ansible_core-2.20.0b1-py3-none-any.whl", hash = "sha256:b6b597323442e5bc4615415e33e803ce83af86346ce87023e8a6cf3736983d7f", size = 2402241, upload-time = "2025-09-23T18:21:48.875Z" },
 ]
 
 [[package]]
@@ -103,8 +84,7 @@ source = { editable = "." }
 dependencies = [
     { name = "ansible-compat" },
     { name = "ansible-core", version = "2.17.14", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "ansible-core", version = "2.19.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' and python_full_version < '3.14'" },
-    { name = "ansible-core", version = "2.20.0b1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14'" },
+    { name = "ansible-core", version = "2.19.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "black" },
     { name = "cffi" },
     { name = "cryptography" },
@@ -174,6 +154,7 @@ pkg = [
     { name = "build" },
     { name = "pip" },
     { name = "pipx" },
+    { name = "setuptools-scm" },
     { name = "twine" },
 ]
 schemas = [
@@ -182,9 +163,8 @@ schemas = [
 
 [package.metadata]
 requires-dist = [
-    { name = "ansible-compat", specifier = ">=25.8.0" },
+    { name = "ansible-compat", specifier = ">=25.8.2" },
     { name = "ansible-core", specifier = ">=2.16.11" },
-    { name = "ansible-core", marker = "python_full_version >= '3.14'", specifier = ">=2.20.0b1" },
     { name = "black", specifier = ">=24.3.0" },
     { name = "cffi", specifier = ">=1.17.1" },
     { name = "cryptography", specifier = ">=38" },
@@ -194,8 +174,8 @@ requires-dist = [
     { name = "jsonschema", specifier = ">=4.10.0" },
     { name = "packaging", specifier = ">=22.0" },
     { name = "pathspec", specifier = ">=0.10.3" },
-    { name = "pyyaml", specifier = ">=6.0.2" },
-    { name = "pyyaml", marker = "python_full_version < '3.14'", specifier = ">=6.0.3" },
+    { name = "pyyaml", marker = "python_full_version < '3.14'", specifier = ">=6.0.2" },
+    { name = "pyyaml", marker = "python_full_version >= '3.14'", specifier = ">=6.0.3" },
     { name = "referencing", specifier = ">=0.36.2" },
     { name = "ruamel-yaml", specifier = ">=0.18.11" },
     { name = "ruamel-yaml-clib", marker = "python_full_version < '3.14'", specifier = ">=0.2.12" },
@@ -254,6 +234,7 @@ pkg = [
     { name = "build", specifier = ">=0.9" },
     { name = "pip", specifier = ">=25.2" },
     { name = "pipx", specifier = ">=1.7.1" },
+    { name = "setuptools-scm", specifier = ">=9.2.0" },
     { name = "twine", specifier = ">=4.0.1" },
 ]
 schemas = [{ name = "check-jsonschema", specifier = ">=0.26.3" }]
@@ -2957,6 +2938,20 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/18/5d/3bf57dcd21979b887f014ea83c24ae194cfcd12b9e0fda66b957c69d1fca/setuptools-80.9.0.tar.gz", hash = "sha256:f36b47402ecde768dbfafc46e8e4207b4360c654f1f3bb84475f0a28628fb19c", size = 1319958, upload-time = "2025-05-27T00:56:51.443Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a3/dc/17031897dae0efacfea57dfd3a82fdd2a2aeb58e0ff71b77b87e44edc772/setuptools-80.9.0-py3-none-any.whl", hash = "sha256:062d34222ad13e0cc312a4c02d73f059e86a4acbfbdea8f8f76b28c99f306922", size = 1201486, upload-time = "2025-05-27T00:56:49.664Z" },
+]
+
+[[package]]
+name = "setuptools-scm"
+version = "9.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "packaging" },
+    { name = "setuptools" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/8f/8d/ffdcace33d0480d591057a30285b7c33f8dc431fed3fff7dbadf5f9f128f/setuptools_scm-9.2.0.tar.gz", hash = "sha256:6662c9b9497b6c9bf13bead9d7a9084756f68238302c5ed089fb4dbd29d102d7", size = 201229, upload-time = "2025-08-16T12:56:39.477Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f7/14/dd3a6053325e882fe191fb4b42289bbdfabf5f44307c302903a8a3236a0a/setuptools_scm-9.2.0-py3-none-any.whl", hash = "sha256:c551ef54e2270727ee17067881c9687ca2aedf179fa5b8f3fab9e8d73bdc421f", size = 62099, upload-time = "2025-08-16T12:56:37.912Z" },
 ]
 
 [[package]]
