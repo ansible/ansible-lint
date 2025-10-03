@@ -33,8 +33,8 @@ classifiers = [
 ]
 dependencies = [
   "ansible-compat>=25.8.0",  # indirect dependency of cryptography
-  "ansible-core>=2.16.11",  # indirect dependency of ansible-core
-  "ansible-core>=2.20.0b1 ; python_full_version >= '3.14'",  # indirect dependency of ansible-core
+  "ansible-core>=2.16.11; python_version < '3.14'",
+  "ansible-core>=2.20.0b1 ; python_version >= '3.14'",
   "black>=24.3.0",  # indirect dependency of ansible-core
   "cffi>=1.17.1",  # indirect dependency of ruamel-yaml
   "cryptography>=38",
@@ -44,14 +44,14 @@ dependencies = [
   "jsonschema>=4.10.0",
   "packaging>=22.0",
   "pathspec>=0.10.3",
-  "pyyaml>=6.0.2",
-  "pyyaml>=6.0.3 ; python_full_version < '3.14'",  # py314 support
+  "pyyaml>=6.0.2 ; python_version < '3.14'",
+  "pyyaml>=6.0.3 ; python_version >= '3.14'",  # py314 support
   "referencing>=0.36.2",
   "ruamel-yaml>=0.18.11",
-  "ruamel-yaml-clib>=0.2.12 ; python_full_version < '3.14'",
+  "ruamel-yaml-clib>=0.2.12 ; python_version < '3.14'",
   "subprocess-tee>=0.4.1",
-  "wcmatch>=8.1.2 ; python_full_version < '3.12'",
-  "wcmatch>=8.5.0 ; python_full_version >= '3.12'",
+  "wcmatch>=8.1.2 ; python_version < '3.12'",
+  "wcmatch>=8.5.0 ; python_version >= '3.12'",
   "yamllint>=1.34.0",
 ]
 dynamic = ["version"]
@@ -106,7 +106,13 @@ lint = [
   "pytest>=7.2.2",
   "setuptools>=51.1.1",
 ]
-pkg = ["build>=0.9", "pip>=25.2", "pipx>=1.7.1", "twine>=4.0.1"]
+pkg = [
+  "build>=0.9",
+  "pip>=25.2",
+  "pipx>=1.7.1",
+  "setuptools-scm>=9.2.0",
+  "twine>=4.0.1",
+]
 schemas = ["check-jsonschema>=0.26.3"]
 
 [build-system]
@@ -720,6 +726,7 @@ commands = [
     "{tox_root}",
   ],
   ["sh", "-c", "python -m twine check --strict {tox_root}/dist/*"],
+  ["sh", "./tools/test-pkg.sh"],
 ]
 commands_pre = []
 dependency_groups = ["pkg"]

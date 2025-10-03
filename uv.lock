@@ -174,6 +174,7 @@ pkg = [
     { name = "build" },
     { name = "pip" },
     { name = "pipx" },
+    { name = "setuptools-scm" },
     { name = "twine" },
 ]
 schemas = [
@@ -183,7 +184,7 @@ schemas = [
 [package.metadata]
 requires-dist = [
     { name = "ansible-compat", specifier = ">=25.8.0" },
-    { name = "ansible-core", specifier = ">=2.16.11" },
+    { name = "ansible-core", marker = "python_full_version < '3.14'", specifier = ">=2.16.11" },
     { name = "ansible-core", marker = "python_full_version >= '3.14'", specifier = ">=2.20.0b1" },
     { name = "black", specifier = ">=24.3.0" },
     { name = "cffi", specifier = ">=1.17.1" },
@@ -194,8 +195,8 @@ requires-dist = [
     { name = "jsonschema", specifier = ">=4.10.0" },
     { name = "packaging", specifier = ">=22.0" },
     { name = "pathspec", specifier = ">=0.10.3" },
-    { name = "pyyaml", specifier = ">=6.0.2" },
-    { name = "pyyaml", marker = "python_full_version < '3.14'", specifier = ">=6.0.3" },
+    { name = "pyyaml", marker = "python_full_version < '3.14'", specifier = ">=6.0.2" },
+    { name = "pyyaml", marker = "python_full_version >= '3.14'", specifier = ">=6.0.3" },
     { name = "referencing", specifier = ">=0.36.2" },
     { name = "ruamel-yaml", specifier = ">=0.18.11" },
     { name = "ruamel-yaml-clib", marker = "python_full_version < '3.14'", specifier = ">=0.2.12" },
@@ -254,6 +255,7 @@ pkg = [
     { name = "build", specifier = ">=0.9" },
     { name = "pip", specifier = ">=25.2" },
     { name = "pipx", specifier = ">=1.7.1" },
+    { name = "setuptools-scm", specifier = ">=9.2.0" },
     { name = "twine", specifier = ">=4.0.1" },
 ]
 schemas = [{ name = "check-jsonschema", specifier = ">=0.26.3" }]
@@ -2957,6 +2959,20 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/18/5d/3bf57dcd21979b887f014ea83c24ae194cfcd12b9e0fda66b957c69d1fca/setuptools-80.9.0.tar.gz", hash = "sha256:f36b47402ecde768dbfafc46e8e4207b4360c654f1f3bb84475f0a28628fb19c", size = 1319958, upload-time = "2025-05-27T00:56:51.443Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a3/dc/17031897dae0efacfea57dfd3a82fdd2a2aeb58e0ff71b77b87e44edc772/setuptools-80.9.0-py3-none-any.whl", hash = "sha256:062d34222ad13e0cc312a4c02d73f059e86a4acbfbdea8f8f76b28c99f306922", size = 1201486, upload-time = "2025-05-27T00:56:49.664Z" },
+]
+
+[[package]]
+name = "setuptools-scm"
+version = "9.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "packaging" },
+    { name = "setuptools" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/8f/8d/ffdcace33d0480d591057a30285b7c33f8dc431fed3fff7dbadf5f9f128f/setuptools_scm-9.2.0.tar.gz", hash = "sha256:6662c9b9497b6c9bf13bead9d7a9084756f68238302c5ed089fb4dbd29d102d7", size = 201229, upload-time = "2025-08-16T12:56:39.477Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f7/14/dd3a6053325e882fe191fb4b42289bbdfabf5f44307c302903a8a3236a0a/setuptools_scm-9.2.0-py3-none-any.whl", hash = "sha256:c551ef54e2270727ee17067881c9687ca2aedf179fa5b8f3fab9e8d73bdc421f", size = 62099, upload-time = "2025-08-16T12:56:37.912Z" },
 ]
 
 [[package]]
