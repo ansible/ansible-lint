@@ -27,7 +27,6 @@ from ruamel.yaml.parser import ParserError as RuamelParserError
 from yaml.parser import ParserError
 from yaml.scanner import ScannerError
 
-import ansiblelint.skip_utils
 import ansiblelint.utils
 from ansiblelint.constants import States
 from ansiblelint.errors import LintWarning, MatchError, WarnSource
