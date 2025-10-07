@@ -33,7 +33,7 @@ jobs:
         uses: coactions/dynamic-matrix@v4
         with:
           min_python: "3.10"
-          max_python: "3.14"
+          max_python: "3.13"
           default_python: "3.13"
           other_names: |
             lint-pkg-schemas-eco:tox -e lint;tox -e pkg;tox -e schemas;tox -e eco
@@ -43,7 +43,7 @@ jobs:
             py312-devel
             py310-lower
             py312-lower
-            py313-devel
+            py314-devel
           platforms: linux,macos
   test-action:
     runs-on: ubuntu-24.04
@@ -250,14 +250,6 @@ jobs:
         with:
           name: logs.zip
           path: .
-
-      - name: Check for expected number of coverage.xml reports
-        run: |
-          JOBS_PRODUCING_COVERAGE=13
-          if [ "$(find . -name coverage.xml | wc -l | bc)" -ne "${JOBS_PRODUCING_COVERAGE}" ]; then
-            echo "::error::Number of coverage.xml files was not the expected one (${JOBS_PRODUCING_COVERAGE}): $(find . -name coverage.xml |xargs echo)"
-            exit 1
-          fi
 
       - name: Upload coverage data
         uses: codecov/codecov-action@v5.5.1

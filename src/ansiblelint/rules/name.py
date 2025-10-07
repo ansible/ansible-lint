@@ -8,7 +8,6 @@ from collections.abc import MutableMapping
 from typing import TYPE_CHECKING, Any
 
 import wcmatch.pathlib
-import wcmatch.wcmatch
 
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, TransformMixin

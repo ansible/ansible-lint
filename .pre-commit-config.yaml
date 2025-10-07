@@ -34,6 +34,7 @@ repos:
     hooks:
       - id: uv-sync
       - id: uv-lock
+      - id: uv-lock
         name: "deps: upgrade via uv sync --upgrade"
         alias: deps
         args: ["--upgrade"]
@@ -57,7 +58,7 @@ repos:
           - "-o"
           - ".config/requirements-lock.txt"
   - repo: https://github.com/biomejs/pre-commit
-    rev: "v2.2.4"
+    rev: "v2.2.5"
     hooks:
       - id: biome-check
         name: biome
@@ -152,7 +153,7 @@ repos:
         alias: toml
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.13.2
+    rev: v0.13.3
     hooks:
       - id: ruff-format
         alias: ruff
@@ -185,7 +186,7 @@ repos:
           - wcmatch
           - yamllint>=1.34.0
   - repo: https://github.com/RobertCraigie/pyright-python
-    rev: v1.1.405
+    rev: v1.1.406
     hooks:
       - id: pyright
         additional_dependencies: *deps
