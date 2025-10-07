@@ -8,6 +8,9 @@
   description: This hook runs ansible-lint.
   entry: python3 -m ansiblelint -v --force-color
   language: python
+  # version is needed to avoid accidental use of python3.10 on some platforms
+  # as this is not supportted by recent versions of a ansible-lint and ansible-core
+  language_version: python3.13
   # do not pass files to ansible-lint, see:
   # https://github.com/ansible/ansible-lint/issues/611
   pass_filenames: false

@@ -18,6 +18,8 @@ class Reqs(dict[str, SpecifierSet]):
             for req_str in metadata.json["requires_dist"]:
                 req = Requirement(req_str)
                 if req.name:
+                    if req.marker and not req.marker.evaluate():
+                        continue
                     self[req.name] = req.specifier
 
     def matches(self, req_name: str, req_version: str | Version) -> bool:

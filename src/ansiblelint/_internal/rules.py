@@ -108,7 +108,7 @@ class BaseRule:
                         "Ignored exception from %s.%s while processing %s: %s",
                         self.__class__.__name__,
                         method.__name__,
-                        str(file),
+                        file,
                         exc,
                     )
                     _logger.debug("Ignored exception details", exc_info=True)
