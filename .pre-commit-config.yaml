@@ -30,7 +30,7 @@ repos:
     hooks:
       - id: check-useless-excludes
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.8.22
+    rev: 0.8.23
     hooks:
       - id: uv-sync
       - id: uv-lock
@@ -145,7 +145,7 @@ repos:
         entry: yamllint --strict
 
   - repo: https://github.com/tombi-toml/tombi-pre-commit
-    rev: v0.6.19
+    rev: v0.6.21
     hooks:
       - id: tombi-format
         alias: toml
