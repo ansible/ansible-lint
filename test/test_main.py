@@ -187,12 +187,13 @@ def test_ro_venv() -> None:
     """Tests behavior when the virtual environment is read-only."""
     tox_work_dir = os.environ.get("TOX_WORK_DIR", ".tox")
     venv_path = f"{tox_work_dir}/ro"
+    prerelease_flag = "" if sys.version_info < (3, 14) else "--pre "
     commands = [
         f"mkdir -p {venv_path}",
         f"chmod -R a+w {venv_path}",
         f"rm -rf {venv_path}",
         f"python -m venv --symlinks {venv_path}",
-        f"{venv_path}/bin/python -m pip install -q -e .",
+        f"{venv_path}/bin/python -m pip install {prerelease_flag}-q -e .",
         f"chmod -R a-w {venv_path}",
         # running with a ro venv and default cwd
         f"{venv_path}/bin/ansible-lint --version",
