@@ -624,7 +624,6 @@ env_list = [
   "docs",
   "schemas",
   "lower",
-  "pre",
   "eco",
 ]
 requires = ["setuptools>=65.3", "tox>=4.30.2", "tox-extra>=2.1", "tox-uv>=1.28"]
