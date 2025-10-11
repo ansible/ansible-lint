@@ -36,6 +36,8 @@ class GalaxyRule(AnsibleLintRule):
         "galaxy[version-missing]": "galaxy.yaml should have version tag.",
         "galaxy[no-runtime]": "meta/runtime.yml file not found.",
         "galaxy[invalid-dependency-version]": "Invalid collection metadata. Dependency version spec range is invalid",
+        "galaxy[no-repository]": "galaxy.yaml should have a repository key for publication to Galaxy. See https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html",
+        "galaxy[no-license]": "galaxy.yaml should have a license or license_file key for publication to Galaxy. See https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html",
     }
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
@@ -175,6 +177,26 @@ class GalaxyRule(AnsibleLintRule):
                 self.create_matcherror(
                     message="meta/runtime.yml file not found.",
                     tag="galaxy[no-runtime]",
+                    filename=file,
+                ),
+            )
+
+        # Check for repository key - recommended for Galaxy publication
+        if "repository" not in data:
+            results.append(
+                self.create_matcherror(
+                    message="galaxy.yaml should have a repository key for publication to Galaxy. See https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html",
+                    tag="galaxy[no-repository]",
+                    filename=file,
+                ),
+            )
+
+        # Check for license or license_file key - recommended for Galaxy publication
+        if "license" not in data and "license_file" not in data:
+            results.append(
+                self.create_matcherror(
+                    message="galaxy.yaml should have a license or license_file key for publication to Galaxy. See https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html",
+                    tag="galaxy[no-license]",
                     filename=file,
                 ),
             )
