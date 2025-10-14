@@ -32,7 +32,6 @@ cachier
 codeclimate
 codespell
 deannotate
-debops
 dellemc
 devel
 doas
