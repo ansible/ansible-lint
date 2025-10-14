@@ -2,6 +2,9 @@
 # cspell: ignore nullglob
 set -euo pipefail
 shopt -s nullglob
+
+cd "$TOX_ROOT_DIR"
+
 files=("${TOX_ENV_DIR}"/.coverage.*)
 if (( ${#files[@]} )); then
   coverage combine -q "--data-file=${TOX_ENV_DIR}/.coverage" "${files[@]}"
