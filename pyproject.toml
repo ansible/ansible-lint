@@ -148,7 +148,6 @@ skip_empty = true
 branch = true
 concurrency = ["multiprocessing", "thread"]
 parallel = true
-relative_files = true
 source = ["src"]
 
 [tool.mypy]
