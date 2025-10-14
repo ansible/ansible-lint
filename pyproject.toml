@@ -688,7 +688,7 @@ set_env.TERM = "dump"
 
 [tool.tox.env.eco]
 commands = [
-  ["sh", "-c", "tools/test-eco.sh"]
+  ["sh", "-c", "tools/test-eco.sh"],
 ]
 commands_post = []
 commands_pre = []
