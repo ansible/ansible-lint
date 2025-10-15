@@ -55,7 +55,7 @@ platformdirs==4.5.0
     # via black
 pycparser==2.23 ; implementation_name != 'PyPy'
     # via cffi
-pytokens==0.1.10
+pytokens==0.2.0
     # via black
 pyyaml==6.0.3
     # via
@@ -63,7 +63,7 @@ pyyaml==6.0.3
     #   ansible-core
     #   ansible-lint
     #   yamllint
-referencing==0.36.2
+referencing==0.37.0
     # via
     #   ansible-lint
     #   jsonschema
