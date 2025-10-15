@@ -1,66 +1,154 @@
 {
   "$defs": {
     "group": {
+      "additionalProperties": false,
+      "description": "See https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html#inventory-basics-formats-hosts-and-groups",
       "properties": {
         "children": {
+          "additionalProperties": false,
+          "description": "See https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html#grouping-groups-parent-child-group-relationships",
+          "pattern": "^[a-zA-Z_]\\w*$",
           "patternProperties": {
-            "[a-zA-Z-_0-9]": {
+            "^[a-zA-Z_]\\w*$": {
               "$ref": "#/$defs/group"
             }
-          }
+          },
+          "title": "Children",
+          "type": ["object", "string", "null"]
         },
         "hosts": {
+          "additionalProperties": false,
+          "description": "See https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html#inventory-basics-formats-hosts-and-groups",
+          "examples": [
+            {
+              "foo.example.com": null
+            },
+            "foo.example.com",
+            {
+              "www[01:50].example.com": null
+            },
+            {
+              "www[01:50:2].example.com": null
+            }
+          ],
+          "minLength": 1,
           "patternProperties": {
-            "[a-zA-Z.-_0-9]": {
+            ".": {
+              "additionalProperties": false,
+              "description": "See https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html#inventory-basics-formats-hosts-and-groups",
+              "patternProperties": {
+                "^[a-zA-Z_]\\w*$": {
+                  "description": "See https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html#assigning-a-variable-to-one-machine-host-variables",
+                  "title": "Host Variable"
+                }
+              },
+              "title": "Host",
               "type": ["object", "null"]
             }
           },
-          "type": ["object", "string"]
+          "title": "Hosts",
+          "type": ["object", "string", "null"]
         },
         "vars": {
-          "type": "object"
+          "additionalProperties": false,
+          "description": "See https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html#assigning-a-variable-to-many-machines-group-variables",
+          "examples": [
+            {
+              "ntp_server": "ntp.atlanta.example.com",
+              "proxy": "proxy.atlanta.example.com"
+            }
+          ],
+          "pattern": "^[a-zA-Z_]\\w*$",
+          "patternProperties": {
+            "^[a-zA-Z_]\\w*$": {
+              "description": "See https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html#assigning-a-variable-to-many-machines-group-variables",
+              "title": "Group Variable"
+            }
+          },
+          "title": "Group Variables",
+          "type": ["object", "string", "null"]
         }
       },
+      "title": "Group",
       "type": ["object", "null"]
-    },
-    "special-group": {
-      "additionalProperties": false,
-      "properties": {
-        "children": {
-          "type": ["object", "null"]
-        },
-        "groups": {
-          "type": ["object", "null"]
-        },
-        "hosts": {
-          "type": ["object", "null"]
-        },
-        "vars": {
-          "type": ["object", "null"]
-        }
-      },
-      "type": "object"
     }
   },
   "$id": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/inventory.json",
   "$schema": "http://json-schema.org/draft-07/schema",
-  "additionalProperties": true,
+  "additionalProperties": false,
   "description": "See https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html",
   "examples": [
+    {
+      "dbservers": {
+        "hosts": {
+          "one.example.com": null,
+          "three.example.com": null,
+          "two.example.com": null
+        }
+      },
+      "ungrouped": {
+        "hosts": {
+          "mail.example.com": null
+        }
+      },
+      "webservers": {
+        "hosts": {
+          "bar.example.com": null,
+          "foo.example.com": null
+        }
+      }
+    },
+    {
+      "atlanta": {
+        "hosts": {
+          "host1": {
+            "http_port": 80,
+            "maxRequestsPerChild": 808
+          },
+          "host2": {
+            "http_port": 303,
+            "maxRequestsPerChild": 909
+          }
+        }
+      }
+    },
+    {
+      "webservers": {
+        "hosts": {
+          "www[01:50].example.com": null
+        }
+      }
+    },
+    {
+      "webservers": {
+        "hosts": {
+          "www[01:50:2].example.com": null
+        }
+      }
+    }
+  ],
+  "markdownDescription": "All keys at top levels are groups with `all` and `ungrouped` having a special meaning.\n\nSee [How to build your inventory](https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html)",
+  "patternProperties": {
+    "^[a-zA-Z_]\\w*$": {
+      "$ref": "#/$defs/group"
+    }
+  },
+  "properties": {
+    "all": {
+      "$ref": "#/$defs/group",
+      "description": "See https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html#default-groups"
+    },
+    "ungrouped": {
+      "$ref": "#/$defs/group",
+      "description": "See https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html#default-groups"
+    }
+  },
+  "title": "Ansible Inventory",
+  "type": "object",
+  "x-ansible-lint": [
     "inventory.yaml",
     "inventory.yml",
     "inventory/*.yml",
     "inventory/*.yaml"
-  ],
-  "markdownDescription": "All keys at top levels are groups with `all` and `ungrouped` having a special meaning.\n\nSee [How to build your inventory](https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html)",
-  "properties": {
-    "all": {
-      "$ref": "#/$defs/special-group"
-    },
-    "ungrouped": {
-      "$ref": "#/$defs/group"
-    }
-  },
-  "title": "Ansible Inventory Schema",
-  "type": "object"
+  ]
 }
