@@ -81,7 +81,7 @@ runs:
       with:
         cache: pip
         cache-dependency-path: ${{ steps.get_reqs.outputs.reqs_file }}
-        python-version: "3.13"
+        python-version: "3.14"
 
     - name: Install ansible-lint
       shell: bash
