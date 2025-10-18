@@ -430,6 +430,17 @@ if "pytest" in sys.modules:
         for result in results:
             assert result.tag == "var-naming[no-role-prefix]"
 
+    def test_var_naming_with_custom_role_prefix() -> None:
+        """Test rule matches."""
+        role_path = "examples/roles/role_vars_prefix_detection"
+        conf_path = "examples/roles/role_vars_prefix_detection/.ansible-lint"
+        result = run_ansible_lint(
+            f"--config-file={conf_path}",
+            role_path,
+        )
+        assert result.returncode == RC.SUCCESS
+        assert "var-naming[no-role-prefix]" not in result.stdout
+
     @pytest.mark.libyaml
     def test_var_naming_with_role_prefix_plays(
         default_rules_collection: RulesCollection,

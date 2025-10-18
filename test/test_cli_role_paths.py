@@ -232,8 +232,6 @@ def test_run_role_identified_prefix_missing(local_test_dir: Path) -> None:
     )
     assert result.returncode == RC.VIOLATIONS_FOUND
     assert (
-        "Variables names from within roles should use bar_ as a prefix" in result.stdout
-    )
-    assert (
-        "Variables names from within roles should use bar_ as a prefix" in result.stdout
+        "Variables names from within roles should use /^_*bar_/ pattern as a prefix."
+        in result.stdout
     )
