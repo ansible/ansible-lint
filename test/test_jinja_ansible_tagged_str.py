@@ -38,10 +38,25 @@ class TestAnsibleTaggedStrErrorHandling:
     @pytest.mark.parametrize(
         ("error_message", "should_be_ignored"),
         (
+            # _AnsibleTaggedStr errors (cockpit issue)
             ('can only concatenate list (not "_AnsibleTaggedStr") to list', True),
             ('can only concatenate str (not "_AnsibleTaggedStr") to str', True),
+            # UndefinedMarker errors (kdump issue)
+            ('can only concatenate list (not "UndefinedMarker") to list', True),
+            ('can only concatenate str (not "UndefinedMarker") to str', True),
+            # AnsibleUndefined errors (kernel_settings issue)
+            ('can only concatenate list (not "AnsibleUndefined") to list', True),
+            ('can only concatenate str (not "AnsibleUndefined") to str', True),
+            # StrictUndefined errors (kernel_settings issue)
+            ('can only concatenate list (not "StrictUndefined") to list', True),
+            ('can only concatenate str (not "StrictUndefined") to str', True),
+            # ChainableUndefined errors (vpn issue)
+            ('can only concatenate list (not "ChainableUndefined") to list', True),
+            ('can only concatenate str (not "ChainableUndefined") to str', True),
+            # Other known patterns
             ("Unexpected templating type error occurred on", True),
             ("Object of type method is not JSON serializable", True),
+            # Legitimate errors that should NOT be ignored
             ('can only concatenate list (not "int") to list', False),
             ("TemplateSyntaxError: unexpected char '!' at 5", False),
         ),
@@ -49,7 +64,16 @@ class TestAnsibleTaggedStrErrorHandling:
     def test_jinja_ignore_patterns_comprehensive(
         self, error_message: str, should_be_ignored: bool
     ) -> None:
-        """Test comprehensive ignore patterns for _AnsibleTaggedStr errors."""
+        """Test comprehensive ignore patterns for ansible-core 2.19+ type errors.
+        
+        This covers:
+        - _AnsibleTaggedStr errors (cockpit role)
+        - UndefinedMarker errors (kdump role)
+        - AnsibleUndefined/StrictUndefined errors (kernel_settings role)
+        - ChainableUndefined errors (vpn role)
+        
+        See: linux-system-roles/vpn#207
+        """
         matches = bool(ignored_re.search(error_message))
         assert matches == should_be_ignored, (
             f"Error message '{error_message}' should {'be ignored' if should_be_ignored else 'not be ignored'} "
