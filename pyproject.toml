@@ -148,6 +148,7 @@ skip_empty = true
 branch = true
 concurrency = ["multiprocessing", "thread"]
 parallel = true
+relative_files = true
 source = ["src"]
 
 [tool.mypy]
@@ -688,7 +689,6 @@ set_env.TERM = "dump"
 [tool.tox.env.eco]
 commands = [
   ["sh", "-c", "tools/test-eco.sh"],
-  ["{tox_root}/tools/report-coverage"],
 ]
 commands_post = []
 commands_pre = []

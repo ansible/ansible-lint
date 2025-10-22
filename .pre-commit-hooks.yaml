@@ -9,7 +9,7 @@
   entry: python3 -m ansiblelint -v --force-color
   language: python
   # version is needed to avoid accidental use of python3.10 on some platforms
-  # as this is not supportted by recent versions of a ansible-lint and ansible-core
+  # as this is not supported by recent versions of ansible-lint and ansible-core
   language_version: python3.13
   # do not pass files to ansible-lint, see:
   # https://github.com/ansible/ansible-lint/issues/611
@@ -17,7 +17,7 @@
   always_run: true
   additional_dependencies:
     # https://github.com/pre-commit/pre-commit/issues/1526
-    # If you want to use specific version of ansible-core or ansible, feel
+    # If you want to use a specific version of ansible-core or ansible, feel
     # free to override `additional_dependencies` in your own hook config
     # file as we only support latest stable version of ansible-core when used
     # as an action.
