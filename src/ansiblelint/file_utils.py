@@ -14,7 +14,6 @@ from typing import TYPE_CHECKING, Any, cast
 
 import pathspec
 import wcmatch.pathlib
-import wcmatch.wcmatch
 from yaml.error import YAMLError
 
 from ansiblelint.app import get_app
