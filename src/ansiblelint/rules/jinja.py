@@ -69,20 +69,21 @@ ignored_re = re.compile(
             r"^The '(.*)' test expects a dictionary$",
             # https://github.com/ansible/ansible-lint/issues/4338
             r"An unhandled exception occurred while templating (.*). Error was a <class 'ansible.errors.AnsibleFilterError'>, original message: The (.*) test expects a dictionary$",
-    r"can only concatenate list \(not \"_AnsibleTaggedStr\"\) to list",
-    r"can only concatenate str \(not \"_AnsibleTaggedStr\"\) to str",
-    r"can only concatenate list \(not \"UndefinedMarker\"\) to list",
-    r"can only concatenate str \(not \"UndefinedMarker\"\) to str",
-    r"can only concatenate list \(not \"AnsibleUndefined\"\) to list",
-    r"can only concatenate str \(not \"AnsibleUndefined\"\) to str",
-    r"can only concatenate list \(not \"StrictUndefined\"\) to list",
-    r"can only concatenate str \(not \"StrictUndefined\"\) to str",
-    r"can only concatenate list \(not \"ChainableUndefined\"\) to list",
-    r"can only concatenate str \(not \"ChainableUndefined\"\) to str",
+            r"can only concatenate list \(not \"_AnsibleTaggedStr\"\) to list",
+            r"can only concatenate str \(not \"_AnsibleTaggedStr\"\) to str",
+            r"can only concatenate list \(not \"UndefinedMarker\"\) to list",
+            r"can only concatenate str \(not \"UndefinedMarker\"\) to str",
+            r"can only concatenate list \(not \"AnsibleUndefined\"\) to list",
+            r"can only concatenate str \(not \"AnsibleUndefined\"\) to str",
+            r"can only concatenate list \(not \"StrictUndefined\"\) to list",
+            r"can only concatenate str \(not \"StrictUndefined\"\) to str",
+            r"can only concatenate list \(not \"ChainableUndefined\"\) to list",
+            r"can only concatenate str \(not \"ChainableUndefined\"\) to str",
         ],
     ),
     flags=re.MULTILINE | re.DOTALL,
 )
+
 
 @dataclass(frozen=True)
 class JinjaRuleTMetaSpacing(RuleMatchTransformMeta):
@@ -988,13 +989,15 @@ if "pytest" in sys.modules:
         assert ignored_re.search(
             'can only concatenate str (not "_AnsibleTaggedStr") to str'
         ), "String concatenation with _AnsibleTaggedStr should also be ignored"
-        
+
         assert ignored_re.search(
             'can only concatenate str (not "UndefinedMarker") to str'
         ), "String concatenation with UndefinedMarker should also be ignored"
-        
-        # Test UndefinedMarker errors are ignored 
-        undefined_error_msg = 'can only concatenate list (not "UndefinedMarker") to list'
+
+        # Test UndefinedMarker errors are ignored
+        undefined_error_msg = (
+            'can only concatenate list (not "UndefinedMarker") to list'
+        )
         assert ignored_re.search(undefined_error_msg), (
             f"UndefinedMarker error should be ignored: {undefined_error_msg}"
         )

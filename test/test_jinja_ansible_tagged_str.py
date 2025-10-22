@@ -65,13 +65,13 @@ class TestAnsibleTaggedStrErrorHandling:
         self, error_message: str, should_be_ignored: bool
     ) -> None:
         """Test comprehensive ignore patterns for ansible-core 2.19+ type errors.
-        
+
         This covers:
         - _AnsibleTaggedStr errors (cockpit role)
         - UndefinedMarker errors (kdump role)
         - AnsibleUndefined/StrictUndefined errors (kernel_settings role)
         - ChainableUndefined errors (vpn role)
-        
+
         See: linux-system-roles/vpn#207
         """
         matches = bool(ignored_re.search(error_message))
