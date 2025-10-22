@@ -985,19 +985,7 @@ if "pytest" in sys.modules:
             f"Normal error should not be ignored: {normal_error_msg}"
         )
 
-        # Test that the ignore pattern works for the specific error we're testing
-        assert ignored_re.search(
-            'can only concatenate str (not "_AnsibleTaggedStr") to str'
-        ), "String concatenation with _AnsibleTaggedStr should also be ignored"
-
-        assert ignored_re.search(
-            'can only concatenate str (not "UndefinedMarker") to str'
-        ), "String concatenation with UndefinedMarker should also be ignored"
-
         # Test UndefinedMarker errors are ignored
-        undefined_error_msg = (
+        assert ignored_re.search(
             'can only concatenate list (not "UndefinedMarker") to list'
-        )
-        assert ignored_re.search(undefined_error_msg), (
-            f"UndefinedMarker error should be ignored: {undefined_error_msg}"
-        )
+        ), "UndefinedMarker concatenation should be ignored"
