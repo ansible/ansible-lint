@@ -876,8 +876,7 @@
     "version",
     "readme",
     "authors",
-    "description",
-    "repository"
+    "description"
   ],
   "title": "Ansible galaxy.yml Schema",
   "type": "object"
