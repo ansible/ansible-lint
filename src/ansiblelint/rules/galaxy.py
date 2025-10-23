@@ -275,6 +275,16 @@ if "pytest" in sys.modules:
                 ["galaxy[no-runtime]"],
                 id="broken_no_runtime",
             ),
+            pytest.param(
+                "examples/collections/broken_no_license/galaxy.yml",
+                ["galaxy[no-license]"],
+                id="broken_no_license",
+            ),
+            pytest.param(
+                "examples/collections/broken_no_repo/galaxy.yml",
+                ["galaxy[no-repository]"],
+                id="broken_no_repo",
+            ),
         ),
     )
     def test_galaxy_rule(
