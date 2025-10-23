@@ -1,0 +1,11 @@
+---
+name: broken_no_repo
+namespace: fixtures
+version: 1.2.3
+authors:
+  - John
+readme: ../README.md
+tags: ["tools"]
+description: Lorem ipsum
+license:
+  - MIT
