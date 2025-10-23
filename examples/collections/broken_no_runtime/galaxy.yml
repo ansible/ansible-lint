@@ -8,4 +8,5 @@ readme: ../README.md
 tags: ["tools"]
 description: Lorem ipsum
 repository: https://www.github.com/my_org/my_collection
-license: LICENSE
+license:
+  - MIT
