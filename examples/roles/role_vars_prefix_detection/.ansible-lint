@@ -1,0 +1,2 @@
+---
+role_var_prefix: "^_*({role}_|fo|bar)"
