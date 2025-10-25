@@ -1,0 +1,18 @@
+---
+- name: Echo thefoo
+  ansible.builtin.command: echo thefoo
+  changed_when: true
+  register: thefoo
+
+- name: Echo thebar
+  ansible.builtin.command: echo thebar
+  changed_when: true
+  register: role_vars_prefix_detection_thebar
+
+- name: Test ansible.builtin.set_fact without role prefix
+  ansible.builtin.set_fact:
+    foo: bar
+
+- name: Test set_fact with role prefix
+  ansible.builtin.set_fact:
+    role_vars_prefix_detection_foo: bar
