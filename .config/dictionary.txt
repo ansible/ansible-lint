@@ -91,6 +91,7 @@ switchport
 sysvinit
 taskshandlers
 testinfra
+thefoo
 timesyncd
 tmpfs
 tomlsort
