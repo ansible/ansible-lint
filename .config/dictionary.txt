@@ -53,6 +53,7 @@ indentless
 inlinehilite
 iscsi
 junitxml
+kdump
 kubevirt
 libyaml
 licensedb
