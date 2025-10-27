@@ -71,6 +71,14 @@ ignored_re = re.compile(
             r"An unhandled exception occurred while templating (.*). Error was a <class 'ansible.errors.AnsibleFilterError'>, original message: The (.*) test expects a dictionary$",
             r"can only concatenate list \(not \"_AnsibleTaggedStr\"\) to list",
             r"can only concatenate str \(not \"_AnsibleTaggedStr\"\) to str",
+            r"can only concatenate list \(not \"UndefinedMarker\"\) to list",
+            r"can only concatenate str \(not \"UndefinedMarker\"\) to str",
+            r"can only concatenate list \(not \"AnsibleUndefined\"\) to list",
+            r"can only concatenate str \(not \"AnsibleUndefined\"\) to str",
+            r"can only concatenate list \(not \"StrictUndefined\"\) to list",
+            r"can only concatenate str \(not \"StrictUndefined\"\) to str",
+            r"can only concatenate list \(not \"ChainableUndefined\"\) to list",
+            r"can only concatenate str \(not \"ChainableUndefined\"\) to str",
         ],
     ),
     flags=re.MULTILINE | re.DOTALL,
@@ -977,7 +985,7 @@ if "pytest" in sys.modules:
             f"Normal error should not be ignored: {normal_error_msg}"
         )
 
-        # Test that the ignore pattern works for the specific error we're testing
+        # Test UndefinedMarker errors are ignored
         assert ignored_re.search(
-            'can only concatenate str (not "_AnsibleTaggedStr") to str'
-        ), "String concatenation with _AnsibleTaggedStr should also be ignored"
+            'can only concatenate list (not "UndefinedMarker") to list'
+        ), "UndefinedMarker concatenation should be ignored"
