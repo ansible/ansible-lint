@@ -1,6 +1,5 @@
 Chamoulaud
 Codeclimate
-DEVEL
 FQCN
 FQCNs
 LIBYAML
@@ -34,7 +33,6 @@ codeclimate
 codespell
 deannotate
 dellemc
-devel
 doas
 dzdo
 ematcher
@@ -73,7 +71,6 @@ pbrun
 pfexec
 plainexamples
 pmrun
-pwsh
 pymdownx
 redirections
 reformatter
