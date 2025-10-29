@@ -8,7 +8,10 @@ from pathlib import Path
 
 from ansiblelint.cli import get_rules_dirs
 from ansiblelint.config import Options
-from ansiblelint.rules import RulesCollection, TransformMixin
+from ansiblelint.rules import (
+    RulesCollection,
+    TransformMixin,
+)
 
 if __name__ == "__main__":
     subprocess.run(
