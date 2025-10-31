@@ -250,8 +250,8 @@ class VariableNamingRule(AnsibleLintRule):
         results = []
         task_prefix = Prefix()
         role_prefix = Prefix()
-        if file and file.parent and file.parent.kind == "role":
-            role_prefix = Prefix(file.parent.path.name)
+        if file and file.role:
+            role_prefix = Prefix(file.role)
         ansible_module = task["action"]["__ansible_module__"]
         # If the task uses the 'vars' section to set variables
         # only check role prefix for include_role and import_role tasks 'vars'
@@ -426,7 +426,7 @@ if "pytest" in sys.modules:
             Lintable("examples/roles/role_vars_prefix_detection"),
             rules=default_rules_collection,
         ).run()
-        assert len(results) == 2
+        assert len(results) == 4
         for result in results:
             assert result.tag == "var-naming[no-role-prefix]"
 
