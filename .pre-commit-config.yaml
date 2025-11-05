@@ -30,7 +30,7 @@ repos:
     hooks:
       - id: check-useless-excludes
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.9.2
+    rev: 0.9.7
     hooks:
       - id: uv-sync
       - id: uv-lock
@@ -58,7 +58,7 @@ repos:
           - "-o"
           - ".config/requirements-lock.txt"
   - repo: https://github.com/biomejs/pre-commit
-    rev: "v2.2.5"
+    rev: "v2.3.2"
     hooks:
       - id: biome-check
         name: biome
@@ -145,7 +145,7 @@ repos:
         entry: yamllint --strict
 
   - repo: https://github.com/tombi-toml/tombi-pre-commit
-    rev: v0.6.31
+    rev: v0.6.40
     hooks:
       - id: tombi-format
         alias: toml
@@ -153,7 +153,7 @@ repos:
         alias: toml
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.0
+    rev: v0.14.3
     hooks:
       - id: ruff-format
         alias: ruff
@@ -186,12 +186,12 @@ repos:
           - wcmatch
           - yamllint>=1.34.0
   - repo: https://github.com/RobertCraigie/pyright-python
-    rev: v1.1.406
+    rev: v1.1.407
     hooks:
       - id: pyright
         additional_dependencies: *deps
   - repo: https://github.com/pycqa/pylint
-    rev: v4.0.0
+    rev: v4.0.2
     hooks:
       - id: pylint
         args:
