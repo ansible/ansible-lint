@@ -18,7 +18,7 @@ click==8.3.0
     # via black
 colorama==0.4.6 ; sys_platform == 'win32'
     # via click
-cryptography==46.0.2
+cryptography==46.0.3
     # via
     #   ansible-core
     #   ansible-lint
@@ -68,11 +68,11 @@ referencing==0.37.0
     #   ansible-lint
     #   jsonschema
     #   jsonschema-specifications
-rpds-py==0.27.1
+rpds-py==0.28.0
     # via
     #   jsonschema
     #   referencing
-ruamel-yaml==0.18.15
+ruamel-yaml==0.18.16
     # via ansible-lint
 subprocess-tee==0.4.2
     # via
