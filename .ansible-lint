@@ -32,6 +32,12 @@ mock_roles:
 # Enable checking of loop variable prefixes in roles
 loop_var_prefix: "^(__|{role}_)"
 
+# Enforce role-related variable names to start with the pattern below.
+# By default Ansible Lint accepts "role name" prefix with optional leading underscore(s).
+# With this option for example you can prefix role variables with the collection name
+# which the role belongs to instead of role name.
+role_var_prefix: "^_*{role}_"
+
 # Enforce variable names to follow pattern below, in addition to Ansible own
 # requirements, like avoiding python identifiers. To disable add `var-naming`
 # to skip_list.
