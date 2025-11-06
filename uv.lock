@@ -164,7 +164,7 @@ schemas = [
 [package.metadata]
 requires-dist = [
     { name = "ansible-compat", specifier = ">=25.8.2" },
-    { name = "ansible-core", specifier = ">=2.17.10" },
+    { name = "ansible-core", specifier = ">=2.17.10,<2.20.0" },
     { name = "black", specifier = ">=24.3.0" },
     { name = "cffi", specifier = ">=1.17.1" },
     { name = "cryptography", specifier = ">=38" },
