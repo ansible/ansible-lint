@@ -21,4 +21,4 @@
     # free to override `additional_dependencies` in your own hook config
     # file as we only support latest stable version of ansible-core when used
     # as an action.
-    - ansible-core>=2.19.0
+    - ansible-core>=2.19.0,<2.20.0
