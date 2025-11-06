@@ -164,7 +164,9 @@ repos:
     hooks:
       - id: mypy
         # "." and pass_files are used to make pre-commit mypy behave the same as standalone mypy
-        args: ["."]
+        args:
+          - --python-version=3.12
+          - .
         pass_filenames: false
         additional_dependencies: &deps
           - ansible-compat>=25.8.0
