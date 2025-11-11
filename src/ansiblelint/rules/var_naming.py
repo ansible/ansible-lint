@@ -48,7 +48,7 @@ class VariableNamingRule(AnsibleLintRule):
     # List of special variables that should be treated as read-only. This list
     # does not include connection variables, which we expect users to tune in
     # specific cases.
-    # https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html
+    # https://docs.ansible.com/projects/ansible/latest/reference_appendices/special_variables.html
     read_only_names = {
         "ansible_check_mode",
         "ansible_collection_name",
