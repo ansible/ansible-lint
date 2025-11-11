@@ -1,5 +1,5 @@
 ---
-# https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#role-argument-validation
+# https://docs.ansible.com/projects/ansible/latest/user_guide/playbooks_reuse_roles.html#role-argument-validation
 argument_specs:
   main:
     short_description: The main entry point for the role.

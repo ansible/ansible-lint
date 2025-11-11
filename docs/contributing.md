@@ -52,14 +52,14 @@ community.
   announcements including social events.
 
 To get release announcements and important changes from the community, see the
-[Bullhorn newsletter](https://docs.ansible.com/ansible/devel/community/communication.html#the-bullhorn).
+[Bullhorn newsletter](https://docs.ansible.com/projects/ansible/devel/community/communication.html#the-bullhorn).
 
 For a live chat experience join
 the [#devtools:ansible.com](https://matrix.to/#/#devtools:ansible.com)
 Matrix room.
 
 You can find more information in the
-[Ansible communication guide](https://docs.ansible.com/ansible/devel/community/communication.html).
+[Ansible communication guide](https://docs.ansible.com/projects/ansible/devel/community/communication.html).
 
 Possible security bugs should be reported via email to
 <mailto:security@ansible.com>.
@@ -69,14 +69,14 @@ Possible security bugs should be reported via email to
 As with all Ansible projects, we have a [Code of Conduct].
 
 [ansible communication]:
-  https://docs.ansible.com/ansible/latest/community/communication.html
+  https://docs.ansible.com/projects/ansible/latest/community/communication.html
 [code of conduct]:
-  https://docs.ansible.com/ansible/latest/community/code_of_conduct.html
+  https://docs.ansible.com/projects/ansible/latest/community/code_of_conduct.html
 [creating your fork on github]:
   https://docs.github.com/en/get-started/quickstart/contributing-to-projects
 [discussions]: https://github.com/ansible/ansible-lint/discussions
 [supported ansible versions]:
-  https://docs.ansible.com/ansible-core/devel/reference_appendices/release_and_maintenance.html#ansible-core-release-cycle
+  https://docs.ansible.com/projects/ansible-core/devel/reference_appendices/release_and_maintenance.html#ansible-core-release-cycle
 [tox]: https://tox.readthedocs.io
 
 ## Module dependency graph

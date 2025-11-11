@@ -168,7 +168,7 @@ def load_yamllint_config(yamllint_file: Path | None = None) -> CustomYamlLintCon
             errors.append(msg)
     if errors:
         nl = "\n"
-        msg = f"Found incompatible custom yamllint configuration ({file}), please either remove the file or edit it to comply with:{nl}  - {(nl + '  - ').join(errors)}.{nl}{nl}Read https://ansible.readthedocs.io/projects/lint/rules/yaml/ for more details regarding why we have these requirements. Fix mode will not be available."
+        msg = f"Found incompatible custom yamllint configuration ({file}), please either remove the file or edit it to comply with:{nl}  - {(nl + '  - ').join(errors)}.{nl}{nl}Read https://docs.ansible.com/projects/lint/rules/yaml/ for more details regarding why we have these requirements. Fix mode will not be available."
         config.incompatible = msg
 
     _logger.debug("Effective yamllint rules used: %s", config.rules)

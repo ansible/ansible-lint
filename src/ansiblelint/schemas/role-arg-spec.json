@@ -228,7 +228,7 @@
     },
     "option": {
       "additionalProperties": false,
-      "markdownDescription": "See [argument-spec](https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec)",
+      "markdownDescription": "See [argument-spec](https://docs.ansible.com/projects/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec)",
       "properties": {
         "apply_defaults": {
           "type": "string"
@@ -352,7 +352,7 @@
         },
         "type": {
           "$ref": "#/$defs/datatype",
-          "markdownDescription": "See [argument-spec](https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec"
+          "markdownDescription": "See [argument-spec](https://docs.ansible.com/projects/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec"
         },
         "version_added": {
           "type": "string"
@@ -374,13 +374,13 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "additionalProperties": false,
   "examples": ["meta/argument_specs.yml"],
-  "markdownDescription": "See [role-argument-validation](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#role-argument-validation)",
+  "markdownDescription": "See [role-argument-validation](https://docs.ansible.com/projects/ansible/latest/user_guide/playbooks_reuse_roles.html#role-argument-validation)",
   "properties": {
     "argument_specs": {
       "additionalProperties": {
         "$ref": "#/$defs/entry_point"
       },
-      "markdownDescription": "Add entry point, usually `main`.\nSee [role-argument-validation](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#role-argument-validation)"
+      "markdownDescription": "Add entry point, usually `main`.\nSee [role-argument-validation](https://docs.ansible.com/projects/ansible/latest/user_guide/playbooks_reuse_roles.html#role-argument-validation)"
     }
   },
   "title": "Ansible Role Argument Specs Schema"

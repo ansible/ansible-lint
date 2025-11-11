@@ -39,7 +39,7 @@ def test_load_ignore_txt_default_success() -> None:
             _ignore_file.write(
                 dedent(
                     """
-                    # See https://ansible.readthedocs.io/projects/lint/configuring/#ignoring-rules-for-entire-files
+                    # See https://docs.ansible.com/projects/lint/configuring/#ignoring-rules-for-entire-files
                     playbook2.yml package-latest # comment
                     playbook2.yml foo-bar
                     playbook2.yml another-role skip # rule with qualifier

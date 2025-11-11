@@ -356,7 +356,7 @@
         },
         "interpreter_python": {
           "default": "auto_silent",
-          "description": "See https://docs.ansible.com/ansible/devel/reference_appendices/interpreter_discovery.html",
+          "description": "See https://docs.ansible.com/projects/ansible/devel/reference_appendices/interpreter_discovery.html",
           "title": "Interpreter Python",
           "type": "string"
         },
@@ -512,7 +512,7 @@
   "$id": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/molecule.json",
   "$schema": "http://json-schema.org/draft-07/schema",
   "additionalProperties": false,
-  "description": "https://ansible.readthedocs.io/projects/molecule/configuration/",
+  "description": "https://docs.ansible.com/projects/molecule/configuration/",
   "examples": ["molecule/*/molecule.yml"],
   "properties": {
     "dependency": {

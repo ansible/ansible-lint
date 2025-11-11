@@ -3,7 +3,7 @@
 This rule checks the file extension for playbooks is either `.yml` or `.yaml`.
 Ansible playbooks are expressed in YAML format with minimal syntax.
 
-The [YAML syntax](https://docs.ansible.com/ansible/latest/reference_appendices/YAMLSyntax.html#yaml-syntax) reference provides additional detail.
+The [YAML syntax](https://docs.ansible.com/projects/ansible/latest/reference_appendices/YAMLSyntax.html#yaml-syntax) reference provides additional detail.
 
 ## Problematic Code
 

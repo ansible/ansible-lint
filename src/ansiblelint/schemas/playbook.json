@@ -27,7 +27,7 @@
       ],
       "patternProperties": {
         "^(ansible\\.builtin\\.)?import_playbook$": {
-          "markdownDescription": "* Includes a file with a list of plays to be executed.\n *  Files with a list of plays can only be included at the top level.\n * You cannot use this action inside a play.\n\nSee [import_playbook](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/import_playbook_module.html)",
+          "markdownDescription": "* Includes a file with a list of plays to be executed.\n *  Files with a list of plays can only be included at the top level.\n * You cannot use this action inside a play.\n\nSee [import_playbook](https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/import_playbook_module.html)",
           "title": "Import Playbook",
           "type": "string"
         },
@@ -76,7 +76,7 @@
           "type": "string"
         }
       ],
-      "markdownDescription": "See [become](https://docs.ansible.com/ansible/latest/user_guide/become.html)",
+      "markdownDescription": "See [become](https://docs.ansible.com/projects/ansible/latest/user_guide/become.html)",
       "title": "Become Method"
     },
     "block": {
@@ -129,7 +129,7 @@
               }
             ]
           },
-          "markdownDescription": "Blocks create logical groups of tasks. Blocks also offer ways to handle task errors, similar to exception handling in many programming languages. See [blocks](https://docs.ansible.com/ansible/latest/user_guide/playbooks_blocks.html)",
+          "markdownDescription": "Blocks create logical groups of tasks. Blocks also offer ways to handle task errors, similar to exception handling in many programming languages. See [blocks](https://docs.ansible.com/projects/ansible/latest/user_guide/playbooks_blocks.html)",
           "title": "Block",
           "type": "array"
         },
@@ -278,12 +278,12 @@
     },
     "ignore_errors": {
       "$ref": "#/$defs/templated-boolean",
-      "markdownDescription": "See [ignore_errors](https://docs.ansible.com/ansible/latest/user_guide/playbooks_error_handling.html#ignoring-failed-commands)",
+      "markdownDescription": "See [ignore_errors](https://docs.ansible.com/projects/ansible/latest/user_guide/playbooks_error_handling.html#ignoring-failed-commands)",
       "title": "Ignore Errors"
     },
     "no_log": {
       "$ref": "#/$defs/templated-boolean",
-      "markdownDescription": "Use for protecting sensitive data. See [no_log](https://docs.ansible.com/ansible/latest/reference_appendices/logging.html)",
+      "markdownDescription": "Use for protecting sensitive data. See [no_log](https://docs.ansible.com/projects/ansible/latest/reference_appendices/logging.html)",
       "title": "no_log"
     },
     "play": {
@@ -557,7 +557,7 @@
           "$ref": "#/$defs/templated-boolean"
         },
         "order": {
-          "markdownDescription": "See https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_strategies.html#ordering-execution-based-on-inventory",
+          "markdownDescription": "See https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_strategies.html#ordering-execution-based-on-inventory",
           "oneOf": [
             {
               "enum": [
@@ -600,7 +600,7 @@
               }
             ]
           },
-          "markdownDescription": "Roles let you automatically load related vars, files, tasks, handlers, and other Ansible artifacts based on a known file structure. After you group your content in roles, you can easily reuse them and share them with other users.\n See [roles](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#roles)",
+          "markdownDescription": "Roles let you automatically load related vars, files, tasks, handlers, and other Ansible artifacts based on a known file structure. After you group your content in roles, you can easily reuse them and share them with other users.\n See [roles](https://docs.ansible.com/projects/ansible/latest/user_guide/playbooks_reuse_roles.html#roles)",
           "title": "Roles",
           "type": "array"
         },
@@ -620,7 +620,7 @@
               "type": "array"
             }
           ],
-          "markdownDescription": "Integer, percentage or list of those. See [Setting the batch size with serial](https://docs.ansible.com/ansible/latest/user_guide/playbooks_strategies.html#setting-the-batch-size-with-serial)",
+          "markdownDescription": "Integer, percentage or list of those. See [Setting the batch size with serial](https://docs.ansible.com/projects/ansible/latest/user_guide/playbooks_strategies.html#setting-the-batch-size-with-serial)",
           "title": "Batch size"
         },
         "strategy": {
@@ -675,7 +675,7 @@
           "items": {
             "$ref": "#/$defs/vars_prompt"
           },
-          "markdownDescription": "See [vars_prompt](https://docs.ansible.com/ansible/latest/user_guide/playbooks_prompts.html)",
+          "markdownDescription": "See [vars_prompt](https://docs.ansible.com/projects/ansible/latest/user_guide/playbooks_prompts.html)",
           "title": "vars_prompt",
           "type": "array"
         },
@@ -691,7 +691,7 @@
       "type": "object"
     },
     "play-role": {
-      "markdownDescription": "See [roles](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#roles)",
+      "markdownDescription": "See [roles](https://docs.ansible.com/projects/ansible/latest/user_guide/playbooks_reuse_roles.html#roles)",
       "properties": {
         "any_errors_fatal": {
           "$ref": "#/$defs/templated-boolean",
@@ -807,7 +807,7 @@
       "type": "object"
     },
     "removed-include-module": {
-      "markdownDescription": "See [include module](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/include_module.html)",
+      "markdownDescription": "See [include module](https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/include_module.html)",
       "not": {},
       "title": "Replace 'include' with either 'ansible.builtin.include_tasks' or 'ansible.builtin.import_tasks'"
     },
@@ -901,7 +901,7 @@
         },
         "changed_when": {
           "$ref": "#/$defs/complex_conditional",
-          "markdownDescription": "See [changed_when](https://docs.ansible.com/ansible/latest/user_guide/playbooks_error_handling.html#defining-changed)",
+          "markdownDescription": "See [changed_when](https://docs.ansible.com/projects/ansible/latest/user_guide/playbooks_error_handling.html#defining-changed)",
           "title": "Changed When"
         },
         "check_mode": {
@@ -968,7 +968,7 @@
               "type": "array"
             }
           ],
-          "markdownDescription": "Applies only to handlers. See [listen](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_handlers.html)",
+          "markdownDescription": "Applies only to handlers. See [listen](https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_handlers.html)",
           "title": "Listen"
         },
         "local_action": {
@@ -1090,7 +1090,7 @@
               "type": "array"
             }
           ],
-          "markdownDescription": "See [loops](https://docs.ansible.com/ansible/latest/user_guide/playbooks_loops.html#loops)",
+          "markdownDescription": "See [loops](https://docs.ansible.com/projects/ansible/latest/user_guide/playbooks_loops.html#loops)",
           "title": "With Items"
         },
         "with_lines": {
@@ -1236,7 +1236,7 @@
         },
         "unsafe": {
           "default": false,
-          "markdownDescription": "See [unsafe](https://docs.ansible.com/ansible/latest/user_guide/playbooks_prompts.html#allowing-special-characters-in-vars-prompt-values)",
+          "markdownDescription": "See [unsafe](https://docs.ansible.com/projects/ansible/latest/user_guide/playbooks_prompts.html#allowing-special-characters-in-vars-prompt-values)",
           "title": "Unsafe",
           "type": "boolean"
         }

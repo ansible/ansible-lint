@@ -45,14 +45,14 @@
   "$id": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/inventory.json",
   "$schema": "http://json-schema.org/draft-07/schema",
   "additionalProperties": true,
-  "description": "See https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html",
+  "description": "See https://docs.ansible.com/projects/ansible/latest/inventory_guide/intro_inventory.html",
   "examples": [
     "inventory.yaml",
     "inventory.yml",
     "inventory/*.yml",
     "inventory/*.yaml"
   ],
-  "markdownDescription": "All keys at top levels are groups with `all` and `ungrouped` having a special meaning.\n\nSee [How to build your inventory](https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html)",
+  "markdownDescription": "All keys at top levels are groups with `all` and `ungrouped` having a special meaning.\n\nSee [How to build your inventory](https://docs.ansible.com/projects/ansible/latest/inventory_guide/intro_inventory.html)",
   "properties": {
     "all": {
       "$ref": "#/$defs/special-group"

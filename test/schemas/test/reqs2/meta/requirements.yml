@@ -1,4 +1,4 @@
-# https://docs.ansible.com/ansible/latest/galaxy/user_guide.html
+# https://docs.ansible.com/projects/ansible/latest/galaxy/user_guide.html
 collections:
   - doo.bar
   - name: geerlingguy.php_roles

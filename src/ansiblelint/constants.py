@@ -10,7 +10,7 @@ MAX_TAGS_COUNT = 20
 MAX_LENGTH_TAG = 64
 DEFAULT_RULESDIR = Path(__file__).parent / "rules"
 CUSTOM_RULESDIR_ENVVAR = "ANSIBLE_LINT_CUSTOM_RULESDIR"
-RULE_DOC_URL = "https://ansible.readthedocs.io/projects/lint/rules/"
+RULE_DOC_URL = "https://docs.ansible.com/projects/lint/rules/"
 SKIP_SCHEMA_UPDATE = "ANSIBLE_LINT_SKIP_SCHEMA_UPDATE"
 
 ENV_VARS_HELP = {
@@ -83,7 +83,7 @@ FileType = Literal[
     "meta-runtime",
     "tasks",  # includes pre_tasks, post_tasks
     "handlers",  # very similar to tasks but with some specifics
-    # https://docs.ansible.com/ansible/latest/galaxy/user_guide.html#installing-roles-and-collections-from-the-same-requirements-yml-file
+    # https://docs.ansible.com/projects/ansible/latest/galaxy/user_guide.html#installing-roles-and-collections-from-the-same-requirements-yml-file
     "requirements",
     "role",  # that is a folder!
     "yaml",  # generic yaml file, previously reported as unknown file type

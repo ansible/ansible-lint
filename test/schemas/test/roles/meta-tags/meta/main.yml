@@ -1,5 +1,5 @@
 ---
-# https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html#role-dependencies
+# https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_reuse_roles.html#role-dependencies
 dependencies:
   - role: foo
     tags: fruit # simple string allowed
@@ -12,7 +12,7 @@ dependencies:
   - role: role_with_condition
     when: inventory_hostname == "foo"
   - role: another_role
-    # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#passing-different-parameters
+    # https://docs.ansible.com/projects/ansible/latest/user_guide/playbooks_reuse_roles.html#passing-different-parameters
     something_that_counts_as_role_parameter: ...
     vars:
       "foo": bar

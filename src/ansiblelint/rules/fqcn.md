@@ -24,7 +24,7 @@ The `fqcn` rule has the following checks:
 
 !!! warning
 
-    This rule does not take [`collections` keyword](https://docs.ansible.com/ansible/latest/collections_guide/collections_using_playbooks.html#simplifying-module-names-with-the-collections-keyword) into consideration for resolving content.
+    This rule does not take [`collections` keyword](https://docs.ansible.com/projects/ansible/latest/collections_guide/collections_using_playbooks.html#simplifying-module-names-with-the-collections-keyword) into consideration for resolving content.
     The `collections` keyword provided a temporary mechanism transitioning to Ansible 2.9.
     You should rewrite any content that uses the `collections:` key and avoid it where possible.
 

@@ -232,7 +232,7 @@
           "required": ["name"]
         }
       ],
-      "markdownDescription": "See https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html#role-dependencies and https://github.com/ansible/ansible/blob/devel/lib/ansible/playbook/role/metadata.py#L79\n\nOther keys are treated as role [parameters](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#passing-different-parameters).",
+      "markdownDescription": "See https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_reuse_roles.html#role-dependencies and https://github.com/ansible/ansible/blob/devel/lib/ansible/playbook/role/metadata.py#L79\n\nOther keys are treated as role [parameters](https://docs.ansible.com/projects/ansible/latest/user_guide/playbooks_reuse_roles.html#passing-different-parameters).",
       "properties": {
         "become": {
           "title": "Become",
@@ -1227,7 +1227,7 @@
     },
     "collections": {
       "items": {
-        "markdownDescription": "See [Using collections in roles](https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#using-collections-in-roles) and [collection naming conventions](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_in_groups.html#naming-conventions)",
+        "markdownDescription": "See [Using collections in roles](https://docs.ansible.com/projects/ansible/latest/user_guide/collections_using.html#using-collections-in-roles) and [collection naming conventions](https://docs.ansible.com/projects/ansible/latest/dev_guide/developing_modules_in_groups.html#naming-conventions)",
         "pattern": "^[a-z_]+\\.[a-z_]+$",
         "type": "string"
       },
@@ -1542,7 +1542,7 @@
   },
   "$id": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/meta.json",
   "$schema": "http://json-schema.org/draft-07/schema",
-  "description": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html#using-role-dependencies",
+  "description": "https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_reuse_roles.html#using-role-dependencies",
   "examples": ["meta/main.yml"],
   "properties": {
     "additionalProperties": false,

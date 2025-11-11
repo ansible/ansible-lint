@@ -1,5 +1,5 @@
 ---
-# https://docs.ansible.com/ansible/latest/user_guide/playbooks_loops.html#with-flattened
+# https://docs.ansible.com/projects/ansible/latest/user_guide/playbooks_loops.html#with-flattened
 - hosts: localhost
   tasks:
     - ansible.builtin.debug:

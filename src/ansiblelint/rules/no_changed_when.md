@@ -44,6 +44,6 @@ tasks.
 ```
 
 [shell]:
-  https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html
+  https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/shell_module.html
 [command]:
-  https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html
+  https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/command_module.html

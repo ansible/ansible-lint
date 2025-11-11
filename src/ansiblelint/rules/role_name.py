@@ -60,7 +60,7 @@ class RoleNames(AnsibleLintRule):
         "Role names are now limited to contain only lowercase alphanumeric "
         "characters, plus underline and start with an alpha character."
     )
-    link = "https://docs.ansible.com/ansible/devel/dev_guide/developing_collections_structure.html#roles-directory"
+    link = "https://docs.ansible.com/projects/ansible/devel/dev_guide/developing_collections_structure.html#roles-directory"
     severity = "HIGH"
     tags = ["deprecations", "metadata"]
     version_changed = "6.8.5"

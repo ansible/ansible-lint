@@ -72,7 +72,7 @@ $ ansible-lint examples/playbooks/play.yml examples/roles/bobbins
 ```
 
 [collection structure layout]:
-  https://docs.ansible.com/ansible-core/devel/dev_guide/developing_collections_structure.html#collection-structure
+  https://docs.ansible.com/projects/ansible-core/devel/dev_guide/developing_collections_structure.html#collection-structure
 
 ## Running example playbooks
 
@@ -311,7 +311,7 @@ fully understand [variable precedence].
 [sarif]:
   https://docs.oasis-open.org/sarif/sarif/v2.1.0/csprd01/sarif-v2.1.0-csprd01.html
 [variable precedence]:
-  https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#understanding-variable-precedence
+  https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_variables.html#understanding-variable-precedence
 
 ## Dependencies and requirements
 
@@ -319,10 +319,10 @@ Ansible-lint will recognize `requirements.yml` files used for runtime and
 testing purposes and install them automatically. Valid locations for these files
 are:
 
-- [`requirements.yml`](https://docs.ansible.com/ansible/latest/galaxy/user_guide.html#installing-roles-and-collections-from-the-same-requirements-yml-file)
+- [`requirements.yml`](https://docs.ansible.com/projects/ansible/latest/galaxy/user_guide.html#installing-roles-and-collections-from-the-same-requirements-yml-file)
 - `roles/requirements.yml`
 - `collections/requirements.yml`
 - `tests/requirements.yml`
 - `tests/integration/requirements.yml`
 - `tests/unit/requirements.yml`
-- [`galaxy.yml`](https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html)
+- [`galaxy.yml`](https://docs.ansible.com/projects/ansible/latest/dev_guide/collections_galaxy_meta.html)

@@ -11,11 +11,11 @@ putting `644` there will produce very different results.
 
 Modules that are checked:
 
-- [`ansible.builtin.assemble`](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/assemble_module.html)
-- [`ansible.builtin.copy`](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html)
-- [`ansible.builtin.file`](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html)
-- [`ansible.builtin.replace`](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/replace_module.html)
-- [`ansible.builtin.template`](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/template_module.html)
+- [`ansible.builtin.assemble`](https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/assemble_module.html)
+- [`ansible.builtin.copy`](https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/copy_module.html)
+- [`ansible.builtin.file`](https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/file_module.html)
+- [`ansible.builtin.replace`](https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/replace_module.html)
+- [`ansible.builtin.template`](https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/template_module.html)
 
 ## Problematic Code
 
