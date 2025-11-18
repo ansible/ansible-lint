@@ -33,7 +33,7 @@ classifiers = [
 ]
 dependencies = [
   "ansible-compat>=25.8.2",
-  "ansible-core>=2.16.11",
+  "ansible-core>=2.17.10",
   "black>=24.3.0",
   "cffi>=1.17.1",  # indirect dependency of ruamel-yaml
   "cryptography>=38",
@@ -209,6 +209,7 @@ score = "n"
 [tool.pylint.messages_control]
 disable = [
   "unknown-option-value",
+  "cyclic-import",  # likely https://github.com/pylint-dev/pylint/issues/10140
   # https://gist.github.com/cidrblock/ec3412bacfeb34dbc2d334c1d53bef83
   "C0103",  # invalid-name / ruff N815
   "C0105",  # typevar-name-incorrect-variance / ruff PLC0105
