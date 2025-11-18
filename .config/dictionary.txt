@@ -1,6 +1,5 @@
 Chamoulaud
 Codeclimate
-DEVEL
 FQCN
 FQCNs
 LIBYAML
@@ -34,7 +33,6 @@ codeclimate
 codespell
 deannotate
 dellemc
-devel
 doas
 dzdo
 ematcher
@@ -53,6 +51,7 @@ indentless
 inlinehilite
 iscsi
 junitxml
+kdump
 kubevirt
 libyaml
 licensedb
@@ -72,7 +71,6 @@ pbrun
 pfexec
 plainexamples
 pmrun
-pwsh
 pymdownx
 redirections
 reformatter
