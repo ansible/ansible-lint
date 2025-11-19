@@ -1,4 +1,5 @@
 # cspell: ignore FURB xunit
+#:tombi schema.strict = false
 
 [project]
 name = "ansible-lint"

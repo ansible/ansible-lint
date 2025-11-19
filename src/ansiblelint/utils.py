@@ -124,11 +124,9 @@ def parse_yaml_from_file(filepath: str) -> AnsibleJSON:
     """Extract a decrypted YAML object from file."""
     dataloader = DataLoader()  # type: ignore[no-untyped-call,unused-ignore]
     if hasattr(dataloader, "set_vault_secrets"):
-        dataloader.set_vault_secrets(
-            [
-                ("default", PromptVaultSecret(_bytes=to_bytes(DEFAULT_VAULT_PASSWORD)))  # type: ignore[no-untyped-call]
-            ]
-        )
+        dataloader.set_vault_secrets([
+            ("default", PromptVaultSecret(_bytes=to_bytes(DEFAULT_VAULT_PASSWORD)))  # type: ignore[no-untyped-call]
+        ])
     result: object = dataloader.load_from_file(filepath)
     if result is None:
         return result
