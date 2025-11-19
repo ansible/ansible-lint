@@ -51,8 +51,8 @@ from ansible.errors import AnsibleError, AnsibleParserError
 try:
     from ansible.module_utils.common.text.converters import to_bytes
 except ImportError:  # pragma: no branch
-    from ansible.module_utils._text import (
-        to_bytes,  # type: ignore[no-redef,unused-ignore]
+    from ansible.module_utils._text import (  # type: ignore[no-redef,unused-ignore]
+        to_bytes,
     )
 
 from ansible.module_utils.parsing.convert_bool import boolean
