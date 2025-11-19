@@ -10,7 +10,7 @@ from ansiblelint.runner import Runner
 def test_base_rule_url() -> None:
     """Test that rule URL is set to expected value."""
     rule = BaseRule()
-    assert rule.url == "https://ansible.readthedocs.io/projects/lint/rules/"
+    assert rule.url == "https://docs.ansible.com/projects/lint/rules/"
 
 
 @pytest.mark.parametrize(

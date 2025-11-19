@@ -2,7 +2,7 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "https://raw.githubusercontent.com/ansible/ansible-rulebook/main/ansible_rulebook/schema/ruleset_schema.json",
     "title": "Ansible Rulebook",
-    "description": "See https://ansible.readthedocs.io/projects/rulebook/en/stable/rulebooks.html",
+    "description": "See https://docs.ansible.com/projects/rulebook/en/latest/rulebooks.html",
     "type": "array",
     "items": {
         "$ref": "#/$defs/ruleset"

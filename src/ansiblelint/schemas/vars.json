@@ -17,7 +17,7 @@
       "type": "null"
     }
   ],
-  "description": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html",
+  "description": "https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_variables.html",
   "examples": [
     "playbooks/vars/*.yml",
     "vars/*.yml",
@@ -25,6 +25,6 @@
     "host_vars/*.yml",
     "group_vars/*.yml"
   ],
-  "markdownDescription": "See [Using Variables](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html)",
+  "markdownDescription": "See [Using Variables](https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_variables.html)",
   "title": "Ansible Vars Schema"
 }

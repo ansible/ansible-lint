@@ -58,7 +58,7 @@ dynamic = ["version"]
 
 [project.urls]
 changelog = "https://github.com/ansible/ansible-lint/releases"
-documentation = "https://ansible.readthedocs.io/projects/lint/"
+documentation = "https://docs.ansible.com/projects/lint/"
 homepage = "https://github.com/ansible/ansible-lint"
 repository = "https://github.com/ansible/ansible-lint"
 

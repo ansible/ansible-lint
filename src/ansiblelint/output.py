@@ -17,7 +17,7 @@ import sys
 # - vscode integrated terminal - bold might not be rendered differently, links will not work
 #
 # When it comes to colors being used, try to match:
-# - Ansible official documentation theme, https://docs.ansible.com/ansible/latest/dev_guide/developing_api.html
+# - Ansible official documentation theme, https://docs.ansible.com/projects/ansible/latest/dev_guide/developing_api.html
 # - VSCode Ansible extension for syntax highlighting
 # - GitHub markdown theme
 #
