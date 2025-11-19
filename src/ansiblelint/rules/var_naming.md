@@ -75,6 +75,6 @@ var_naming_pattern: "^[a-z_][a-z0-9_]*$"
 
 [cop]: https://redhat-cop.github.io/automation-good-practices/#_naming_things
 [var-names]:
-  https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#creating-valid-variable-names
+  https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_variables.html#creating-valid-variable-names
 [magic-vars]:
-  https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html
+  https://docs.ansible.com/projects/ansible/latest/reference_appendices/special_variables.html

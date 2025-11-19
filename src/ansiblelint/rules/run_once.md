@@ -11,9 +11,9 @@ This rule can produce the following messages:
 
 For more information see the following topics in Ansible documentation:
 
-- [free strategy](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/free_strategy.html#free-strategy)
-- [selecting a strategy](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_strategies.html#selecting-a-strategy)
-- [run_once(playbook keyword) more info](https://docs.ansible.com/ansible/latest/reference_appendices/playbooks_keywords.html)
+- [free strategy](https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/free_strategy.html#free-strategy)
+- [selecting a strategy](https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_strategies.html#selecting-a-strategy)
+- [run_once(playbook keyword) more info](https://docs.ansible.com/projects/ansible/latest/reference_appendices/playbooks_keywords.html)
 
 !!! warning
 
