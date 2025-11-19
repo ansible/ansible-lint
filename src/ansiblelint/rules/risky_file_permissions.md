@@ -14,18 +14,18 @@ settings.
 
 Modules that are checked:
 
-- [`ansible.builtin.assemble`](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/assemble_module.html)
-- [`ansible.builtin.copy`](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html)
-- [`ansible.builtin.file`](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html)
-- [`ansible.builtin.get_url`](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/get_url_module.html)
-- [`ansible.builtin.replace`](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/replace_module.html)
-- [`ansible.builtin.template`](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/template_module.html)
-- [`community.general.archive`](https://docs.ansible.com/ansible/latest/collections/community/general/archive_module.html)
-- [`community.general.ini_file`](https://docs.ansible.com/ansible/latest/collections/community/general/ini_file_module.html)
+- [`ansible.builtin.assemble`](https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/assemble_module.html)
+- [`ansible.builtin.copy`](https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/copy_module.html)
+- [`ansible.builtin.file`](https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/file_module.html)
+- [`ansible.builtin.get_url`](https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/get_url_module.html)
+- [`ansible.builtin.replace`](https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/replace_module.html)
+- [`ansible.builtin.template`](https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/template_module.html)
+- [`community.general.archive`](https://docs.ansible.com/projects/ansible/latest/collections/community/general/archive_module.html)
+- [`community.general.ini_file`](https://docs.ansible.com/projects/ansible/latest/collections/community/general/ini_file_module.html)
 
 !!! warning
 
-    This rule does not take [module_defaults](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_module_defaults.html) configuration into account.
+    This rule does not take [module_defaults](https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_module_defaults.html) configuration into account.
     There are currently no plans to implement this feature because changing task location can also change task behavior.
 
 ## Problematic code

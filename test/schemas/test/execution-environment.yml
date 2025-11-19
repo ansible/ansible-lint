@@ -1,5 +1,5 @@
 ---
-# Example from https://docs.ansible.com/automation-controller/latest/html/userguide/ee_reference.html
+# Example from https://legacy-controller-docs.ansible.com/automation-controller/
 version: 1
 
 build_arg_defaults:
