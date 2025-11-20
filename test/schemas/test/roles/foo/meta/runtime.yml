@@ -1,4 +1,4 @@
-# Based on https://docs.ansible.com/ansible/devel/dev_guide/developing_collections_structure.html#meta-directory
+# Based on https://docs.ansible.com/projects/ansible/devel/dev_guide/developing_collections_structure.html#meta-directory
 requires_ansible: ">=2.10,<2.11"
 plugin_routing:
   inventory:

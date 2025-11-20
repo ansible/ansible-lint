@@ -7,7 +7,7 @@ value along with conditionals on the options like `mutually_exclusive`,
 `required_together`, `required_one_of` and so on.
 
 For more information see the
-[argument spec validator](https://docs.ansible.com/ansible/latest/reference_appendices/module_utils.html#argumentspecvalidator)
+[argument spec validator](https://docs.ansible.com/projects/ansible/latest/reference_appendices/module_utils.html#argumentspecvalidator)
 topic in the Ansible module utility documentation.
 
 Possible messages:

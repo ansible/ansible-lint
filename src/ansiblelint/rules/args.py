@@ -194,10 +194,16 @@ class ArgsRule(AnsibleLintRule):
                     # through `ArgumentSpecValidator` class as in case of modules.
                     return []
 
-                with patch.object(
-                    sys,
-                    "argv",
-                    ["", json.dumps({"ANSIBLE_MODULE_ARGS": clean_json(module_args)})],
+                buffer = io.BytesIO(
+                    json.dumps({
+                        "ANSIBLE_MODULE_ARGS": clean_json(module_args)
+                    }).encode()
+                )
+                with (
+                    patch.object(
+                        sys, "stdin", io.TextIOWrapper(buffer, encoding="utf-8")
+                    ),
+                    patch.object(sys, "argv", [""]),
                 ):
                     fio = io.StringIO()
                     failed_msg = ""
