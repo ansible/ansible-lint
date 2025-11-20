@@ -4,7 +4,7 @@ This rule identifies deprecated modules in playbooks.
 You should avoid using deprecated modules because they are not maintained, which can pose a security risk.
 Additionally when a module is deprecated it is available temporarily with a plan for future removal.
 
-Refer to the [Ansible module index](https://docs.ansible.com/ansible/latest/collections/index_module.html) for information about replacements and removal dates for deprecated modules.
+Refer to the [Ansible module index](https://docs.ansible.com/projects/ansible/latest/collections/index_module.html) for information about replacements and removal dates for deprecated modules.
 
 ## Problematic Code
 
