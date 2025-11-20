@@ -1,7 +1,7 @@
 # no-free-form
 
 This rule identifies any use of
-[free-form](https://docs.ansible.com/ansible/2.7/user_guide/playbooks_intro.html#action-shorthand)
+[free-form](https://docs.ansible.com/projects/ansible/latest/index.html#action-shorthand)
 module calling syntax and asks for switching to the full syntax.
 
 **Free-form** syntax, also known as **inline** or **shorthand**, can produce

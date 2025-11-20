@@ -9,7 +9,7 @@ contact_links:
     url: https://github.com/ansible/ansible-lint/discussions/
     about: Any kind of questions should go on the forum.
   - name: Security bug report
-    url: https://docs.ansible.com/ansible/latest/community/reporting_bugs_and_features.html
+    url: https://docs.ansible.com/projects/ansible/latest/community/reporting_bugs_and_features.html
     about: |
       Please learn how to report security vulnerabilities here.
 
@@ -17,7 +17,7 @@ contact_links:
       instead of using this issue tracker and you will receive
       a prompt response.
 
-      For more information, see https://docs.ansible.com/ansible/latest/community/reporting_bugs_and_features.html
+      For more information, see https://docs.ansible.com/projects/ansible/latest/community/reporting_bugs_and_features.html
   - name: Ansible Code of Conduct
-    url: https://docs.ansible.com/ansible/latest/community/code_of_conduct.html
+    url: https://docs.ansible.com/projects/ansible/latest/community/code_of_conduct.html
     about: Be nice to other members of the community. Behave.

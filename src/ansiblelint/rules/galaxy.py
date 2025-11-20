@@ -36,8 +36,8 @@ class GalaxyRule(AnsibleLintRule):
         "galaxy[version-missing]": "galaxy.yaml should have version tag.",
         "galaxy[no-runtime]": "meta/runtime.yml file not found.",
         "galaxy[invalid-dependency-version]": "Invalid collection metadata. Dependency version spec range is invalid",
-        "galaxy[no-repository]": "galaxy.yaml should have a repository key for publication to Galaxy. See https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html",
-        "galaxy[no-license]": "galaxy.yaml should have a license or license_file key for publication to Galaxy. See https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html",
+        "galaxy[no-repository]": "galaxy.yaml should have a repository key for publication to Galaxy. See https://docs.ansible.com/projects/ansible/latest/dev_guide/collections_galaxy_meta.html",
+        "galaxy[no-license]": "galaxy.yaml should have a license or license_file key for publication to Galaxy. See https://docs.ansible.com/projects/ansible/latest/dev_guide/collections_galaxy_meta.html",
     }
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
@@ -185,7 +185,7 @@ class GalaxyRule(AnsibleLintRule):
         if "repository" not in data:
             results.append(
                 self.create_matcherror(
-                    message="galaxy.yaml should have a repository key for publication to Galaxy. See https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html",
+                    message="galaxy.yaml should have a repository key for publication to Galaxy. See https://docs.ansible.com/projects/ansible/latest/dev_guide/collections_galaxy_meta.html",
                     tag="galaxy[no-repository]",
                     filename=file,
                 ),
@@ -195,7 +195,7 @@ class GalaxyRule(AnsibleLintRule):
         if "license" not in data and "license_file" not in data:
             results.append(
                 self.create_matcherror(
-                    message="galaxy.yaml should have a license or license_file key for publication to Galaxy. See https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html",
+                    message="galaxy.yaml should have a license or license_file key for publication to Galaxy. See https://docs.ansible.com/projects/ansible/latest/dev_guide/collections_galaxy_meta.html",
                     tag="galaxy[no-license]",
                     filename=file,
                 ),

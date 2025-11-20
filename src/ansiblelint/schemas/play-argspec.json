@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/play-argspec.json",
   "title": "Ansible Playbook Argspec Schema",
-  "description": "See https://docs.ansible.com/ansible/latest/collections/ansible/builtin/validate_argument_spec_module.html",
+  "description": "See https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/validate_argument_spec_module.html",
   "examples": ["**/*.meta.yml", "**/*.meta.yaml"],
   "type": "object",
   "properties": {

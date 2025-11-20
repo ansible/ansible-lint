@@ -35,7 +35,7 @@ automation content.
     related to the installation will be closed and locked.
 
 For a container image, we recommend using
-[community-ansible-dev-tools](https://ansible.readthedocs.io/projects/dev-tools/container/)
+[community-ansible-dev-tools](https://docs.ansible.com/projects/dev-tools/container/)
 which includes `ansible-dev-tools` (it combines critical Ansible development packages into
 a unified Python package). If you have a use case that the `community-ansible-dev-tools`
 container doesn't satisfy, please contact the team through the
@@ -138,7 +138,7 @@ All the arguments are optional and most users should not need them:
 
 Due to limitations on how GitHub Actions are processing arguments, we do not
 plan to provide extra options. You will have to make use of
-[ansible-lint own configuration file](https://ansible.readthedocs.io/projects/lint/configuring/)
+[ansible-lint own configuration file](https://docs.ansible.com/projects/lint/configuring/)
 to alter its behavior.
 
 ### Installing roles and collections from private repositories
