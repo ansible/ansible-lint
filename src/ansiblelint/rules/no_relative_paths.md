@@ -28,7 +28,7 @@ files with the `src` argument.
     Doing this can result in disorganized projects and cause user confusion when distinguishing between resources of the same type, such as YAML.
 
 See
-[task paths](https://docs.ansible.com/ansible/latest/playbook_guide/playbook_pathing.html#task-paths)
+[task paths](https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbook_pathing.html#task-paths)
 in the Ansible documentation for more information.
 
 ## Problematic Code

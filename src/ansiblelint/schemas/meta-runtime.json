@@ -41,7 +41,7 @@
   "$id": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/meta-runtime.json",
   "$schema": "http://json-schema.org/draft-07/schema",
   "additionalProperties": false,
-  "description": "See https://docs.ansible.com/ansible/devel/dev_guide/developing_collections_structure.html#meta-directory",
+  "description": "See https://docs.ansible.com/projects/ansible/devel/dev_guide/developing_collections_structure.html#meta-directory",
   "examples": ["**/meta/runtime.yml"],
   "properties": {
     "action_groups": {

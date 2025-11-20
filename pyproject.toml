@@ -1,4 +1,5 @@
 # cspell: ignore FURB xunit
+#:tombi schema.strict = false
 
 [project]
 name = "ansible-lint"
@@ -57,7 +58,7 @@ dynamic = ["version"]
 
 [project.urls]
 changelog = "https://github.com/ansible/ansible-lint/releases"
-documentation = "https://ansible.readthedocs.io/projects/lint/"
+documentation = "https://docs.ansible.com/projects/lint/"
 homepage = "https://github.com/ansible/ansible-lint"
 repository = "https://github.com/ansible/ansible-lint"
 
@@ -166,7 +167,7 @@ exclude_gitignore = true
 follow_untyped_imports = true
 incremental = false
 no_implicit_optional = true
-python_version = "3.10"
+python_version = "3.12"
 show_error_code_links = true
 strict = true
 warn_redundant_casts = true

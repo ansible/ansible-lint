@@ -116,7 +116,7 @@ CRITICAL Found incompatible custom yamllint configuration (.yamllint), please ei
   - octal-values.forbid-implicit-octal must be true
   - octal-values.forbid-explicit-octal must be true
 
-Read https://ansible.readthedocs.io/projects/lint/rules/yaml/ for more details regarding why we have these requirements.
+Read https://docs.ansible.com/projects/lint/rules/yaml/ for more details regarding why we have these requirements.
 ```
 
 !!! warning
@@ -148,6 +148,6 @@ when there is no custom file present.
 [1.2.2]: https://yaml.org/spec/1.2.2/
 [yaml specification]: https://yaml.org/
 [guide]:
-  https://docs.ansible.com/ansible/latest/reference_appendices/YAMLSyntax.html#yaml-basics
+  https://docs.ansible.com/projects/ansible/latest/reference_appendices/YAMLSyntax.html#yaml-basics
 [prettier]: https://prettier.io/
 [yamllint]: https://yamllint.readthedocs.io/en/stable/
