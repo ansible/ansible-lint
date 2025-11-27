@@ -104,9 +104,8 @@ class YamllintRule(AnsibleLintRule, TransformMixin):
         :param lintable: Lintable instance
         :param data: data to transform
         """
-        # This method does nothing because the YAML reformatting is implemented
-        # in data dumper. Still presence of this method helps us with
-        # documentation generation.
+        if match.tag == "yaml[comments]":
+            match.fixed = True
 
 
 # testing code to be loaded only with pytest or when executed the rule file
