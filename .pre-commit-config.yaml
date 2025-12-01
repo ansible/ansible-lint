@@ -171,7 +171,6 @@ repos:
           - black>=22.10.0
           - cryptography>=39.0.1
           - filelock>=3.12.2
-          - importlib_metadata
           - jinja2
           - license-expression >= 30.3.0
           - pip>=22.3.1

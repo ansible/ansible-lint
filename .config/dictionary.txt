@@ -13,7 +13,6 @@ PYTHONBREAKPOINT
 PYTHONIOENCODING
 PYTHONPYCACHEPREFIX
 Parseable
-Representer
 SARIF
 Sarif
 Sbarnea
@@ -75,7 +74,6 @@ pymdownx
 redirections
 reformatter
 releasenotes
-representer
 rulebooks
 runas
 sarif
