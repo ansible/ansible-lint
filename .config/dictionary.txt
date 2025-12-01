@@ -74,6 +74,7 @@ pymdownx
 redirections
 reformatter
 releasenotes
+representer
 rulebooks
 runas
 sarif
