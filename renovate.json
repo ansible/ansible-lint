@@ -1,4 +1,64 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>ansible/actions//config/renovate.json"]
+  "extends": [
+    "github>ansible/actions//config/renovate.json"
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": [
+        "ansible-core"
+      ],
+      "allowedVersions": "<2.17",
+      "description": "Platform compatibility constraint from .config/platform-constraints.txt"
+    },
+    {
+      "matchPackageNames": [
+        "cffi"
+      ],
+      "allowedVersions": "<1.16",
+      "description": "Platform compatibility constraint from .config/platform-constraints.txt"
+    },
+    {
+      "matchPackageNames": [
+        "django"
+      ],
+      "allowedVersions": "<4.3",
+      "description": "Platform compatibility constraint from .config/platform-constraints.txt"
+    },
+    {
+      "matchPackageNames": [
+        "importlib-metadata"
+      ],
+      "allowedVersions": "<6.1",
+      "description": "Platform compatibility constraint from .config/platform-constraints.txt"
+    },
+    {
+      "matchPackageNames": [
+        "jsonschema"
+      ],
+      "allowedVersions": "<4.22",
+      "description": "Platform compatibility constraint from .config/platform-constraints.txt"
+    },
+    {
+      "matchPackageNames": [
+        "packaging"
+      ],
+      "allowedVersions": "<25.0",
+      "description": "Platform compatibility constraint from .config/platform-constraints.txt"
+    },
+    {
+      "matchPackageNames": [
+        "python-gnupg"
+      ],
+      "allowedVersions": "<0.5.3",
+      "description": "Platform compatibility constraint from .config/platform-constraints.txt"
+    },
+    {
+      "matchPackageNames": [
+        "setuptools"
+      ],
+      "allowedVersions": "<65.6",
+      "description": "Platform compatibility constraint from .config/platform-constraints.txt"
+    }
+  ]
 }
