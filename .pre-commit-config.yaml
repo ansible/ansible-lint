@@ -30,7 +30,7 @@ repos:
     hooks:
       - id: check-useless-excludes
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.9.7
+    rev: 0.9.13
     hooks:
       - id: uv-sync
       - id: uv-lock
@@ -58,7 +58,7 @@ repos:
           - "-o"
           - ".config/requirements-lock.txt"
   - repo: https://github.com/biomejs/pre-commit
-    rev: "v2.3.2"
+    rev: "v2.3.8"
     hooks:
       - id: biome-check
         name: biome
@@ -79,7 +79,7 @@ repos:
           ]
         name: cspell + remove unused and sort dictionary
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.34.1
+    rev: 0.35.0
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
@@ -153,14 +153,14 @@ repos:
         alias: toml
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.3
+    rev: v0.14.7
     hooks:
       - id: ruff-format
         alias: ruff
       - id: ruff-check
         alias: ruff
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.18.2
+    rev: v1.19.0
     hooks:
       - id: mypy
         # "." and pass_files are used to make pre-commit mypy behave the same as standalone mypy
@@ -190,7 +190,7 @@ repos:
       - id: pyright
         additional_dependencies: *deps
   - repo: https://github.com/pycqa/pylint
-    rev: v4.0.2
+    rev: v4.0.4
     hooks:
       - id: pylint
         args:
