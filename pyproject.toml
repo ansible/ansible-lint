@@ -460,7 +460,7 @@ reportPossiblyUnboundVariable = false
 reportPrivateImportUsage = false
 
 # spell-checker:ignore filterwarnings norecursedirs optionflags
-[tool.pytest.ini_options]
+[tool.pytest.config]
 # do not add options here as this will likely break either console runs or IDE
 # integration like vscode or pycharm
 addopts = "-p no:pytest_cov --durations=10 --failed-first"
