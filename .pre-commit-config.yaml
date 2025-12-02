@@ -75,7 +75,7 @@ repos:
             "-euo",
             "pipefail",
             "-c",
-            "cspell-cli . --relative --no-progress --no-summary && cspell-cli . --disable-dictionary=words --no-exit-code --words-only --quiet --unique | LC_ALL=C sort > .config/dictionary.txt",
+            "cspell-cli . --relative --no-progress --no-summary && cspell-cli . --disable-dictionary=words --no-exit-code --words-only --quiet --unique | tr '[:upper:]' '[:lower:]' | LC_ALL=C sort -u > .config/dictionary.txt",
           ]
         name: cspell + remove unused and sort dictionary
   - repo: https://github.com/python-jsonschema/check-jsonschema
