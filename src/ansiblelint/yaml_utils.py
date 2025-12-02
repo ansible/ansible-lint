@@ -824,6 +824,11 @@ class FormattedEmitter(Emitter):
         else:
             # single blank lines in post comments
             value = self._re_repeat_blank_lines.sub("\n\n", value)
+
+        # make sure that comments have a space after #
+        if value.startswith("#") and not value.startswith("# ") and len(value) > 1:
+            value = "# " + value[1:]
+
         comment.value = value
 
         # make sure that the eol comment only has one space before it.
