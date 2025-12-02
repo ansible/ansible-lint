@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.10"
 resolution-markers = [
     "python_full_version >= '3.14'",
@@ -192,8 +192,8 @@ requires-dist = [
     { name = "jsonschema", specifier = ">=4.10.0" },
     { name = "packaging", specifier = ">=22.0" },
     { name = "pathspec", specifier = ">=0.10.3" },
-    { name = "pyyaml", marker = "python_full_version < '3.14'", specifier = ">=6.0.2" },
-    { name = "pyyaml", marker = "python_full_version >= '3.14'", specifier = ">=6.0.3" },
+    { name = "pyyaml", marker = "python_full_version < '3.14'", specifier = ">=6.0.1" },
+    { name = "pyyaml", marker = "python_full_version >= '3.14'", specifier = ">=6.0.1" },
     { name = "referencing", specifier = ">=0.36.2" },
     { name = "ruamel-yaml", specifier = ">=0.18.11" },
     { name = "ruamel-yaml-clib", marker = "python_full_version < '3.14'", specifier = ">=0.2.12" },
@@ -227,7 +227,7 @@ dev = [
     { name = "pytest-plus", specifier = ">=0.8.1" },
     { name = "pytest-sugar", specifier = ">=1.1.1" },
     { name = "pytest-xdist", extras = ["psutil", "setproctitle"], specifier = ">=2.1.0" },
-    { name = "pyyaml", specifier = ">=6.0.2" },
+    { name = "pyyaml", specifier = ">=6.0.1" },
     { name = "ruamel-yaml", specifier = ">=0.18.11" },
     { name = "ruamel-yaml-clib", marker = "python_full_version < '3.14'", specifier = ">=0.2.12" },
     { name = "tox", specifier = ">=4.24.2" },
