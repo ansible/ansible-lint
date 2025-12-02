@@ -84,9 +84,9 @@ def load_ignore_txt(filepath: Path | None = None) -> dict[str, set[IgnoreRule]]:
         ignore_file = IGNORE_FILE.alternative
 
     if ignore_file:
-        with open(ignore_file, encoding="utf-8") as _ignore_file:
+        with open(ignore_file, encoding="utf-8") as ignore_file_h:
             _logger.debug("Loading ignores from '%s'", ignore_file)
-            for line in _ignore_file:
+            for line in ignore_file_h:
                 entry = line.split("#")[0].rstrip()
                 if entry:
                     try:
