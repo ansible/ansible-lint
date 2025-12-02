@@ -345,5 +345,15 @@ if "pytest" in sys.modules:
         success = "examples/playbooks/rule-args-module-pass.yml"
         with caplog.at_level(logging.WARNING):
             results = Runner(success, rules=default_rules_collection).run()
-        assert len(results) == 0, results
-        assert len(caplog.records) == 0, caplog.records
+        try:
+            assert len(results) == 0, results
+        except AssertionError:
+            for result in results:
+                print(f"{result.filename}:{result.lineno}: {result.message}")  # noqa: T201
+            raise
+        try:
+            assert len(caplog.records) == 0, caplog.records
+        except AssertionError:
+            for record in caplog.records:
+                print(f"LOG: {record.levelname}: {record.msg}")  # noqa: T201
+            raise
