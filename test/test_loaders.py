@@ -35,8 +35,8 @@ def test_load_ignore_txt_default_success() -> None:
     with tempfile.TemporaryDirectory() as temporary_directory:
         ignore_file = Path(temporary_directory) / IGNORE_FILE.default
 
-        with ignore_file.open("w", encoding="utf-8") as _ignore_file:
-            _ignore_file.write(
+        with ignore_file.open("w", encoding="utf-8") as ignore_file_h:
+            ignore_file_h.write(
                 dedent(
                     """
                     # See https://docs.ansible.com/projects/lint/configuring/#ignoring-rules-for-entire-files
@@ -70,8 +70,8 @@ def test_load_ignore_txt_default_success_alternative() -> None:
         ignore_file = Path(temporary_directory) / IGNORE_FILE.alternative
         ignore_file.parent.mkdir(parents=True)
 
-        with ignore_file.open("w", encoding="utf-8") as _ignore_file:
-            _ignore_file.write(
+        with ignore_file.open("w", encoding="utf-8") as ignore_file_h:
+            ignore_file_h.write(
                 dedent(
                     """
                     playbook.yml foo-bar
@@ -104,8 +104,8 @@ def test_load_ignore_txt_custom_success() -> None:
         ignore_file = Path(temporary_directory) / "subdir" / "my_ignores.txt"
         ignore_file.parent.mkdir(parents=True, exist_ok=True)
 
-        with ignore_file.open("w", encoding="utf-8") as _ignore_file:
-            _ignore_file.write(
+        with ignore_file.open("w", encoding="utf-8") as ignore_file_h:
+            ignore_file_h.write(
                 dedent(
                     """
                     playbook.yml hector
@@ -144,8 +144,8 @@ def test_load_ignore_txt_invalid_tags(monkeypatch: pytest.MonkeyPatch) -> None:
     with tempfile.TemporaryDirectory() as temporary_directory:
         ignore_file = Path(temporary_directory) / IGNORE_FILE.default
 
-        with ignore_file.open("w", encoding="utf-8") as _ignore_file:
-            _ignore_file.write(
+        with ignore_file.open("w", encoding="utf-8") as ignore_file_h:
+            ignore_file_h.write(
                 dedent(
                     """
                     playbook2.yml package-latest invalid-tag
