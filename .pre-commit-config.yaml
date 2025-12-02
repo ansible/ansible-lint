@@ -201,7 +201,7 @@ repos:
     hooks:
       - id: vulture
   - repo: https://github.com/ansible/team-devtools
-    rev: v25.12.6
+    rev: v25.12.7
     hooks:
       - id: check-platform-constraints
   - # keep at bottom as these are slower
