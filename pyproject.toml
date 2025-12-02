@@ -43,8 +43,8 @@ dependencies = [
   "jsonschema>=4.10.0",
   "packaging>=22.0",
   "pathspec>=0.10.3",
-  "pyyaml>=6.0.2 ; python_version < '3.14'",
-  "pyyaml>=6.0.3 ; python_version >= '3.14'",  # py314 support
+  "pyyaml>=6.0.1 ; python_version < '3.14'",
+  "pyyaml>=6.0.1 ; python_version >= '3.14'",  # py314 support
   "referencing>=0.36.2",
   "ruamel-yaml>=0.18.11",
   "ruamel-yaml-clib>=0.2.12 ; python_version < '3.14'",
@@ -88,7 +88,7 @@ dev = [
   "pytest-plus>=0.8.1",
   "pytest-sugar>=1.1.1",
   "pytest-xdist[psutil,setproctitle]>=2.1.0",
-  "pyyaml>=6.0.2",
+  "pyyaml>=6.0.1",
   "ruamel-yaml>=0.18.11",
   "ruamel-yaml-clib>=0.2.12 ; python_full_version < '3.14'",
   "tox>=4.24.2",
