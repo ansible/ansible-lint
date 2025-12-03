@@ -160,7 +160,7 @@ repos:
       - id: ruff-check
         alias: ruff
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.18.2
+    rev: v1.19.0
     hooks:
       - id: mypy
         # "." and pass_files are used to make pre-commit mypy behave the same as standalone mypy
@@ -190,7 +190,7 @@ repos:
       - id: pyright
         additional_dependencies: *deps
   - repo: https://github.com/pycqa/pylint
-    rev: v4.0.3
+    rev: v4.0.4
     hooks:
       - id: pylint
         args:
