@@ -82,7 +82,7 @@ dev = [
   "psutil>=7.0.0",
   "pylint>=3.3.8",
   "pyrsistent>=0.20.0",
-  "pytest>=7.2.2",
+  "pytest>=9",
   "pytest-instafail>=0.5.0",
   "pytest-mock>=3.15.0",
   "pytest-plus>=0.8.1",
@@ -102,7 +102,7 @@ lint = [
   "pip>=25.2",
   "pre-commit>=4.1",
   "pre-commit-uv>=4.1.4",
-  "pytest>=7.2.2",
+  "pytest>=9",
   "setuptools>=51.1.1",
 ]
 pkg = [
@@ -460,19 +460,15 @@ reportPossiblyUnboundVariable = false
 reportPrivateImportUsage = false
 
 # spell-checker:ignore filterwarnings norecursedirs optionflags
-[tool.pytest.ini_options]
+[tool.pytest]
 # do not add options here as this will likely break either console runs or IDE
 # integration like vscode or pycharm
-addopts = "-p no:pytest_cov --durations=10 --failed-first"
+addopts = ["--durations=10", "--failed-first", "-p no:pytest_cov"]
 doctest_optionflags = ["ALLOW_UNICODE", "ELLIPSIS"]
 filterwarnings = [
-  "error",
-  # https://sourceforge.net/p/ruamel-yaml/tickets/452/
-  "ignore:Deprecated call to `pkg_resources.declare_namespace:DeprecationWarning",
-  # https://github.com/spdx/tools-python/issues/507
-  "ignore:pkg_resources is deprecated as an API:DeprecationWarning",
   # We raise one non critical warning from our own conftest.py:
   "always::pytest.PytestWarning",
+  "error",
   # py312 ansible-core
   # https://github.com/ansible/ansible/issues/81906
   "ignore:'importlib.abc.TraversableResources' is deprecated and slated for removal in Python 3.14:DeprecationWarning",
@@ -491,11 +487,11 @@ norecursedirs = [
   ".cache",
   ".config",
   ".eggs",
+  ".eggs",
   ".git",
   ".github",
   ".mypy_cache",
   ".projects",
-  ".eggs",
   ".tox",
   "__pycache__",
   "ansible_collections",
@@ -510,17 +506,17 @@ norecursedirs = [
   "test/schemas",
 ]
 python_files = [
-  "test_*.py",
   # Ref: https://docs.pytest.org/en/latest/reference.html#confval-python_files
   # Needed to discover legacy nose test modules:
   "Test*.py",
   # Needed to discover embedded Rule tests
   "rules/*.py",
+  "test_*.py",
 ]
 # Using --pyargs instead of testpath as we embed some tests
 # See: https://github.com/pytest-dev/pytest/issues/6451#issuecomment-687043537
 # testpaths =
-xfail_strict = true
+strict_xfail = true
 
 [tool.ruff]
 cache-dir = "./.cache/.ruff"
