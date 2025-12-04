@@ -1,0 +1,8 @@
+---
+- name: Playbook issue 4705
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Debug for 4705
+      ansible.builtin.debug:
+        msg: "Hello, World! - This line is far too long and goes over the 111 lines which is allowed by our custom yamllint configuration."

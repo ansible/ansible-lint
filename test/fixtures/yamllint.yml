@@ -1,4 +1,4 @@
 ---
 rules:
   line-length:
-    max: 222
+    max: 111
