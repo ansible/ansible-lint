@@ -346,4 +346,12 @@ if "pytest" in sys.modules:
         with caplog.at_level(logging.WARNING):
             results = Runner(success, rules=default_rules_collection).run()
         assert len(results) == 0, results
-        assert len(caplog.records) == 0, caplog.records
+        # Remove any records about incompatible ansible version with the collections
+        # Sample: AnsibleWarning Collection community.docker does not support Ansible version
+        records = [
+            record
+            for record in caplog.records
+            if "does not support Ansible version" not in record.getMessage()
+        ]
+        log_string = "\n".join(record.getMessage() for record in records)
+        assert len(records) == 0, log_string
