@@ -30,7 +30,7 @@ repos:
     hooks:
       - id: check-useless-excludes
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.9.7
+    rev: 0.9.13
     hooks:
       - id: uv-sync
       - id: uv-lock
@@ -58,14 +58,14 @@ repos:
           - "-o"
           - ".config/requirements-lock.txt"
   - repo: https://github.com/biomejs/pre-commit
-    rev: "v2.3.2"
+    rev: "v2.3.8"
     hooks:
       - id: biome-check
         name: biome
         alias: biome
         args: [--unsafe]
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v9.2.1
+    rev: v9.3.3
     hooks:
       - id: cspell
         entry: bash
@@ -75,11 +75,11 @@ repos:
             "-euo",
             "pipefail",
             "-c",
-            "cspell-cli . --relative --no-progress --no-summary && cspell-cli . --disable-dictionary=words --no-exit-code --words-only --quiet --unique | LC_ALL=C sort > .config/dictionary.txt",
+            "cspell-cli . --relative --no-progress --no-summary && cspell-cli . --disable-dictionary=words --no-exit-code --words-only --quiet --unique | tr '[:upper:]' '[:lower:]' | LC_ALL=C sort -u > .config/dictionary.txt",
           ]
         name: cspell + remove unused and sort dictionary
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.34.1
+    rev: 0.35.0
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
@@ -146,7 +146,7 @@ repos:
         entry: yamllint --strict
 
   - repo: https://github.com/tombi-toml/tombi-pre-commit
-    rev: v0.6.40
+    rev: v0.7.0
     hooks:
       - id: tombi-format
         alias: toml
@@ -154,14 +154,14 @@ repos:
         alias: toml
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.3
+    rev: v0.14.7
     hooks:
       - id: ruff-format
         alias: ruff
       - id: ruff-check
         alias: ruff
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.18.2
+    rev: v1.19.0
     hooks:
       - id: mypy
         # "." and pass_files are used to make pre-commit mypy behave the same as standalone mypy
@@ -172,7 +172,6 @@ repos:
           - black>=22.10.0
           - cryptography>=39.0.1
           - filelock>=3.12.2
-          - importlib_metadata
           - jinja2
           - license-expression >= 30.3.0
           - pip>=22.3.1
@@ -192,7 +191,7 @@ repos:
       - id: pyright
         additional_dependencies: *deps
   - repo: https://github.com/pycqa/pylint
-    rev: v4.0.2
+    rev: v4.0.4
     hooks:
       - id: pylint
         args:
@@ -202,6 +201,10 @@ repos:
     rev: v2.14
     hooks:
       - id: vulture
+  - repo: https://github.com/ansible/team-devtools
+    rev: v25.12.8
+    hooks:
+      - id: check-platform-constraints
   - # keep at bottom as these are slower
     repo: local
     hooks:

@@ -43,7 +43,7 @@ jobs:
         run: python3 -m pip install --user "tox>=4.0.0"
 
       - name: Check out src from Git
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0 # needed by setuptools-scm
           submodules: true
