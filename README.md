@@ -35,6 +35,7 @@ jobs:
           args: ""
           gh_action_ref: "<version - e.g. `v25.5.0`>" # Not recommended for non-composite action use
           setup_python: "true"
+          python_version: "3.14"
           working_directory: ""
           requirements_file: ""
 ```
@@ -50,6 +51,7 @@ All the arguments are optional:
 - `requirements_file`: Path to the requirements.yml file to install role and
   collection dependencies.
 - `setup_python`: If python should be installed. Default is `true`.
+- `python_version`: The version of python to install. Default is `3.14`.
 - `working_directory`: The directory where to run ansible-lint from. Default is
   `github.workspace`. Needed if you want to lint only a subset of
   your repository.

@@ -120,6 +120,7 @@ jobs:
         with:
           args: ""
           setup_python: "true"
+          python_version: "3.14"
           working_directory: ""
           requirements_file: ""
 ```
@@ -128,6 +129,7 @@ All the arguments are optional and most users should not need them:
 
 - `args`: Arguments to be passed to ansible-lint command.
 - `setup_python`: If python should be installed. Default is `true`.
+- `python_version`: Python version to be installed. Default is `3.14`.
 - `working_directory`: The directory where to run ansible-lint from. Default is
   `github.workspace`. That might be needed if you want to lint only a subset of
   your repository.
