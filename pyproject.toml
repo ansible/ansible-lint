@@ -178,7 +178,6 @@ ignore_errors = true
 ignore_missing_imports = true
 module = [
   "ansible.parsing.yaml.constructor",
-  "license_expression",
   "ruamel.yaml",
 ]
 
@@ -477,7 +476,7 @@ filterwarnings = [
 ]
 junit_family = "xunit2"
 markers = ["libyaml: tests that will pass only with pyyaml libyaml is present."]
-minversion = "4.6.6"
+minversion = "9.0"  # toml config changes
 # https://code.visualstudio.com/docs/python/testing
 # coverage is re-enabled in `tox.ini`. That approach is safer than
 # `--no-cov` which prevents activation from tox.ini and which also fails
@@ -654,6 +653,7 @@ commands = [
 ]
 commands_pre = []
 description = "Bump all test dependencies"
+dependency_groups = ["lint"]
 env_dir = "{work_dir}/lint"
 skip_install = true
 
