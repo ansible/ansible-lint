@@ -136,7 +136,13 @@ def initialize_options(arguments: list[str] | None = None) -> BaseFileLock | Non
     options.warn_list = [normalize_tag(tag) for tag in options.warn_list]
 
     options.configured = True
-    options.cache_dir = get_cache_dir(pathlib.Path(options.project_dir))
+    if not (
+        options.version
+        or options.list_profiles
+        or options.list_rules
+        or options.list_tags
+    ):
+        options.cache_dir = get_cache_dir(pathlib.Path(options.project_dir))
 
     # add a lock file so we do not have two instances running inside at the same time
     if options.cache_dir:
