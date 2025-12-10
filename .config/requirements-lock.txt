@@ -6,7 +6,7 @@ attrs==25.4.0
     # via
     #   jsonschema
     #   referencing
-black==25.11.0
+black==25.12.0
     # via ansible-lint
 bracex==2.6
     # via wcmatch
@@ -49,7 +49,7 @@ pathspec==0.12.1
     #   ansible-lint
     #   black
     #   yamllint
-platformdirs==4.5.0
+platformdirs==4.5.1
     # via black
 pycparser==2.23 ; implementation_name != 'PyPy'
     # via cffi
