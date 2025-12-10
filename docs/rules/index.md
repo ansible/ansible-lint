@@ -38,7 +38,6 @@
 - [package-latest][]
 - [parser-error][]
 - [partial-become][]
-- [pattern][]
 - [playbook-extension][]
 - [risky-file-permissions][]
 - [risky-octal][]

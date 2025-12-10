@@ -34,16 +34,16 @@ jobs:
       TOXENV: pkg
 
     steps:
-      - name: Switch to using Python 3.10 by default
-        uses: actions/setup-python@v5
+      - name: Switch to using latest Python by default
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.10"
+          python-version: "3.14"
 
       - name: Install tox
         run: python3 -m pip install --user "tox>=4.0.0"
 
       - name: Check out src from Git
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0 # needed by setuptools-scm
           submodules: true

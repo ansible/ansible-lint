@@ -47,7 +47,14 @@ from typing import TYPE_CHECKING, Any
 import ruamel.yaml.parser
 import yaml
 from ansible.errors import AnsibleError, AnsibleParserError
-from ansible.module_utils._text import to_bytes
+
+try:
+    from ansible.module_utils.common.text.converters import to_bytes
+except ImportError:  # pragma: no branch
+    from ansible.module_utils._text import (  # type: ignore[no-redef,unused-ignore]
+        to_bytes,
+    )
+
 from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.mod_args import ModuleArgsParser
@@ -115,7 +122,7 @@ _logger = logging.getLogger(__name__)
 
 def parse_yaml_from_file(filepath: str) -> AnsibleJSON:
     """Extract a decrypted YAML object from file."""
-    dataloader = DataLoader()  # type: ignore[no-untyped-call]
+    dataloader = DataLoader()  # type: ignore[no-untyped-call,unused-ignore]
     if hasattr(dataloader, "set_vault_secrets"):
         dataloader.set_vault_secrets([
             ("default", PromptVaultSecret(_bytes=to_bytes(DEFAULT_VAULT_PASSWORD)))  # type: ignore[no-untyped-call]
@@ -132,7 +139,7 @@ def parse_yaml_from_file(filepath: str) -> AnsibleJSON:
 
 def path_dwim(basedir: str, given: str) -> str:
     """Convert a given path do-what-I-mean style."""
-    dataloader = DataLoader()  # type: ignore[no-untyped-call]
+    dataloader = DataLoader()  # type: ignore[no-untyped-call,unused-ignore]
     dataloader.set_basedir(basedir)
     return str(dataloader.path_dwim(given))
 
@@ -147,7 +154,7 @@ def ansible_templar(basedir: Path, templatevars: Any) -> Templar:
     if basedir.name == "tasks":
         basedir = basedir.parent
 
-    dataloader = DataLoader()  # type: ignore[no-untyped-call]
+    dataloader = DataLoader()  # type: ignore[no-untyped-call,unused-ignore]
     dataloader.set_basedir(str(basedir))
     templar = Templar(dataloader, variables=templatevars)
     return templar

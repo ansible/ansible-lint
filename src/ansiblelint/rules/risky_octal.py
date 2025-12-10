@@ -40,7 +40,7 @@ class OctalPermissionsRule(AnsibleLintRule):
     description = (
         "Numeric file permissions without leading zero can behave in unexpected ways."
     )
-    link = "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html"
+    link = "https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/file_module.html"
     severity = "VERY_HIGH"
     tags = ["formatting"]
     version_changed = "6.9.1"

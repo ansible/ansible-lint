@@ -36,6 +36,8 @@ class GalaxyRule(AnsibleLintRule):
         "galaxy[version-missing]": "galaxy.yaml should have version tag.",
         "galaxy[no-runtime]": "meta/runtime.yml file not found.",
         "galaxy[invalid-dependency-version]": "Invalid collection metadata. Dependency version spec range is invalid",
+        "galaxy[no-repository]": "galaxy.yaml should have a repository key for publication to Galaxy. See https://docs.ansible.com/projects/ansible/latest/dev_guide/collections_galaxy_meta.html",
+        "galaxy[no-license]": "galaxy.yaml should have a license or license_file key for publication to Galaxy. See https://docs.ansible.com/projects/ansible/latest/dev_guide/collections_galaxy_meta.html",
     }
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
@@ -179,6 +181,26 @@ class GalaxyRule(AnsibleLintRule):
                 ),
             )
 
+        # Check for repository key - recommended for Galaxy publication
+        if "repository" not in data:
+            results.append(
+                self.create_matcherror(
+                    message="galaxy.yaml should have a repository key for publication to Galaxy. See https://docs.ansible.com/projects/ansible/latest/dev_guide/collections_galaxy_meta.html",
+                    tag="galaxy[no-repository]",
+                    filename=file,
+                ),
+            )
+
+        # Check for license or license_file key - recommended for Galaxy publication
+        if "license" not in data and "license_file" not in data:
+            results.append(
+                self.create_matcherror(
+                    message="galaxy.yaml should have a license or license_file key for publication to Galaxy. See https://docs.ansible.com/projects/ansible/latest/dev_guide/collections_galaxy_meta.html",
+                    tag="galaxy[no-license]",
+                    filename=file,
+                ),
+            )
+
         return results
 
 
@@ -252,6 +274,16 @@ if "pytest" in sys.modules:
                 "examples/collections/broken_no_runtime/galaxy.yml",
                 ["galaxy[no-runtime]"],
                 id="broken_no_runtime",
+            ),
+            pytest.param(
+                "examples/collections/broken_no_license/galaxy.yml",
+                ["galaxy[no-license]"],
+                id="broken_no_license",
+            ),
+            pytest.param(
+                "examples/collections/broken_no_repo/galaxy.yml",
+                ["galaxy[no-repository]"],
+                id="broken_no_repo",
             ),
         ),
     )

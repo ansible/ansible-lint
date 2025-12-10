@@ -23,32 +23,31 @@ project:
 - `schema[ansible-lint-config]` validates
   [ansible-lint configuration](https://github.com/ansible/ansible-lint/blob/main/src/ansiblelint/schemas/ansible-lint-config.json)
 - `schema[role-arg-spec]` validates
-  [role argument specs](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html#specification-format)
+  [role argument specs](https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_reuse_roles.html#specification-format)
   which is a little bit different than the module argument spec.
 - `schema[execution-environment]` validates
-  [execution environments](https://docs.ansible.com/automation-controller/latest/html/userguide/execution_environments.html)
+  [execution environments](https://legacy-controller-docs.ansible.com/automation-controller/)
 - `schema[galaxy]` validates
-  [collection metadata](https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html).
+  [collection metadata](https://docs.ansible.com/projects/ansible/latest/dev_guide/collections_galaxy_meta.html).
 - `schema[inventory]` validates
-  [inventory files](https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html)
+  [inventory files](https://docs.ansible.com/projects/ansible/latest/inventory_guide/intro_inventory.html)
   that match `inventory/*.yml`.
 - `schema[meta-runtime]` validates
-  [runtime information](https://docs.ansible.com/ansible/devel/dev_guide/developing_collections_structure.html#meta-directory-and-runtime-yml)
+  [runtime information](https://docs.ansible.com/projects/ansible/devel/dev_guide/developing_collections_structure.html#meta-directory-and-runtime-yml)
   that matches `meta/runtime.yml`
 - `schema[meta]` validates metadata for roles that match `meta/main.yml`. See
-  [role-dependencies](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html#role-dependencies)
+  [role-dependencies](https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_reuse_roles.html#role-dependencies)
   or
   [role/metadata.py](https://github.com/ansible/ansible/blob/devel/lib/ansible/playbook/role/metadata.py#L79))
   for details.
-- `schema[pattern]` validates Ansible patterns.
-- `schema[play-argspec]` validates Ansible playbook [argspec files](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/validate_argument_spec_module.html).
+- `schema[play-argspec]` validates Ansible playbook [argspec files](https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/validate_argument_spec_module.html).
 - `schema[playbook]` validates Ansible playbooks.
 - `schema[requirements]` validates Ansible
-  [requirements](https://docs.ansible.com/ansible/latest/galaxy/user_guide.html#install-multiple-collections-with-a-requirements-file)
+  [requirements](https://docs.ansible.com/projects/ansible/latest/galaxy/user_guide.html#install-multiple-collections-with-a-requirements-file)
   files that match `requirements.yml`.
 - `schema[tasks]` validates Ansible task files that match `tasks/**/*.yml`.
 - `schema[vars]` validates Ansible
-  [variables](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html)
+  [variables](https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_variables.html)
   that match `vars/*.yml` and `defaults/*.yml`.
 
 Maintained in the

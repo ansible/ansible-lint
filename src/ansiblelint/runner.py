@@ -27,7 +27,6 @@ from ruamel.yaml.parser import ParserError as RuamelParserError
 from yaml.parser import ParserError
 from yaml.scanner import ScannerError
 
-import ansiblelint.skip_utils
 import ansiblelint.utils
 from ansiblelint.constants import States
 from ansiblelint.errors import LintWarning, MatchError, WarnSource
@@ -439,6 +438,7 @@ class Runner:
 
                     if (
                         "filename" in groups
+                        and groups["filename"]
                         and str(lintable.path.absolute()) != groups["filename"]
                         and lintable.filename != groups["filename"]
                     ):

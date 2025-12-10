@@ -6,15 +6,13 @@ ci:
   autofix_commit_msg: "chore: auto fixes from pre-commit.com hooks"
   skip:
     # https://github.com/pre-commit-ci/issues/issues/55
-    - pip-compile
     - pyright
-    - renovate-config-validator # container limits
+    - tombi-format
+    - tombi-lint
     - schemas
   submodules: true
 exclude: >
   (?x)^(
-    .config/constraints.txt|
-    .config/.*requirements.*|
     examples/broken/encoding.yml|
     examples/broken/encoding.j2|
     examples/broken/yaml-with-tabs/invalid-due-tabs.yaml|
@@ -31,44 +29,43 @@ repos:
   - repo: meta
     hooks:
       - id: check-useless-excludes
-  - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 41.91.1
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.9.13
     hooks:
-      - id: renovate-config-validator
-        alias: renovate
-        args: [--strict]
-  - repo: https://github.com/rbubley/mirrors-prettier
-    # keep it before yamllint
-    rev: v3.6.2
+      - id: uv-sync
+      - id: uv-lock
+      - id: uv-lock
+        name: "deps: upgrade via uv sync --upgrade"
+        alias: deps
+        args: ["--upgrade"]
+        stages: [manual]
+      - id: uv-export
+        name: "deps: regenerate requirements-lock.txt for actions"
+        args:
+          - "--no-dev"
+          - "--no-emit-package"
+          - ansible-core
+          - "--no-emit-package"
+          - resolvelib
+          - "--no-emit-package"
+          - ruamel-yaml-clib
+          - "--no-emit-package"
+          - tomli
+          - "--no-emit-package"
+          - typing-extensions
+          - "--no-emit-project"
+          - "--no-hashes"
+          - "-o"
+          - ".config/requirements-lock.txt"
+  - repo: https://github.com/biomejs/pre-commit
+    rev: "v2.3.8"
     hooks:
-      - id: prettier
-        # Temporary excludes so we can gradually normalize the formatting
-        exclude: >
-          (?x)^(
-            .*\.md$|
-            examples/other/some.j2.yaml|
-            examples/playbooks/collections/.*|
-            examples/playbooks/example.yml|
-            examples/playbooks/invalid-transform.yml|
-            examples/playbooks/multiline-brackets.*|
-            examples/playbooks/templates/not-valid.yaml|
-            examples/playbooks/vars/empty.transformed.yml|
-            examples/playbooks/vars/empty.yml|
-            examples/playbooks/with-skip-tag-id.yml|
-            examples/playbooks/with-umlaut-.*|
-            examples/yamllint/.*|
-            src/ansiblelint/schemas/(molecule|tasks|playbook|rulebook|pattern).json|
-            test/fixtures/formatting-before/.*|
-            test/schemas/(negative_test|test)/.*\.md|
-            test/schemas/data/.*|
-            src/ansiblelint/schemas/ansible-navigator-config.json
-          )$
-        always_run: true
-        additional_dependencies:
-          - prettier@3.2.4
-          - prettier-plugin-sort-json@3.1.0
+      - id: biome-check
+        name: biome
+        alias: biome
+        args: [--unsafe]
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v9.2.0
+    rev: v9.3.3
     hooks:
       - id: cspell
         entry: bash
@@ -78,11 +75,11 @@ repos:
             "-euo",
             "pipefail",
             "-c",
-            "cspell-cli . --relative --no-progress --no-summary && cspell-cli . --disable-dictionary=words --no-exit-code --words-only --quiet --unique | LC_ALL=C sort > .config/dictionary.txt",
+            "cspell-cli . --relative --no-progress --no-summary && cspell-cli . --disable-dictionary=words --no-exit-code --words-only --quiet --unique | tr '[:upper:]' '[:lower:]' | LC_ALL=C sort -u > .config/dictionary.txt",
           ]
         name: cspell + remove unused and sort dictionary
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.33.3
+    rev: 0.35.0
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
@@ -138,6 +135,7 @@ repos:
         exclude: >
           (?x)^(
             examples/playbooks/templates/.*|
+            examples/playbooks/transform-yaml-comments.yml|
             examples/yamllint/.*|
             examples/other/some.j2.yaml|
             examples/playbooks/collections/.*|
@@ -147,26 +145,23 @@ repos:
         types: [file, yaml]
         entry: yamllint --strict
 
-  - repo: https://github.com/pappasam/toml-sort
-    rev: v0.24.2
+  - repo: https://github.com/tombi-toml/tombi-pre-commit
+    rev: v0.7.0
     hooks:
-      - id: toml-sort-fix
+      - id: tombi-format
+        alias: toml
+      - id: tombi-lint
         alias: toml
 
-  - repo: https://github.com/tox-dev/tox-ini-fmt
-    rev: 1.6.0
-    hooks:
-      - id: tox-ini-fmt
-
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.11
+    rev: v0.14.7
     hooks:
       - id: ruff-format
         alias: ruff
       - id: ruff-check
         alias: ruff
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.17.1
+    rev: v1.19.0
     hooks:
       - id: mypy
         # "." and pass_files are used to make pre-commit mypy behave the same as standalone mypy
@@ -177,7 +172,6 @@ repos:
           - black>=22.10.0
           - cryptography>=39.0.1
           - filelock>=3.12.2
-          - importlib_metadata
           - jinja2
           - license-expression >= 30.3.0
           - pip>=22.3.1
@@ -192,12 +186,12 @@ repos:
           - wcmatch
           - yamllint>=1.34.0
   - repo: https://github.com/RobertCraigie/pyright-python
-    rev: v1.1.404
+    rev: v1.1.407
     hooks:
       - id: pyright
         additional_dependencies: *deps
   - repo: https://github.com/pycqa/pylint
-    rev: v3.3.8
+    rev: v4.0.4
     hooks:
       - id: pylint
         args:
@@ -207,6 +201,10 @@ repos:
     rev: v2.14
     hooks:
       - id: vulture
+  - repo: https://github.com/ansible/team-devtools
+    rev: v25.12.8
+    hooks:
+      - id: check-platform-constraints
   - # keep at bottom as these are slower
     repo: local
     hooks:
@@ -217,33 +215,3 @@ repos:
         pass_filenames: false
         always_run: true
         # stages: [manual]
-      - id: deps
-        name: Upgrade constraints files and requirements
-        files: ^(pyproject\.toml|.config/.*)$
-        always_run: true
-        language: python
-        entry: python3 -m uv pip compile -q --all-extras --python-version=3.10 --output-file=.config/constraints.txt pyproject.toml --upgrade
-        pass_filenames: false
-        stages:
-          - manual
-        additional_dependencies:
-          - uv>=0.6.6
-      - id: pip-compile
-        name: Check constraints files and requirements
-        files: ^(pyproject\.toml|\.config/.*)$
-        language: python
-        entry: uv pip compile -q --all-extras --python-version=3.10 --output-file=.config/constraints.txt pyproject.toml
-        pass_filenames: false
-        additional_dependencies:
-          - uv>=0.6.6
-      - id: lock
-        name: Update requirements-lock.txt
-        alias: lock
-        always_run: true
-        entry: python3 -m uv pip compile -q --python-version=3.10 --upgrade --output-file=.config/requirements-lock.txt pyproject.toml --strip-extras
-        files: ^(pyproject\.toml|\.config/.*)$
-        language: python
-        pass_filenames: false
-        stages: [manual]
-        additional_dependencies:
-          - uv>=0.6.6
