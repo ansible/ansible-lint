@@ -438,6 +438,7 @@ class Runner:
 
                     if (
                         "filename" in groups
+                        and groups["filename"]
                         and str(lintable.path.absolute()) != groups["filename"]
                         and lintable.filename != groups["filename"]
                     ):
