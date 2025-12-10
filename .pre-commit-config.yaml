@@ -135,6 +135,7 @@ repos:
         exclude: >
           (?x)^(
             examples/playbooks/templates/.*|
+            examples/playbooks/transform-yaml-comments.yml|
             examples/yamllint/.*|
             examples/other/some.j2.yaml|
             examples/playbooks/collections/.*|
