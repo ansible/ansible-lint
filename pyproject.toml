@@ -1,4 +1,5 @@
 # cspell: ignore FURB xunit
+#:tombi schema.strict = false
 
 [project]
 name = "ansible-lint"
@@ -33,18 +34,17 @@ classifiers = [
 ]
 dependencies = [
   "ansible-compat>=25.8.2",
-  "ansible-core>=2.16.11",
+  "ansible-core>=2.16.14",
   "black>=24.3.0",
-  "cffi>=1.17.1",  # indirect dependency of ruamel-yaml
+  "cffi>=1.15.1",  # indirect dependency of ruamel-yaml
   "cryptography>=38",
   "distro>=1.9.0",
   "filelock>=3.8.2",
-  "importlib-metadata>=8.7.0",
   "jsonschema>=4.10.0",
   "packaging>=22.0",
   "pathspec>=0.10.3",
-  "pyyaml>=6.0.2 ; python_version < '3.14'",
-  "pyyaml>=6.0.3 ; python_version >= '3.14'",  # py314 support
+  "pyyaml>=6.0.1 ; python_version < '3.14'",
+  "pyyaml>=6.0.1 ; python_version >= '3.14'",  # py314 support
   "referencing>=0.36.2",
   "ruamel-yaml>=0.18.11",
   "ruamel-yaml-clib>=0.2.12 ; python_version < '3.14'",
@@ -57,7 +57,7 @@ dynamic = ["version"]
 
 [project.urls]
 changelog = "https://github.com/ansible/ansible-lint/releases"
-documentation = "https://ansible.readthedocs.io/projects/lint/"
+documentation = "https://docs.ansible.com/projects/lint/"
 homepage = "https://github.com/ansible/ansible-lint"
 repository = "https://github.com/ansible/ansible-lint"
 
@@ -82,13 +82,13 @@ dev = [
   "psutil>=7.0.0",
   "pylint>=3.3.8",
   "pyrsistent>=0.20.0",
-  "pytest>=7.2.2",
+  "pytest>=9",
   "pytest-instafail>=0.5.0",
   "pytest-mock>=3.15.0",
   "pytest-plus>=0.8.1",
   "pytest-sugar>=1.1.1",
   "pytest-xdist[psutil,setproctitle]>=2.1.0",
-  "pyyaml>=6.0.2",
+  "pyyaml>=6.0.1",
   "ruamel-yaml>=0.18.11",
   "ruamel-yaml-clib>=0.2.12 ; python_full_version < '3.14'",
   "tox>=4.24.2",
@@ -102,7 +102,7 @@ lint = [
   "pip>=25.2",
   "pre-commit>=4.1",
   "pre-commit-uv>=4.1.4",
-  "pytest>=7.2.2",
+  "pytest>=9",
   "setuptools>=51.1.1",
 ]
 pkg = [
@@ -166,7 +166,7 @@ exclude_gitignore = true
 follow_untyped_imports = true
 incremental = false
 no_implicit_optional = true
-python_version = "3.10"
+python_version = "3.12"
 show_error_code_links = true
 strict = true
 warn_redundant_casts = true
@@ -178,7 +178,6 @@ ignore_errors = true
 ignore_missing_imports = true
 module = [
   "ansible.parsing.yaml.constructor",
-  "license_expression",
   "ruamel.yaml",
 ]
 
@@ -209,6 +208,7 @@ score = "n"
 [tool.pylint.messages_control]
 disable = [
   "unknown-option-value",
+  "cyclic-import",  # likely https://github.com/pylint-dev/pylint/issues/10140
   # https://gist.github.com/cidrblock/ec3412bacfeb34dbc2d334c1d53bef83
   "C0103",  # invalid-name / ruff N815
   "C0105",  # typevar-name-incorrect-variance / ruff PLC0105
@@ -459,19 +459,15 @@ reportPossiblyUnboundVariable = false
 reportPrivateImportUsage = false
 
 # spell-checker:ignore filterwarnings norecursedirs optionflags
-[tool.pytest.ini_options]
+[tool.pytest]
 # do not add options here as this will likely break either console runs or IDE
 # integration like vscode or pycharm
-addopts = "-p no:pytest_cov --durations=10 --failed-first"
+addopts = ["--durations=10", "--failed-first", "-p no:pytest_cov"]
 doctest_optionflags = ["ALLOW_UNICODE", "ELLIPSIS"]
 filterwarnings = [
-  "error",
-  # https://sourceforge.net/p/ruamel-yaml/tickets/452/
-  "ignore:Deprecated call to `pkg_resources.declare_namespace:DeprecationWarning",
-  # https://github.com/spdx/tools-python/issues/507
-  "ignore:pkg_resources is deprecated as an API:DeprecationWarning",
   # We raise one non critical warning from our own conftest.py:
   "always::pytest.PytestWarning",
+  "error",
   # py312 ansible-core
   # https://github.com/ansible/ansible/issues/81906
   "ignore:'importlib.abc.TraversableResources' is deprecated and slated for removal in Python 3.14:DeprecationWarning",
@@ -480,7 +476,7 @@ filterwarnings = [
 ]
 junit_family = "xunit2"
 markers = ["libyaml: tests that will pass only with pyyaml libyaml is present."]
-minversion = "4.6.6"
+minversion = "9.0"  # toml config changes
 # https://code.visualstudio.com/docs/python/testing
 # coverage is re-enabled in `tox.ini`. That approach is safer than
 # `--no-cov` which prevents activation from tox.ini and which also fails
@@ -490,11 +486,11 @@ norecursedirs = [
   ".cache",
   ".config",
   ".eggs",
+  ".eggs",
   ".git",
   ".github",
   ".mypy_cache",
   ".projects",
-  ".eggs",
   ".tox",
   "__pycache__",
   "ansible_collections",
@@ -509,17 +505,17 @@ norecursedirs = [
   "test/schemas",
 ]
 python_files = [
-  "test_*.py",
   # Ref: https://docs.pytest.org/en/latest/reference.html#confval-python_files
   # Needed to discover legacy nose test modules:
   "Test*.py",
   # Needed to discover embedded Rule tests
   "rules/*.py",
+  "test_*.py",
 ]
 # Using --pyargs instead of testpath as we embed some tests
 # See: https://github.com/pytest-dev/pytest/issues/6451#issuecomment-687043537
 # testpaths =
-xfail_strict = true
+strict_xfail = true
 
 [tool.ruff]
 cache-dir = "./.cache/.ruff"
@@ -657,6 +653,7 @@ commands = [
 ]
 commands_pre = []
 description = "Bump all test dependencies"
+dependency_groups = ["lint"]
 env_dir = "{work_dir}/lint"
 skip_install = true
 

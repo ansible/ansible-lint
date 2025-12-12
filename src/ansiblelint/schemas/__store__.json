@@ -1,6 +1,6 @@
 {
   "ansible-lint-config": {
-    "etag": "edfce2b56aae684bf1f0b9978dcfaaaa588dbc236f6e0ce29427277f6a327ddc",
+    "etag": "d08ce380364a2935299f89bf453787601d44a1bc6b70a38afaec4a8b0b80d104",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible-lint-config.json"
   },
   "ansible-navigator-config": {
@@ -12,55 +12,55 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/changelog.json"
   },
   "execution-environment": {
-    "etag": "075ab552988793a43ddfe9907b0e391331c54b5dbee2ad1a194e6fc9268e5df9",
+    "etag": "127ca906c1dc04fe55e4dd1ee0742a096a40f094ec3d4418b803456713c35243",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/execution-environment.json"
   },
   "galaxy": {
-    "etag": "02f664876e65460fe9f81d218ae2bcd04c56756648688041f3da505346f39cd2",
+    "etag": "fbee11277e3cf6fd3ae47831fb912dda5954e2689d1830ddaba7cbac1fd0ce3b",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/galaxy.json"
   },
   "inventory": {
-    "etag": "b52c251a121e2e807928db7b4e09338babde9e74a50d0f74e8908f6e230d101d",
+    "etag": "d5f717b4df27cd750ce0acdcbfa2b7ad747815c8b98d4f6ea474a637ba04ce72",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/inventory.json"
   },
   "meta": {
-    "etag": "6315f4ea4ed7a14f3d011bbb3095ee56ed4621c4e7c1d14c85dcf88a5cfe3573",
+    "etag": "d63b91b4cb6a73cde4d9d98b7b5d9bbaf8ed568173e90682afb5b11cd6ba55b3",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/meta.json"
   },
   "meta-runtime": {
-    "etag": "448b614e9d4411b82d220950b7a415c248cc75d5431f9b8058c771a595d40163",
+    "etag": "eae3d798ca5ccb03b3fd81ec44ea3d579782e75d1bd5a96eb0d64b1939c3b1f1",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/meta-runtime.json"
   },
   "molecule": {
-    "etag": "3b625438c28e884ac42a14c09ca542fc3e1b4466abaf47d0c28646e0857d3fb5",
+    "etag": "c654d6e4f94ae56daa39f456d15d31c933977e2eb3f5031dca40533f25c32746",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/molecule.json"
   },
   "play-argspec": {
-    "etag": "b418c4edcf2a44f0534321e0b38b6b7fb3f73a87c4f6ea18cab15e4b3f53bd20",
+    "etag": "699edbc9ddf026606d8cd79f71b10f9487f6acc37e8622143f76e5e8d0ae14bf",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/play-argspec.json"
   },
   "playbook": {
-    "etag": "db849c713091b29d3a569e72a82f8a28f49b3b14ad90c1a96936099b04eb393e",
+    "etag": "09d087fd7fe850790857de197c778bbce80ec360234e3240e2eff964f773aa8c",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/playbook.json"
   },
   "requirements": {
-    "etag": "5ae3a6058ac626a341338c760db7cef7f02a8911c7293c7e129dbc6b0f8bb86d",
+    "etag": "4473c6fcaddcc040aa8357ed3fd2b316c5699c4cc1978dbf3935c29be35b8a62",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/requirements.json"
   },
   "role-arg-spec": {
-    "etag": "c470f67bc8eec3937957773074d7b6549deefd83dd0c3e13db725df166a66df3",
+    "etag": "cb7ac0c4f8d55736f8c53e27bc6984f67d12fda5eadca1991f50d5d78fcdfb63",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/role-arg-spec.json"
   },
   "rulebook": {
-    "etag": "9f785b5986cdbfe3b4ba911cbb65263df150bb595b22e4f191081b9360717d33",
+    "etag": "41f38449e81586dd859f756cd605d0cd368415320b1bcfb4e92ae80e9f1baa7d",
     "url": "https://raw.githubusercontent.com/ansible/ansible-rulebook/main/ansible_rulebook/schema/ruleset_schema.json"
   },
   "tasks": {
-    "etag": "9f3b54cf5cc432d57c9691fb3108a7f37996ab0875e2abb66eda0aa62437dcdc",
+    "etag": "0e94cba9067e983083040bd661515801b5b1d4fd5660019f34234bba7ec8de1a",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/tasks.json"
   },
   "vars": {
-    "etag": "73feaa77561d1d5b0bebe6cd66d499a28d67037055ac6d746139a38c9d28ca04",
+    "etag": "76e5ac2daa6465ba16c3a566307876cf6d74ff433cf7fd0836bc4a9e389b668a",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/vars.json"
   }
 }

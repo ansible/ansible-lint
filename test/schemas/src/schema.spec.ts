@@ -161,14 +161,14 @@ function getTestFiles(
 ): { file: string; expect_fail: boolean }[] {
   const files = Array.from(
     new Set(
-      globs.flatMap((glob: any) =>
+      globs.flatMap((glob: string) =>
         minimatch.match(test_files, path.join("**", glob)),
       ),
     ),
   );
   const negative_files = Array.from(
     new Set(
-      globs.flatMap((glob: any) =>
+      globs.flatMap((glob: string) =>
         minimatch.match(negative_test_files, path.join("**", glob)),
       ),
     ),
@@ -186,6 +186,12 @@ function getAllFiles(dir: string): string[] {
   return fs.readdirSync(dir).reduce((files: string[], file: string) => {
     const name = path.join(dir, file);
     const isDirectory = fs.statSync(name).isDirectory();
-    return isDirectory ? [...files, ...getAllFiles(name)] : [...files, name];
+    if (isDirectory) {
+      files.push(...getAllFiles(name));
+      return files;
+    } else {
+      files.push(name);
+      return files;
+    }
   }, []);
 }

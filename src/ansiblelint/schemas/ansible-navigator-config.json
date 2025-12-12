@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
     "additionalProperties": false,
-    "description": "See https://ansible.readthedocs.io/projects/navigator/settings/",
+    "description": "See https://docs.ansible.com/projects/navigator/settings/",
     "properties": {
         "ansible-navigator": {
             "additionalProperties": false,

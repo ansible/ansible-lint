@@ -765,7 +765,7 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "additionalProperties": false,
   "examples": ["galaxy.yml"],
-  "markdownDescription": "https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html",
+  "markdownDescription": "https://docs.ansible.com/projects/ansible/latest/dev_guide/collections_galaxy_meta.html",
   "properties": {
     "authors": {
       "items": {
@@ -847,7 +847,7 @@
       "type": "string"
     },
     "readme": {
-      "markdownDescription": "The path to the Markdown (.md) readme file. This path is relative to the root of the collection.\nSee [metadata structure](https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html)",
+      "markdownDescription": "The path to the Markdown (.md) readme file. This path is relative to the root of the collection.\nSee [metadata structure](https://docs.ansible.com/projects/ansible/latest/dev_guide/collections_galaxy_meta.html)",
       "title": "Readme",
       "type": "string"
     },
@@ -876,8 +876,7 @@
     "version",
     "readme",
     "authors",
-    "description",
-    "repository"
+    "description"
   ],
   "title": "Ansible galaxy.yml Schema",
   "type": "object"
