@@ -134,6 +134,10 @@
       "title": "Quiet",
       "type": "boolean"
     },
+    "role_var_prefix": {
+      "title": "Role Var Prefix",
+      "type": "string"
+    },
     "rules": {
       "additionalProperties": {
         "$ref": "#/$defs/rule"
