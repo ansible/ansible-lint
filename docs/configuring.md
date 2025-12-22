@@ -84,7 +84,7 @@ on each change but you can also run the tool yourself using the CI of your choic
     `additional_dependencies`.
 
 Change **rev:** to either a commit sha or tag of Ansible-lint that contains
-`.pre-commit-hooks.yaml`.
+`.pre-commit-config.yaml`.
 
 ```yaml
 ---
