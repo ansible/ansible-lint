@@ -826,7 +826,7 @@ class FormattedEmitter(Emitter):
             value = self._re_repeat_blank_lines.sub("\n\n", value)
 
         # make sure that comments have a space after #
-        if value.startswith("#") and not value.startswith("# ") and len(value) > 1:
+        if value.startswith("#") and not value.startswith("# ") and value[1:].strip():
             value = "# " + value[1:]
 
         comment.value = value

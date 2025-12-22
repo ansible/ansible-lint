@@ -1,5 +1,7 @@
 ---
 #comment without space
+#
+#second comment after blank
 - name: Fixture
   hosts: localhost
   tasks:
