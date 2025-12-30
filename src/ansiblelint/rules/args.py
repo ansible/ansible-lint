@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
+import atexit
 import contextlib
 import importlib.util
 import io
 import json
 import logging
 import re
+import shutil
 import sys
+import tempfile
 from typing import TYPE_CHECKING, Any
 
 # pylint: disable=preferred-module
@@ -60,9 +63,19 @@ workarounds_drop_map = {
     # https://github.com/ansible/ansible-lint/issues/3152
     "ansible.posix.synchronize": ["use_ssh_args"],
 }
+_SAFE_ASYNC_DIR = tempfile.mkdtemp(prefix="ansible-lint-async-")
+
+
+def _cleanup_async_dir() -> None:
+    """Safely remove the temp directory and all its contents."""
+    shutil.rmtree(_SAFE_ASYNC_DIR, ignore_errors=True)
+
+
+atexit.register(_cleanup_async_dir)
+
 workarounds_inject_map = {
     # https://github.com/ansible/ansible-lint/issues/2824
-    "ansible.builtin.async_status": {"_async_dir": "/tmp/ansible-async"},
+    "ansible.builtin.async_status": {"_async_dir": _SAFE_ASYNC_DIR},
 }
 workarounds_mutex_args_map = {
     # https://github.com/ansible/ansible-lint/issues/4623
