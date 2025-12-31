@@ -46,6 +46,11 @@ const schema_files = fs
   .filter((el) => path.extname(el) === ".json");
 console.log(`Schemas: ${schema_files}`);
 
+schema_files.forEach((schema_file) => {
+  const schema_json = JSON.parse(fs.readFileSync(`f/${schema_file}`, "utf8"));
+  ajv.addSchema(schema_json, schema_file);
+});
+
 describe("schemas under f/", () => {
   schema_files.forEach((schema_file) => {
     if (
@@ -54,8 +59,11 @@ describe("schemas under f/", () => {
     ) {
       return;
     }
-    const schema_json = JSON.parse(fs.readFileSync(`f/${schema_file}`, "utf8"));
-    ajv.addSchema(schema_json);
+    const schema_instance = ajv.getSchema(schema_file);
+    if (!schema_instance) return;
+
+    // biome-ignore lint/suspicious/noExplicitAny: internal test suite needs to access dynamic schema properties
+    const schema_json = schema_instance.schema as any;
     const validator = ajv.compile(schema_json);
     if (
       schema_json.examples === undefined &&
