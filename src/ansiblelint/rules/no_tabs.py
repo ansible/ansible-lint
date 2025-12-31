@@ -54,8 +54,9 @@ class NoTabsRule(AnsibleLintRule):
         file: Lintable | None = None,
     ) -> list[MatchError]:
         result = []
-        action = task["action"]["__ansible_module__"]
-        for k, v, _ in nested_items_path(task):
+        # Check the key/value pairs found by the nested pathing
+        for k, v, _path in nested_items_path(task):
+            # Check if the Key itself has a tab (almost never allowed)
             if isinstance(k, str) and "\t" in k and not has_jinja(k):
                 result.append(
                     self.create_matcherror(
@@ -64,19 +65,20 @@ class NoTabsRule(AnsibleLintRule):
                         filename=file,
                     )
                 )
-            if (
-                isinstance(v, str)
-                and "\t" in v
-                and (action, k) not in self.allow_list
-                and not has_jinja(v)
-            ):
-                result.append(
-                    self.create_matcherror(
-                        message=self.shortdesc,
-                        data=v,
-                        filename=file,
+
+            # Check if the Value has a tab
+            if isinstance(v, str) and "\t" in v and not has_jinja(v):
+                # We check if 'k' is in our allow_list for ANY of the modules
+                is_allowed = any(k == allowed_key for _, allowed_key in self.allow_list)
+
+                if not is_allowed:
+                    result.append(
+                        self.create_matcherror(
+                            message=self.shortdesc,
+                            data=v,
+                            filename=file,
+                        )
                     )
-                )
         return result
 
 
@@ -102,3 +104,12 @@ if "pytest" in sys.modules:
         # 2.19 has more precise line:columns numbers so the effective result
         # is different.
         assert lines == [10, 13] or lines == [12, 15, 15], lines
+
+    @pytest.mark.libyaml
+    def test_no_tabs_block_pass(default_rules_collection: RulesCollection) -> None:
+        """Verify that tabs are allowed in lineinfile even inside blocks."""
+        results = Runner(
+            "examples/playbooks/rule-no-tabs-block-pass.yml",
+            rules=default_rules_collection,
+        ).run()
+        assert len(results) == 0
