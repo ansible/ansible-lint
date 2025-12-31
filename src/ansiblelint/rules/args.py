@@ -279,7 +279,7 @@ class ArgsRule(AnsibleLintRule):
         if value_not_in_choices_error:
             # ignore templated value not in allowed choices
             choice_key = value_not_in_choices_error.group("name")
-            choice_value = task["action"][choice_key]
+            choice_value = task["action"].get(choice_key)
             if has_jinja(choice_value):
                 _logger.debug(
                     "Value checking ignored for '%s' option in task '%s' at line %s.",
@@ -355,3 +355,28 @@ if "pytest" in sys.modules:
         ]
         log_string = "\n".join(record.getMessage() for record in records)
         assert len(records) == 0, log_string
+
+    def test_args_parse_failed_msg_no_key() -> None:
+        """Test that _parse_failed_msg does not crash if key is missing in task."""
+
+        class MockTask:
+            def __init__(self) -> None:
+                self.action = {"policy": "allow"}
+                self.line = 1
+
+            def __getitem__(self, key: str) -> Any:
+                return getattr(self, key)
+
+        rule = ArgsRule()
+        task = MockTask()
+        failed_msg = '{"msg": "value of default must be one of: allow, deny, reject"}'
+
+        # pylint: disable=protected-access
+        results = rule._parse_failed_msg(  # noqa: SLF001
+            failed_msg,
+            task,  # type: ignore[arg-type]
+            "ufw",
+        )
+
+        assert len(results) == 1
+        assert "value of default must be one of" in results[0].message
