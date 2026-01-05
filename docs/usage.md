@@ -17,7 +17,7 @@ Ansible-lint prints output on both `stdout` and `stderr`.
 - `stderr` displays logging and free-form messages like statistics.
 
 Most `ansible-lint` examples use pep8 as the output format (`-p`) which is
-machine parseable.
+machine parsable.
 
 Ansible-lint also print errors using their [annotation] format when it detects
 the `GITHUB_ACTIONS=true` and `GITHUB_WORKFLOW=...` variables.

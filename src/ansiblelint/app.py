@@ -372,8 +372,8 @@ def choose_formatter_factory(
         r = formatters.CodeclimateJSONFormatter
     elif options_list.format == "sarif":
         r = formatters.SarifFormatter
-    elif options_list.parseable or options_list.format == "pep8":
-        r = formatters.ParseableFormatter
+    elif options_list.format == "pep8":
+        r = formatters.PEP8Formatter
     return r
 
 

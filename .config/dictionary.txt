@@ -46,7 +46,6 @@ nodeps
 nomatchestest
 nxos
 octals
-parseable
 pathex
 pbrun
 pfexec

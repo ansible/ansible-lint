@@ -166,7 +166,7 @@ def test_broken_ansible_cfg() -> None:
 
 
 def test_list_tags() -> None:
-    """Asserts that we can list tags and that the output is parseable yaml."""
+    """Asserts that we can list tags and that the output is parsable yaml."""
     result = subprocess.run(
         ["ansible-lint", "--list-tags"],
         check=True,

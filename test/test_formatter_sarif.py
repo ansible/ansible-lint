@@ -164,23 +164,6 @@ class TestSarifFormatter:
         assert results[1]["message"]["text"] == self.matches[1].message
 
 
-def test_sarif_parsable_ignored() -> None:
-    """Test that -p option does not alter SARIF format."""
-    cmd = [
-        sys.executable,
-        "-m",
-        "ansiblelint",
-        "-v",
-        "-p",
-    ]
-    file = "examples/playbooks/empty_playbook.yml"
-    result = subprocess.run([*cmd, file], check=False)
-    result2 = subprocess.run([*cmd, "-p", file], check=False)
-
-    assert result.returncode == result2.returncode
-    assert result.stdout == result2.stdout
-
-
 @pytest.mark.parametrize(
     ("file", "return_code"),
     (
