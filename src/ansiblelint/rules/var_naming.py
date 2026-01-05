@@ -274,9 +274,9 @@ class VariableNamingRule(AnsibleLintRule):
         # If the task uses the 'set_fact' module
         if ansible_module == "set_fact":
             for key in filter(
-                lambda x: isinstance(x, str)
-                and not x.startswith("__")
-                and x != "cacheable",
+                lambda x: (
+                    isinstance(x, str) and not x.startswith("__") and x != "cacheable"
+                ),
                 task["action"].keys(),
             ):
                 match_error = self.get_var_naming_matcherror(
