@@ -1,3 +1,10 @@
 ---
 dependencies:
   - role: bobbins
+
+argument_specs:
+  main:
+    short_description: "The main entry point"
+    options:
+      example_var:
+        type: str

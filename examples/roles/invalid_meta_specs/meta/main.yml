@@ -1,0 +1,12 @@
+---
+galaxy_info:
+  author: "ansible-lint"
+  description: "test"
+  license: "MIT"
+  min_ansible_version: "2.10"
+
+argument_specs:
+  main:
+    options:
+      my_var:
+        type: not_a_real_type
