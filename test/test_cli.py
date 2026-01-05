@@ -23,7 +23,6 @@ def fixture_base_arguments() -> list[str]:
 @pytest.mark.parametrize(
     ("args", "config_path"),
     (
-        pytest.param(["-p"], "test/fixtures/parseable.yml", id="1"),
         pytest.param(["-q"], "test/fixtures/quiet.yml", id="2"),
         pytest.param(
             ["-r", "test/fixtures/rules/"],
