@@ -143,7 +143,6 @@ class Options:  # pylint: disable=too-many-instance-attributes
     list_tags: bool = False
     write_list: list[str] = field(default_factory=list)
     write_exclude_list: list[str] = field(default_factory=list)
-    parseable: bool = False
     quiet: bool = False
     rulesdirs: list[Path] = field(default_factory=list)
     skip_list: list[str] = field(default_factory=list)

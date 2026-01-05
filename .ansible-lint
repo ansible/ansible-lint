@@ -13,7 +13,6 @@ exclude_paths:
   - .cache/ # implicit unless exclude_paths is defined in config
   - test/fixtures/formatting-before/
   - test/fixtures/formatting-prettier/
-# parseable: true
 # quiet: true
 # strict: true
 # verbosity: 1

@@ -101,11 +101,6 @@
       "title": "Only Builtins Allow Modules",
       "type": "array"
     },
-    "parseable": {
-      "default": true,
-      "title": "Parseable",
-      "type": "boolean"
-    },
     "profile": {
       "enum": [
         "min",

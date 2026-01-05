@@ -110,7 +110,7 @@ def test_runner_exclude_globs(
     ("formatter_cls"),
     (
         pytest.param(formatters.Formatter, id="Formatter-plain"),
-        pytest.param(formatters.ParseableFormatter, id="ParseableFormatter-colored"),
+        pytest.param(formatters.PEP8Formatter, id="PEP8Formatter-colored"),
         pytest.param(formatters.QuietFormatter, id="QuietFormatter-colored"),
         pytest.param(formatters.Formatter, id="Formatter-colored"),
     ),
