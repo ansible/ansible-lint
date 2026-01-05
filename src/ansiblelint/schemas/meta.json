@@ -1570,6 +1570,13 @@
     },
     "galaxy_info": {
       "$ref": "#/$defs/GalaxyInfoModel"
+    },
+    "argument_specs": {
+      "title": "Role Argument Specifications",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "role-arg-spec.json#/$defs/entry_point"
+      }
     }
   },
   "title": "Ansible Meta Schema v1/v2",
