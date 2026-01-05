@@ -14,7 +14,7 @@ This rule can produce the following messages:
 
 !!! warning
 
-    While Ansible inherits have of `become` and `become_user` from upper levels,
+    While Ansible inherits `become` and `become_user` from upper levels,
     like play level or command line, we do not look at these values. This rule
     requires you to be explicit and always define both in the same place, mainly
     in order to prevent accidents when some tasks are moved from one location to
@@ -32,7 +32,7 @@ This rule can produce the following messages:
       ansible.builtin.service:
         name: httpd
         state: started
-      become_user: apache # <- Does not change the user because "become: true" is not set.
+      become_user: apache # <- "become: true" should be set here, not at play level.
 ```
 
 ## Correct Code
@@ -88,7 +88,7 @@ This rule can produce the following messages:
   ansible.builtin.service:
     name: httpd
     state: started
-  become_user: apache # <- Does not change the user because "become: true" is not set.
+  become_user: apache # <- "become: true" should be set here, not rely on play level.
 ```
 
 ## Correct Code
@@ -118,7 +118,7 @@ This rule can produce the following messages:
     name: httpd
     state: started
   become: true # <- Activates privilege escalation.
-  become_user: apache # <- Does not change the user because "become: true" is not set.
+  become_user: apache # <- Changes the user with the desired privileges.
 ```
 
 !!! note

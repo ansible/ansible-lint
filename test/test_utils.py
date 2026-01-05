@@ -404,7 +404,7 @@ def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
         "-x",
         "schema",  # exclude schema as our test file would fail it
         "-v",
-        "-p",
+        "--format=pep8",
         "--nocolor",
         "--offline",
         "--exclude=examples",
