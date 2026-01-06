@@ -161,7 +161,7 @@ disallow_untyped_calls = true
 disallow_untyped_defs = true
 error_summary = true
 # site-packages is here to help vscode mypy integration getting confused
-exclude = "(.config|test/local-content|site-packages|~/.pyenv|examples|plugins/modules).*"
+exclude = "(.config|test/local-content|test/fixtures/eco|site-packages|~/.pyenv|examples|plugins/modules).*"
 exclude_gitignore = true
 # https://github.com/python/mypy/issues/12664
 follow_untyped_imports = true
@@ -463,7 +463,12 @@ reportPrivateImportUsage = false
 [tool.pytest]
 # do not add options here as this will likely break either console runs or IDE
 # integration like vscode or pycharm
-addopts = ["--durations=10", "--failed-first", "-p no:pytest_cov"]
+addopts = [
+  "--durations=10",
+  "--failed-first",
+  # "-m=eco",
+  "-p no:pytest_cov",
+]
 doctest_optionflags = ["ALLOW_UNICODE", "ELLIPSIS"]
 filterwarnings = [
   # We raise one non critical warning from our own conftest.py:
@@ -476,7 +481,10 @@ filterwarnings = [
   "ignore:Attribute s is deprecated and will be removed in Python 3.14; use value instead:DeprecationWarning",
 ]
 junit_family = "xunit2"
-markers = ["libyaml: tests that will pass only with pyyaml libyaml is present."]
+markers = [
+  "eco: test impact on ecosystem repositories (slow)",
+  "libyaml: tests that will pass only with pyyaml libyaml is present."
+]
 minversion = "9.0"  # toml config changes
 # https://code.visualstudio.com/docs/python/testing
 # coverage is re-enabled in `tox.ini`. That approach is safer than
@@ -503,6 +511,7 @@ norecursedirs = [
   "plugins",
   "site",
   "src/ansible_lint.egg-info",
+  "test/fixtures/eco",
   "test/schemas",
 ]
 python_files = [
@@ -683,14 +692,6 @@ skip_install = false
 set_env.DYLD_FALLBACK_LIBRARY_PATH = "/opt/homebrew/lib:{env:LD_LIBRARY_PATH}"
 set_env.NO_COLOR = "1"
 set_env.TERM = "dump"
-
-[tool.tox.env.eco]
-commands = [
-  ["sh", "-c", "tools/test-eco.sh"],
-]
-commands_post = []
-commands_pre = []
-description = "Perform ecosystem impact (downstream testing) https://github.com/ansible/ansible-lint/discussions/1403"
 
 [tool.tox.env.hook]
 commands = [["{tox_root}/tools/test-hook.sh"]]
@@ -887,6 +888,7 @@ exclude = [
   "test/local-content",
   "venv",
   "src/ansiblelint/_version.py",
+  "test/fixtures/eco"
 ]
 ignore_names = [
   "_ANSIBLE_ARGS",

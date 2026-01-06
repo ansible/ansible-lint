@@ -21,6 +21,7 @@ exclude: >
     examples/playbooks/vars/empty.transformed.yml|
     examples/playbooks/vars/empty.yml|
     src/ansiblelint/schemas/rulebook.json|
+    test/fixtures/eco/.*|
     test/schemas/data/licenses.json|
     test/schemas/negative_test|
     test/schemas/package-lock.json

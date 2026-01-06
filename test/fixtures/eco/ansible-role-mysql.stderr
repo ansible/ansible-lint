@@ -1,0 +1,100 @@
+name[casing]: All names should start with an uppercase letter.
+handlers/main.yml:2:9 Task/Handler: restart mysql
+
+schema[meta]: $.galaxy_info.min_ansible_version 2.12 is not of type 'string'. See https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_reuse_roles.html#using-role-dependencies
+meta/main.yml:1  Returned errors will not include exact line numbers, but they will mention
+the schema name being used as a tag, like ``schema[playbook]``,
+``schema[tasks]``.
+
+This rule is not skippable and stops further processing of the file.
+
+If incorrect schema was picked, you might want to either:
+
+* move the file to standard location, so its file is detected correctly.
+* use ``kinds:`` option in linter config to help it pick correct file type.
+[/]
+
+fqcn[action]: Use FQCN for module actions, such `community.mysql.mysql_db`.
+tasks/databases.yml:3:3 Action `mysql_db` is not FQCN.
+
+name[missing]: All tasks should be named.
+tasks/main.yml:3 Task/Handler: include_tasks variables.yml
+
+name[missing]: All tasks should be named.
+tasks/main.yml:6 Task/Handler: include_tasks setup-RedHat.yml
+
+name[missing]: All tasks should be named.
+tasks/main.yml:9 Task/Handler: include_tasks setup-Debian.yml
+
+name[missing]: All tasks should be named.
+tasks/main.yml:12 Task/Handler: include_tasks setup-Archlinux.yml
+
+name[missing]: All tasks should be named.
+tasks/main.yml:22 Task/Handler: include_tasks configure.yml
+
+name[missing]: All tasks should be named.
+tasks/main.yml:23 Task/Handler: include_tasks secure-installation.yml
+
+name[missing]: All tasks should be named.
+tasks/main.yml:24 Task/Handler: include_tasks databases.yml
+
+name[missing]: All tasks should be named.
+tasks/main.yml:25 Task/Handler: include_tasks users.yml
+
+name[missing]: All tasks should be named.
+tasks/main.yml:26 Task/Handler: include_tasks replication.yml
+
+fqcn[action]: Use FQCN for module actions, such `community.mysql.mysql_user`.
+tasks/replication.yml:3:3 Action `mysql_user` is not FQCN.
+
+fqcn[action]: Use FQCN for module actions, such `community.mysql.mysql_replication`.
+tasks/replication.yml:18:3 Action `mysql_replication` is not FQCN.
+
+fqcn[action]: Use FQCN for module actions, such `community.mysql.mysql_replication`.
+tasks/replication.yml:32:3 Action `mysql_replication` is not FQCN.
+
+ignore-errors: Use failed_when and specify error conditions instead of using ignore_errors.
+tasks/replication.yml:45 Task/Handler: Configure replication on the slave.
+
+fqcn[action]: Use FQCN for module actions, such `community.mysql.mysql_replication`.
+tasks/replication.yml:46:3 Action `mysql_replication` is not FQCN.
+
+fqcn[action]: Use FQCN for module actions, such `community.mysql.mysql_replication`.
+tasks/replication.yml:65:3 Action `mysql_replication` is not FQCN.
+
+fqcn[action]: Use FQCN for module actions, such `community.mysql.mysql_user`.
+tasks/secure-installation.yml:3:3 Action `mysql_user` is not FQCN.
+
+no-changed-when: Commands should not change things if nothing needs doing.
+tasks/secure-installation.yml:45 Task/Handler: Update MySQL root authentication via socket for localhost (Linux, MySQL ≥ 8.4)
+
+jinja[spacing]: Jinja2 spacing could be improved: {{ mysql_root_hosts.stdout_lines|default([]) }} -> {{ mysql_root_hosts.stdout_lines | default([]) }} (warning)
+tasks/secure-installation.yml:51:15 Jinja2 template rewrite recommendation: `{{ mysql_root_hosts.stdout_lines | default([]) }}`.
+
+no-changed-when: Commands should not change things if nothing needs doing.
+tasks/secure-installation.yml:61 Task/Handler: Update MySQL root password for localhost root account (5.7.x ≤ MySQL < 8.4)
+
+jinja[spacing]: Jinja2 spacing could be improved: {{ mysql_root_hosts.stdout_lines|default([]) }} -> {{ mysql_root_hosts.stdout_lines | default([]) }} (warning)
+tasks/secure-installation.yml:68:15 Jinja2 template rewrite recommendation: `{{ mysql_root_hosts.stdout_lines | default([]) }}`.
+
+no-changed-when: Commands should not change things if nothing needs doing.
+tasks/secure-installation.yml:80 Task/Handler: Update MySQL root password for localhost root account (< 5.7.x).
+
+jinja[spacing]: Jinja2 spacing could be improved: {{ mysql_root_hosts.stdout_lines|default([]) }} -> {{ mysql_root_hosts.stdout_lines | default([]) }} (warning)
+tasks/secure-installation.yml:85:15 Jinja2 template rewrite recommendation: `{{ mysql_root_hosts.stdout_lines | default([]) }}`.
+
+fqcn[action]: Use FQCN for module actions, such `community.mysql.mysql_user`.
+tasks/secure-installation.yml:111:3 Action `mysql_user` is not FQCN.
+
+jinja[spacing]: Jinja2 spacing could be improved: {{ mysql_anonymous_hosts.stdout_lines|default([]) }} -> {{ mysql_anonymous_hosts.stdout_lines | default([]) }} (warning)
+tasks/secure-installation.yml:115:15 Jinja2 template rewrite recommendation: `{{ mysql_anonymous_hosts.stdout_lines | default([]) }}`.
+
+fqcn[action]: Use FQCN for module actions, such `community.mysql.mysql_db`.
+tasks/secure-installation.yml:118:3 Action `mysql_db` is not FQCN.
+
+fqcn[action-core]: Use FQCN for builtin module actions (ansible.builtin.yum).
+tasks/setup-RedHat.yml:3:3 Use `ansible.builtin.dnf` or `ansible.legacy.dnf` instead.
+
+fqcn[action]: Use FQCN for module actions, such `community.mysql.mysql_user`.
+tasks/users.yml:3:3 Action `mysql_user` is not FQCN.
+

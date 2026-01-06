@@ -1,0 +1,198 @@
+var-naming[no-role-prefix]: Variables names from within roles should use authorized_key_ as a prefix. (vars: authorized_key)
+.ansible/collections/ansible_collections/devroles/system/roles/authorized_key/defaults/main.yml:1:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use common_ as a prefix. (register: shared_tools)
+.ansible/collections/ansible_collections/devroles/system/roles/common/tasks/main.yml:16:17 Task/Handler: Install shared tools
+
+var-naming[no-role-prefix]: Variables names from within roles should use mariadb_ as a prefix. (register: configure_admin)
+.ansible/collections/ansible_collections/devroles/system/roles/mariadb/tasks/configure_access.yml:1:13 Task/Handler: Set admin password
+
+var-naming[no-role-prefix]: Variables names from within roles should use mariadb_ as a prefix. (register: _first_run)
+.ansible/collections/ansible_collections/devroles/system/roles/mariadb/tasks/main.yml:28:13 Task/Handler: Setup mysql data structures for first run
+
+var-naming[no-role-prefix]: Variables names from within roles should use mounts_ as a prefix. (vars: mounts)
+.ansible/collections/ansible_collections/devroles/system/roles/mounts/defaults/main.yml:11:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use mythtv_ as a prefix. (register: kernels)
+.ansible/collections/ansible_collections/devroles/system/roles/mythtv/handlers/main.yml:10:13 Task/Handler: Run extract
+
+no-changed-when: Commands should not change things if nothing needs doing.
+.ansible/collections/ansible_collections/devroles/system/roles/mythtv/handlers/main.yml:27 Task/Handler: Move firmware
+
+var-naming[no-role-prefix]: Variables names from within roles should use mythtv_ as a prefix. (register: install_packages)
+.ansible/collections/ansible_collections/devroles/system/roles/mythtv/tasks/main.yml:1:13 Task/Handler: Install packages
+
+var-naming[no-role-prefix]: Variables names from within roles should use packages_server_ as a prefix. (register: __create_virtualenvs)
+.ansible/collections/ansible_collections/devroles/system/roles/packages_server/tasks/main.yml:22:13 Task/Handler: Create python virtualenvs
+
+var-naming[no-role-prefix]: Variables names from within roles should use python_prep_ as a prefix. (set_fact: _long_version)
+.ansible/collections/ansible_collections/devroles/system/roles/python_prep/tasks/main.yml:1:5 Task/Handler: Set python package versions
+
+var-naming[no-role-prefix]: Variables names from within roles should use python_prep_ as a prefix. (set_fact: _short_version)
+.ansible/collections/ansible_collections/devroles/system/roles/python_prep/tasks/main.yml:1:5 Task/Handler: Set python package versions
+
+var-naming[no-role-prefix]: Variables names from within roles should use sudoers_ as a prefix. (vars: sudoers)
+.ansible/collections/ansible_collections/devroles/system/roles/sudoers/defaults/main.yml:3:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use sudoers_ as a prefix. (register: _ensure_sudo_installed)
+.ansible/collections/ansible_collections/devroles/system/roles/sudoers/tasks/main.yml:26:17 Task/Handler: Ensure that sudo is installed
+
+var-naming[no-role-prefix]: Variables names from within roles should use system_repositories_ as a prefix. (register: get_repo_file)
+.ansible/collections/ansible_collections/devroles/system/roles/system_repositories/tasks/main.yml:32:13 Task/Handler: Download repo files
+
+var-naming[no-role-prefix]: Variables names from within roles should use system_repositories_ as a prefix. (register: install_rpm_key)
+.ansible/collections/ansible_collections/devroles/system/roles/system_repositories/tasks/main.yml:46:13 Task/Handler: Install RPM keys
+
+no-changed-when: Commands should not change things if nothing needs doing.
+.ansible/collections/ansible_collections/devroles/system/roles/update_ca_trust/handlers/main.yml:1 Task/Handler: update-ca-trust
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (vars: nginx_zone_cache_size)
+.ansible/collections/ansible_collections/devroles/system/roles/webserver/defaults/main.yml:6:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (vars: nginx_request_limit)
+.ansible/collections/ansible_collections/devroles/system/roles/webserver/defaults/main.yml:8:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (vars: nginx_max_connections_per_ip)
+.ansible/collections/ansible_collections/devroles/system/roles/webserver/defaults/main.yml:10:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (vars: nginx_bandwidth_limit_after_size)
+.ansible/collections/ansible_collections/devroles/system/roles/webserver/defaults/main.yml:12:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (vars: nginx_max_bandwidth_outbound)
+.ansible/collections/ansible_collections/devroles/system/roles/webserver/defaults/main.yml:14:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (vars: nginx_burst_queue)
+.ansible/collections/ansible_collections/devroles/system/roles/webserver/defaults/main.yml:16:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (register: create_ssl_private_key)
+.ansible/collections/ansible_collections/devroles/system/roles/webserver/tasks/letsencrypt.yml:8:13 Task/Handler: Create openssl private key for {{ domain.tld }}
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (register: create_csr)
+.ansible/collections/ansible_collections/devroles/system/roles/webserver/tasks/letsencrypt.yml:16:13 Task/Handler: Create CSR for {{ domain.tld }}
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (register: letsencrypt_challenge)
+.ansible/collections/ansible_collections/devroles/system/roles/webserver/tasks/letsencrypt.yml:26:13 Task/Handler: Apply for letsencrypt for {{ domain.tld }}
+
+args[module]: missing required arguments: acme_version (warning)
+.ansible/collections/ansible_collections/devroles/system/roles/webserver/tasks/letsencrypt.yml:57 Task/Handler: Retrieve letsencrypt certificate for {{ domain.tld }}
+
+galaxy[no-changelog]: No changelog found. Please add a changelog file. Refer to the galaxy.md file for more info.
+galaxy.yml:1
+
+galaxy[tags]: galaxy.yaml must have one of the required tags: ['application', 'cloud', 'database', 'eda', 'infrastructure', 'linux', 'monitoring', 'networking', 'security', 'storage', 'tools', 'windows']
+galaxy.yml:1
+
+meta-runtime[unsupported-version]: 'requires_ansible' key must refer to a currently supported version such as: >=2.15.0, >=2.16.0, >=2.17.0, >=2.18.0, >=2.19.0
+meta/runtime.yml:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use authorized_key_ as a prefix. (vars: authorized_key)
+roles/authorized_key/defaults/main.yml:1:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use common_ as a prefix. (register: shared_tools)
+roles/common/tasks/main.yml:16:17 Task/Handler: Install shared tools
+
+var-naming[no-role-prefix]: Variables names from within roles should use mariadb_ as a prefix. (register: configure_admin)
+roles/mariadb/tasks/configure_access.yml:1:13 Task/Handler: Set admin password
+
+var-naming[no-role-prefix]: Variables names from within roles should use mariadb_ as a prefix. (register: _first_run)
+roles/mariadb/tasks/main.yml:28:13 Task/Handler: Setup mysql data structures for first run
+
+var-naming[no-role-prefix]: Variables names from within roles should use mounts_ as a prefix. (vars: mounts)
+roles/mounts/defaults/main.yml:11:1
+
+syntax-check[specific]: You cannot use loops on 'import_role' statements. You should use 'include_role' instead.
+roles/mta/tasks/main.yml:1:3
+
+var-naming[no-role-prefix]: Variables names from within roles should use mythtv_ as a prefix. (register: kernels)
+roles/mythtv/handlers/main.yml:10:13 Task/Handler: Run extract
+
+no-changed-when: Commands should not change things if nothing needs doing.
+roles/mythtv/handlers/main.yml:27 Task/Handler: Move firmware
+
+var-naming[no-role-prefix]: Variables names from within roles should use mythtv_ as a prefix. (register: install_packages)
+roles/mythtv/tasks/main.yml:1:13 Task/Handler: Install packages
+
+var-naming[no-role-prefix]: Variables names from within roles should use packages_server_ as a prefix. (register: __create_virtualenvs)
+roles/packages_server/tasks/main.yml:22:13 Task/Handler: Create python virtualenvs
+
+var-naming[no-role-prefix]: Variables names from within roles should use packages_workstation_ as a prefix. (register: __install_rpm_fusion_pkgs)
+roles/packages_workstation/tasks/Linux/01_cli.yml:14:13 Task/Handler: Install RPM Fusion packages
+
+var-naming[no-role-prefix]: Variables names from within roles should use packages_workstation_ as a prefix. (register: install_cli)
+roles/packages_workstation/tasks/Linux/01_cli.yml:25:13 Task/Handler: Install CLI packages
+
+var-naming[no-role-prefix]: Variables names from within roles should use packages_workstation_ as a prefix. (register: create_virtualenvs)
+roles/packages_workstation/tasks/Linux/02_virtualenv.yml:1:13 Task/Handler: Create python virtualenvs
+
+var-naming[no-role-prefix]: Variables names from within roles should use packages_workstation_ as a prefix. (register: check)
+roles/packages_workstation/tasks/Linux/03_libvirt.yml:18:17 Task/Handler: Configure libvirt storage
+
+var-naming[no-role-prefix]: Variables names from within roles should use packages_workstation_ as a prefix. (register: group_file)
+roles/packages_workstation/tasks/Linux/03_libvirt.yml:58:17 Task/Handler: Check for /usr/lib/group existence
+
+var-naming[no-role-prefix]: Variables names from within roles should use packages_workstation_ as a prefix. (register: libvirt_group_line)
+roles/packages_workstation/tasks/Linux/03_libvirt.yml:66:21 Task/Handler: Fix issue with some versions of virt-manager messing up groups
+
+var-naming[no-role-prefix]: Variables names from within roles should use packages_workstation_ as a prefix. (register: install_kerberos)
+roles/packages_workstation/tasks/Linux/05_kerberos.yml:1:13 Task/Handler: Install Kerberos
+
+var-naming[no-role-prefix]: Variables names from within roles should use packages_workstation_ as a prefix. (register: _blu_ray_tmp)
+roles/packages_workstation/tasks/Linux/06_blu_ray.yml:23:17 Task/Handler: Create temporary target dir
+
+var-naming[no-role-prefix]: Variables names from within roles should use packages_workstation_ as a prefix. (set_fact: packages_backend)
+roles/packages_workstation/tasks/Linux/main.yml:1:5 Task/Handler: Determine package backend
+
+var-naming[no-role-prefix]: Variables names from within roles should use packages_workstation_ as a prefix. (vars: packages_workstation)
+roles/packages_workstation/vars/MacOSX.yml:1:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use python_prep_ as a prefix. (set_fact: _long_version)
+roles/python_prep/tasks/main.yml:1:5 Task/Handler: Set python package versions
+
+var-naming[no-role-prefix]: Variables names from within roles should use python_prep_ as a prefix. (set_fact: _short_version)
+roles/python_prep/tasks/main.yml:1:5 Task/Handler: Set python package versions
+
+var-naming[no-role-prefix]: Variables names from within roles should use sudoers_ as a prefix. (vars: sudoers)
+roles/sudoers/defaults/main.yml:3:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use sudoers_ as a prefix. (register: _ensure_sudo_installed)
+roles/sudoers/tasks/main.yml:26:17 Task/Handler: Ensure that sudo is installed
+
+var-naming[no-role-prefix]: Variables names from within roles should use system_repositories_ as a prefix. (register: get_repo_file)
+roles/system_repositories/tasks/main.yml:32:13 Task/Handler: Download repo files
+
+var-naming[no-role-prefix]: Variables names from within roles should use system_repositories_ as a prefix. (register: install_rpm_key)
+roles/system_repositories/tasks/main.yml:46:13 Task/Handler: Install RPM keys
+
+no-changed-when: Commands should not change things if nothing needs doing.
+roles/update_ca_trust/handlers/main.yml:1 Task/Handler: update-ca-trust
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (vars: nginx_zone_cache_size)
+roles/webserver/defaults/main.yml:6:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (vars: nginx_request_limit)
+roles/webserver/defaults/main.yml:8:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (vars: nginx_max_connections_per_ip)
+roles/webserver/defaults/main.yml:10:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (vars: nginx_bandwidth_limit_after_size)
+roles/webserver/defaults/main.yml:12:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (vars: nginx_max_bandwidth_outbound)
+roles/webserver/defaults/main.yml:14:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (vars: nginx_burst_queue)
+roles/webserver/defaults/main.yml:16:1
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (register: create_ssl_private_key)
+roles/webserver/tasks/letsencrypt.yml:8:13 Task/Handler: Create openssl private key for {{ domain.tld }}
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (register: create_csr)
+roles/webserver/tasks/letsencrypt.yml:16:13 Task/Handler: Create CSR for {{ domain.tld }}
+
+var-naming[no-role-prefix]: Variables names from within roles should use webserver_ as a prefix. (register: letsencrypt_challenge)
+roles/webserver/tasks/letsencrypt.yml:26:13 Task/Handler: Apply for letsencrypt for {{ domain.tld }}
+
+args[module]: missing required arguments: acme_version (warning)
+roles/webserver/tasks/letsencrypt.yml:57 Task/Handler: Retrieve letsencrypt certificate for {{ domain.tld }}
+

@@ -1,0 +1,7 @@
+# This file contains ignores rule violations for ansible-lint
+bootstrap/defaults/main.yml yaml[truthy]
+bootstrap/meta/argument_specs.yml yaml[truthy]
+bootstrap/tasks/assert.yml yaml[truthy]
+bootstrap/tasks/gather_facts.yml yaml[line-length]
+bootstrap/tasks/gather_facts.yml yaml[truthy]
+bootstrap/tasks/main.yml yaml[truthy]

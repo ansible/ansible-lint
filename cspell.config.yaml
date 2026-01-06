@@ -19,6 +19,7 @@ ignorePaths:
   - uv.lock
   # Test fixtures generated from outside
   - test/**/*.result
+  - test/fixtures/eco/**
   - src/ansiblelint/schemas/*.json
   # Other
   - "*.egg-info"

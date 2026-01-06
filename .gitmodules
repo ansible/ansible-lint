@@ -1,0 +1,18 @@
+[submodule "test/fixtures/eco/bootstrap"]
+	path = test/fixtures/eco/bootstrap
+	url = https://github.com/robertdebock/ansible-role-bootstrap
+[submodule "test/fixtures/eco/cisco.nxos"]
+	path = test/fixtures/eco/cisco.nxos
+	url = https://github.com/ansible-collections/cisco.nxos
+[submodule "test/fixtures/eco/ansible_collection_system"]
+	path = test/fixtures/eco/ansible_collection_system
+	url = https://github.com/devroles/ansible_collection_system
+[submodule "test/fixtures/eco/ansible-docker-rootless"]
+	path = test/fixtures/eco/ansible-docker-rootless
+	url = https://github.com/konstruktoid/ansible-docker-rootless
+[submodule "test/fixtures/eco/ansible-role-hardening"]
+	path = test/fixtures/eco/ansible-role-hardening
+	url = https://github.com/konstruktoid/ansible-role-hardening
+[submodule "test/fixtures/eco/ansible-role-mysql"]
+	path = test/fixtures/eco/ansible-role-mysql
+	url = https://github.com/geerlingguy/ansible-role-mysql.git
