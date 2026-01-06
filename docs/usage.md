@@ -55,6 +55,13 @@ where it failed to work as expected and caused false negatives.
 
 ## Linting playbooks and roles
 
+!!! warning "Execution Directory"
+
+    **Always run `ansible-lint` from the root of your project or collection.**
+    As of version 25.7.0, running the linter from within a subdirectory
+    (such as inside a `roles/` or `tasks/` folder) is not supported and
+    may result in zero errors being reported even if violations exist.
+
 Ansible-lint recommends following the [collection structure layout] whether you
 plan to build a collection or not.
 
