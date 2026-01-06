@@ -4,8 +4,9 @@ Customize how Ansible-lint runs against automation content to suit your needs.
 You can ignore certain rules, enable `opt-in` rules, and control various other
 settings.
 
-Ansible-lint loads configuration from a file in the current working directory or
-from a file that you specify in the command line.
+Ansible-lint loads configuration from a file in the project root directory (current
+working directory) or from a file that you specify in the command line. Executing the
+linter from the project root is required for correct file discovery and dependency resolution.
 
 Any configuration option that is passed from the command line will override
 the one specified inside the configuration file.
@@ -19,8 +20,11 @@ in your current working directory.
 
 !!! note
 
-    If Ansible-lint cannot find a configuration file in the current directory it attempts to locate it in a parent directory.
-    However Ansible-lint does not try to load configuration that is outside the git repository.
+    If Ansible-lint cannot find a configuration file in the current directory it
+    attempts to locate it in a parent directory. However, Ansible-lint does not
+    try to load configuration that is outside the git repository. **Note that
+    while the config may be found in a parent directory, the linter still
+    expects to be executed from the root of the project being linted.**
 
 ## Specifying configuration files
 
