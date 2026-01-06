@@ -1,0 +1,11 @@
+---
+- name: Example playbook
+  hosts: localhost
+  tasks:
+    - name: Example block
+      block:
+        - name: This should now pass linting
+          ansible.builtin.lineinfile:
+            path: some.txt
+            regexp: "^\t$"  # Tab inside allowed key
+            line: "string with \t inside"
