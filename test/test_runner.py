@@ -87,6 +87,25 @@ def test_runner_exclude_paths(default_rules_collection: RulesCollection) -> None
     assert len(matches) == 0
 
 
+def test_exclude_paths_ignores_broken_yaml(
+    default_rules_collection: RulesCollection,
+    tmp_path: Path,
+) -> None:
+    """Ensure exclude_paths prevents parsing of invalid YAML files (#4745)."""
+    broken_yaml = tmp_path / "secrets.yml"
+    broken_yaml.write_text("---\ninvalid: : : : yaml\n", encoding="utf-8")
+
+    runner = Runner(
+        broken_yaml,
+        rules=default_rules_collection,
+        exclude_paths=[str(broken_yaml)],
+    )
+
+    results = runner.run()
+
+    assert len(results) == 0
+
+
 @pytest.mark.parametrize(
     ("exclude_path"),
     (pytest.param("**/playbooks_globs/*b.yml", id="1"),),
