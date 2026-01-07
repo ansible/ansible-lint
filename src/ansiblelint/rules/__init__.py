@@ -23,7 +23,6 @@ from ansiblelint._internal.rules import (
     RuntimeErrorRule,
     WarningRule,
 )
-from ansiblelint.app import App, get_app
 from ansiblelint.config import PROFILES, Options
 from ansiblelint.config import options as default_options
 from ansiblelint.constants import RULE_DOC_URL, SKIPPED_RULES_KEY
@@ -33,6 +32,7 @@ from ansiblelint.file_utils import Lintable, expand_paths_vars
 if TYPE_CHECKING:
     from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
+    from ansiblelint.app import App
     from ansiblelint.errors import RuleMatchTransformMeta
 
 _logger = logging.getLogger(__name__)
@@ -390,12 +390,12 @@ class RulesCollection:
 
     def __init__(  # pylint: disable=too-many-arguments
         self,
+        app: App,
         rulesdirs: list[str] | list[Path] | None = None,
         options: Options | None = None,
         profile_name: str | None = None,
         *,
         conditional: bool = True,
-        app: App | None = None,
     ) -> None:
         """Initialize a RulesCollection instance."""
         if options is None:
@@ -406,10 +406,7 @@ class RulesCollection:
         else:
             self.options = options
         self.profile = []
-        # app should be defined on normal run logic, but for testing we might
-        # not pass it, and in this case we assume offline mode for performance
-        # reasons.
-        self.app = app or get_app(offline=True)
+        self.app = app
 
         if profile_name:
             self.profile = PROFILES[profile_name]

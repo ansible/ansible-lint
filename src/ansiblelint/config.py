@@ -314,6 +314,11 @@ def get_version_warning() -> str:
         release_url = (
             "https://api.github.com/repos/ansible/ansible-lint/releases/latest"
         )
+        if not release_url.startswith(
+            "https://"
+        ):  # pragma: no cover (ruff compatibility)
+            msg = "release_url must start with https://"
+            raise ValueError(msg)
         try:
             with urllib.request.urlopen(release_url) as url:
                 data = json.load(url)

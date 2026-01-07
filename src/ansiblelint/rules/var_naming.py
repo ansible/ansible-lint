@@ -23,6 +23,7 @@ from ansiblelint.text import has_jinja, is_fqcn, is_fqcn_or_name
 from ansiblelint.utils import parse_yaml_from_file
 
 if TYPE_CHECKING:
+    from ansiblelint.app import App
     from ansiblelint.errors import MatchError
     from ansiblelint.utils import Task
 
@@ -365,9 +366,10 @@ if "pytest" in sys.modules:
         file: str,
         expected: int,
         config_options: Options,
+        app: App,
     ) -> None:
         """Test rule matches."""
-        rules = RulesCollection(options=config_options)
+        rules = RulesCollection(app=app, options=config_options)
         rules.register(VariableNamingRule())
         results = Runner(Lintable(file), rules=rules).run()
         assert len(results) == expected

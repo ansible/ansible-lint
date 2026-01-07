@@ -7,7 +7,6 @@ import itertools
 import logging
 import os
 import sys
-from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -387,7 +386,6 @@ def _sanitize_list_options(tag_list: list[str]) -> list[str]:
     return sorted(set(tags))
 
 
-@lru_cache
 def get_app(*, offline: bool | None = None, cached: bool = False) -> App:
     """Return the application instance, caching the return value."""
     # Avoids ever running the app initialization twice if cached argument
