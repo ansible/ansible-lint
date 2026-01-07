@@ -179,3 +179,48 @@ def test_rules_id_format(config_options: Options, app: App) -> None:
     assert "yaml" in keys, "yaml rule is missing"
     assert len(rules) == 51  # update this number when adding new rules!
     assert len(keys) == len(rules), "Duplicate rule ids?"
+
+
+def test_tag_inclusion(
+    test_rules_collection: RulesCollection,
+    ematchtestfile: Lintable,
+) -> None:
+    """Test that bracketed sub-tags are treated surgically for inclusion."""
+    all_matches = test_rules_collection.run(ematchtestfile)
+
+    if not all_matches:
+        pytest.fail("No matches found in ematchtestfile!")
+
+    target_tag = all_matches[0].tag
+    matches = test_rules_collection.run(ematchtestfile, tags={target_tag})
+
+    assert len(matches) > 0
+    for m in matches:
+        assert m.tag == target_tag
+
+
+def test_tag_exclusion(
+    test_rules_collection: RulesCollection,
+    ematchtestfile: Lintable,
+) -> None:
+    """Test that bracketed sub-tags are treated surgically for exclusion."""
+    target_tag = "TEST0001[BANNED]"
+
+    matches = test_rules_collection.run(ematchtestfile, skip_list=[target_tag])
+
+    tag_results = [m.tag for m in matches]
+    assert target_tag not in tag_results
+
+
+def test_category_tag_override(
+    test_rules_collection: RulesCollection,
+    ematchtestfile: Lintable,
+) -> None:
+    """Test that specific sub-tag requests override broad category inclusion."""
+    matches = test_rules_collection.run(
+        ematchtestfile, tags={"test1", "TEST0001[BANNED]"}
+    )
+
+    for m in matches:
+        if m.rule.id == "TEST0001":
+            assert m.tag == "TEST0001[BANNED]"
