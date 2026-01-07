@@ -1,0 +1,8 @@
+# Ensure that you can use `uv` directly if you already have a pre-activated
+# virtual environment, otherwise `uv sync` will refuse to run as it will
+# complain about uv project environment being different than yours.
+[env]
+UV_PROJECT_ENVIRONMENT = "{{ get_env(name='VIRTUAL_ENV', default='.venv') }}"
+
+[tools]
+python = "latest"

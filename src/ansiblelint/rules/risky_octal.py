@@ -169,11 +169,12 @@ if "pytest" in sys.modules:
             pytest.param("examples/playbooks/rule-risky-octal-fail.yml", 4, id="fail"),
         ),
     )
-    def test_octal(file: str, failures: int) -> None:
+    def test_octal(
+        file: str, failures: int, empty_rule_collection: RulesCollection
+    ) -> None:
         """Test that octal permissions are valid."""
-        collection = RulesCollection()
-        collection.register(OctalPermissionsRule())
-        results = Runner(file, rules=collection).run()
+        empty_rule_collection.register(OctalPermissionsRule())
+        results = Runner(file, rules=empty_rule_collection).run()
 
         assert len(results) == failures
         for result in results:

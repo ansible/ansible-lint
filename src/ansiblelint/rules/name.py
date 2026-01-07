@@ -309,20 +309,18 @@ if "pytest" in sys.modules:
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
 
-    def test_file_positive() -> None:
+    def test_file_positive(empty_rule_collection: RulesCollection) -> None:
         """Positive test for name[missing]."""
-        collection = RulesCollection()
-        collection.register(NameRule())
+        empty_rule_collection.register(NameRule())
         success = "examples/playbooks/rule-name-missing-pass.yml"
-        good_runner = Runner(success, rules=collection)
+        good_runner = Runner(success, rules=empty_rule_collection)
         assert good_runner.run() == []
 
-    def test_file_negative() -> None:
+    def test_file_negative(empty_rule_collection: RulesCollection) -> None:
         """Negative test for name[missing]."""
-        collection = RulesCollection()
-        collection.register(NameRule())
+        empty_rule_collection.register(NameRule())
         failure = "examples/playbooks/rule-name-missing-fail.yml"
-        bad_runner = Runner(failure, rules=collection)
+        bad_runner = Runner(failure, rules=empty_rule_collection)
         errs = bad_runner.run()
         assert len(errs) == 5
 
@@ -386,33 +384,30 @@ if "pytest" in sys.modules:
         assert results[0].tag == "name[prefix]"
         assert results[1].tag == "name[prefix]"
 
-    def test_rule_name_lowercase() -> None:
+    def test_rule_name_lowercase(empty_rule_collection: RulesCollection) -> None:
         """Negative test for a task that starts with lowercase."""
-        collection = RulesCollection()
-        collection.register(NameRule())
+        empty_rule_collection.register(NameRule())
         failure = "examples/playbooks/rule-name-casing.yml"
-        bad_runner = Runner(failure, rules=collection)
+        bad_runner = Runner(failure, rules=empty_rule_collection)
         errs = bad_runner.run()
         assert len(errs) == 1
         assert errs[0].tag == "name[casing]"
         assert errs[0].rule.id == "name"
 
-    def test_name_play() -> None:
+    def test_name_play(empty_rule_collection: RulesCollection) -> None:
         """Positive test for name[play]."""
-        collection = RulesCollection()
-        collection.register(NameRule())
+        empty_rule_collection.register(NameRule())
         success = "examples/playbooks/rule-name-play-fail.yml"
-        errs = Runner(success, rules=collection).run()
+        errs = Runner(success, rules=empty_rule_collection).run()
         assert len(errs) == 1
         assert errs[0].tag == "name[play]"
         assert errs[0].rule.id == "name"
 
-    def test_name_template() -> None:
+    def test_name_template(empty_rule_collection: RulesCollection) -> None:
         """Negative test for name[templated]."""
-        collection = RulesCollection()
-        collection.register(NameRule())
+        empty_rule_collection.register(NameRule())
         failure = "examples/playbooks/rule-name-templated-fail.yml"
-        bad_runner = Runner(failure, rules=collection)
+        bad_runner = Runner(failure, rules=empty_rule_collection)
         errs = bad_runner.run()
         assert len(errs) == 1
         assert errs[0].tag == "name[template]"

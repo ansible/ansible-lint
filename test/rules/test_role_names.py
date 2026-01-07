@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, Any
 
 import pytest
 
-from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.role_name import RoleNames
 from ansiblelint.runner import Runner
 
@@ -14,6 +13,9 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from _pytest.fixtures import SubRequest
+
+    from ansiblelint.rules import RulesCollection
+
 
 ROLE_NAME_VALID = "test_role"
 
@@ -35,11 +37,12 @@ PLAY_INCLUDE_ROLE = f"""
 
 
 @pytest.fixture(name="test_rules_collection")
-def fixture_test_rules_collection() -> RulesCollection:
+def fixture_test_rules_collection(
+    empty_rule_collection: RulesCollection,
+) -> RulesCollection:
     """Instantiate a roles collection for tests."""
-    collection = RulesCollection()
-    collection.register(RoleNames())
-    return collection
+    empty_rule_collection.register(RoleNames())
+    return empty_rule_collection
 
 
 def dict_to_files(parent_dir: Path, file_dict: dict[str, Any]) -> None:

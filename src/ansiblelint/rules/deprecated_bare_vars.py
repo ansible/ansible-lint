@@ -112,19 +112,17 @@ if "pytest" in sys.modules:
     from ansiblelint.runner import Runner
 
     @pytest.mark.filterwarnings("ignore::ansible_compat.runtime.AnsibleWarning")
-    def test_use_bare_positive() -> None:
+    def test_use_bare_positive(empty_rule_collection: RulesCollection) -> None:
         """Positive test for deprecated-bare-vars."""
-        collection = RulesCollection()
-        collection.register(UsingBareVariablesIsDeprecatedRule())
+        empty_rule_collection.register(UsingBareVariablesIsDeprecatedRule())
         success = "examples/playbooks/rule-deprecated-bare-vars-pass.yml"
-        good_runner = Runner(success, rules=collection)
+        good_runner = Runner(success, rules=empty_rule_collection)
         assert good_runner.run() == []
 
-    def test_use_bare_negative() -> None:
+    def test_use_bare_negative(empty_rule_collection: RulesCollection) -> None:
         """Negative test for deprecated-bare-vars."""
-        collection = RulesCollection()
-        collection.register(UsingBareVariablesIsDeprecatedRule())
+        empty_rule_collection.register(UsingBareVariablesIsDeprecatedRule())
         failure = "examples/playbooks/rule-deprecated-bare-vars-fail.yml"
-        bad_runner = Runner(failure, rules=collection)
+        bad_runner = Runner(failure, rules=empty_rule_collection)
         errs = bad_runner.run()
         assert len(errs) == 11

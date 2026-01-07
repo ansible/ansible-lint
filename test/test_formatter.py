@@ -21,52 +21,85 @@
 # THE SOFTWARE.
 import pathlib
 
-from ansiblelint.app import get_app
+import pytest
+
+from ansiblelint.app import App
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.formatters import Formatter
 from ansiblelint.rules import AnsibleLintRule, RulesCollection
 
-collection = RulesCollection(app=get_app(offline=True))
-rule = AnsibleLintRule()
-rule.id = "TCF0001"
-collection.register(rule)
-formatter = Formatter(pathlib.Path.cwd(), display_relative_path=True)
+# pylint: disable=redefined-outer-name
+
 # These details would generate a rich rendering error if not escaped:
 DETAILS = "Some [/tmp/foo] details."
 
 
-def test_format_coloured_string() -> None:
+@pytest.fixture
+def formatter_rule() -> AnsibleLintRule:
+    """Create a test rule for formatter tests."""
+    rule = AnsibleLintRule()
+    rule.id = "TCF0001"
+    return rule
+
+
+@pytest.fixture(scope="session")
+def formatter_collection(
+    formatter_rule: AnsibleLintRule,
+    app: App,
+) -> RulesCollection:
+    """Create a rules collection with the test rule."""
+    collection = RulesCollection(app=app)
+    collection.register(formatter_rule)
+    return collection
+
+
+@pytest.fixture
+def formatter() -> Formatter:
+    """Create a Formatter instance."""
+    return Formatter(pathlib.Path.cwd(), display_relative_path=True)
+
+
+def test_format_coloured_string(
+    formatter: Formatter,
+    formatter_rule: AnsibleLintRule,
+) -> None:
     """Test colored formatting."""
     match = MatchError(
         message="message",
         lineno=1,
         details=DETAILS,
         lintable=Lintable("filename.yml", content=""),
-        rule=rule,
+        rule=formatter_rule,
     )
     formatter.apply(match)
 
 
-def test_unicode_format_string() -> None:
+def test_unicode_format_string(
+    formatter: Formatter,
+    formatter_rule: AnsibleLintRule,
+) -> None:
     """Test formatting unicode."""
     match = MatchError(
         message="\U0001f427",
         lineno=1,
         details=DETAILS,
         lintable=Lintable("filename.yml", content=""),
-        rule=rule,
+        rule=formatter_rule,
     )
     formatter.apply(match)
 
 
-def test_dict_format_line() -> None:
+def test_dict_format_line(
+    formatter: Formatter,
+    formatter_rule: AnsibleLintRule,
+) -> None:
     """Test formatting dictionary details."""
     match = MatchError(
         message="xyz",
         lineno=1,
         details={"hello": "world"},  # type: ignore[arg-type]
         lintable=Lintable("filename.yml", content=""),
-        rule=rule,
+        rule=formatter_rule,
     )
     formatter.apply(match)

@@ -2,7 +2,7 @@
 
 import pytest
 
-from ansiblelint.app import get_app
+from ansiblelint.app import App
 from ansiblelint.rules import RulesCollection
 from ansiblelint.runner import Runner
 from ansiblelint.testing import run_ansible_lint
@@ -51,9 +51,10 @@ def test_example_syntax_error(
             assert result[i].column == expected[2]
 
 
-def test_example_custom_module(default_rules_collection: RulesCollection) -> None:
+def test_example_custom_module(
+    default_rules_collection: RulesCollection, app: App
+) -> None:
     """custom_module.yml is expected to pass."""
-    app = get_app(offline=True)
     result = Runner(
         "examples/playbooks/custom_module.yml",
         rules=default_rules_collection,

@@ -234,19 +234,17 @@ if "pytest" in sys.modules:
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
 
-    def test_partial_become_pass() -> None:
+    def test_partial_become_pass(empty_rule_collection: RulesCollection) -> None:
         """No errors found for partial-become."""
-        collection = RulesCollection()
-        collection.register(BecomeUserWithoutBecomeRule())
+        empty_rule_collection.register(BecomeUserWithoutBecomeRule())
         success = "examples/playbooks/rule-partial-become-without-become-pass.yml"
-        good_runner = Runner(success, rules=collection)
+        good_runner = Runner(success, rules=empty_rule_collection)
         assert good_runner.run() == []
 
-    def test_partial_become_fail() -> None:
+    def test_partial_become_fail(empty_rule_collection: RulesCollection) -> None:
         """Errors found for partial-become."""
-        collection = RulesCollection()
-        collection.register(BecomeUserWithoutBecomeRule())
+        empty_rule_collection.register(BecomeUserWithoutBecomeRule())
         failure = "examples/playbooks/rule-partial-become-without-become-fail.yml"
-        bad_runner = Runner(failure, rules=collection)
+        bad_runner = Runner(failure, rules=empty_rule_collection)
         errs = bad_runner.run()
         assert len(errs) == 3
