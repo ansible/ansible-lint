@@ -18,6 +18,7 @@ from ansiblelint.file_utils import (
     expand_path_vars,
     expand_paths_vars,
     find_project_root,
+    kind_from_path,
     normpath,
     normpath_path,
 )
@@ -543,3 +544,55 @@ def test_bug_2513(
         results = Runner(filename, rules=default_rules_collection).run()
         assert len(results) == 1
         assert results[0].rule.id == "name"
+
+
+def test_kind_from_path_parent_collision(tmp_path: Path) -> None:
+    """Verify that a parent directory named 'tasks' doesn't cause false positives.
+
+    See https://github.com/ansible/ansible-lint/issues/4763
+    """
+    tasks_parent = tmp_path / "tasks"
+    project_dir = tasks_parent / "my_project"
+    project_dir.mkdir(parents=True)
+
+    (project_dir / ".git").mkdir()
+
+    playbook_path = project_dir / "site.yml"
+    playbook_path.touch()
+
+    kind = kind_from_path(playbook_path)
+
+    assert kind != "tasks", f"File {playbook_path} should not be identified as 'tasks'"
+
+
+def test_kind_from_path_valid_tasks(tmp_path: Path) -> None:
+    """Verify that legitimate tasks directories are still correctly identified."""
+    project_dir = tmp_path / "my_project"
+    project_dir.mkdir()
+    (project_dir / ".git").mkdir()
+
+    task_dir = project_dir / "tasks"
+    task_dir.mkdir()
+    task_path = task_dir / "main.yml"
+    task_path.touch()
+
+    kind = kind_from_path(task_path)
+
+    assert kind == "tasks", f"File {task_path} should be identified as 'tasks'"
+
+
+def test_kind_from_path_outside_project_root(tmp_path: Path) -> None:
+    """Verify fallback to absolute path when file is outside the project root.
+
+    This triggers the except block in kind_from_path
+    """
+    project_dir = tmp_path / "actual_project"
+    project_dir.mkdir()
+    (project_dir / ".git").mkdir()
+
+    outside_file = tmp_path / "external_file.yml"
+    outside_file.touch()
+
+    kind = kind_from_path(outside_file)
+
+    assert kind == "yaml"
