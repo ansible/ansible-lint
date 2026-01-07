@@ -29,7 +29,6 @@ from typing import TYPE_CHECKING, Any
 
 import pytest
 from ansible.utils.sentinel import Sentinel
-from ansible_compat.runtime import Runtime
 from packaging.version import Version
 
 from ansiblelint import cli, constants, utils
@@ -53,8 +52,6 @@ if TYPE_CHECKING:
     from _pytest.monkeypatch import MonkeyPatch
 
     from ansiblelint.rules import RulesCollection
-
-runtime = Runtime(require_module=True)
 
 
 @pytest.mark.parametrize(
