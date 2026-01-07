@@ -33,8 +33,6 @@
     "build": true
   },
   "git.ignoreLimitWarning": true,
-  "grammarly.config.documentDomain": "academic",
-  "grammarly.files.include": ["**/*.txt", "**/*.md"],
   "mypy-type-checker.severity": {
     "error": "Warning"
   },

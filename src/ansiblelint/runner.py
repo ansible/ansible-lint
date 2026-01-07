@@ -246,7 +246,11 @@ class Runner:
                     sub_tag = "yaml"
                     if isinstance(lintable.exc.args, tuple):
                         message = lintable.exc.args[0]
-                    detail = lintable.exc.__cause__.problem
+                    detail = (
+                        str(lintable.exc.__cause__.problem)
+                        if lintable.exc.__cause__.problem
+                        else ""
+                    )
                     if lintable.exc.__cause__.problem_mark:
                         line = lintable.exc.__cause__.problem_mark.line + 1
                         column = lintable.exc.__cause__.problem_mark.column + 1
@@ -276,7 +280,6 @@ class Runner:
 
         # -- phase 1 : syntax check in parallel --
         if not self.skip_ansible_syntax_check:
-            # app = get_app(cached=True)
 
             def worker(lintable: Lintable) -> list[MatchError]:
                 return self._get_ansible_syntax_check_matches(

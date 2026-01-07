@@ -210,12 +210,13 @@ if "pytest" in sys.modules:
     from ansiblelint.rules import RulesCollection  # pylint: disable=ungrouped-imports
     from ansiblelint.runner import Runner
 
-    def test_galaxy_no_collection_version() -> None:
+    def test_galaxy_no_collection_version(
+        empty_rule_collection: RulesCollection,
+    ) -> None:
         """Test for no collection version in galaxy."""
-        collection = RulesCollection()
-        collection.register(GalaxyRule())
+        empty_rule_collection.register(GalaxyRule())
         failure = "examples/.no_collection_version/galaxy.yml"
-        bad_runner = Runner(failure, rules=collection)
+        bad_runner = Runner(failure, rules=empty_rule_collection)
         errs = bad_runner.run()
         assert len(errs) == 1
 

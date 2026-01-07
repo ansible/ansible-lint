@@ -142,6 +142,9 @@ if "pytest" in sys.modules:
     from ansiblelint.rules import RulesCollection
     from ansiblelint.testing import RunFromText
 
+    if TYPE_CHECKING:
+        from ansiblelint.app import App
+
     @pytest.mark.parametrize(
         ("file", "expected"),
         (
@@ -161,9 +164,10 @@ if "pytest" in sys.modules:
         file: str,
         expected: int,
         default_rules_collection: RulesCollection,
+        app: App,
     ) -> None:
         """The ini_file module does not accept preserve mode."""
-        runner = RunFromText(default_rules_collection)
+        runner = RunFromText(default_rules_collection, app)
         results = runner.run(Path(file))
         assert len(results) == expected
         for result in results:

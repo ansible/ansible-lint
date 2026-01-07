@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
+from ansiblelint.app import App, get_app
 from ansiblelint.config import Options
 from ansiblelint.constants import DEFAULT_RULESDIR
 from ansiblelint.rules import RulesCollection
@@ -19,6 +20,8 @@ from ansiblelint.testing import RunFromText
 
 if TYPE_CHECKING:
     from _pytest.fixtures import SubRequest
+
+# pylint: disable=redefined-outer-name
 
 
 # The sessions scope does not apply to xdist, so we will still have one
@@ -36,23 +39,37 @@ def fixture_default_rules_collection() -> RulesCollection:
 
 
 @pytest.fixture
-def default_text_runner(default_rules_collection: RulesCollection) -> RunFromText:
-    """Return RunFromText instance for the default set of collections."""
-    return RunFromText(default_rules_collection)
+def empty_rule_collection(app: App) -> RulesCollection:
+    """Return an empty rules collection."""
+    return RulesCollection(app=app)
 
 
 @pytest.fixture
-def rule_runner(request: SubRequest) -> RunFromText:
+def default_text_runner(
+    default_rules_collection: RulesCollection, app: App
+) -> RunFromText:
+    """Return RunFromText instance for the default set of collections."""
+    return RunFromText(default_rules_collection, app)
+
+
+@pytest.fixture
+def rule_runner(request: SubRequest, app: App) -> RunFromText:
     """Return runner for a specific rule class."""
     rule_class = request.param
     config_options = Options()
     config_options.enable_list.append(rule_class().id)
     collection = RulesCollection(options=config_options)
     collection.register(rule_class())
-    return RunFromText(collection)
+    return RunFromText(collection, app)
 
 
 @pytest.fixture(name="config_options")
 def fixture_config_options() -> Options:
     """Return configuration options that will be restored after testrun."""
     return Options()
+
+
+@pytest.fixture(scope="session")
+def app() -> App:
+    """Return the application instance."""
+    return get_app(offline=True)
