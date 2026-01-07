@@ -15,6 +15,7 @@ from ansiblelint.rules import AnsibleLintRule, TransformMixin
 if TYPE_CHECKING:
     from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
+    from ansiblelint.app import App
     from ansiblelint.config import Options
     from ansiblelint.errors import MatchError
     from ansiblelint.utils import Task
@@ -324,10 +325,10 @@ if "pytest" in sys.modules:
         errs = bad_runner.run()
         assert len(errs) == 5
 
-    def test_name_prefix_positive(config_options: Options) -> None:
+    def test_name_prefix_positive(config_options: Options, app: App) -> None:
         """Positive test for name[prefix]."""
         config_options.enable_list = ["name[prefix]"]
-        collection = RulesCollection(options=config_options)
+        collection = RulesCollection(app=app, options=config_options)
         collection.register(NameRule())
         success = Lintable(
             "examples/playbooks/tasks/main.yml",
@@ -337,10 +338,10 @@ if "pytest" in sys.modules:
         results = good_runner.run()
         assert len(results) == 0
 
-    def test_name_prefix_negative(config_options: Options) -> None:
+    def test_name_prefix_negative(config_options: Options, app: App) -> None:
         """Negative test for name[missing]."""
         config_options.enable_list = ["name[prefix]"]
-        collection = RulesCollection(options=config_options)
+        collection = RulesCollection(app=app, options=config_options)
         collection.register(NameRule())
         failure = Lintable(
             "examples/playbooks/tasks/rule-name-prefix-fail.yml",
@@ -354,10 +355,10 @@ if "pytest" in sys.modules:
         assert results[1].tag == "name[prefix]"
         assert results[2].tag == "name[prefix]"
 
-    def test_name_prefix_negative_2(config_options: Options) -> None:
+    def test_name_prefix_negative_2(config_options: Options, app: App) -> None:
         """Negative test for name[prefix]."""
         config_options.enable_list = ["name[prefix]"]
-        collection = RulesCollection(options=config_options)
+        collection = RulesCollection(app=app, options=config_options)
         collection.register(NameRule())
         failure = Lintable(
             "examples/playbooks/tasks/partial_prefix/foo.yml",
@@ -369,10 +370,10 @@ if "pytest" in sys.modules:
         assert results[0].tag == "name[prefix]"
         assert results[1].tag == "name[prefix]"
 
-    def test_name_prefix_negative_3(config_options: Options) -> None:
+    def test_name_prefix_negative_3(config_options: Options, app: App) -> None:
         """Negative test for name[prefix]."""
         config_options.enable_list = ["name[prefix]"]
-        collection = RulesCollection(options=config_options)
+        collection = RulesCollection(app=app, options=config_options)
         collection.register(NameRule())
         failure = Lintable(
             "examples/playbooks/tasks/partial_prefix/main.yml",

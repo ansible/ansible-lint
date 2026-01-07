@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from collections.abc import MutableMapping, MutableSequence
     from typing import Any
 
+    from ansiblelint.app import App
     from ansiblelint.config import Options
     from ansiblelint.errors import MatchError
 
@@ -178,12 +179,13 @@ if "pytest" in sys.modules:
         expected_kind: str,
         expected: list[str],
         config_options: Options,
+        app: App,
     ) -> None:
         """Validate parsing of ansible output."""
         lintable = Lintable(file)
         assert lintable.kind == expected_kind
 
-        rules = RulesCollection(options=config_options)
+        rules = RulesCollection(app=app, options=config_options)
         rules.register(YamllintRule())
         results = Runner(lintable, rules=rules).run()
 

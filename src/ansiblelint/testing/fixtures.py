@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 # The sessions scope does not apply to xdist, so we will still have one
 # session for each worker, but at least it will a limited number.
 @pytest.fixture(name="default_rules_collection", scope="session")
-def fixture_default_rules_collection() -> RulesCollection:
+def fixture_default_rules_collection(app: App) -> RulesCollection:
     """Return default rule collection."""
     assert DEFAULT_RULESDIR.is_dir()
     config_options = Options()
@@ -35,7 +35,9 @@ def fixture_default_rules_collection() -> RulesCollection:
     # That is instantiated very often and do want to avoid ansible-galaxy
     # install errors due to concurrency.
     config_options.offline = True
-    return RulesCollection(rulesdirs=[DEFAULT_RULESDIR], options=config_options)
+    return RulesCollection(
+        app=app, rulesdirs=[DEFAULT_RULESDIR], options=config_options
+    )
 
 
 @pytest.fixture
@@ -58,7 +60,7 @@ def rule_runner(request: SubRequest, app: App) -> RunFromText:
     rule_class = request.param
     config_options = Options()
     config_options.enable_list.append(rule_class().id)
-    collection = RulesCollection(options=config_options)
+    collection = RulesCollection(app=app, options=config_options)
     collection.register(rule_class())
     return RunFromText(collection, app)
 

@@ -33,13 +33,14 @@ from ansiblelint.rules import RulesCollection
 from ansiblelint.testing import run_ansible_lint
 
 if TYPE_CHECKING:
+    from ansiblelint.app import App
     from ansiblelint.config import Options
 
 
 @pytest.fixture(name="test_rules_collection")
-def fixture_test_rules_collection() -> RulesCollection:
+def fixture_test_rules_collection(app: App) -> RulesCollection:
     """Create a shared rules collection test instance."""
-    return RulesCollection([Path("./test/rules/fixtures").resolve()])
+    return RulesCollection(app=app, rulesdirs=[Path("./test/rules/fixtures").resolve()])
 
 
 @pytest.fixture(name="ematchtestfile")
@@ -133,14 +134,16 @@ def test_skip_non_existent_id(
     assert len(matches) == 4
 
 
-def test_no_duplicate_rule_ids() -> None:
+def test_no_duplicate_rule_ids(app: App) -> None:
     """Check that rules of the collection don't have duplicate IDs."""
-    real_rules = RulesCollection([Path("./src/ansiblelint/rules").resolve()])
+    real_rules = RulesCollection(
+        app=app, rulesdirs=[Path("./src/ansiblelint/rules").resolve()]
+    )
     rule_ids = [rule.id for rule in real_rules]
     assert not any(y > 1 for y in collections.Counter(rule_ids).values())
 
 
-def test_rule_listing() -> None:
+def test_rule_listing(app: App) -> None:
     """Test that rich list format output is rendered as a table.
 
     This check also offers the contract of having rule id, short and long
@@ -150,16 +153,17 @@ def test_rule_listing() -> None:
     result = run_ansible_lint("-r", str(rules_path), "-L")
     assert result.returncode == 0
 
-    for rule in RulesCollection([rules_path]):
+    for rule in RulesCollection(app=app, rulesdirs=[rules_path]):
         assert rule.id in result.stdout
         assert rule.shortdesc in result.stdout
 
 
-def test_rules_id_format(config_options: Options) -> None:
+def test_rules_id_format(config_options: Options, app: App) -> None:
     """Assure all our rules have consistent format."""
     rule_id_re = re.compile(r"^[a-z-]{4,30}$")
     rules = RulesCollection(
-        [Path("./src/ansiblelint/rules").resolve()],
+        app=app,
+        rulesdirs=[Path("./src/ansiblelint/rules").resolve()],
         options=config_options,
         conditional=False,
     )

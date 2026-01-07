@@ -30,7 +30,7 @@ repos:
     hooks:
       - id: check-useless-excludes
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.9.21
+    rev: 0.9.22
     hooks:
       - id: uv-sync
       - id: uv-lock
@@ -42,6 +42,7 @@ repos:
       - id: uv-export
         name: "deps: regenerate requirements-lock.txt for actions"
         args:
+          - "--no-default-groups"
           - "--no-dev"
           - "--no-emit-package"
           - ansible-core
@@ -146,7 +147,7 @@ repos:
         entry: yamllint --strict
 
   - repo: https://github.com/tombi-toml/tombi-pre-commit
-    rev: v0.7.14
+    rev: v0.7.15
     hooks:
       - id: tombi-format
         alias: toml
@@ -160,6 +161,7 @@ repos:
         alias: ruff
       - id: ruff-check
         alias: ruff
+        args: ["--unsafe-fixes"]
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.19.1
     hooks:

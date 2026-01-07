@@ -103,6 +103,7 @@ lint = [
   "pre-commit>=4.1",
   "pre-commit-uv>=4.1.4",
   "pytest>=9",
+  "ruff>=0.14.10",
   "setuptools>=51.1.1",
 ]
 pkg = [
@@ -873,6 +874,7 @@ PRE_COMMIT_COLOR = "always"
 
 [tool.uv]
 package = true
+default-groups = "all"
 
 [tool.vulture]
 exclude = [

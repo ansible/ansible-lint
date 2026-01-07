@@ -376,9 +376,9 @@ def main(argv: list[str] | None = None) -> int:
         cached=True,
     )  # to be sure we use the offline value from settings
     rules = RulesCollection(
-        options.rulesdirs,
-        profile_name=options.profile,
         app=app,
+        rulesdirs=options.rulesdirs,
+        profile_name=options.profile,
         options=options,
     )
 
