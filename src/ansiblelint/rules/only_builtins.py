@@ -90,6 +90,8 @@ if "pytest" in sys.modules:
         result = run_ansible_lint(
             f"--config-file={conf_path}",
             "--strict",
+            "--offline",
+            "--nocolor",
             "--warn-list=",
             "--enable-list",
             "only-builtins",

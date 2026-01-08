@@ -24,7 +24,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/inventory.json"
   },
   "meta": {
-    "etag": "d2f353a0077365ff075b14876b619ef65e7268129fd12b4f1b571549f2f39f14",
+    "etag": "fa83d61b00b254d54a7c9a69e4fb8b722f356adec906da7beb733cadda1342bc",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/meta.json"
   },
   "meta-runtime": {

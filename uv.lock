@@ -155,6 +155,7 @@ dev = [
     { name = "tox-uv" },
     { name = "types-jsonschema" },
     { name = "types-pyyaml" },
+    { name = "uv" },
 ]
 docs = [
     { name = "markdown-exec", extra = ["ansi"] },
@@ -236,6 +237,7 @@ dev = [
     { name = "tox-uv", specifier = ">=1.25" },
     { name = "types-jsonschema", specifier = ">=4.25.1.20250822" },
     { name = "types-pyyaml", specifier = ">=6.0.12.20250822" },
+    { name = "uv", specifier = ">=0.8" },
 ]
 docs = [
     { name = "markdown-exec", extras = ["ansi"], specifier = ">=1.11.0" },

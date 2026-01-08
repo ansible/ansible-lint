@@ -26,6 +26,9 @@ in your current working directory.
     while the config may be found in a parent directory, the linter still
     expects to be executed from the root of the project being linted.**
 
+    Symlinked config files are followed and resolved and this will affect
+    the how project path will be determined if not mentioned explicitly.
+
 ## Specifying configuration files
 
 Use the `-c <filename>` CLI flag with command line invocations of Ansible-lint,
