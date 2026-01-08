@@ -531,10 +531,6 @@ class RulesCollection:
         if tags or skip_list:
             filtered_matches = []
             for m in matches:
-                # skip if exact tag is in skip_list or broad rule id is skipped
-                if m.tag in skip_list or m.rule.id in skip_list:
-                    continue
-
                 # inclusion logic (if tags are provided)
                 if tags:
                     if (
