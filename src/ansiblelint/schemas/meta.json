@@ -19,6 +19,25 @@
       "title": "AIXPlatformModel",
       "type": "object"
     },
+    "AlmaLinuxPlatformModel": {
+      "properties": {
+        "name": {
+          "const": "AlmaLinux",
+          "title": "Name",
+          "type": "string"
+        },
+        "versions": {
+          "default": "all",
+          "items": {
+            "enum": ["8", "9", "10", "all"],
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "title": "AlmaLinuxPlatformModel",
+      "type": "object"
+    },
     "AlpinePlatformModel": {
       "properties": {
         "name": {
