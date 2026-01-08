@@ -96,6 +96,7 @@ dev = [
   "tox-uv>=1.25",
   "types-jsonschema>=4.25.1.20250822",
   "types-pyyaml>=6.0.12.20250822",
+  "uv>=0.8",
 ]
 docs = ["markdown-exec[ansi]>=1.11.0", "mkdocs-ansible>=25.5.0", "six>=1.16.0"]
 lint = [

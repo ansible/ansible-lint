@@ -80,6 +80,8 @@ def load_config(
     if not config_path or not os.path.exists(config_path):
         # a missing default config file should not trigger an error
         return {}, None
+    # resolve symlinks in config path as we will only use the final location
+    config_path = Path(config_path).resolve().as_posix()
 
     config_lintable = Lintable(
         config_path,
@@ -98,6 +100,15 @@ def load_config(
     config["config_file"] = config_path
     config_dir = os.path.dirname(config_path)
     expand_to_normalized_paths(config, config_dir)
+
+    if (
+        "project_dir" in config
+        and config["project_dir"]
+        and config["project_dir"][0] not in ("/", "~")
+    ):
+        config["project_dir"] = (
+            (Path(config_path).parent / config["project_dir"]).resolve().as_posix()
+        )
 
     return config, config_path
 

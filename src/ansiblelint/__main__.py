@@ -144,6 +144,8 @@ def initialize_options(arguments: list[str] | None = None) -> BaseFileLock | Non
     ):
         options.cache_dir = get_cache_dir(pathlib.Path(options.project_dir))
 
+    options.project_dir = Path(options.project_dir).resolve().as_posix()
+
     # add a lock file so we do not have two instances running inside at the same time
     if options.cache_dir:
         options.cache_dir.mkdir(parents=True, exist_ok=True)
