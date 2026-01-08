@@ -1379,6 +1379,9 @@
             "$ref": "#/$defs/AIXPlatformModel"
           },
           {
+            "$ref": "#/$defs/AlmaLinuxPlatformModel"
+          },
+          {
             "$ref": "#/$defs/AlpinePlatformModel"
           },
           {
