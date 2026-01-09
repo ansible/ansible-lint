@@ -7,7 +7,6 @@ import itertools
 import logging
 import os
 import sys
-from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -49,6 +48,7 @@ class App:
 
         # Without require_module, our _set_collections_basedir may fail
         self.runtime = Runtime(
+            project_dir=Path(options.project_dir),
             isolated=True,
             require_module=True,
             verbosity=options.verbosity,
@@ -372,8 +372,8 @@ def choose_formatter_factory(
         r = formatters.CodeclimateJSONFormatter
     elif options_list.format == "sarif":
         r = formatters.SarifFormatter
-    elif options_list.parseable or options_list.format == "pep8":
-        r = formatters.ParseableFormatter
+    elif options_list.format == "pep8":
+        r = formatters.PEP8Formatter
     return r
 
 
@@ -387,7 +387,6 @@ def _sanitize_list_options(tag_list: list[str]) -> list[str]:
     return sorted(set(tags))
 
 
-@lru_cache
 def get_app(*, offline: bool | None = None, cached: bool = False) -> App:
     """Return the application instance, caching the return value."""
     # Avoids ever running the app initialization twice if cached argument

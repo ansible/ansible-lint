@@ -47,11 +47,14 @@ if "pytest" in sys.modules:
         ("file", "expected"),
         (pytest.param("examples/playbooks/play-without-extension", 1, id="fail"),),
     )
-    def test_playbook_extension(file: str, expected: int) -> None:
+    def test_playbook_extension(
+        file: str, expected: int, empty_rule_collection: RulesCollection
+    ) -> None:
         """The ini_file module does not accept preserve mode."""
-        rules = RulesCollection()
-        rules.register(PlaybookExtensionRule())
-        results = Runner(Lintable(file, kind="playbook"), rules=rules).run()
+        empty_rule_collection.register(PlaybookExtensionRule())
+        results = Runner(
+            Lintable(file, kind="playbook"), rules=empty_rule_collection
+        ).run()
         assert len(results) == expected
         for result in results:
             assert result.tag == "playbook-extension"

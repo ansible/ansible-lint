@@ -6,6 +6,7 @@ from __future__ import annotations
 import subprocess
 from pathlib import Path
 
+from ansiblelint.app import get_app
 from ansiblelint.cli import get_rules_dirs
 from ansiblelint.config import Options
 from ansiblelint.rules import (
@@ -25,7 +26,8 @@ if __name__ == "__main__":
     options.rulesdirs = get_rules_dirs([])
     options.list_rules = True
     rules = RulesCollection(
-        options.rulesdirs,
+        app=get_app(offline=True),
+        rulesdirs=options.rulesdirs,
         options=options,
     )
     contents: list[str] = [

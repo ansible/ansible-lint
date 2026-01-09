@@ -19,6 +19,25 @@
       "title": "AIXPlatformModel",
       "type": "object"
     },
+    "AlmaLinuxPlatformModel": {
+      "properties": {
+        "name": {
+          "const": "AlmaLinux",
+          "title": "Name",
+          "type": "string"
+        },
+        "versions": {
+          "default": "all",
+          "items": {
+            "enum": ["8", "9", "10", "all"],
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "title": "AlmaLinuxPlatformModel",
+      "type": "object"
+    },
     "AlpinePlatformModel": {
       "properties": {
         "name": {
@@ -1360,6 +1379,9 @@
             "$ref": "#/$defs/AIXPlatformModel"
           },
           {
+            "$ref": "#/$defs/AlmaLinuxPlatformModel"
+          },
+          {
             "$ref": "#/$defs/AlpinePlatformModel"
           },
           {
@@ -1570,6 +1592,13 @@
     },
     "galaxy_info": {
       "$ref": "#/$defs/GalaxyInfoModel"
+    },
+    "argument_specs": {
+      "title": "Role Argument Specifications",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "role-arg-spec.json#/$defs/entry_point"
+      }
     }
   },
   "title": "Ansible Meta Schema v1/v2",

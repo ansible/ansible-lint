@@ -79,7 +79,6 @@ from yaml.representer import RepresenterError
 from yaml.scanner import ScannerError
 
 from ansiblelint._internal.rules import AnsibleParserErrorRule, RuntimeErrorRule
-from ansiblelint.app import App, get_app
 from ansiblelint.config import Options, get_deps_versions, options
 from ansiblelint.constants import (
     ANNOTATION_KEYS,
@@ -105,6 +104,7 @@ from ansiblelint.types import (
 )
 
 if TYPE_CHECKING:
+    from ansiblelint.app import App
     from ansiblelint.rules import RulesCollection
 # ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
 # string as the password to enable such yaml files to be opened and parsed
@@ -633,7 +633,7 @@ class HandleChildren:
             possible_paths.append(path_dwim(loc, role_name[-1]))
 
         if namespace_name and collection_name:
-            for loc in get_app(cached=True).runtime.config.collections_paths:
+            for loc in self.app.runtime.config.collections_paths:
                 loc = os.path.expanduser(loc)
                 possible_paths.append(
                     path_dwim(

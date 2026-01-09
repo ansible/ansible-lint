@@ -27,12 +27,12 @@ def test_unjinja() -> None:
 def test_rule_config(
     rule_name: str,
     rule_config: dict[str, Any],
+    empty_rule_collection: RulesCollection,
 ) -> None:
     """Check that a rule config can be accessed."""
-    rules = RulesCollection()
-    rules.register(ComplexityRule())
+    empty_rule_collection.register(ComplexityRule())
 
-    for rule in rules:
+    for rule in empty_rule_collection:
         if rule.id == rule_name:
             assert rule._collection  # noqa: SLF001
             assert rule.rule_config == rule_config

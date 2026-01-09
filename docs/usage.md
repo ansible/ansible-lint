@@ -17,7 +17,7 @@ Ansible-lint prints output on both `stdout` and `stderr`.
 - `stderr` displays logging and free-form messages like statistics.
 
 Most `ansible-lint` examples use pep8 as the output format (`-p`) which is
-machine parseable.
+machine parsable.
 
 Ansible-lint also print errors using their [annotation] format when it detects
 the `GITHUB_ACTIONS=true` and `GITHUB_WORKFLOW=...` variables.
@@ -54,6 +54,13 @@ complexity and performance overhead. It also presented several corner cases
 where it failed to work as expected and caused false negatives.
 
 ## Linting playbooks and roles
+
+!!! warning "Execution Directory"
+
+    **Always run `ansible-lint` from the root of your project or collection.**
+    As of version 25.7.0, running the linter from within a subdirectory
+    (such as inside a `roles/` or `tasks/` folder) is not supported and
+    may result in zero errors being reported even if violations exist.
 
 Ansible-lint recommends following the [collection structure layout] whether you
 plan to build a collection or not.

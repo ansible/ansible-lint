@@ -29,7 +29,6 @@ from typing import TYPE_CHECKING, Any
 
 import pytest
 from ansible.utils.sentinel import Sentinel
-from ansible_compat.runtime import Runtime
 from packaging.version import Version
 
 from ansiblelint import cli, constants, utils
@@ -53,8 +52,6 @@ if TYPE_CHECKING:
     from _pytest.monkeypatch import MonkeyPatch
 
     from ansiblelint.rules import RulesCollection
-
-runtime = Runtime(require_module=True)
 
 
 @pytest.mark.parametrize(
@@ -404,7 +401,7 @@ def test_cli_auto_detect(capfd: CaptureFixture[str]) -> None:
         "-x",
         "schema",  # exclude schema as our test file would fail it
         "-v",
-        "-p",
+        "--format=pep8",
         "--nocolor",
         "--offline",
         "--exclude=examples",

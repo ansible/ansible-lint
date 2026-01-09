@@ -42,7 +42,7 @@ dependencies = [
   "filelock>=3.8.2",
   "jsonschema>=4.10.0",
   "packaging>=22.0",
-  "pathspec>=0.10.3",
+  "pathspec>=0.10.3,<1.0.0",  # current yamllint not compatible with newer version
   "pyyaml>=6.0.1 ; python_version < '3.14'",
   "pyyaml>=6.0.1 ; python_version >= '3.14'",  # py314 support
   "referencing>=0.36.2",
@@ -96,6 +96,7 @@ dev = [
   "tox-uv>=1.25",
   "types-jsonschema>=4.25.1.20250822",
   "types-pyyaml>=6.0.12.20250822",
+  "uv>=0.8",
 ]
 docs = ["markdown-exec[ansi]>=1.11.0", "mkdocs-ansible>=25.5.0", "six>=1.16.0"]
 lint = [
@@ -103,6 +104,7 @@ lint = [
   "pre-commit>=4.1",
   "pre-commit-uv>=4.1.4",
   "pytest>=9",
+  "ruff>=0.14.10",
   "setuptools>=51.1.1",
 ]
 pkg = [
@@ -873,6 +875,7 @@ PRE_COMMIT_COLOR = "always"
 
 [tool.uv]
 package = true
+default-groups = "all"
 
 [tool.vulture]
 exclude = [

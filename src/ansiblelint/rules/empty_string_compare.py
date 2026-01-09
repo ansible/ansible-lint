@@ -58,24 +58,26 @@ if "pytest" in sys.modules:
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
 
-    def test_rule_empty_string_compare_fail() -> None:
+    def test_rule_empty_string_compare_fail(
+        empty_rule_collection: RulesCollection,
+    ) -> None:
         """Test rule matches."""
-        rules = RulesCollection()
-        rules.register(ComparisonToEmptyStringRule())
+        empty_rule_collection.register(ComparisonToEmptyStringRule())
         results = Runner(
             "examples/playbooks/rule-empty-string-compare-fail.yml",
-            rules=rules,
+            rules=empty_rule_collection,
         ).run()
         assert len(results) == 3
         for result in results:
             assert result.message == ComparisonToEmptyStringRule().shortdesc
 
-    def test_rule_empty_string_compare_pass() -> None:
+    def test_rule_empty_string_compare_pass(
+        empty_rule_collection: RulesCollection,
+    ) -> None:
         """Test rule matches."""
-        rules = RulesCollection()
-        rules.register(ComparisonToEmptyStringRule())
+        empty_rule_collection.register(ComparisonToEmptyStringRule())
         results = Runner(
             "examples/playbooks/rule-empty-string-compare-pass.yml",
-            rules=rules,
+            rules=empty_rule_collection,
         ).run()
         assert len(results) == 0, results

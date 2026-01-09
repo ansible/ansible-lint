@@ -19,6 +19,7 @@ from ansiblelint.text import has_jinja, is_fqcn, is_fqcn_or_name
 from ansiblelint.utils import parse_yaml_from_file
 
 if TYPE_CHECKING:
+    from ansiblelint.app import App
     from ansiblelint.errors import MatchError
     from ansiblelint.utils import Task
 
@@ -274,9 +275,9 @@ class VariableNamingRule(AnsibleLintRule):
         # If the task uses the 'set_fact' module
         if ansible_module == "set_fact":
             for key in filter(
-                lambda x: isinstance(x, str)
-                and not x.startswith("__")
-                and x != "cacheable",
+                lambda x: (
+                    isinstance(x, str) and not x.startswith("__") and x != "cacheable"
+                ),
                 task["action"].keys(),
             ):
                 match_error = self.get_var_naming_matcherror(
@@ -365,9 +366,10 @@ if "pytest" in sys.modules:
         file: str,
         expected: int,
         config_options: Options,
+        app: App,
     ) -> None:
         """Test rule matches."""
-        rules = RulesCollection(options=config_options)
+        rules = RulesCollection(app=app, options=config_options)
         rules.register(VariableNamingRule())
         results = Runner(Lintable(file), rules=rules).run()
         assert len(results) == expected

@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any
 from ansiblelint.rules import AnsibleLintRule, RulesCollection
 
 if TYPE_CHECKING:
+    from ansiblelint.app import App
     from ansiblelint.config import Options
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
@@ -100,11 +101,12 @@ if "pytest" in sys.modules:
         expected_results: list[str],
         monkeypatch: pytest.MonkeyPatch,
         config_options: Options,
+        app: App,
     ) -> None:
         """Test rule."""
         monkeypatch.setattr(config_options, "max_tasks", 5)
         monkeypatch.setattr(config_options, "max_block_depth", 3)
-        collection = RulesCollection(options=config_options)
+        collection = RulesCollection(app=app, options=config_options)
         collection.register(ComplexityRule())
         results = Runner(file, rules=collection).run()
 
