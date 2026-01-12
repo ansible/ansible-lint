@@ -52,3 +52,26 @@ def test_with_inventory_concurrent_syntax_checks(tmp_path: Path) -> None:
         # https://github.com/ansible/ansible-lint/issues/4446.
         assert "AttributeError" not in result.stderr
         counter += 1
+
+
+def test_app_fixed_violations_coverage(tmp_path: Path) -> None:
+    """Directly test App.report_outcome to get coverage on RC.FIXED_VIOLATIONS."""
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+    from ansiblelint.runner import LintResult
+
+    options = Options()
+    options.project_dir = str(tmp_path)
+    options.cache_dir = tmp_path / ".cache"
+    options.cache_dir.mkdir()
+
+    app = App(options)
+
+    mock_file = Lintable(tmp_path / "playbook.yml", kind="playbook")
+    mock_file.updated = True
+
+    result = LintResult(files={mock_file}, matches=[])
+
+    exit_code = app.report_outcome(result)
+
+    assert exit_code == RC.FIXED_VIOLATIONS
