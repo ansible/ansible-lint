@@ -42,7 +42,7 @@ dependencies = [
   "filelock>=3.8.2",
   "jsonschema>=4.10.0",
   "packaging>=22.0",
-  "pathspec>=0.10.3,<1.0.0",  # current yamllint not compatible with newer version
+  "pathspec>=0.10.3",
   "pyyaml>=6.0.1 ; python_version < '3.14'",
   "pyyaml>=6.0.1 ; python_version >= '3.14'",  # py314 support
   "referencing>=0.36.2",

@@ -193,7 +193,7 @@ requires-dist = [
     { name = "filelock", specifier = ">=3.8.2" },
     { name = "jsonschema", specifier = ">=4.10.0" },
     { name = "packaging", specifier = ">=22.0" },
-    { name = "pathspec", specifier = ">=0.10.3,<1.0.0" },
+    { name = "pathspec", specifier = ">=0.10.3" },
     { name = "pyyaml", marker = "python_full_version < '3.14'", specifier = ">=6.0.1" },
     { name = "pyyaml", marker = "python_full_version >= '3.14'", specifier = ">=6.0.1" },
     { name = "referencing", specifier = ">=0.36.2" },
