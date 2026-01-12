@@ -24,7 +24,7 @@ cryptography==46.0.3
     #   ansible-lint
 distro==1.9.0
     # via ansible-lint
-filelock==3.20.1
+filelock==3.20.3
     # via ansible-lint
 jinja2==3.1.6
     # via ansible-core
@@ -44,7 +44,7 @@ packaging==25.0
     #   ansible-core
     #   ansible-lint
     #   black
-pathspec==0.12.1
+pathspec==1.0.3
     # via
     #   ansible-lint
     #   black
@@ -70,7 +70,7 @@ rpds-py==0.30.0
     # via
     #   jsonschema
     #   referencing
-ruamel-yaml==0.18.17
+ruamel-yaml==0.19.1
     # via ansible-lint
 subprocess-tee==0.4.2
     # via
