@@ -28,7 +28,7 @@ filelock==3.20.3
     # via ansible-lint
 jinja2==3.1.6
     # via ansible-core
-jsonschema==4.25.1
+jsonschema==4.26.0
     # via
     #   ansible-compat
     #   ansible-lint
@@ -70,7 +70,7 @@ rpds-py==0.30.0
     # via
     #   jsonschema
     #   referencing
-ruamel-yaml==0.19.1
+ruamel-yaml==0.18.17
     # via ansible-lint
 subprocess-tee==0.4.2
     # via
