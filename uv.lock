@@ -188,7 +188,7 @@ requires-dist = [
     { name = "ansible-core", specifier = ">=2.16.14" },
     { name = "black", specifier = ">=24.3.0" },
     { name = "cffi", specifier = ">=1.15.1" },
-    { name = "cryptography", specifier = "<38" },
+    { name = "cryptography", specifier = ">=37" },
     { name = "distro", specifier = ">=1.9.0" },
     { name = "filelock", specifier = ">=3.8.2" },
     { name = "jsonschema", specifier = ">=4.10.0" },
