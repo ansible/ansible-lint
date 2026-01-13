@@ -37,6 +37,7 @@ class RC:  # pylint: disable=too-few-public-methods
     INVALID_CONFIG = 3
     LOCK_TIMEOUT = 4
     NO_FILES_MATCHED = 5
+    FIXED_VIOLATIONS = 8
     EXIT_CONTROL_C = 130
 
 
