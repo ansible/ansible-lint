@@ -198,7 +198,10 @@ class App:
     ) -> int:
         """Display information about how to skip found rules.
 
-        Returns exit code, 2 if errors were found, 0 when only warnings were found.
+        Returns exit code:
+          - 0: when no errors were found
+          - 2: if errors were found
+          - 8: if all errors were fixed automatically
         """
         msg = ""
 
@@ -260,6 +263,8 @@ class App:
                 files_count,
                 is_success=mark_as_success,
             )
+        if not summary.failures and changed_files_count > 0:
+            return RC.FIXED_VIOLATIONS
         if mark_as_success:
             if not files_count:
                 # success without any file being analyzed is reported as failure
