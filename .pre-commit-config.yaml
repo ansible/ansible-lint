@@ -71,12 +71,13 @@ repos:
       - id: cspell
         entry: bash
         pass_filenames: false
+        additional_dependencies: ["cspell"]  # Circumvent caching differences between pre-commit and tox -e lint
         args:
           [
             "-euo",
             "pipefail",
             "-c",
-            "cspell-cli . --relative --no-progress --no-summary && cspell-cli . --disable-dictionary=words --no-exit-code --words-only --quiet --unique | tr '[:upper:]' '[:lower:]' | LC_ALL=C sort -u > .config/dictionary.txt",
+            "echo 'cspell version:' && cspell-cli --version && cspell-cli . --relative --no-progress --no-summary; cspell-cli . --disable-dictionary=ansible-lint-custom --no-exit-code --words-only --quiet --unique | tr '[:upper:]' '[:lower:]' | LC_ALL=C sort -u > .config/dictionary.txt",
           ]
         name: cspell + remove unused and sort dictionary
   - repo: https://github.com/python-jsonschema/check-jsonschema
@@ -204,7 +205,7 @@ repos:
     hooks:
       - id: vulture
   - repo: https://github.com/ansible/team-devtools
-    rev: v25.12.8
+    rev: v26.1.0
     hooks:
       - id: check-platform-constraints
   - # keep at bottom as these are slower
