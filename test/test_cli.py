@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import os
+import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
+from unittest.mock import patch
 
 import pytest
 
 from ansiblelint import cli
+from ansiblelint.config import Options
 
 if TYPE_CHECKING:
     from _pytest.monkeypatch import MonkeyPatch
@@ -254,3 +257,29 @@ def test_config_dev_null(base_arguments: list[str], config_file: str) -> None:
     """Ensures specific config files produce error code 3."""
     cfg = cli.get_config([*base_arguments, "-c", config_file])
     assert cfg.config_file == "/dev/null"
+
+
+def test_offline_cli_overrides_config(base_arguments: list[str]) -> None:
+    """Ensure --no-offline overrides offline: true in config (#4845)."""
+    cli_config = Options()
+    cli_config.offline = False
+    file_config = {"offline": True}
+
+    command: list[str] = [*base_arguments, "--no-offline"]
+    with patch.object(sys, "argv", command):
+        result = cli.merge_config(file_config, cli_config)
+
+    assert result.offline is False
+
+
+def test_offline_config_used_when_no_cli(base_arguments: list[str]) -> None:
+    """Ensure config file is used when CLI flag is absent (#4845)."""
+    cli_config = Options()
+    cli_config.offline = False
+    file_config = {"offline": True}
+
+    command: list[str] = [*base_arguments]
+    with patch.object(sys, "argv", command):
+        result = cli.merge_config(file_config, cli_config)
+
+    assert result.offline is True
