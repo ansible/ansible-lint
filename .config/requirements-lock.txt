@@ -24,7 +24,7 @@ cryptography==37.0.4
     #   ansible-lint
 distro==1.9.0
     # via ansible-lint
-filelock==3.20.3
+filelock==3.20.1
     # via ansible-lint
 jinja2==3.1.6
     # via ansible-core
