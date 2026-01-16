@@ -23,6 +23,7 @@ from ansiblelint.text import has_jinja, is_fqcn, is_fqcn_or_name
 from ansiblelint.utils import parse_yaml_from_file
 
 if TYPE_CHECKING:
+    from ansiblelint.app import App
     from ansiblelint.errors import MatchError
     from ansiblelint.utils import Task
 
@@ -48,7 +49,7 @@ class VariableNamingRule(AnsibleLintRule):
     # List of special variables that should be treated as read-only. This list
     # does not include connection variables, which we expect users to tune in
     # specific cases.
-    # https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html
+    # https://docs.ansible.com/projects/ansible/latest/reference_appendices/special_variables.html
     read_only_names = {
         "ansible_check_mode",
         "ansible_collection_name",
@@ -250,8 +251,8 @@ class VariableNamingRule(AnsibleLintRule):
         results = []
         task_prefix = Prefix()
         role_prefix = Prefix()
-        if file and file.parent and file.parent.kind == "role":
-            role_prefix = Prefix(file.parent.path.name)
+        if file and file.role:
+            role_prefix = Prefix(file.role)
         ansible_module = task["action"]["__ansible_module__"]
         # If the task uses the 'vars' section to set variables
         # only check role prefix for include_role and import_role tasks 'vars'
@@ -274,9 +275,9 @@ class VariableNamingRule(AnsibleLintRule):
         # If the task uses the 'set_fact' module
         if ansible_module == "set_fact":
             for key in filter(
-                lambda x: isinstance(x, str)
-                and not x.startswith("__")
-                and x != "cacheable",
+                lambda x: (
+                    isinstance(x, str) and not x.startswith("__") and x != "cacheable"
+                ),
                 task["action"].keys(),
             ):
                 match_error = self.get_var_naming_matcherror(
@@ -365,9 +366,10 @@ if "pytest" in sys.modules:
         file: str,
         expected: int,
         config_options: Options,
+        app: App,
     ) -> None:
         """Test rule matches."""
-        rules = RulesCollection(options=config_options)
+        rules = RulesCollection(app=app, options=config_options)
         rules.register(VariableNamingRule())
         results = Runner(Lintable(file), rules=rules).run()
         assert len(results) == expected
@@ -426,7 +428,7 @@ if "pytest" in sys.modules:
             Lintable("examples/roles/role_vars_prefix_detection"),
             rules=default_rules_collection,
         ).run()
-        assert len(results) == 2
+        assert len(results) == 4
         for result in results:
             assert result.tag == "var-naming[no-role-prefix]"
 

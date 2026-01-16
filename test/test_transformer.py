@@ -212,6 +212,13 @@ def fixture_runner_result(
             True,
             id="name-capitalize",
         ),
+        pytest.param(
+            "examples/playbooks/transform-yaml-comments.yml",
+            3,
+            True,
+            True,
+            id="yaml-comments",
+        ),
     ),
 )
 @mock.patch.dict(os.environ, {"ANSIBLE_LINT_WRITE_TMP": "1"}, clear=True)

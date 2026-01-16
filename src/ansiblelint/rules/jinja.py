@@ -559,14 +559,13 @@ if "pytest" in sys.modules:
     from ansiblelint.transformer import Transformer
 
     @pytest.mark.libyaml
-    def test_jinja_spacing_playbook() -> None:
+    def test_jinja_spacing_playbook(empty_rule_collection: RulesCollection) -> None:
         """Ensure that expected error lines are matching found linting error lines."""
         # list unexpected error lines or non-matching error lines
         lineno_list = [33, 36, 39, 42, 45, 48, 74]
         lintable = Lintable("examples/playbooks/jinja-spacing.yml")
-        collection = RulesCollection()
-        collection.register(JinjaRule())
-        results = Runner(lintable, rules=collection).run()
+        empty_rule_collection.register(JinjaRule())
+        results = Runner(lintable, rules=empty_rule_collection).run()
         assert len(results) == len(lineno_list)
         for index, result in enumerate(results):
             assert result.tag == "jinja[spacing]"
@@ -577,12 +576,11 @@ if "pytest" in sys.modules:
         # )
         # assert len(error_lines_difference) == 0
 
-    def test_jinja_spacing_vars() -> None:
+    def test_jinja_spacing_vars(empty_rule_collection: RulesCollection) -> None:
         """Ensure that expected error details are matching found linting error details."""
-        collection = RulesCollection()
-        collection.register(JinjaRule())
+        empty_rule_collection.register(JinjaRule())
         lintable = Lintable("examples/playbooks/vars/jinja-spacing.yml")
-        results = Runner(lintable, rules=collection).run()
+        results = Runner(lintable, rules=empty_rule_collection).run()
 
         error_expected_lineno = [14, 15, 16, 17, 18, 19, 32]
         assert len(results) == len(error_expected_lineno)
@@ -862,23 +860,23 @@ if "pytest" in sys.modules:
         ("lintable", "matches"),
         (pytest.param("examples/playbooks/vars/rule_jinja_vars.yml", 0, id="0"),),
     )
-    def test_jinja_file(lintable: str, matches: int) -> None:
+    def test_jinja_file(
+        lintable: str, matches: int, empty_rule_collection: RulesCollection
+    ) -> None:
         """Tests our ability to process var filesspot spacing errors."""
-        collection = RulesCollection()
-        collection.register(JinjaRule())
-        errs = Runner(lintable, rules=collection).run()
+        empty_rule_collection.register(JinjaRule())
+        errs = Runner(lintable, rules=empty_rule_collection).run()
         assert len(errs) == matches
         for err in errs:
             assert isinstance(err, JinjaRule)
             assert errs[0].tag == "jinja[invalid]"
             assert errs[0].rule.id == "jinja"
 
-    def test_jinja_invalid() -> None:
+    def test_jinja_invalid(empty_rule_collection: RulesCollection) -> None:
         """Tests our ability to spot spacing errors inside jinja2 templates."""
-        collection = RulesCollection()
-        collection.register(JinjaRule())
+        empty_rule_collection.register(JinjaRule())
         success = "examples/playbooks/rule-jinja-fail.yml"
-        errs = Runner(success, rules=collection).run()
+        errs = Runner(success, rules=empty_rule_collection).run()
         assert len(errs) == 2
         assert errs[0].tag == "jinja[spacing]"
         assert errs[0].rule.id == "jinja"
@@ -887,12 +885,11 @@ if "pytest" in sys.modules:
         assert errs[1].rule.id == "jinja"
         assert errs[1].lineno in [9, 10, 13]  # 2.19 has better line identification
 
-    def test_jinja_valid() -> None:
+    def test_jinja_valid(empty_rule_collection: RulesCollection) -> None:
         """Tests our ability to parse jinja, even when variables may not be defined."""
-        collection = RulesCollection()
-        collection.register(JinjaRule())
+        empty_rule_collection.register(JinjaRule())
         success = "examples/playbooks/rule-jinja-pass.yml"
-        errs = Runner(success, rules=collection).run()
+        errs = Runner(success, rules=empty_rule_collection).run()
         assert len(errs) == 0
 
     @mock.patch.dict(os.environ, {"ANSIBLE_LINT_WRITE_TMP": "1"}, clear=True)
@@ -926,7 +923,7 @@ if "pytest" in sys.modules:
         assert expected_content == transformed_content
         playbook.with_suffix(f".tmp{playbook.suffix}").unlink()
 
-    def test_jinja_nested_var_errors() -> None:
+    def test_jinja_nested_var_errors(empty_rule_collection: RulesCollection) -> None:
         """Tests our ability to handle nested var errors from jinja2 templates."""
 
         def _do_template(*args, **kwargs):  # type: ignore[no-untyped-def] # Templar.do_template has no type hint
@@ -939,11 +936,10 @@ if "pytest" in sys.modules:
             raise AnsibleError(str(msg))
 
         do_template = Templar.do_template
-        collection = RulesCollection()
-        collection.register(JinjaRule())
+        empty_rule_collection.register(JinjaRule())
         lintable = Lintable("examples/playbooks/jinja-nested-vars.yml")
         with mock.patch.object(Templar, "do_template", _do_template):
-            results = Runner(lintable, rules=collection).run()
+            results = Runner(lintable, rules=empty_rule_collection).run()
             assert len(results) == 0
 
     @pytest.mark.parametrize(
@@ -958,14 +954,16 @@ if "pytest" in sys.modules:
         ),
     )
     def test_filter_import_failure(
-        nodeps: str, expected_results: int, monkeypatch: pytest.MonkeyPatch
+        nodeps: str,
+        expected_results: int,
+        monkeypatch: pytest.MonkeyPatch,
+        empty_rule_collection: RulesCollection,
     ) -> None:
         """Tests how we process import failures from within filters."""
         monkeypatch.setenv("ANSIBLE_LINT_NODEPS", nodeps)
-        collection = RulesCollection()
-        collection.register(JinjaRule())
+        empty_rule_collection.register(JinjaRule())
         lintable = Lintable("examples/playbooks/test_filter_with_importerror.yml")
-        results = Runner(lintable, rules=collection).run()
+        results = Runner(lintable, rules=empty_rule_collection).run()
         assert len(results) == expected_results
 
     def test_jinja_template_generates_ansible_tagged_str_error() -> None:

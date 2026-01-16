@@ -525,7 +525,7 @@
     "required": [
         "ansible-navigator"
     ],
-    "title": "ansible-navigator settings v25",
+    "title": "ansible-navigator settings v26",
     "type": "object",
-    "version": "25"
+    "version": "26"
 }

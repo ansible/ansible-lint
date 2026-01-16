@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
+import atexit
 import contextlib
 import importlib.util
 import io
 import json
 import logging
 import re
+import shutil
 import sys
+import tempfile
 from typing import TYPE_CHECKING, Any
 
 # pylint: disable=preferred-module
@@ -60,9 +63,19 @@ workarounds_drop_map = {
     # https://github.com/ansible/ansible-lint/issues/3152
     "ansible.posix.synchronize": ["use_ssh_args"],
 }
+_SAFE_ASYNC_DIR = tempfile.mkdtemp(prefix="ansible-lint-async-")
+
+
+def _cleanup_async_dir() -> None:
+    """Safely remove the temp directory and all its contents."""
+    shutil.rmtree(_SAFE_ASYNC_DIR, ignore_errors=True)
+
+
+atexit.register(_cleanup_async_dir)
+
 workarounds_inject_map = {
     # https://github.com/ansible/ansible-lint/issues/2824
-    "ansible.builtin.async_status": {"_async_dir": "/tmp/ansible-async"},
+    "ansible.builtin.async_status": {"_async_dir": _SAFE_ASYNC_DIR},
 }
 workarounds_mutex_args_map = {
     # https://github.com/ansible/ansible-lint/issues/4623
@@ -194,10 +207,16 @@ class ArgsRule(AnsibleLintRule):
                     # through `ArgumentSpecValidator` class as in case of modules.
                     return []
 
-                with patch.object(
-                    sys,
-                    "argv",
-                    ["", json.dumps({"ANSIBLE_MODULE_ARGS": clean_json(module_args)})],
+                buffer = io.BytesIO(
+                    json.dumps({
+                        "ANSIBLE_MODULE_ARGS": clean_json(module_args)
+                    }).encode()
+                )
+                with (
+                    patch.object(
+                        sys, "stdin", io.TextIOWrapper(buffer, encoding="utf-8")
+                    ),
+                    patch.object(sys, "argv", [""]),
                 ):
                     fio = io.StringIO()
                     failed_msg = ""
@@ -273,7 +292,7 @@ class ArgsRule(AnsibleLintRule):
         if value_not_in_choices_error:
             # ignore templated value not in allowed choices
             choice_key = value_not_in_choices_error.group("name")
-            choice_value = task["action"][choice_key]
+            choice_value = task["action"].get(choice_key)
             if has_jinja(choice_value):
                 _logger.debug(
                     "Value checking ignored for '%s' option in task '%s' at line %s.",
@@ -340,4 +359,37 @@ if "pytest" in sys.modules:
         with caplog.at_level(logging.WARNING):
             results = Runner(success, rules=default_rules_collection).run()
         assert len(results) == 0, results
-        assert len(caplog.records) == 0, caplog.records
+        # Remove any records about incompatible ansible version with the collections
+        # Sample: AnsibleWarning Collection community.docker does not support Ansible version
+        records = [
+            record
+            for record in caplog.records
+            if "does not support Ansible version" not in record.getMessage()
+        ]
+        log_string = "\n".join(record.getMessage() for record in records)
+        assert len(records) == 0, log_string
+
+    def test_args_parse_failed_msg_no_key() -> None:
+        """Test that _parse_failed_msg does not crash if key is missing in task."""
+
+        class MockTask:
+            def __init__(self) -> None:
+                self.action = {"policy": "allow"}
+                self.line = 1
+
+            def __getitem__(self, key: str) -> Any:
+                return getattr(self, key)
+
+        rule = ArgsRule()
+        task = MockTask()
+        failed_msg = '{"msg": "value of default must be one of: allow, deny, reject"}'
+
+        # pylint: disable=protected-access
+        results = rule._parse_failed_msg(  # noqa: SLF001
+            failed_msg,
+            task,  # type: ignore[arg-type]
+            "ufw",
+        )
+
+        assert len(results) == 1
+        assert "value of default must be one of" in results[0].message

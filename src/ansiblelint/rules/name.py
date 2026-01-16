@@ -15,6 +15,7 @@ from ansiblelint.rules import AnsibleLintRule, TransformMixin
 if TYPE_CHECKING:
     from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
+    from ansiblelint.app import App
     from ansiblelint.config import Options
     from ansiblelint.errors import MatchError
     from ansiblelint.utils import Task
@@ -309,27 +310,25 @@ if "pytest" in sys.modules:
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
 
-    def test_file_positive() -> None:
+    def test_file_positive(empty_rule_collection: RulesCollection) -> None:
         """Positive test for name[missing]."""
-        collection = RulesCollection()
-        collection.register(NameRule())
+        empty_rule_collection.register(NameRule())
         success = "examples/playbooks/rule-name-missing-pass.yml"
-        good_runner = Runner(success, rules=collection)
+        good_runner = Runner(success, rules=empty_rule_collection)
         assert good_runner.run() == []
 
-    def test_file_negative() -> None:
+    def test_file_negative(empty_rule_collection: RulesCollection) -> None:
         """Negative test for name[missing]."""
-        collection = RulesCollection()
-        collection.register(NameRule())
+        empty_rule_collection.register(NameRule())
         failure = "examples/playbooks/rule-name-missing-fail.yml"
-        bad_runner = Runner(failure, rules=collection)
+        bad_runner = Runner(failure, rules=empty_rule_collection)
         errs = bad_runner.run()
         assert len(errs) == 5
 
-    def test_name_prefix_positive(config_options: Options) -> None:
+    def test_name_prefix_positive(config_options: Options, app: App) -> None:
         """Positive test for name[prefix]."""
         config_options.enable_list = ["name[prefix]"]
-        collection = RulesCollection(options=config_options)
+        collection = RulesCollection(app=app, options=config_options)
         collection.register(NameRule())
         success = Lintable(
             "examples/playbooks/tasks/main.yml",
@@ -339,10 +338,10 @@ if "pytest" in sys.modules:
         results = good_runner.run()
         assert len(results) == 0
 
-    def test_name_prefix_negative(config_options: Options) -> None:
+    def test_name_prefix_negative(config_options: Options, app: App) -> None:
         """Negative test for name[missing]."""
         config_options.enable_list = ["name[prefix]"]
-        collection = RulesCollection(options=config_options)
+        collection = RulesCollection(app=app, options=config_options)
         collection.register(NameRule())
         failure = Lintable(
             "examples/playbooks/tasks/rule-name-prefix-fail.yml",
@@ -356,10 +355,10 @@ if "pytest" in sys.modules:
         assert results[1].tag == "name[prefix]"
         assert results[2].tag == "name[prefix]"
 
-    def test_name_prefix_negative_2(config_options: Options) -> None:
+    def test_name_prefix_negative_2(config_options: Options, app: App) -> None:
         """Negative test for name[prefix]."""
         config_options.enable_list = ["name[prefix]"]
-        collection = RulesCollection(options=config_options)
+        collection = RulesCollection(app=app, options=config_options)
         collection.register(NameRule())
         failure = Lintable(
             "examples/playbooks/tasks/partial_prefix/foo.yml",
@@ -371,10 +370,10 @@ if "pytest" in sys.modules:
         assert results[0].tag == "name[prefix]"
         assert results[1].tag == "name[prefix]"
 
-    def test_name_prefix_negative_3(config_options: Options) -> None:
+    def test_name_prefix_negative_3(config_options: Options, app: App) -> None:
         """Negative test for name[prefix]."""
         config_options.enable_list = ["name[prefix]"]
-        collection = RulesCollection(options=config_options)
+        collection = RulesCollection(app=app, options=config_options)
         collection.register(NameRule())
         failure = Lintable(
             "examples/playbooks/tasks/partial_prefix/main.yml",
@@ -386,33 +385,30 @@ if "pytest" in sys.modules:
         assert results[0].tag == "name[prefix]"
         assert results[1].tag == "name[prefix]"
 
-    def test_rule_name_lowercase() -> None:
+    def test_rule_name_lowercase(empty_rule_collection: RulesCollection) -> None:
         """Negative test for a task that starts with lowercase."""
-        collection = RulesCollection()
-        collection.register(NameRule())
+        empty_rule_collection.register(NameRule())
         failure = "examples/playbooks/rule-name-casing.yml"
-        bad_runner = Runner(failure, rules=collection)
+        bad_runner = Runner(failure, rules=empty_rule_collection)
         errs = bad_runner.run()
         assert len(errs) == 1
         assert errs[0].tag == "name[casing]"
         assert errs[0].rule.id == "name"
 
-    def test_name_play() -> None:
+    def test_name_play(empty_rule_collection: RulesCollection) -> None:
         """Positive test for name[play]."""
-        collection = RulesCollection()
-        collection.register(NameRule())
+        empty_rule_collection.register(NameRule())
         success = "examples/playbooks/rule-name-play-fail.yml"
-        errs = Runner(success, rules=collection).run()
+        errs = Runner(success, rules=empty_rule_collection).run()
         assert len(errs) == 1
         assert errs[0].tag == "name[play]"
         assert errs[0].rule.id == "name"
 
-    def test_name_template() -> None:
+    def test_name_template(empty_rule_collection: RulesCollection) -> None:
         """Negative test for name[templated]."""
-        collection = RulesCollection()
-        collection.register(NameRule())
+        empty_rule_collection.register(NameRule())
         failure = "examples/playbooks/rule-name-templated-fail.yml"
-        bad_runner = Runner(failure, rules=collection)
+        bad_runner = Runner(failure, rules=empty_rule_collection)
         errs = bad_runner.run()
         assert len(errs) == 1
         assert errs[0].tag == "name[template]"

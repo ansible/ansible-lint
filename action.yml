@@ -14,6 +14,10 @@ inputs:
     description: If false, this action will not setup python and will instead rely on the already installed python.
     required: false
     default: "true"
+  python_version:
+    description: The version of Python to use when setting up Python environment. Default is 3.14.
+    required: false
+    default: "3.14"
   working_directory:
     description: The directory where to run ansible-lint from. Default is `github.workspace`.
     required: false
@@ -77,11 +81,11 @@ runs:
 
     - name: Set up Python
       if: inputs.setup_python == 'true'
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6
       with:
         cache: pip
         cache-dependency-path: ${{ steps.get_reqs.outputs.reqs_file }}
-        python-version: "3.14"
+        python-version: ${{ inputs.python_version }}
 
     - name: Install ansible-lint
       shell: bash

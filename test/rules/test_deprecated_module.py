@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+from ansiblelint.app import App
 from ansiblelint.rules import RulesCollection
 from ansiblelint.rules.deprecated_module import DeprecatedModuleRule
 from ansiblelint.testing import RunFromText
@@ -13,11 +14,12 @@ MODULE_DEPRECATED = """
 """
 
 
-def test_module_deprecated(tmp_path: Path) -> None:
+def test_module_deprecated(
+    tmp_path: Path, app: App, empty_rule_collection: RulesCollection
+) -> None:
     """Test for deprecated-module."""
-    collection = RulesCollection()
-    collection.register(DeprecatedModuleRule())
-    runner = RunFromText(collection)
+    empty_rule_collection.register(DeprecatedModuleRule())
+    runner = RunFromText(empty_rule_collection, app)
     results = runner.run_role_tasks_main(MODULE_DEPRECATED, tmp_path=tmp_path)
     assert len(results) == 1
     # based on version and blend of ansible being used, we may

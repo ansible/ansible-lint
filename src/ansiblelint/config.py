@@ -47,7 +47,7 @@ DEFAULT_KINDS = [
     {"ansible-navigator-config": "**/ansible-navigator.{yaml,yml}"},
     {"inventory": "**/inventory/**.{yaml,yml}"},
     {"requirements": "**/meta/requirements.{yaml,yml}"},  # v1 only
-    # https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html
+    # https://docs.ansible.com/projects/ansible/latest/dev_guide/collections_galaxy_meta.html
     {"galaxy": "**/galaxy.yml"},  # Galaxy collection meta
     {"reno": "**/releasenotes/*/*.{yaml,yml}"},  # reno release notes
     {"vars": "**/{host_vars,group_vars,vars,defaults}/**/*.{yaml,yml}"},
@@ -143,7 +143,6 @@ class Options:  # pylint: disable=too-many-instance-attributes
     list_tags: bool = False
     write_list: list[str] = field(default_factory=list)
     write_exclude_list: list[str] = field(default_factory=list)
-    parseable: bool = False
     quiet: bool = False
     rulesdirs: list[Path] = field(default_factory=list)
     skip_list: list[str] = field(default_factory=list)
@@ -180,7 +179,7 @@ class Options:  # pylint: disable=too-many-instance-attributes
     yamllint_file: Path | None = None
     max_tasks: int = 100
     max_block_depth: int = 20
-    # Refer to https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix
+    # Refer to https://docs.ansible.com/projects/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix
     _default_supported = ["2.15.", "2.16.", "2.17.", "2.18.", "2.19."]
     supported_ansible_also: list[str] = field(default_factory=list)
 
@@ -315,8 +314,13 @@ def get_version_warning() -> str:
         release_url = (
             "https://api.github.com/repos/ansible/ansible-lint/releases/latest"
         )
+        if not release_url.startswith(
+            "https://"
+        ):  # pragma: no cover (ruff compatibility)
+            msg = "release_url must start with https://"
+            raise ValueError(msg)
         try:
-            with urllib.request.urlopen(release_url) as url:  # noqa: S310
+            with urllib.request.urlopen(release_url) as url:
                 data = json.load(url)
                 with open(cache_file, "w", encoding="utf-8") as f:
                     json.dump(data, f)

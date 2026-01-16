@@ -80,6 +80,8 @@ def load_config(
     if not config_path or not os.path.exists(config_path):
         # a missing default config file should not trigger an error
         return {}, None
+    # resolve symlinks in config path as we will only use the final location
+    config_path = Path(config_path).resolve().as_posix()
 
     config_lintable = Lintable(
         config_path,
@@ -98,6 +100,15 @@ def load_config(
     config["config_file"] = config_path
     config_dir = os.path.dirname(config_path)
     expand_to_normalized_paths(config, config_dir)
+
+    if (
+        "project_dir" in config
+        and config["project_dir"]
+        and config["project_dir"][0] not in ("/", "~")
+    ):
+        config["project_dir"] = (
+            (Path(config_path).parent / config["project_dir"]).resolve().as_posix()
+        )
 
     return config, config_path
 
@@ -318,14 +329,6 @@ def get_cli_parser() -> argparse.ArgumentParser:
         help="Specify which rules profile to be used.",
     )
     parser.add_argument(
-        "-p",
-        "--parseable",
-        dest="parseable",
-        default=False,
-        action="store_true",
-        help="parseable output, same as '-f pep8'",
-    )
-    parser.add_argument(
         "--project-dir",
         dest="project_dir",
         default=None,
@@ -493,7 +496,6 @@ def merge_config(file_config: dict[Any, Any], cli_config: Options) -> Options:
     """Combine the file config with the CLI args."""
     bools = (
         "display_relative_path",
-        "parseable",
         "quiet",
         "strict",
         "use_default_rules",
@@ -536,7 +538,13 @@ def merge_config(file_config: dict[Any, Any], cli_config: Options) -> Options:
 
     for entry in bools:
         file_value = file_config.pop(entry, False)
-        v = getattr(cli_config, entry) or file_value
+        v = getattr(cli_config, entry)
+        if (
+            not v
+            and entry not in sys.argv
+            and f"--no-{entry.replace('_', '-')}" not in sys.argv
+        ):
+            v = file_value
         setattr(cli_config, entry, v)
 
     for entry, default_scalar in scalar_map.items():
@@ -590,6 +598,11 @@ def get_config(arguments: list[str]) -> Options:
             _logger.warning(
                 "Replaced deprecated '--write' option with '--fix', change you call to avoid future regressions when we remove old option.",
             )
+        # cspell:ignore parseable
+        if value in ("-p", "--parseable"):
+            arguments[i] = "--format=pep8"
+            msg = f"Deprecated `{value}` cli option replaced with current `{arguments[i]}` option. This alias will be removed in a future release."
+            _logger.warning(msg)
     options = Options(**vars(parser.parse_args(arguments)))
 
     # docs is not document, being used for internal documentation building

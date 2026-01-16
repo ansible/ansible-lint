@@ -37,7 +37,6 @@ junit.xml
 .python-version
 
 # Environments
-.env
 .venv
 env/
 venv/
@@ -80,4 +79,7 @@ test/local-content
 test/schemas/node_modules
 node_modules
 .direnv
-.ansible
+
+# ignore it only at repository root as we want to discover if these are
+# created accidentally in other folders.
+/.ansible

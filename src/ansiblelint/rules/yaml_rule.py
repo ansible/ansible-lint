@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from collections.abc import MutableMapping, MutableSequence
     from typing import Any
 
+    from ansiblelint.app import App
     from ansiblelint.config import Options
     from ansiblelint.errors import MatchError
 
@@ -104,9 +105,8 @@ class YamllintRule(AnsibleLintRule, TransformMixin):
         :param lintable: Lintable instance
         :param data: data to transform
         """
-        # This method does nothing because the YAML reformatting is implemented
-        # in data dumper. Still presence of this method helps us with
-        # documentation generation.
+        if match.tag == "yaml[comments]":
+            match.fixed = True
 
 
 # testing code to be loaded only with pytest or when executed the rule file
@@ -179,12 +179,13 @@ if "pytest" in sys.modules:
         expected_kind: str,
         expected: list[str],
         config_options: Options,
+        app: App,
     ) -> None:
         """Validate parsing of ansible output."""
         lintable = Lintable(file)
         assert lintable.kind == expected_kind
 
-        rules = RulesCollection(options=config_options)
+        rules = RulesCollection(app=app, options=config_options)
         rules.register(YamllintRule())
         results = Runner(lintable, rules=rules).run()
 

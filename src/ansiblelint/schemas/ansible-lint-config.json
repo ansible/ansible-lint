@@ -17,7 +17,7 @@
   "$id": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible-lint-config.json",
   "$schema": "http://json-schema.org/draft-07/schema",
   "additionalProperties": false,
-  "description": "https://ansible.readthedocs.io/projects/lint/configuring/",
+  "description": "https://docs.ansible.com/projects/lint/configuring/",
   "examples": [
     ".ansible-lint",
     ".ansible-lint.yml",
@@ -100,11 +100,6 @@
       },
       "title": "Only Builtins Allow Modules",
       "type": "array"
-    },
-    "parseable": {
-      "default": true,
-      "title": "Parseable",
-      "type": "boolean"
     },
     "profile": {
       "enum": [

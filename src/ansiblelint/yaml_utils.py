@@ -168,7 +168,7 @@ def load_yamllint_config(yamllint_file: Path | None = None) -> CustomYamlLintCon
             errors.append(msg)
     if errors:
         nl = "\n"
-        msg = f"Found incompatible custom yamllint configuration ({file}), please either remove the file or edit it to comply with:{nl}  - {(nl + '  - ').join(errors)}.{nl}{nl}Read https://ansible.readthedocs.io/projects/lint/rules/yaml/ for more details regarding why we have these requirements. Fix mode will not be available."
+        msg = f"Found incompatible custom yamllint configuration ({file}), please either remove the file or edit it to comply with:{nl}  - {(nl + '  - ').join(errors)}.{nl}{nl}Read https://docs.ansible.com/projects/lint/rules/yaml/ for more details regarding why we have these requirements. Fix mode will not be available."
         config.incompatible = msg
 
     _logger.debug("Effective yamllint rules used: %s", config.rules)
@@ -824,6 +824,11 @@ class FormattedEmitter(Emitter):
         else:
             # single blank lines in post comments
             value = self._re_repeat_blank_lines.sub("\n\n", value)
+
+        # make sure that comments have a space after #
+        if value.startswith("#") and not value.startswith("# ") and value[1:].strip():
+            value = "# " + value[1:]
+
         comment.value = value
 
         # make sure that the eol comment only has one space before it.

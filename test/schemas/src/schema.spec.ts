@@ -46,6 +46,11 @@ const schema_files = fs
   .filter((el) => path.extname(el) === ".json");
 console.log(`Schemas: ${schema_files}`);
 
+schema_files.forEach((schema_file) => {
+  const schema_json = JSON.parse(fs.readFileSync(`f/${schema_file}`, "utf8"));
+  ajv.addSchema(schema_json, schema_file);
+});
+
 describe("schemas under f/", () => {
   schema_files.forEach((schema_file) => {
     if (
@@ -54,8 +59,11 @@ describe("schemas under f/", () => {
     ) {
       return;
     }
-    const schema_json = JSON.parse(fs.readFileSync(`f/${schema_file}`, "utf8"));
-    ajv.addSchema(schema_json);
+    const schema_instance = ajv.getSchema(schema_file);
+    if (!schema_instance) return;
+
+    // biome-ignore lint/suspicious/noExplicitAny: internal test suite needs to access dynamic schema properties
+    const schema_json = schema_instance.schema as any;
     const validator = ajv.compile(schema_json);
     if (
       schema_json.examples === undefined &&
@@ -161,14 +169,14 @@ function getTestFiles(
 ): { file: string; expect_fail: boolean }[] {
   const files = Array.from(
     new Set(
-      globs.flatMap((glob: any) =>
+      globs.flatMap((glob: string) =>
         minimatch.match(test_files, path.join("**", glob)),
       ),
     ),
   );
   const negative_files = Array.from(
     new Set(
-      globs.flatMap((glob: any) =>
+      globs.flatMap((glob: string) =>
         minimatch.match(negative_test_files, path.join("**", glob)),
       ),
     ),
@@ -186,6 +194,12 @@ function getAllFiles(dir: string): string[] {
   return fs.readdirSync(dir).reduce((files: string[], file: string) => {
     const name = path.join(dir, file);
     const isDirectory = fs.statSync(name).isDirectory();
-    return isDirectory ? [...files, ...getAllFiles(name)] : [...files, name];
+    if (isDirectory) {
+      files.push(...getAllFiles(name));
+      return files;
+    } else {
+      files.push(name);
+      return files;
+    }
   }, []);
 }

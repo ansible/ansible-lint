@@ -19,6 +19,25 @@
       "title": "AIXPlatformModel",
       "type": "object"
     },
+    "AlmaLinuxPlatformModel": {
+      "properties": {
+        "name": {
+          "const": "AlmaLinux",
+          "title": "Name",
+          "type": "string"
+        },
+        "versions": {
+          "default": "all",
+          "items": {
+            "enum": ["8", "9", "10", "all"],
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "title": "AlmaLinuxPlatformModel",
+      "type": "object"
+    },
     "AlpinePlatformModel": {
       "properties": {
         "name": {
@@ -232,7 +251,7 @@
           "required": ["name"]
         }
       ],
-      "markdownDescription": "See https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html#role-dependencies and https://github.com/ansible/ansible/blob/devel/lib/ansible/playbook/role/metadata.py#L79\n\nOther keys are treated as role [parameters](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#passing-different-parameters).",
+      "markdownDescription": "See https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_reuse_roles.html#role-dependencies and https://github.com/ansible/ansible/blob/devel/lib/ansible/playbook/role/metadata.py#L79\n\nOther keys are treated as role [parameters](https://docs.ansible.com/projects/ansible/latest/user_guide/playbooks_reuse_roles.html#passing-different-parameters).",
       "properties": {
         "become": {
           "title": "Become",
@@ -380,6 +399,7 @@
               "40",
               "41",
               "42",
+              "43",
               "all"
             ],
             "type": "string"
@@ -1227,7 +1247,7 @@
     },
     "collections": {
       "items": {
-        "markdownDescription": "See [Using collections in roles](https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#using-collections-in-roles) and [collection naming conventions](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_in_groups.html#naming-conventions)",
+        "markdownDescription": "See [Using collections in roles](https://docs.ansible.com/projects/ansible/latest/user_guide/collections_using.html#using-collections-in-roles) and [collection naming conventions](https://docs.ansible.com/projects/ansible/latest/dev_guide/developing_modules_in_groups.html#naming-conventions)",
         "pattern": "^[a-z_]+\\.[a-z_]+$",
         "type": "string"
       },
@@ -1357,6 +1377,9 @@
         "anyOf": [
           {
             "$ref": "#/$defs/AIXPlatformModel"
+          },
+          {
+            "$ref": "#/$defs/AlmaLinuxPlatformModel"
           },
           {
             "$ref": "#/$defs/AlpinePlatformModel"
@@ -1542,7 +1565,7 @@
   },
   "$id": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/meta.json",
   "$schema": "http://json-schema.org/draft-07/schema",
-  "description": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html#using-role-dependencies",
+  "description": "https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_reuse_roles.html#using-role-dependencies",
   "examples": ["meta/main.yml"],
   "properties": {
     "additionalProperties": false,
@@ -1569,6 +1592,13 @@
     },
     "galaxy_info": {
       "$ref": "#/$defs/GalaxyInfoModel"
+    },
+    "argument_specs": {
+      "title": "Role Argument Specifications",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "role-arg-spec.json#/$defs/entry_point"
+      }
     }
   },
   "title": "Ansible Meta Schema v1/v2",

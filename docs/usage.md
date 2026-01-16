@@ -17,7 +17,7 @@ Ansible-lint prints output on both `stdout` and `stderr`.
 - `stderr` displays logging and free-form messages like statistics.
 
 Most `ansible-lint` examples use pep8 as the output format (`-p`) which is
-machine parseable.
+machine parsable.
 
 Ansible-lint also print errors using their [annotation] format when it detects
 the `GITHUB_ACTIONS=true` and `GITHUB_WORKFLOW=...` variables.
@@ -55,6 +55,13 @@ where it failed to work as expected and caused false negatives.
 
 ## Linting playbooks and roles
 
+!!! warning "Execution Directory"
+
+    **Always run `ansible-lint` from the root of your project or collection.**
+    As of version 25.7.0, running the linter from within a subdirectory
+    (such as inside a `roles/` or `tasks/` folder) is not supported and
+    may result in zero errors being reported even if violations exist.
+
 Ansible-lint recommends following the [collection structure layout] whether you
 plan to build a collection or not.
 
@@ -72,7 +79,7 @@ $ ansible-lint examples/playbooks/play.yml examples/roles/bobbins
 ```
 
 [collection structure layout]:
-  https://docs.ansible.com/ansible-core/devel/dev_guide/developing_collections_structure.html#collection-structure
+  https://docs.ansible.com/projects/ansible-core/devel/dev_guide/developing_collections_structure.html#collection-structure
 
 ## Running example playbooks
 
@@ -311,7 +318,7 @@ fully understand [variable precedence].
 [sarif]:
   https://docs.oasis-open.org/sarif/sarif/v2.1.0/csprd01/sarif-v2.1.0-csprd01.html
 [variable precedence]:
-  https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#understanding-variable-precedence
+  https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_variables.html#understanding-variable-precedence
 
 ## Dependencies and requirements
 
@@ -319,10 +326,10 @@ Ansible-lint will recognize `requirements.yml` files used for runtime and
 testing purposes and install them automatically. Valid locations for these files
 are:
 
-- [`requirements.yml`](https://docs.ansible.com/ansible/latest/galaxy/user_guide.html#installing-roles-and-collections-from-the-same-requirements-yml-file)
+- [`requirements.yml`](https://docs.ansible.com/projects/ansible/latest/galaxy/user_guide.html#installing-roles-and-collections-from-the-same-requirements-yml-file)
 - `roles/requirements.yml`
 - `collections/requirements.yml`
 - `tests/requirements.yml`
 - `tests/integration/requirements.yml`
 - `tests/unit/requirements.yml`
-- [`galaxy.yml`](https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html)
+- [`galaxy.yml`](https://docs.ansible.com/projects/ansible/latest/dev_guide/collections_galaxy_meta.html)

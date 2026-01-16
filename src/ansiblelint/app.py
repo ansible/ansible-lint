@@ -7,7 +7,6 @@ import itertools
 import logging
 import os
 import sys
-from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -49,6 +48,7 @@ class App:
 
         # Without require_module, our _set_collections_basedir may fail
         self.runtime = Runtime(
+            project_dir=Path(options.project_dir),
             isolated=True,
             require_module=True,
             verbosity=options.verbosity,
@@ -198,7 +198,10 @@ class App:
     ) -> int:
         """Display information about how to skip found rules.
 
-        Returns exit code, 2 if errors were found, 0 when only warnings were found.
+        Returns exit code:
+          - 0: when no errors were found
+          - 2: if errors were found
+          - 8: if all errors were fixed automatically
         """
         msg = ""
 
@@ -226,7 +229,7 @@ class App:
                 ignore_file.writelines(sorted(lines))
         elif matched_rules and not self.options.quiet:
             console_stderr.print(
-                "Read [link=https://ansible.readthedocs.io/projects/lint/configuring/#ignoring-rules-for-entire-files]documentation[/link] for instructions on how to ignore specific rule violations.",
+                "Read [link=https://docs.ansible.com/projects/lint/configuring/#ignoring-rules-for-entire-files]documentation[/link] for instructions on how to ignore specific rule violations.",
             )
 
         # Do not deprecate the old tags just yet. Why? Because it is not currently feasible
@@ -260,6 +263,8 @@ class App:
                 files_count,
                 is_success=mark_as_success,
             )
+        if not summary.failures and changed_files_count > 0:
+            return RC.FIXED_VIOLATIONS
         if mark_as_success:
             if not files_count:
                 # success without any file being analyzed is reported as failure
@@ -372,8 +377,8 @@ def choose_formatter_factory(
         r = formatters.CodeclimateJSONFormatter
     elif options_list.format == "sarif":
         r = formatters.SarifFormatter
-    elif options_list.parseable or options_list.format == "pep8":
-        r = formatters.ParseableFormatter
+    elif options_list.format == "pep8":
+        r = formatters.PEP8Formatter
     return r
 
 
@@ -387,7 +392,6 @@ def _sanitize_list_options(tag_list: list[str]) -> list[str]:
     return sorted(set(tags))
 
 
-@lru_cache
 def get_app(*, offline: bool | None = None, cached: bool = False) -> App:
     """Return the application instance, caching the return value."""
     # Avoids ever running the app initialization twice if cached argument

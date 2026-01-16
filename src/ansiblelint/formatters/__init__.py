@@ -89,8 +89,8 @@ class QuietFormatter(BaseFormatter[Any]):
         )
 
 
-class ParseableFormatter(BaseFormatter[Any]):
-    """Parseable uses PEP8 compatible format."""
+class PEP8Formatter(BaseFormatter[Any]):
+    """Parsable uses PEP8 compatible format."""
 
     def apply(self, match: MatchError) -> str:
         result = (

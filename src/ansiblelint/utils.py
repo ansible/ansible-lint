@@ -51,7 +51,10 @@ from ansible.errors import AnsibleError, AnsibleParserError
 try:
     from ansible.module_utils.common.text.converters import to_bytes
 except ImportError:  # pragma: no branch
-    from ansible.module_utils._text import to_bytes
+    from ansible.module_utils._text import (  # type: ignore[no-redef,unused-ignore]
+        to_bytes,
+    )
+
 from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.mod_args import ModuleArgsParser
@@ -76,7 +79,6 @@ from yaml.representer import RepresenterError
 from yaml.scanner import ScannerError
 
 from ansiblelint._internal.rules import AnsibleParserErrorRule, RuntimeErrorRule
-from ansiblelint.app import App, get_app
 from ansiblelint.config import Options, get_deps_versions, options
 from ansiblelint.constants import (
     ANNOTATION_KEYS,
@@ -102,6 +104,7 @@ from ansiblelint.types import (
 )
 
 if TYPE_CHECKING:
+    from ansiblelint.app import App
     from ansiblelint.rules import RulesCollection
 # ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
 # string as the password to enable such yaml files to be opened and parsed
@@ -119,7 +122,7 @@ _logger = logging.getLogger(__name__)
 
 def parse_yaml_from_file(filepath: str) -> AnsibleJSON:
     """Extract a decrypted YAML object from file."""
-    dataloader = DataLoader()  # type: ignore[no-untyped-call]
+    dataloader = DataLoader()  # type: ignore[no-untyped-call,unused-ignore]
     if hasattr(dataloader, "set_vault_secrets"):
         dataloader.set_vault_secrets([
             ("default", PromptVaultSecret(_bytes=to_bytes(DEFAULT_VAULT_PASSWORD)))  # type: ignore[no-untyped-call]
@@ -136,7 +139,7 @@ def parse_yaml_from_file(filepath: str) -> AnsibleJSON:
 
 def path_dwim(basedir: str, given: str) -> str:
     """Convert a given path do-what-I-mean style."""
-    dataloader = DataLoader()  # type: ignore[no-untyped-call]
+    dataloader = DataLoader()  # type: ignore[no-untyped-call,unused-ignore]
     dataloader.set_basedir(basedir)
     return str(dataloader.path_dwim(given))
 
@@ -151,7 +154,7 @@ def ansible_templar(basedir: Path, templatevars: Any) -> Templar:
     if basedir.name == "tasks":
         basedir = basedir.parent
 
-    dataloader = DataLoader()  # type: ignore[no-untyped-call]
+    dataloader = DataLoader()  # type: ignore[no-untyped-call,unused-ignore]
     dataloader.set_basedir(str(basedir))
     templar = Templar(dataloader, variables=templatevars)
     return templar
@@ -630,7 +633,7 @@ class HandleChildren:
             possible_paths.append(path_dwim(loc, role_name[-1]))
 
         if namespace_name and collection_name:
-            for loc in get_app(cached=True).runtime.config.collections_paths:
+            for loc in self.app.runtime.config.collections_paths:
                 loc = os.path.expanduser(loc)
                 possible_paths.append(
                     path_dwim(
