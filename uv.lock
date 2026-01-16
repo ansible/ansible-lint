@@ -202,7 +202,7 @@ requires-dist = [
     { name = "subprocess-tee", specifier = ">=0.4.1" },
     { name = "wcmatch", marker = "python_full_version < '3.12'", specifier = ">=8.1.2" },
     { name = "wcmatch", marker = "python_full_version >= '3.12'", specifier = ">=8.5.0" },
-    { name = "yamllint", specifier = ">=1.34.0" },
+    { name = "yamllint", specifier = ">=1.38.0" },
 ]
 
 [package.metadata.requires-dev]
