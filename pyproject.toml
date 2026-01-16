@@ -37,12 +37,12 @@ dependencies = [
   "ansible-core>=2.16.14",
   "black>=24.3.0",
   "cffi>=1.15.1",  # indirect dependency of ruamel-yaml
-  "cryptography>=38",
+  "cryptography>=37",
   "distro>=1.9.0",
   "filelock>=3.8.2",
   "jsonschema>=4.10.0",
   "packaging>=22.0",
-  "pathspec>=0.10.3,<1.0.0",  # current yamllint not compatible with newer version
+  "pathspec>=1.0.3,<1.1.0",
   "pyyaml>=6.0.1 ; python_version < '3.14'",
   "pyyaml>=6.0.1 ; python_version >= '3.14'",  # py314 support
   "referencing>=0.36.2",
@@ -51,7 +51,7 @@ dependencies = [
   "subprocess-tee>=0.4.1",
   "wcmatch>=8.1.2 ; python_version < '3.12'",
   "wcmatch>=8.5.0 ; python_version >= '3.12'",
-  "yamllint>=1.34.0",
+  "yamllint>=1.38.0",
 ]
 dynamic = ["version"]
 
@@ -567,6 +567,7 @@ ignore = [
   "PLC0415",
   "PLC2701",
   "PLW1641",
+  "RUF067",
   "S404",
 ]
 select = ["ALL"]
