@@ -24,11 +24,11 @@ cryptography==37.0.4
     #   ansible-lint
 distro==1.9.0
     # via ansible-lint
-filelock==3.20.1
+filelock==3.20.3
     # via ansible-lint
 jinja2==3.1.6
     # via ansible-core
-jsonschema==4.25.1
+jsonschema==4.26.0
     # via
     #   ansible-compat
     #   ansible-lint
@@ -44,7 +44,7 @@ packaging==25.0
     #   ansible-core
     #   ansible-lint
     #   black
-pathspec==0.12.1
+pathspec==1.0.3
     # via
     #   ansible-lint
     #   black
@@ -78,5 +78,5 @@ subprocess-tee==0.4.2
     #   ansible-lint
 wcmatch==10.1
     # via ansible-lint
-yamllint==1.37.1
+yamllint==1.38.0
     # via ansible-lint
