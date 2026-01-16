@@ -92,6 +92,7 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
                         message=f"Avoid using free-form when calling module actions. ({action})",
                         lineno=task.line,
                         filename=file,
+                        details=action,
                     ),
                 )
         return results
@@ -125,7 +126,10 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
                 if v[0] in "\"'":
                     # Keep quoted strings together
                     quote = v[0]
-                    _, v, remainder = v.split(quote, 2)
+                    try:
+                        _, v, remainder = v.split(quote, 2)
+                    except ValueError:
+                        return val
                     v = (
                         DoubleQuotedScalarString
                         if quote == '"'
@@ -146,10 +150,12 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
 
             if match.tag == "no-free-form":
                 module_opts: dict[str, Any] = {}
+                target_module = match.details
+
                 for _ in range(len(task)):
                     k, v = task.popitem(False)
                     # identify module as key and process its value
-                    if len(k.split(".")) == 3 and isinstance(v, str):
+                    if k == target_module and isinstance(v, str):
                         cmd = filter_values(v, "=", module_opts)
                         if cmd:
                             module_opts["cmd"] = cmd
@@ -196,7 +202,7 @@ if "pytest" in sys.modules:
         ("file", "expected"),
         (
             pytest.param("examples/playbooks/rule-no-free-form-pass.yml", 0, id="pass"),
-            pytest.param("examples/playbooks/rule-no-free-form-fail.yml", 3, id="fail"),
+            pytest.param("examples/playbooks/rule-no-free-form-fail.yml", 6, id="fail"),
         ),
     )
     def test_rule_no_free_form(
@@ -207,6 +213,26 @@ if "pytest" in sys.modules:
         """Validate that rule works as intended."""
         results = Runner(file, rules=default_rules_collection).run()
 
-        for result in results:
+        rule_results = [r for r in results if r.rule.id == NoFreeFormRule.id]
+
+        for result in rule_results:
             assert result.rule.id == NoFreeFormRule.id, result
-        assert len(results) == expected
+        assert len(rule_results) == expected
+
+    def test_no_free_form_transform_error_handling() -> None:
+        """Test that transform handles malformed quoted strings."""
+        from ruamel.yaml.comments import CommentedMap
+
+        from ansiblelint.errors import MatchError
+
+        rule = NoFreeFormRule()
+        task = CommentedMap({"ansible.builtin.shell": 'chdir=" /tmp echo foo'})
+        match = MatchError(
+            message="test",
+            rule=rule,
+            details="ansible.builtin.shell",
+            tag="no-free-form",
+        )
+
+        rule.transform(match, None, task)  # type: ignore[arg-type]
+        assert task["ansible.builtin.shell"] == {"cmd": 'chdir=" /tmp echo foo'}
