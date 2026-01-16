@@ -78,5 +78,5 @@ subprocess-tee==0.4.2
     #   ansible-lint
 wcmatch==10.1
     # via ansible-lint
-yamllint==1.37.1
+yamllint==1.38.0
     # via ansible-lint
