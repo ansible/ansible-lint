@@ -70,7 +70,7 @@ rpds-py==0.30.0
     # via
     #   jsonschema
     #   referencing
-ruamel-yaml==0.18.17
+ruamel-yaml==0.19.1
     # via ansible-lint
 subprocess-tee==0.4.2
     # via
