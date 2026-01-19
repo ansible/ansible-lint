@@ -6,7 +6,7 @@ attrs==25.4.0
     # via
     #   jsonschema
     #   referencing
-black==25.12.0
+black==26.1.0
     # via ansible-lint
 bracex==2.6
     # via wcmatch
@@ -18,7 +18,7 @@ click==8.3.1
     # via black
 colorama==0.4.6 ; sys_platform == 'win32'
     # via click
-cryptography==37.0.4
+cryptography==46.0.3
     # via
     #   ansible-core
     #   ansible-lint
