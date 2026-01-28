@@ -38,7 +38,7 @@ markupsafe==3.0.3
     # via jinja2
 mypy-extensions==1.1.0
     # via black
-packaging==25.0
+packaging==26.0
     # via
     #   ansible-compat
     #   ansible-core
@@ -51,9 +51,9 @@ pathspec==1.0.3
     #   yamllint
 platformdirs==4.5.1
     # via black
-pycparser==2.23 ; implementation_name != 'PyPy'
+pycparser==3.0 ; implementation_name != 'PyPy'
     # via cffi
-pytokens==0.3.0
+pytokens==0.4.0
     # via black
 pyyaml==6.0.3
     # via
