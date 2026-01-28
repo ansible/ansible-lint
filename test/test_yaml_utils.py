@@ -1042,3 +1042,20 @@ def test_yamllint_file_config_loaded() -> None:
     config_fixture = Path(fixtures_dir / "yamllint.yml")
     config = ansiblelint.yaml_utils.load_yamllint_config(yamllint_file=config_fixture)
     assert config.rules["line-length"]["max"] == 222
+
+
+def test_formatted_yaml_anchor_indentation() -> None:
+    """Verify that anchors in sequences don't cause runaway indentation (#4935)."""
+    yaml = ansiblelint.yaml_utils.FormattedYAML()
+
+    anchor_input = """---
+- &my_anchor
+  name: my_name
+- <<: *my_anchor
+  name: other_name
+"""
+    data_anchor = yaml.load(anchor_input)
+    output_anchor = yaml.dumps(data_anchor)
+
+    assert "  name: my_name" in output_anchor
+    assert "            name: my_name" not in output_anchor
