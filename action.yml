@@ -100,8 +100,7 @@ runs:
       # git+https://github.com/ansible/ansible-lint@${{ github.action_ref || 'main' }}
       # SETUPTOOLS_SCM_PRETEND_VERSION=${{ github.action_ref || 'main' }}
       run: |
-        cd $GITHUB_ACTION_PATH
-        uv pip install --system "ansible-lint[lock] @ git+https://github.com/ansible/ansible-lint@$GH_ACTION_REF"
+        uv tool install --python ${{ inputs.python_version }} "ansible-lint[lock] @ git+https://github.com/ansible/ansible-lint@$GH_ACTION_REF"
         ansible-lint --version
 
     - name: Install role and collection dependencies from requirements file
