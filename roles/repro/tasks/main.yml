@@ -1,5 +1,0 @@
----
-- dnf: name={{ item }} state=latest
-  register: dnf_updates
-  changed_when: dnf_updates is changed
-  when: update_packages
