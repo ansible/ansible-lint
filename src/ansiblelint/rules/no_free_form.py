@@ -269,3 +269,45 @@ if "pytest" in sys.modules:
         assert task["ansible.builtin.dnf"]["name"] == "{{ item }}"
         assert task["ansible.builtin.dnf"]["state"] == "latest"
         assert "cmd" not in task["ansible.builtin.dnf"]
+
+    def test_no_free_form_transform_unmatched_quote_value() -> None:
+        """Test that malformed quoted values fall back to cmd."""
+        from ruamel.yaml.comments import CommentedMap
+
+        from ansiblelint.errors import MatchError
+
+        rule = NoFreeFormRule()
+        task = CommentedMap(
+            {"ansible.builtin.command": 'name="foo"bar chdir=/tmp'},
+        )
+        match = MatchError(
+            message="test",
+            rule=rule,
+            details="ansible.builtin.command",
+            tag="no-free-form",
+        )
+
+        rule.transform(match, None, task)  # type: ignore[arg-type]
+        assert task["ansible.builtin.command"] == {
+            "cmd": 'name="foo"bar chdir=/tmp',
+        }
+
+    def test_no_free_form_transform_raw_unbalanced_executable() -> None:
+        """Test raw transform fallback when executable value is unbalanced."""
+        from ruamel.yaml.comments import CommentedMap
+
+        from ansiblelint.errors import MatchError
+
+        rule = NoFreeFormRule()
+        task = CommentedMap(
+            {"ansible.builtin.raw": 'executable="/bin/bash echo foo'},
+        )
+        match = MatchError(
+            message="test",
+            rule=rule,
+            tag="no-free-form[raw]",
+        )
+
+        rule.transform(match, None, task)  # type: ignore[arg-type]
+        assert task["ansible.builtin.raw"] == 'executable="/bin/bash echo foo'
+        assert "args" not in task
