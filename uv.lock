@@ -139,6 +139,7 @@ dev = [
     { name = "mypy" },
     { name = "netaddr" },
     { name = "pip" },
+    { name = "prek" },
     { name = "psutil" },
     { name = "pylint" },
     { name = "pyrsistent" },
@@ -162,12 +163,14 @@ docs = [
     { name = "markdown-exec", extra = ["ansi"] },
     { name = "mkdocs-ansible", version = "25.5.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "mkdocs-ansible", version = "25.6.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "prek" },
     { name = "six" },
 ]
 lint = [
     { name = "pip" },
     { name = "pre-commit" },
     { name = "pre-commit-uv" },
+    { name = "prek" },
     { name = "pytest" },
     { name = "ruff" },
     { name = "setuptools" },
@@ -176,6 +179,7 @@ pkg = [
     { name = "build" },
     { name = "pip" },
     { name = "pipx" },
+    { name = "prek" },
     { name = "setuptools-scm" },
     { name = "twine" },
 ]
@@ -222,6 +226,7 @@ dev = [
     { name = "mypy", specifier = ">=1.17.1" },
     { name = "netaddr", specifier = ">=1.3.0" },
     { name = "pip", specifier = ">=25.2" },
+    { name = "prek", specifier = ">=0.3.1" },
     { name = "psutil", specifier = ">=7.0.0" },
     { name = "pylint", specifier = ">=3.3.8" },
     { name = "pyrsistent", specifier = ">=0.20.0" },
@@ -244,12 +249,14 @@ dev = [
 docs = [
     { name = "markdown-exec", extras = ["ansi"], specifier = ">=1.11.0" },
     { name = "mkdocs-ansible", specifier = ">=25.5.0" },
+    { name = "prek", specifier = ">=0.3.1" },
     { name = "six", specifier = ">=1.16.0" },
 ]
 lint = [
     { name = "pip", specifier = ">=25.2" },
     { name = "pre-commit", specifier = ">=4.1" },
     { name = "pre-commit-uv", specifier = ">=4.1.4" },
+    { name = "prek", specifier = ">=0.3.1" },
     { name = "pytest", specifier = ">=9" },
     { name = "ruff", specifier = ">=0.14.10" },
     { name = "setuptools", specifier = ">=51.1.1" },
@@ -258,6 +265,7 @@ pkg = [
     { name = "build", specifier = ">=0.9" },
     { name = "pip", specifier = ">=25.2" },
     { name = "pipx", specifier = ">=1.7.1" },
+    { name = "prek", specifier = ">=0.3.1" },
     { name = "setuptools-scm", specifier = ">=9.2.0" },
     { name = "twine", specifier = ">=4.0.1" },
 ]
