@@ -30,6 +30,7 @@ import shutil
 import site
 import sys
 import warnings
+from fnmatch import fnmatch
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -294,6 +295,28 @@ def _rule_is_skipped(tag: str, rules: set[IgnoreRule]) -> bool:
     return False
 
 
+def _get_ignored_rules_for_file(
+    filename: str, ignore_map: dict[str, set[IgnoreRule]]
+) -> set[IgnoreRule]:
+    """Get all IgnoreRule objects that apply to a given filename.
+
+    Supports both exact matches and glob patterns.
+    """
+    ignored_rules = set()
+    normalized_filename = str(Path(filename).as_posix())
+
+    for pattern, rule_set in ignore_map.items():
+        normalized_pattern = str(Path(pattern).as_posix())
+
+        # Check for exact match first (fast path for backward compatibility)
+        if normalized_filename == normalized_pattern or fnmatch(
+            normalized_filename, normalized_pattern
+        ):
+            ignored_rules.update(rule_set)
+
+    return ignored_rules
+
+
 # pylint: disable=too-many-locals,too-many-statements
 def main(argv: list[str] | None = None) -> int:
     """Linter CLI entry point."""
@@ -402,13 +425,16 @@ def main(argv: list[str] | None = None) -> int:
     ignore_map = load_ignore_txt(options.ignore_file)
     # prune qualified skips from ignore file
     result.matches = [
-        m for m in result.matches if not _rule_is_skipped(m.tag, ignore_map[m.filename])
+        m
+        for m in result.matches
+        if not _rule_is_skipped(
+            m.tag, _get_ignored_rules_for_file(m.filename, ignore_map)
+        )
     ]
     # others entries are ignored
     for match in result.matches:
-        if match.tag in [
-            i.rule for i in ignore_map[match.filename]
-        ]:  # pragma: no cover
+        ignored_rules = _get_ignored_rules_for_file(match.filename, ignore_map)
+        if match.tag in [ir.rule for ir in ignored_rules]:  # pragma: no cover
             match.ignored = True
             _logger.debug("Ignored: %s", match)
 
