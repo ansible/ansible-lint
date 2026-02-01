@@ -634,6 +634,9 @@ def get_config(arguments: list[str]) -> Options:
             srcs=options.lintables,
             config_file=options.config_file,
         )
+        if method == "file system root":
+            project_dir = Path.home()
+            method = "user home directory"
         options.project_dir = os.path.expanduser(normpath(project_dir))
         log_entries.append(
             (
