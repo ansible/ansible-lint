@@ -119,7 +119,7 @@ def validate_file_schema(file: Lintable) -> list[str]:
 def _deep_match_relevance(error: ValidationError) -> tuple[bool | int, ...]:
     validator = error.validator
     return (
-        validator not in ("anyOf", "oneOf"),  # type: ignore[comparison-overlap]
+        validator not in ("anyOf", "oneOf"),
         len(error.absolute_path),
         -len(error.path),
     )
