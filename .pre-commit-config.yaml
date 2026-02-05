@@ -116,7 +116,7 @@ repos:
       - id: trailing-whitespace
         exclude: >
           (?x)^(
-            examples/playbooks/(with-skip-tag-id|unicode).yml|
+            examples/playbooks/(with-skip-tag-id|unicode|with-multiple-yaml-violations).yml|
             examples/playbooks/example.yml|
             examples/yamllint/.*|
             test/eco/.*.result|

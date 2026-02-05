@@ -1,0 +1,6 @@
+---
+- hosts: all
+  tasks:
+    - name: Trailing whitespace on this line      
+      ansible.builtin.debug:
+        msg :  "Too many spaces around colon"
