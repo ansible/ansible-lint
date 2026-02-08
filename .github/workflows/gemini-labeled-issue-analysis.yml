@@ -84,10 +84,8 @@ jobs:
           TITLE="${{ github.event.issue.title }}"
           BODY="${{ github.event.issue.body }}"
           
-          # Run prompt injection check
           python -m utils.security.prompt_injection "$TITLE" "$BODY" > ../prompt_injection_result.json 2> ../prompt_injection_debug.log || true
           
-          # Parse results
           if [ -f "../prompt_injection_result.json" ]; then
             HAS_INJECTION=$(jq -r '.has_prompt_injection // false' ../prompt_injection_result.json)
             RISK_LEVEL=$(jq -r '.risk_level // "safe"' ../prompt_injection_result.json)
@@ -109,28 +107,14 @@ jobs:
             echo "bypass=false" >> $GITHUB_OUTPUT
           fi
           
-      - name: Post security warning if needed
-        if: steps.security_check.outputs.has_injection == 'true' && steps.bypass_check.outputs.bypass != 'true'
+      - name: Post security warning if high risk
+        if: steps.security_check.outputs.has_injection == 'true' && (steps.security_check.outputs.risk_level == 'high' || steps.security_check.outputs.risk_level == 'critical') && steps.bypass_check.outputs.bypass != 'true'
         uses: actions/github-script@v7
         with:
           script: |
             const riskLevel = '${{ steps.security_check.outputs.risk_level }}';
-            const isHighRisk = riskLevel === 'high' || riskLevel === 'critical';
+            const comment = '## 🛡️ Security Check Result\n\n🔴 **Risk Level:** `' + riskLevel.toUpperCase() + '`\n\n⚠️ **Analysis blocked due to potential prompt injection.**\n\nIf this is a false positive, a maintainer can add the `Gemini Analyze : Bypass Prompt Injection Check` label.\n\n---\n<sub>🤖 Automated security check by AI Issue Triage</sub>';
             
-            let emoji = '🟢';
-            if (riskLevel === 'critical') emoji = '🔴';
-            else if (riskLevel === 'high') emoji = '🟠';
-            else if (riskLevel === 'medium') emoji = '🟡';
-            
-            const comment = `## 🛡️ Security Check Result
-
-${emoji} **Risk Level:** \`${riskLevel.toUpperCase()}\`
-
-${isHighRisk ? '⚠️ **Analysis blocked due to potential prompt injection.**\n\nIf this is a false positive, a maintainer can add the \`Gemini Analyze : Bypass Prompt Injection Check\` label.' : '⚠️ **Warning:** Potential prompt injection patterns detected, but proceeding with analysis.'}
-
----
-<sub>🤖 Automated security check by AI Issue Triage</sub>`;
-
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -138,25 +122,21 @@ ${isHighRisk ? '⚠️ **Analysis blocked due to potential prompt injection.**\n
               body: comment
             });
             
-            // Add security label
-            const labelName = isHighRisk ? 'Prompt injection blocked' : 'Prompt injection warning';
-            const labelColor = isHighRisk ? 'd73a4a' : 'fbca04';
-            
             try {
               await github.rest.issues.createLabel({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                name: labelName,
-                color: labelColor,
+                name: 'Prompt injection blocked',
+                color: 'd73a4a',
                 description: 'AI-generated: Security concern detected'
               });
-            } catch (e) {}
+            } catch (e) { console.log('Label may already exist'); }
             
             await github.rest.issues.addLabels({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              labels: [labelName]
+              labels: ['Prompt injection blocked']
             });
             
       - name: Skip analysis if high risk
@@ -229,26 +209,10 @@ ${isHighRisk ? '⚠️ **Analysis blocked due to potential prompt injection.**\n
             const similarity = Math.round((result.similarity_score || 0) * 100);
             const confidence = Math.round((result.confidence_score || 0) * 100);
             const originalIssue = result.duplicate_of;
+            const originalRef = originalIssue ? '#' + originalIssue.issue_id + ' - ' + originalIssue.title : 'Unknown';
             
-            let comment = `## 🔍 Duplicate Detection Report
-
-🔄 **Status:** DUPLICATE DETECTED
-
-### 📊 Similarity Metrics
-| Metric | Score |
-|--------|-------|
-| Similarity | ${similarity}% |
-| Confidence | ${confidence}% |
-
-### 🎯 Original Issue
-${originalIssue ? `[#${originalIssue.issue_id}](${originalIssue.url}) - ${originalIssue.title}` : 'Unknown'}
-
-### 💡 Recommendation
-${result.recommendation || 'Consider closing this as duplicate.'}
-
----
-<sub>🤖 Duplicate detection by AI Issue Triage</sub>`;
-
+            const comment = '## 🔍 Duplicate Detection Report\n\n🔄 **Status:** DUPLICATE DETECTED\n\n### 📊 Similarity Metrics\n| Metric | Score |\n|--------|-------|\n| Similarity | ' + similarity + '% |\n| Confidence | ' + confidence + '% |\n\n### 🎯 Original Issue\n' + originalRef + '\n\n### 💡 Recommendation\n' + (result.recommendation || 'Consider closing this as duplicate.') + '\n\n---\n<sub>🤖 Duplicate detection by AI Issue Triage</sub>';
+            
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -256,7 +220,6 @@ ${result.recommendation || 'Consider closing this as duplicate.'}
               body: comment
             });
             
-            // Add duplicate label
             try {
               await github.rest.issues.createLabel({
                 owner: context.repo.owner,
@@ -265,7 +228,7 @@ ${result.recommendation || 'Consider closing this as duplicate.'}
                 color: 'cfd3d7',
                 description: 'AI-generated: This issue appears to be a duplicate'
               });
-            } catch (e) {}
+            } catch (e) { console.log('Label may already exist'); }
             
             await github.rest.issues.addLabels({
               owner: context.repo.owner,
@@ -357,7 +320,7 @@ ${result.recommendation || 'Consider closing this as duplicate.'}
                   color: label.color,
                   description: 'AI-generated: Issue type'
                 });
-              } catch (e) {}
+              } catch (e) { console.log('Label may already exist'); }
               labelsToAdd.push(label.name);
             }
             
@@ -371,7 +334,7 @@ ${result.recommendation || 'Consider closing this as duplicate.'}
                   color: label.color,
                   description: 'AI-generated: Severity level'
                 });
-              } catch (e) {}
+              } catch (e) { console.log('Label may already exist'); }
               labelsToAdd.push(label.name);
             }
             
@@ -398,4 +361,3 @@ ${result.recommendation || 'Consider closing this as duplicate.'}
             existing_issues.json
             ${{ steps.config.outputs.repomix_output }}
           retention-days: 30
-
