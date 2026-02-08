@@ -1,0 +1,401 @@
+# AI Issue Triage - Label-Based Single Issue Analysis
+# Triggers when an issue is labeled with "Gemini Analyze"
+# For DevConf Pune 2026 Demo
+
+name: AI Labeled Issue Analysis
+
+on:
+  issues:
+    types: [labeled, opened]
+
+jobs:
+  analyze-issue:
+    if: contains(github.event.issue.labels.*.name, 'Gemini Analyze')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Clone AI-Issue-Triage repository
+        uses: actions/checkout@v4
+        with:
+          repository: tanwigeetika1618/AI-Issue-Triage
+          path: ai-triage
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          
+      - name: Install repomix
+        run: npm install -g repomix
+        
+      - name: Read triage config
+        id: config
+        run: |
+          if [ -f "triage.config.json" ]; then
+            REPO_URL=$(jq -r '.repository.url // empty' triage.config.json)
+            REPOMIX_OUTPUT=$(jq -r '.repomix.output_path // "repomix-output.txt"' triage.config.json)
+            CUSTOM_PROMPT=$(jq -r '.analysis.custom_prompt_path // empty' triage.config.json)
+            GEMINI_MODEL=$(jq -r '.gemini.model // empty' triage.config.json)
+            
+            echo "repo_url=$REPO_URL" >> $GITHUB_OUTPUT
+            echo "repomix_output=$REPOMIX_OUTPUT" >> $GITHUB_OUTPUT
+            echo "custom_prompt=$CUSTOM_PROMPT" >> $GITHUB_OUTPUT
+            echo "gemini_model=$GEMINI_MODEL" >> $GITHUB_OUTPUT
+          else
+            echo "repomix_output=repomix-output.txt" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Generate codebase file with repomix
+        run: |
+          REPO_URL="${{ steps.config.outputs.repo_url }}"
+          OUTPUT_PATH="${{ steps.config.outputs.repomix_output }}"
+          
+          if [ -n "$REPO_URL" ]; then
+            repomix --remote "$REPO_URL" --output "$OUTPUT_PATH"
+          else
+            repomix --output "$OUTPUT_PATH"
+          fi
+          
+      - name: Install Python dependencies
+        run: |
+          cd ai-triage
+          pip install -r requirements.txt
+          pip install -e .
+          
+      - name: Check for prompt injection
+        id: security_check
+        continue-on-error: true
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          cd ai-triage
+          
+          TITLE="${{ github.event.issue.title }}"
+          BODY="${{ github.event.issue.body }}"
+          
+          # Run prompt injection check
+          python -m utils.security.prompt_injection "$TITLE" "$BODY" > ../prompt_injection_result.json 2> ../prompt_injection_debug.log || true
+          
+          # Parse results
+          if [ -f "../prompt_injection_result.json" ]; then
+            HAS_INJECTION=$(jq -r '.has_prompt_injection // false' ../prompt_injection_result.json)
+            RISK_LEVEL=$(jq -r '.risk_level // "safe"' ../prompt_injection_result.json)
+            
+            echo "has_injection=$HAS_INJECTION" >> $GITHUB_OUTPUT
+            echo "risk_level=$RISK_LEVEL" >> $GITHUB_OUTPUT
+          else
+            echo "has_injection=false" >> $GITHUB_OUTPUT
+            echo "risk_level=safe" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Check if bypass label exists
+        id: bypass_check
+        run: |
+          LABELS='${{ toJson(github.event.issue.labels.*.name) }}'
+          if echo "$LABELS" | grep -q "Gemini Analyze : Bypass Prompt Injection Check"; then
+            echo "bypass=true" >> $GITHUB_OUTPUT
+          else
+            echo "bypass=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Post security warning if needed
+        if: steps.security_check.outputs.has_injection == 'true' && steps.bypass_check.outputs.bypass != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const riskLevel = '${{ steps.security_check.outputs.risk_level }}';
+            const isHighRisk = riskLevel === 'high' || riskLevel === 'critical';
+            
+            let emoji = '🟢';
+            if (riskLevel === 'critical') emoji = '🔴';
+            else if (riskLevel === 'high') emoji = '🟠';
+            else if (riskLevel === 'medium') emoji = '🟡';
+            
+            const comment = `## 🛡️ Security Check Result
+
+${emoji} **Risk Level:** \`${riskLevel.toUpperCase()}\`
+
+${isHighRisk ? '⚠️ **Analysis blocked due to potential prompt injection.**\n\nIf this is a false positive, a maintainer can add the \`Gemini Analyze : Bypass Prompt Injection Check\` label.' : '⚠️ **Warning:** Potential prompt injection patterns detected, but proceeding with analysis.'}
+
+---
+<sub>🤖 Automated security check by AI Issue Triage</sub>`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: comment
+            });
+            
+            // Add security label
+            const labelName = isHighRisk ? 'Prompt injection blocked' : 'Prompt injection warning';
+            const labelColor = isHighRisk ? 'd73a4a' : 'fbca04';
+            
+            try {
+              await github.rest.issues.createLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: labelName,
+                color: labelColor,
+                description: 'AI-generated: Security concern detected'
+              });
+            } catch (e) {}
+            
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: [labelName]
+            });
+            
+      - name: Skip analysis if high risk
+        if: (steps.security_check.outputs.risk_level == 'high' || steps.security_check.outputs.risk_level == 'critical') && steps.bypass_check.outputs.bypass != 'true'
+        run: |
+          echo "Skipping analysis due to high security risk"
+          exit 0
+          
+      - name: Fetch existing issues for duplicate check
+        id: fetch_issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100
+            });
+            
+            const existingIssues = issues.data
+              .filter(issue => issue.number !== context.issue.number)
+              .map(issue => ({
+                issue_id: String(issue.number),
+                title: issue.title,
+                description: issue.body || '',
+                status: 'open',
+                created_date: issue.created_at,
+                url: issue.html_url
+              }));
+            
+            require('fs').writeFileSync('existing_issues.json', JSON.stringify(existingIssues, null, 2));
+            return existingIssues.length;
+            
+      - name: Check for duplicates
+        id: duplicate_check
+        if: (steps.security_check.outputs.risk_level != 'high' && steps.security_check.outputs.risk_level != 'critical') || steps.bypass_check.outputs.bypass == 'true'
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          cd ai-triage
+          
+          MODEL_ARG=""
+          if [ -n "${{ steps.config.outputs.gemini_model }}" ]; then
+            MODEL_ARG="--model ${{ steps.config.outputs.gemini_model }}"
+          fi
+          
+          python -m cli.duplicate_check \
+            --title "${{ github.event.issue.title }}" \
+            --description "${{ github.event.issue.body }}" \
+            --issues ../existing_issues.json \
+            $MODEL_ARG \
+            --format json > ../duplicate_result.json 2>&1 || true
+          
+          if [ -f "../duplicate_result.json" ]; then
+            IS_DUPLICATE=$(jq -r '.is_duplicate // false' ../duplicate_result.json)
+            echo "is_duplicate=$IS_DUPLICATE" >> $GITHUB_OUTPUT
+          else
+            echo "is_duplicate=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Post duplicate result if found
+        if: steps.duplicate_check.outputs.is_duplicate == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const result = JSON.parse(fs.readFileSync('duplicate_result.json', 'utf8'));
+            
+            const similarity = Math.round((result.similarity_score || 0) * 100);
+            const confidence = Math.round((result.confidence_score || 0) * 100);
+            const originalIssue = result.duplicate_of;
+            
+            let comment = `## 🔍 Duplicate Detection Report
+
+🔄 **Status:** DUPLICATE DETECTED
+
+### 📊 Similarity Metrics
+| Metric | Score |
+|--------|-------|
+| Similarity | ${similarity}% |
+| Confidence | ${confidence}% |
+
+### 🎯 Original Issue
+${originalIssue ? `[#${originalIssue.issue_id}](${originalIssue.url}) - ${originalIssue.title}` : 'Unknown'}
+
+### 💡 Recommendation
+${result.recommendation || 'Consider closing this as duplicate.'}
+
+---
+<sub>🤖 Duplicate detection by AI Issue Triage</sub>`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: comment
+            });
+            
+            // Add duplicate label
+            try {
+              await github.rest.issues.createLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: 'Duplicate',
+                color: 'cfd3d7',
+                description: 'AI-generated: This issue appears to be a duplicate'
+              });
+            } catch (e) {}
+            
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ['Duplicate']
+            });
+            
+      - name: Run AI analysis
+        if: steps.duplicate_check.outputs.is_duplicate != 'true' && ((steps.security_check.outputs.risk_level != 'high' && steps.security_check.outputs.risk_level != 'critical') || steps.bypass_check.outputs.bypass == 'true')
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          cd ai-triage
+          
+          CUSTOM_PROMPT_ARG=""
+          if [ -n "${{ steps.config.outputs.custom_prompt }}" ] && [ -f "../${{ steps.config.outputs.custom_prompt }}" ]; then
+            CUSTOM_PROMPT_ARG="--custom-prompt ../${{ steps.config.outputs.custom_prompt }}"
+          fi
+          
+          MODEL_ARG=""
+          if [ -n "${{ steps.config.outputs.gemini_model }}" ]; then
+            MODEL_ARG="--model ${{ steps.config.outputs.gemini_model }}"
+          fi
+          
+          python -m cli.analyze \
+            --title "${{ github.event.issue.title }}" \
+            --description "${{ github.event.issue.body }}" \
+            --source-path "../${{ steps.config.outputs.repomix_output }}" \
+            $CUSTOM_PROMPT_ARG \
+            $MODEL_ARG \
+            --format json \
+            --output ../analysis_result.json
+          
+          python -m cli.analyze \
+            --title "${{ github.event.issue.title }}" \
+            --description "${{ github.event.issue.body }}" \
+            --source-path "../${{ steps.config.outputs.repomix_output }}" \
+            $CUSTOM_PROMPT_ARG \
+            $MODEL_ARG \
+            --format text \
+            --output ../analysis_result.txt
+            
+      - name: Post analysis comment
+        if: steps.duplicate_check.outputs.is_duplicate != 'true' && ((steps.security_check.outputs.risk_level != 'high' && steps.security_check.outputs.risk_level != 'critical') || steps.bypass_check.outputs.bypass == 'true')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const analysisText = fs.readFileSync('analysis_result.txt', 'utf8');
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: analysisText
+            });
+            
+      - name: Add labels based on analysis
+        if: steps.duplicate_check.outputs.is_duplicate != 'true' && ((steps.security_check.outputs.risk_level != 'high' && steps.security_check.outputs.risk_level != 'critical') || steps.bypass_check.outputs.bypass == 'true')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const analysis = JSON.parse(fs.readFileSync('analysis_result.json', 'utf8'));
+            
+            const typeLabels = {
+              'bug': { name: 'Type : Bug', color: 'd73a4a' },
+              'enhancement': { name: 'Type : Enhancement', color: 'a2eeef' },
+              'feature_request': { name: 'Type : Feature request', color: '0e8a16' }
+            };
+            
+            const severityLabels = {
+              'critical': { name: 'Severity : Critical', color: 'b60205' },
+              'high': { name: 'Severity : High', color: 'd93f0b' },
+              'medium': { name: 'Severity : Medium', color: 'fbca04' },
+              'low': { name: 'Severity : Low', color: '0e8a16' }
+            };
+            
+            const labelsToAdd = [];
+            
+            if (analysis.issue_type && typeLabels[analysis.issue_type]) {
+              const label = typeLabels[analysis.issue_type];
+              try {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: label.name,
+                  color: label.color,
+                  description: 'AI-generated: Issue type'
+                });
+              } catch (e) {}
+              labelsToAdd.push(label.name);
+            }
+            
+            if (analysis.severity && severityLabels[analysis.severity]) {
+              const label = severityLabels[analysis.severity];
+              try {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: label.name,
+                  color: label.color,
+                  description: 'AI-generated: Severity level'
+                });
+              } catch (e) {}
+              labelsToAdd.push(label.name);
+            }
+            
+            if (labelsToAdd.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                labels: labelsToAdd
+              });
+            }
+            
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: analysis-artifacts-${{ github.event.issue.number }}
+          path: |
+            analysis_result.json
+            analysis_result.txt
+            prompt_injection_result.json
+            prompt_injection_debug.log
+            duplicate_result.json
+            existing_issues.json
+            ${{ steps.config.outputs.repomix_output }}
+          retention-days: 30
+

@@ -1,0 +1,65 @@
+You are an expert software engineer analyzing a code issue for Ansible Lint - a best practices checker for Ansible playbooks, roles, and collections.
+
+ISSUE DETAILS:
+Title: {title}
+Description: {issue_description}
+
+CODEBASE CONTENT:
+{codebase_content}
+
+ANALYSIS REQUIREMENTS:
+1. **Issue Classification**: Determine if this is a 'bug', 'enhancement', or 'feature_request'
+2. **Severity Assessment**: Rate as 'low', 'medium', 'high', or 'critical'
+3. **Root Cause Analysis**: Identify the primary cause and contributing factors
+4. **Code Location Identification**: Find relevant files, functions, and classes in src/ansiblelint/
+5. **Solution Proposal**: Suggest specific code changes with rationale
+
+RESPONSE FORMAT (JSON):
+{{
+    "issue_type": "bug|enhancement|feature_request",
+    "severity": "low|medium|high|critical",
+    "root_cause_analysis": {{
+        "primary_cause": "Main reason for the issue",
+        "contributing_factors": ["factor1", "factor2"],
+        "affected_components": ["component1", "component2"],
+        "related_code_locations": [
+            {{
+                "file_path": "path/to/file.py",
+                "line_number": 123,
+                "function_name": "function_name",
+                "class_name": "ClassName"
+            }}
+        ]
+    }},
+    "proposed_solutions": [
+        {{
+            "description": "Solution description",
+            "code_changes": "Specific code changes needed",
+            "location": {{
+                "file_path": "path/to/file.py",
+                "line_number": 123,
+                "function_name": "function_name",
+                "class_name": "ClassName"
+            }},
+            "rationale": "Why this solution works"
+        }}
+    ],
+    "confidence_score": 0.85,
+    "analysis_summary": "Brief summary of the analysis"
+}}
+
+ANALYSIS GUIDELINES:
+- Focus on the Ansible Lint codebase structure in src/ansiblelint/
+- Key directories:
+  - src/ansiblelint/rules/ - Contains all lint rules
+  - src/ansiblelint/runner.py - Main execution logic
+  - src/ansiblelint/config.py - Configuration handling
+  - src/ansiblelint/app.py - Application entry point
+- Consider Python linting patterns and rule implementations
+- Look at how existing rules are structured in the rules/ directory for consistency
+- Consider YAML parsing and Ansible-specific patterns
+- Provide actionable, specific solutions with real file paths from the codebase
+- If you cannot find the exact file or function, state that clearly rather than guessing
+
+Please analyze the issue and provide your response in the exact JSON format specified above.
+
