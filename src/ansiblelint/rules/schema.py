@@ -16,6 +16,7 @@ from ansiblelint.text import has_jinja
 if TYPE_CHECKING:
     from collections.abc import MutableMapping
 
+    from ansiblelint.app import App
     from ansiblelint.config import Options
     from ansiblelint.errors import MatchError
     from ansiblelint.utils import Task
@@ -389,12 +390,13 @@ if "pytest" in sys.modules:
         expected_kind: str,
         expected: list[str],
         config_options: Options,
+        app: App,
     ) -> None:
         """Validate parsing of ansible output."""
         lintable = Lintable(file)
         assert lintable.kind == expected_kind
 
-        rules = RulesCollection(options=config_options)
+        rules = RulesCollection(app=app, options=config_options)
         rules.register(ValidateSchemaRule())
         results = Runner(lintable, rules=rules).run()
 
@@ -422,12 +424,13 @@ if "pytest" in sys.modules:
         expected_tag: str,
         count: int,
         config_options: Options,
+        app: App,
     ) -> None:
         """Validate ability to detect schema[moves]."""
         lintable = Lintable(file)
         assert lintable.kind == expected_kind
 
-        rules = RulesCollection(options=config_options)
+        rules = RulesCollection(app=app, options=config_options)
         rules.register(ValidateSchemaRule())
         results = Runner(lintable, rules=rules).run()
 

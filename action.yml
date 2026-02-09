@@ -14,6 +14,10 @@ inputs:
     description: If false, this action will not setup python and will instead rely on the already installed python.
     required: false
     default: "true"
+  python_version:
+    description: The version of Python to use when setting up Python environment. Default is 3.14.
+    required: false
+    default: "3.14"
   working_directory:
     description: The directory where to run ansible-lint from. Default is `github.workspace`.
     required: false
@@ -26,8 +30,12 @@ inputs:
     description: (Internal use only) Expected return code from ansible-lint. Default is 0. Used for self-testing purposes.
     required: false
     default: "0"
+  override_version:
+    description: The branch, tag, or commit to use for ansible-lint.
+    default: ""
+    required: false
   gh_action_ref:
-    description: The branch, tag, or commit to use for ansible-lint. Only recommended for use with composite actions where `GH_ACTION_REF` is set to the parent action version.
+    description: (Deprecated) Use 'override_version' instead.
     default: ""
     required: false
 runs:
@@ -48,12 +56,13 @@ runs:
     - name: Determine github action ref
       shell: bash
       env:
-        GH_ACTION_REF_INPUT: ${{ inputs.gh_action_ref }}
+        OVERRIDE_VER: ${{ inputs.override_version }}
+        OLD_REF: ${{ inputs.gh_action_ref }}
         GITHUB_ACTION_REF_DISAMBIGUATED: ${{ github.action_ref }}
       run: |
-        action_ref="${GH_ACTION_REF_INPUT:-${GITHUB_ACTION_REF_DISAMBIGUATED:-main}}"
-        if [[ ${GH_ACTION_REF_INPUT} ]]; then
-          echo "::warning::Using input 'gh_action_ref': Loading ansible-lint version ${action_ref}. This input should only be used in composite actions where built-in 'GH_ACTION_REF' is set to the parent action version. If possible, use the 'uses: ansible-lint@<version>' syntax instead."
+        action_ref="${OVERRIDE_VER:-${OLD_REF:-${GITHUB_ACTION_REF_DISAMBIGUATED:-main}}}"
+        if [[ -n "${OLD_REF}" ]]; then
+          echo "::warning::Using input 'gh_action_ref': Loading ansible-lint version ${action_ref}. This input is deprecated; please use 'override_version' instead."
         else
           echo "Using ansible-lint ref: $action_ref"
         fi
@@ -75,13 +84,12 @@ runs:
         echo "reqs_file=$reqs_file" >> $GITHUB_OUTPUT
         wget --output-document=$reqs_file https://raw.githubusercontent.com/ansible/ansible-lint/$GH_ACTION_REF/.config/requirements-lock.txt
 
-    - name: Set up Python
+    - name: Set up uv
       if: inputs.setup_python == 'true'
-      uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6
+      uses: astral-sh/setup-uv@v7
       with:
-        cache: pip
-        cache-dependency-path: ${{ steps.get_reqs.outputs.reqs_file }}
-        python-version: "3.14"
+        enable-cache: true
+        python-version: ${{ inputs.python_version }}
 
     - name: Install ansible-lint
       shell: bash
@@ -92,8 +100,12 @@ runs:
       # git+https://github.com/ansible/ansible-lint@${{ github.action_ref || 'main' }}
       # SETUPTOOLS_SCM_PRETEND_VERSION=${{ github.action_ref || 'main' }}
       run: |
-        cd $GITHUB_ACTION_PATH
-        pip install "ansible-lint[lock] @ git+https://github.com/ansible/ansible-lint@$GH_ACTION_REF"
+        if [[ "${{ inputs.setup_python }}" == "true" ]]; then
+          uv tool install --python ${{ inputs.python_version }} "ansible-lint[lock] @ git+https://github.com/ansible/ansible-lint@$GH_ACTION_REF"
+        else
+          echo "setup_python is false, using pip"
+          pip install "ansible-lint[lock] @ git+https://github.com/ansible/ansible-lint@$GH_ACTION_REF"
+        fi
         ansible-lint --version
 
     - name: Install role and collection dependencies from requirements file

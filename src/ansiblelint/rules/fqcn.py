@@ -266,12 +266,11 @@ if "pytest" in sys.modules:
     from ansiblelint.runner import Runner
 
     @pytest.mark.libyaml
-    def test_fqcn_builtin_fail() -> None:
+    def test_fqcn_builtin_fail(empty_rule_collection: RulesCollection) -> None:
         """Test rule matches."""
-        collection = RulesCollection()
-        collection.register(FQCNBuiltinsRule())
+        empty_rule_collection.register(FQCNBuiltinsRule())
         success = "examples/playbooks/rule-fqcn-fail.yml"
-        results = Runner(success, rules=collection).run()
+        results = Runner(success, rules=empty_rule_collection).run()
         assert len(results) == 3
         assert results[0].tag == "fqcn[keyword]"
         assert "Avoid `collections` keyword" in results[0].message
@@ -280,36 +279,32 @@ if "pytest" in sys.modules:
         assert results[2].tag == "fqcn[action]"
         assert "Use FQCN for module actions, such" in results[2].message
 
-    def test_fqcn_builtin_pass() -> None:
+    def test_fqcn_builtin_pass(empty_rule_collection: RulesCollection) -> None:
         """Test rule does not match."""
-        collection = RulesCollection()
-        collection.register(FQCNBuiltinsRule())
+        empty_rule_collection.register(FQCNBuiltinsRule())
         success = "examples/playbooks/rule-fqcn-pass.yml"
-        results = Runner(success, rules=collection).run()
+        results = Runner(success, rules=empty_rule_collection).run()
         assert len(results) == 0, results
 
-    def test_fqcn_deep_fail() -> None:
+    def test_fqcn_deep_fail(empty_rule_collection: RulesCollection) -> None:
         """Test rule matches."""
-        collection = RulesCollection()
-        collection.register(FQCNBuiltinsRule())
+        empty_rule_collection.register(FQCNBuiltinsRule())
         failure = "examples/.collection/plugins/modules/deep/beta.py"
-        results = Runner(failure, rules=collection).run()
+        results = Runner(failure, rules=empty_rule_collection).run()
         assert len(results) == 1
         assert results[0].tag == "fqcn[deep]"
         assert "Deep plugins directory is discouraged" in results[0].message
 
-    def test_fqcn_deep_pass() -> None:
+    def test_fqcn_deep_pass(empty_rule_collection: RulesCollection) -> None:
         """Test rule does not match."""
-        collection = RulesCollection()
-        collection.register(FQCNBuiltinsRule())
+        empty_rule_collection.register(FQCNBuiltinsRule())
         success = "examples/.collection/plugins/modules/alpha.py"
-        results = Runner(success, rules=collection).run()
+        results = Runner(success, rules=empty_rule_collection).run()
         assert len(results) == 0
 
-    def test_fqcn_deep_test_dir_pass() -> None:
+    def test_fqcn_deep_test_dir_pass(empty_rule_collection: RulesCollection) -> None:
         """Test rule does not match."""
-        collection = RulesCollection()
-        collection.register(FQCNBuiltinsRule())
+        empty_rule_collection.register(FQCNBuiltinsRule())
         success = "examples/.collection/plugins/modules/tests/gamma.py"
-        results = Runner(success, rules=collection).run()
+        results = Runner(success, rules=empty_rule_collection).run()
         assert len(results) == 0

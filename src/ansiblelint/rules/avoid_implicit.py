@@ -44,19 +44,21 @@ if "pytest" in sys.modules:
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
 
-    def test_template_instead_of_copy_positive() -> None:
+    def test_template_instead_of_copy_positive(
+        empty_rule_collection: RulesCollection,
+    ) -> None:
         """Positive test for avoid-implicit."""
-        collection = RulesCollection()
-        collection.register(AvoidImplicitRule())
+        empty_rule_collection.register(AvoidImplicitRule())
         success = "examples/playbooks/rule-avoid-implicit-pass.yml"
-        good_runner = Runner(success, rules=collection)
+        good_runner = Runner(success, rules=empty_rule_collection)
         assert good_runner.run() == []
 
-    def test_template_instead_of_copy_negative() -> None:
+    def test_template_instead_of_copy_negative(
+        empty_rule_collection: RulesCollection,
+    ) -> None:
         """Negative test for avoid-implicit."""
-        collection = RulesCollection()
-        collection.register(AvoidImplicitRule())
+        empty_rule_collection.register(AvoidImplicitRule())
         failure = "examples/playbooks/rule-avoid-implicit-fail.yml"
-        bad_runner = Runner(failure, rules=collection)
+        bad_runner = Runner(failure, rules=empty_rule_collection)
         errs = bad_runner.run()
         assert len(errs) == 1

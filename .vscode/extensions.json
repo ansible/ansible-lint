@@ -1,7 +1,6 @@
 {
   "recommendations": [
     "biomejs.biome",
-    "Tyriar.sort-lines",
     "charliermarsh.ruff",
     "github.vscode-github-actions",
     "hbenl.vscode-test-explorer",
@@ -13,10 +12,8 @@
     "redhat.ansible",
     "redhat.vscode-yaml",
     "ryanluker.vscode-coverage-gutters",
-    "shardulm94.trailing-spaces",
     "tombi-toml.tombi",
-    "timonwong.shellcheck",
-    "znck.grammarly"
+    "timonwong.shellcheck"
   ],
   "unwantedRecommendations": [
     "esbenp.prettier-vscode",

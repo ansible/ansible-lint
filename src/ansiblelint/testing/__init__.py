@@ -10,11 +10,12 @@ import tempfile
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from ansiblelint.app import App, get_app
+from ansiblelint.app import get_app as get_app
 
 if TYPE_CHECKING:
     # https://github.com/PyCQA/pylint/issues/3240
     CompletedProcess = subprocess.CompletedProcess[Any]
+    from ansiblelint.app import App
     from ansiblelint.errors import MatchError
     from ansiblelint.rules import RulesCollection
 else:
@@ -27,15 +28,9 @@ from ansiblelint.runner import Runner
 class RunFromText:
     """Use Runner on temp files created from testing text snippets."""
 
-    app: App | None = None
-
-    def __init__(self, collection: RulesCollection) -> None:
+    def __init__(self, collection: RulesCollection, app: App) -> None:
         """Initialize a RunFromText instance with rules collection."""
-        # Emulate command line execution initialization as without it Ansible module
-        # would be loaded with incomplete module/role/collection list.
-        if not self.app:  # pragma: no cover
-            self.app = get_app(offline=True)
-
+        self.app = app
         self.collection = collection
 
     def _call_runner(self, path: Path) -> list[MatchError]:

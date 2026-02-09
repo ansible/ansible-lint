@@ -1,7 +1,6 @@
 [![PyPI version](https://img.shields.io/pypi/v/ansible-lint.svg)](https://pypi.org/project/ansible-lint)
 [![Ansible-lint rules explanation](https://img.shields.io/badge/Ansible--lint-rules-blue.svg)](https://docs.ansible.com/projects/lint/rules/)
 [![Discussions](https://img.shields.io/badge/Discussions-gray.svg)](https://forum.ansible.com/tag/ansible-lint)
-[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 # Ansible-lint
 
@@ -27,7 +26,7 @@ jobs:
     name: Ansible Lint # Naming the build is important to use it as a status check
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Run ansible-lint
         uses: ansible/ansible-lint@main # or vX.X.X version
         # optional (see below):
@@ -35,6 +34,7 @@ jobs:
           args: ""
           gh_action_ref: "<version - e.g. `v25.5.0`>" # Not recommended for non-composite action use
           setup_python: "true"
+          python_version: "3.14"
           working_directory: ""
           requirements_file: ""
 ```
@@ -50,6 +50,7 @@ All the arguments are optional:
 - `requirements_file`: Path to the requirements.yml file to install role and
   collection dependencies.
 - `setup_python`: If python should be installed. Default is `true`.
+- `python_version`: The version of python to install. Default is `3.14`.
 - `working_directory`: The directory where to run ansible-lint from. Default is
   `github.workspace`. Needed if you want to lint only a subset of
   your repository.

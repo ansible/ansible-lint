@@ -229,6 +229,7 @@ if "pytest" in sys.modules:
     def test_local_action_transform(
         config_options: Options,
         monkeypatch: pytest.MonkeyPatch,
+        empty_rule_collection: RulesCollection,
     ) -> None:
         """Test transform functionality for no-log-password rule."""
         monkeypatch.setenv("ANSIBLE_LINT_WRITE_TMP", "1")
@@ -237,10 +238,9 @@ if "pytest" in sys.modules:
         config_options.write_list = ["all"]
 
         config_options.lintables = [str(playbook)]
-        only_local_action_rule: RulesCollection = RulesCollection()
-        only_local_action_rule.register(TaskNoLocalActionRule())
+        empty_rule_collection.register(TaskNoLocalActionRule())
         runner_result = get_matches(
-            rules=only_local_action_rule,
+            rules=empty_rule_collection,
             options=config_options,
         )
         transformer = Transformer(result=runner_result, options=config_options)

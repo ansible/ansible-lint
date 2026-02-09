@@ -37,12 +37,12 @@ dependencies = [
   "ansible-core>=2.16.14",
   "black>=24.3.0",
   "cffi>=1.15.1",  # indirect dependency of ruamel-yaml
-  "cryptography>=38",
+  "cryptography>=37",
   "distro>=1.9.0",
   "filelock>=3.8.2",
   "jsonschema>=4.10.0",
   "packaging>=22.0",
-  "pathspec>=0.10.3",
+  "pathspec>=1.0.3,<1.1.0",
   "pyyaml>=6.0.1 ; python_version < '3.14'",
   "pyyaml>=6.0.1 ; python_version >= '3.14'",  # py314 support
   "referencing>=0.36.2",
@@ -51,7 +51,7 @@ dependencies = [
   "subprocess-tee>=0.4.1",
   "wcmatch>=8.1.2 ; python_version < '3.12'",
   "wcmatch>=8.5.0 ; python_version >= '3.12'",
-  "yamllint>=1.34.0",
+  "yamllint>=1.38.0",
 ]
 dynamic = ["version"]
 
@@ -91,18 +91,20 @@ dev = [
   "pyyaml>=6.0.1",
   "ruamel-yaml>=0.18.11",
   "ruamel-yaml-clib>=0.2.12 ; python_full_version < '3.14'",
+  "tombi>=0.7.26",
   "tox>=4.24.2",
   "tox-extra>=2.1",
   "tox-uv>=1.25",
   "types-jsonschema>=4.25.1.20250822",
   "types-pyyaml>=6.0.12.20250822",
+  "uv>=0.8",
 ]
 docs = ["markdown-exec[ansi]>=1.11.0", "mkdocs-ansible>=25.5.0", "six>=1.16.0"]
 lint = [
   "pip>=25.2",
-  "pre-commit>=4.1",
-  "pre-commit-uv>=4.1.4",
+  "prek>=0.3.1",
   "pytest>=9",
+  "ruff>=0.14.10",
   "setuptools>=51.1.1",
 ]
 pkg = [
@@ -196,7 +198,7 @@ bad-names = [
 # pylint defaults + f,fh,v,id
 good-names = ["i", "j", "k", "Run", "_", "f", "fh", "v", "id", "T"]
 # Ignore as being generated:
-ignore-paths = "^(examples|build|test/schemas/node_modules|.eggs|.cache|.direnv|.tox|src/ansiblelint/_version|.config/).*$"
+ignore-paths = "^(examples|build|test/schemas/node_modules|.eggs|.cache|.direnv|.venv|venv|.mypy_cache|dist|.tox|src/ansiblelint/_version|.config/).*$"
 
 [tool.pylint.REPORTING]
 output-format = "colorized"
@@ -565,6 +567,7 @@ ignore = [
   "PLC0415",
   "PLC2701",
   "PLW1641",
+  "RUF067",
   "S404",
 ]
 select = ["ALL"]
@@ -639,7 +642,7 @@ skip_install = true
 [tool.tox.env.deps]
 commands = [
   [
-    "pre-commit",
+    "prek",
     "run",
     "--all-files",
     "--show-diff-on-failure",
@@ -647,7 +650,7 @@ commands = [
     "manual",
     "deps",
   ],
-  ["pre-commit", "autoupdate"],
+  ["prek", "autoupdate"],
   ["sh", "-c", "cd test/schemas && npm run deps"],
   ["tox", "-e", "lint"],
 ]
@@ -694,10 +697,10 @@ description = "Perform ecosystem impact (downstream testing) https://github.com/
 [tool.tox.env.hook]
 commands = [["{tox_root}/tools/test-hook.sh"]]
 dependency_groups = ["lint"]
-description = "Validate pre-commit hook definition"
+description = "Validate prek hook definition"
 
 [tool.tox.env.lint]
-commands = [["pre-commit", "run", "--all-files", "--show-diff-on-failure"]]
+commands = [["prek", "run", "--all-files", "--show-diff-on-failure"]]
 commands_pre = []
 dependency_groups = ["lint"]
 description = "Run all linters"
@@ -873,6 +876,7 @@ PRE_COMMIT_COLOR = "always"
 
 [tool.uv]
 package = true
+default-groups = "all"
 
 [tool.vulture]
 exclude = [

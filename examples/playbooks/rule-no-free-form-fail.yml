@@ -14,3 +14,12 @@
       ansible.builtin.raw:
         args: "123"
       changed_when: false
+
+    - name: Short name with multiple params (Issue 4750)
+      file: path=/tmp/short1 state=directory mode=0755
+
+    - name: FQCN builtin with free-form
+      ansible.builtin.uri: url=http://example.com return_content=yes
+
+    - name: Short name without a task name
+      template: src=foo.j2 dest=/tmp/foo

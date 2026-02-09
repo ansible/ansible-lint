@@ -166,7 +166,7 @@ def test_broken_ansible_cfg() -> None:
 
 
 def test_list_tags() -> None:
-    """Asserts that we can list tags and that the output is parseable yaml."""
+    """Asserts that we can list tags and that the output is parsable yaml."""
     result = subprocess.run(
         ["ansible-lint", "--list-tags"],
         check=True,
@@ -183,24 +183,23 @@ def test_list_tags() -> None:
             assert isinstance(item, str)
 
 
-def test_ro_venv() -> None:
+def test_ro_venv(tmp_path: Path) -> None:
     """Tests behavior when the virtual environment is read-only."""
     tox_work_dir = os.environ.get("TOX_WORK_DIR", ".tox")
     venv_path = f"{tox_work_dir}/ro"
-    prerelease_flag = "" if sys.version_info < (3, 14) else "--pre "
     commands = [
         f"mkdir -p {venv_path}",
         f"chmod -R a+w {venv_path}",
         f"rm -rf {venv_path}",
-        f"python -m venv --symlinks {venv_path}",
-        f"{venv_path}/bin/python -m pip install {prerelease_flag}-q -e .",
+        f"uv venv --seed --no-project {venv_path}",
+        f"VIRTUAL_ENV={venv_path} uv pip install -q -e .",
         f"chmod -R a-w {venv_path}",
         # running with a ro venv and default cwd
         f"{venv_path}/bin/ansible-lint --version",
         # running from a read-only cwd:
         f"cd / && {abspath(venv_path)}/bin/ansible-lint --version",  # noqa: PTH100
         # running with a ro venv and a custom project path in forced non-online mode, so it will need to install requirements
-        f"{venv_path}/bin/ansible-lint -vv --no-offline --project-dir ./examples/reqs_v2/ ./examples/reqs_v2/",
+        f"{venv_path}/bin/ansible-lint -vv --nocolor --no-offline --project-dir {tmp_path.as_posix()} ./examples/reqs_v2/",
     ]
     for cmd in commands:
         result = subprocess.run(

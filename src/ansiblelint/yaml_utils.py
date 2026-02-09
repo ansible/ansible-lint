@@ -704,7 +704,10 @@ class FormattedEmitter(Emitter):
         super().increase_indent(flow, sequence, indentless)
         # If our previous node was a sequence and we are still trying to indent, don't
         if self.indents.last_seq():
-            self.indent = self.column + 1
+            if self.event and getattr(self.event, "anchor", None):
+                self.indent = self.best_sequence_indent - self.sequence_dash_offset
+            else:
+                self.indent = self.column + 1
 
     def write_indicator(
         self,
@@ -826,7 +829,7 @@ class FormattedEmitter(Emitter):
             value = self._re_repeat_blank_lines.sub("\n\n", value)
 
         # make sure that comments have a space after #
-        if value.startswith("#") and not value.startswith("# ") and len(value) > 1:
+        if value.startswith("#") and not value.startswith("# ") and value[1:].strip():
             value = "# " + value[1:]
 
         comment.value = value

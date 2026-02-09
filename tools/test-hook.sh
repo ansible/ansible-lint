@@ -16,4 +16,4 @@ git init --initial-branch=main
 # we add a file to the repo to avoid error due to no file to to lint
 touch foo.yml
 git add foo.yml
-python3 -m pre_commit try-repo -v "${DIR}/.." ansible-lint
+prek try-repo -v "${DIR}/.." ansible-lint

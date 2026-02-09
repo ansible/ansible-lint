@@ -143,7 +143,6 @@ class Options:  # pylint: disable=too-many-instance-attributes
     list_tags: bool = False
     write_list: list[str] = field(default_factory=list)
     write_exclude_list: list[str] = field(default_factory=list)
-    parseable: bool = False
     quiet: bool = False
     rulesdirs: list[Path] = field(default_factory=list)
     skip_list: list[str] = field(default_factory=list)
@@ -315,6 +314,11 @@ def get_version_warning() -> str:
         release_url = (
             "https://api.github.com/repos/ansible/ansible-lint/releases/latest"
         )
+        if not release_url.startswith(
+            "https://"
+        ):  # pragma: no cover (ruff compatibility)
+            msg = "release_url must start with https://"
+            raise ValueError(msg)
         try:
             with urllib.request.urlopen(release_url) as url:
                 data = json.load(url)
