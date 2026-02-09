@@ -65,6 +65,10 @@ class YamllintRule(AnsibleLintRule, TransformMixin):
         if str(file.base_kind) != "text/yaml":
             return matches
 
+        if self._collection is None:  # pragma: no cover
+            msg = f"Rule {self.id} was not added to a collection."
+            raise RuntimeError(msg)
+
         for problem in run_yamllint(  # type: ignore[no-untyped-call]
             file.content,
             self._collection.app.yamllint_config,
