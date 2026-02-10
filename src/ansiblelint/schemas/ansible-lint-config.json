@@ -45,6 +45,11 @@
       "title": "Exclude Paths",
       "type": "array"
     },
+    "format": {
+      "default": "brief",
+      "title": "Output format",
+      "type": "string"
+    },
     "extra_vars": {
       "title": "Extra Vars",
       "type": "object"
