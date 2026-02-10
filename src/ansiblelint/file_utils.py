@@ -544,7 +544,9 @@ def find_project_root(
 
     if not directory:
         return Path.cwd(), "current working directory"
-    return directory, "file system root"
+    # When no markers are found, use home directory instead of filesystem root
+    # to avoid permission issues (e.g., accessing /root/galaxy.yml)
+    return Path.home(), "user home directory"
 
 
 def expand_dirs_in_lintables(lintables: set[Lintable]) -> None:
