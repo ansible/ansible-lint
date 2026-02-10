@@ -544,8 +544,8 @@ def find_project_root(
 
     if not directory:
         return Path.cwd(), "current working directory"
-    # When no markers are found, return filesystem root
-    return Path("/"), "filesystem root"
+    # When no markers are found, return file system root
+    return Path("/"), "file system root"
 
 
 def expand_dirs_in_lintables(lintables: set[Lintable]) -> None:
