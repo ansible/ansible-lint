@@ -506,7 +506,6 @@ class RulesCollection:
                 continue
 
             is_targeted = any(t.startswith(f"{rule.id}[") for t in tags)
-            is_skipped = any(t.startswith(f"{rule.id}[") for t in skip_list)
 
             # rule selection logic
             if (
@@ -525,7 +524,7 @@ class RulesCollection:
 
                 # rule-level skip check
                 rule_definition = set(rule.tags) | {rule.id}
-                if rule_definition.isdisjoint(skip_list) and not is_skipped:
+                if rule_definition.isdisjoint(skip_list):
                     matches.extend(rule.getmatches(file))
 
         if tags or skip_list:
@@ -544,7 +543,8 @@ class RulesCollection:
                         filtered_matches.append(m)
                 else:
                     # no tags requested, so keep everything that wasn't skipped
-                    filtered_matches.append(m)
+                    if m.tag not in skip_list:
+                        filtered_matches.append(m)
             matches = filtered_matches
 
         return matches
