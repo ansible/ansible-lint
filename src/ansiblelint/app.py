@@ -14,6 +14,7 @@ from ansible_compat.runtime import Runtime
 
 from ansiblelint import formatters
 from ansiblelint._mockings import _perform_mockings
+from ansiblelint.ansible_config import load_ansible_config_into_options
 from ansiblelint.config import PROFILES, Options, get_version_warning
 from ansiblelint.config import options as default_options
 from ansiblelint.constants import RC, RULE_DOC_URL
@@ -45,6 +46,22 @@ class App:
 
         formatter_factory = choose_formatter_factory(options)
         self.formatter = formatter_factory(options.cwd, options.display_relative_path)
+
+        # Load ansible.cfg settings before Runtime initialization
+        # This ensures collections_paths from ansible.cfg is honored
+        load_ansible_config_into_options(options)
+
+        # Set ANSIBLE_COLLECTIONS_PATH before Runtime init to ensure precedence
+        # This matches Ansible's behavior: ENV VAR > ansible.cfg > defaults
+        if options.ansible_collections_paths:
+            # Only set if explicitly configured in ansible.cfg
+            # to preserve default behavior when not configured
+            collections_path_str = os.pathsep.join(options.ansible_collections_paths)
+            _logger.info(
+                "Setting ANSIBLE_COLLECTIONS_PATH from ansible.cfg: %s",
+                collections_path_str,
+            )
+            os.environ["ANSIBLE_COLLECTIONS_PATH"] = collections_path_str
 
         # Without require_module, our _set_collections_basedir may fail
         self.runtime = Runtime(
