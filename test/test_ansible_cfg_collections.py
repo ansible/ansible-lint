@@ -232,13 +232,13 @@ collections_path = {cfg_collections}
     from ansiblelint.app import App
 
     test_options = Options(project_dir=str(project_dir))
-    
+
     # Before creating app, verify env var is set
     assert os.environ.get("ANSIBLE_COLLECTIONS_PATH") == str(env_collections)
-    
+
     # Create app (should preserve ENV VAR, not override with ansible.cfg)
     test_app = App(options=test_options)
-    
+
     # Environment variable should still be set to env_collections
     current_env = os.environ.get("ANSIBLE_COLLECTIONS_PATH", "")
     assert (
