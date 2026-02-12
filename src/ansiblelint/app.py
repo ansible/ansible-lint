@@ -53,9 +53,9 @@ class App:
 
         # Set ANSIBLE_COLLECTIONS_PATH before Runtime init to ensure precedence
         # This matches Ansible's behavior: ENV VAR > ansible.cfg > defaults
-        if options.ansible_collections_paths:
+        if options.ansible_collections_paths and "ANSIBLE_COLLECTIONS_PATH" not in os.environ:
             # Only set if explicitly configured in ansible.cfg
-            # to preserve default behavior when not configured
+            # AND if environment variable is not already set (ENV VAR takes precedence)
             collections_path_str = os.pathsep.join(options.ansible_collections_paths)
             _logger.info(
                 "Setting ANSIBLE_COLLECTIONS_PATH from ansible.cfg: %s",

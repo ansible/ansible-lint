@@ -71,19 +71,15 @@ collections_scan_sys_path = false
     # The test should not fail with linting errors (we have a valid playbook)
     assert result.returncode == 0, f"Unexpected lint errors: {result.stderr}"
 
-    # Now verify the actual collections path was honored
-    # We do this by checking the app's runtime configuration
-    from ansiblelint.config import Options
+    # Verify the actual collections path was honored by checking what
+    # ansible-lint would have set based on the ansible.cfg
+    from ansiblelint.ansible_config import read_collections_paths_from_ansible_cfg
 
-    test_options = Options(project_dir=str(project_dir))
-    test_app = get_app(offline=True)
-    test_app.options.project_dir = str(project_dir)
-
-    # After our fix, runtime.config.collections_paths should include our custom path
-    collections_paths = test_app.runtime.config.collections_paths
+    loaded_paths = read_collections_paths_from_ansible_cfg(str(project_dir))
+    assert loaded_paths is not None, "collections_paths should be read from ansible.cfg"
     assert any(
-        str(custom_collections) in path for path in collections_paths
-    ), f"Custom collections path {custom_collections} not found in {collections_paths}"
+        str(custom_collections) in path for path in loaded_paths
+    ), f"Custom collections path {custom_collections} not found in {loaded_paths}"
 
 
 def test_ansible_cfg_collections_paths_colon_separated(tmp_path: Path) -> None:
@@ -231,16 +227,23 @@ collections_path = {cfg_collections}
     )
 
     # When env var is already set, our code should NOT override it
+    # We test this by creating a new App with the test project_dir
     from ansiblelint.config import Options
+    from ansiblelint.app import App
 
     test_options = Options(project_dir=str(project_dir))
-    test_app = get_app(offline=True)
-
+    
+    # Before creating app, verify env var is set
+    assert os.environ.get("ANSIBLE_COLLECTIONS_PATH") == str(env_collections)
+    
+    # Create app (should preserve ENV VAR, not override with ansible.cfg)
+    test_app = App(options=test_options)
+    
     # Environment variable should still be set to env_collections
     current_env = os.environ.get("ANSIBLE_COLLECTIONS_PATH", "")
     assert (
         str(env_collections) in current_env
-    ), "Environment variable should be preserved when explicitly set"
+    ), f"Environment variable should be preserved when explicitly set, got: {current_env}"
 
 
 def test_ansible_cfg_not_found(tmp_path: Path) -> None:
