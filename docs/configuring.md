@@ -60,16 +60,45 @@ playbook.yml package-latest # disable package-latest rule for playbook.yml
 playbook.yml deprecated-module
 ```
 
+### Glob pattern support
+
+In addition to exact file paths, you can use glob patterns to match multiple files:
+```yaml title=".ansible-lint-ignore"
+# Wildcard patterns
+roles/*/tasks/*.yml no-changed-when
+playbooks/test_*.yml yaml[line-length]
+
+# Recursive patterns (match at any depth)
+**/*.j2 jinja[spacing]
+**/group_vars/**/*.yml var-naming
+
+# Mix exact paths and patterns
+site.yml package-latest
+roles/*/tasks/*.yml command-instead-of-module
+```
+
+Supported glob patterns:
+- `*` - matches any characters within a single directory level
+- `**` - matches across multiple directory levels (recursive)
+- `?` - matches a single character
+
+### Generating ignore files
+
 The file can also be created by adding `--generate-ignore` to the command line.
 Keep in mind that this will override any existing file content.
 
+### Skip qualifier
+
 By default, rules ignored here will raise a non-fatal warning in the
-output.  If you add `skip` to the line, the test will be skipped
+output. If you add `skip` to the line, the test will be skipped
 (see `skip_list`) and not raise any warning.
 
 ```yaml title=".ansible-lint-ignore"
 playbook.yml role-name  # raises warning
 playbook2.yml role-name skip  # no warning
+
+# Skip qualifier also works with patterns
+roles/*/tasks/*.yml no-changed-when skip
 ```
 
 ## Pre-commit setup
