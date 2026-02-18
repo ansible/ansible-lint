@@ -8,6 +8,8 @@ from typing import TYPE_CHECKING
 from ansiblelint.rules import AnsibleLintRule
 
 if TYPE_CHECKING:
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
 
@@ -67,13 +69,12 @@ class RoleArgumentSpec(AnsibleLintRule):
 
 
 if "pytest" in sys.modules:
-    from ansiblelint.app import App
-    from ansiblelint.config import Options
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
 
     def test_role_argument_spec_missing(
-        config_options: Options, app: App,
+        config_options: Options,
+        app: App,
     ) -> None:
         """Role without argument_specs should trigger the rule."""
         config_options.enable_list = ["role-argument-spec"]
@@ -87,7 +88,8 @@ if "pytest" in sys.modules:
         assert len(matched) == 1
 
     def test_role_argument_spec_present_standalone(
-        config_options: Options, app: App,
+        config_options: Options,
+        app: App,
     ) -> None:
         """Role with a standalone argument_specs.yml should pass."""
         config_options.enable_list = ["role-argument-spec"]
@@ -101,7 +103,8 @@ if "pytest" in sys.modules:
         assert len(matched) == 0
 
     def test_role_argument_spec_present_embedded(
-        config_options: Options, app: App,
+        config_options: Options,
+        app: App,
     ) -> None:
         """Role with argument_specs in meta/main.yml should pass."""
         config_options.enable_list = ["role-argument-spec"]

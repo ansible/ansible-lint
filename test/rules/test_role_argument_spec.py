@@ -75,7 +75,9 @@ def test_role_argument_spec_tmpdir_no_spec(
 ) -> None:
     """Dynamic role without argument_specs should trigger the rule."""
     role_layout = {
-        "tasks": {"main.yml": "---\n- name: Test\n  ansible.builtin.debug:\n    msg: hi\n"},
+        "tasks": {
+            "main.yml": "---\n- name: Test\n  ansible.builtin.debug:\n    msg: hi\n"
+        },
         "meta": {"main.yml": "---\ndependencies: []\n"},
     }
     dict_to_files(tmp_path, role_layout)
@@ -90,7 +92,9 @@ def test_role_argument_spec_tmpdir_with_spec(
 ) -> None:
     """Dynamic role with argument_specs.yml should pass."""
     role_layout = {
-        "tasks": {"main.yml": "---\n- name: Test\n  ansible.builtin.debug:\n    msg: hi\n"},
+        "tasks": {
+            "main.yml": "---\n- name: Test\n  ansible.builtin.debug:\n    msg: hi\n"
+        },
         "meta": {
             "main.yml": "---\ndependencies: []\n",
             "argument_specs.yml": (
