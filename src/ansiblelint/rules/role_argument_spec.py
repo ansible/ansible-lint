@@ -59,10 +59,9 @@ class RoleArgumentSpec(AnsibleLintRule):
                         break
 
             if not has_embedded:
-                # Report against meta/main.yml when it exists so that
-                # noqa comments and .ansible-lint-ignore entries work
-                # at the file level. Fall back to the role directory
-                # when there is no meta file at all.
+                # Report against meta/main.yml when it exists so
+                # inline skip comments and ignore file entries work.
+                # Fall back to the role directory if no meta file exists.
                 target = Lintable(meta_file) if meta_file else lintable
                 return [
                     self.create_matcherror(
