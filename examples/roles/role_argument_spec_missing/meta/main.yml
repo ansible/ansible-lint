@@ -1,0 +1,7 @@
+---
+galaxy_info:
+  role_name: role_argument_spec_missing
+  author: Test Author
+  description: A test role without argument specs
+  license: MIT
+dependencies: []

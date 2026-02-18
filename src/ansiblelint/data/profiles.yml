@@ -79,6 +79,7 @@ shared:
       url: https://github.com/ansible/ansible-lint/issues/1900
     meta-incorrect:
     meta-no-tags:
+    role-argument-spec:
     meta-video-links:
     meta-version:
       url: https://github.com/ansible/ansible-lint/issues/2103
