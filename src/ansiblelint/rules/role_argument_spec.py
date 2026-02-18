@@ -5,13 +5,14 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 
+from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.utils import parse_yaml_from_file
 
 if TYPE_CHECKING:
     from ansiblelint.app import App
     from ansiblelint.config import Options
     from ansiblelint.errors import MatchError
-    from ansiblelint.file_utils import Lintable
 
 
 class RoleArgumentSpec(AnsibleLintRule):
@@ -44,10 +45,10 @@ class RoleArgumentSpec(AnsibleLintRule):
 
         if not has_standalone:
             has_embedded = False
+            meta_file = None
             for meta_path in (meta_main_yml, meta_main_yaml):
                 if meta_path.is_file():
-                    from ansiblelint.utils import parse_yaml_from_file
-
+                    meta_file = meta_path
                     meta_data = parse_yaml_from_file(str(meta_path))
                     if (
                         meta_data
@@ -58,10 +59,15 @@ class RoleArgumentSpec(AnsibleLintRule):
                         break
 
             if not has_embedded:
+                # Report against meta/main.yml when it exists so that
+                # noqa comments and .ansible-lint-ignore entries work
+                # at the file level. Fall back to the role directory
+                # when there is no meta file at all.
+                target = Lintable(meta_file) if meta_file else lintable
                 return [
                     self.create_matcherror(
                         message="Role is missing an argument specification file (meta/argument_specs.yml).",
-                        filename=lintable,
+                        filename=target,
                     ),
                 ]
 
