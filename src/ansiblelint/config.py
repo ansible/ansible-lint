@@ -182,6 +182,8 @@ class Options:  # pylint: disable=too-many-instance-attributes
     # Refer to https://docs.ansible.com/projects/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix
     _default_supported = ["2.15.", "2.16.", "2.17.", "2.18.", "2.19."]
     supported_ansible_also: list[str] = field(default_factory=list)
+    # Collections paths from ansible.cfg - when set, will override Runtime defaults
+    ansible_collections_paths: list[str] | None = None
 
     @property
     def nodeps(self) -> bool:
