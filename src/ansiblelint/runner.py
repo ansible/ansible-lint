@@ -7,6 +7,7 @@ import json
 import logging
 import math
 import multiprocessing
+import multiprocessing.dummy
 import multiprocessing.pool
 import os
 import re
@@ -297,14 +298,23 @@ class Runner:
                 files.append(lintable)
 
             # avoid resource leak warning, https://github.com/python/cpython/issues/90549
-            # In environments without /dev/shm (e.g., AWS Lambda/CodeBuild),
-            # semaphore creation fails. Since we're using ThreadPool (not Pool),
-            # we can safely skip this workaround.
             # pylint: disable=unused-variable
             with contextlib.suppress(OSError):
                 global_resource = multiprocessing.Semaphore()  # noqa: F841
 
-            pool = multiprocessing.pool.ThreadPool(processes=threads())
+            # In environments without /dev/shm (e.g., AWS Lambda/CodeBuild),
+            # multiprocessing.pool.ThreadPool fails because it still uses
+            # multiprocessing primitives (locks, queues). Fall back to
+            # multiprocessing.dummy.Pool which is a pure threading implementation.
+            try:
+                pool = multiprocessing.pool.ThreadPool(processes=threads())
+            except (OSError, FileNotFoundError):
+                _logger.info(
+                    "ThreadPool creation failed (likely missing /dev/shm), "
+                    "falling back to multiprocessing.dummy.Pool"
+                )
+                pool = multiprocessing.dummy.Pool(processes=threads())
+
             return_list = pool.map(worker, files, chunksize=1)
             pool.close()
             pool.join()
