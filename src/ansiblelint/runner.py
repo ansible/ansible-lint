@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
+import concurrent.futures
 import contextlib
 import json
 import logging
 import math
 import multiprocessing
-import multiprocessing.dummy
 import multiprocessing.pool
 import os
 import re
@@ -305,19 +305,22 @@ class Runner:
             # In environments without /dev/shm (e.g., AWS Lambda/CodeBuild),
             # multiprocessing.pool.ThreadPool fails because it still uses
             # multiprocessing primitives (locks, queues). Fall back to
-            # multiprocessing.dummy.Pool which is a pure threading implementation.
+            # concurrent.futures.ThreadPoolExecutor which is a pure threading
+            # implementation that doesn't require shared memory.
             try:
                 pool = multiprocessing.pool.ThreadPool(processes=threads())
+                return_list = pool.map(worker, files, chunksize=1)
+                pool.close()
+                pool.join()
             except (OSError, FileNotFoundError):
                 _logger.info(
                     "ThreadPool creation failed (likely missing /dev/shm), "
-                    "falling back to multiprocessing.dummy.Pool"
+                    "falling back to concurrent.futures.ThreadPoolExecutor"
                 )
-                pool = multiprocessing.dummy.Pool(processes=threads())
-
-            return_list = pool.map(worker, files, chunksize=1)
-            pool.close()
-            pool.join()
+                with concurrent.futures.ThreadPoolExecutor(
+                    max_workers=threads()
+                ) as executor:
+                    return_list = list(executor.map(worker, files))
             for data in return_list:
                 matches.extend(data)
 
