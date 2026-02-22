@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  role_name: role_argument_spec_embedded
+  author: Test Author
+  description: A test role with embedded argument specs
+  license: MIT
+dependencies: []
+
+argument_specs:
+  main:
+    short_description: The main entry point for the role.
+    options:
+      example_var:
+        type: str
+        required: false
+        default: hello
+        description: An example variable.
