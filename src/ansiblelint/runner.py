@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import json
 import logging
 import math
@@ -296,8 +297,12 @@ class Runner:
                 files.append(lintable)
 
             # avoid resource leak warning, https://github.com/python/cpython/issues/90549
+            # In environments without /dev/shm (e.g., AWS Lambda/CodeBuild),
+            # semaphore creation fails. Since we're using ThreadPool (not Pool),
+            # we can safely skip this workaround.
             # pylint: disable=unused-variable
-            global_resource = multiprocessing.Semaphore()  # noqa: F841
+            with contextlib.suppress(OSError):
+                global_resource = multiprocessing.Semaphore()  # noqa: F841
 
             pool = multiprocessing.pool.ThreadPool(processes=threads())
             return_list = pool.map(worker, files, chunksize=1)
