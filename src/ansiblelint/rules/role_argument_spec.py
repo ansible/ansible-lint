@@ -65,7 +65,11 @@ class RoleArgumentSpec(AnsibleLintRule):
                 target = Lintable(meta_file) if meta_file else lintable
                 return [
                     self.create_matcherror(
-                        message="Role is missing an argument specification file (meta/argument_specs.yml).",
+                        message=(
+                            "Role is missing an argument spec — add "
+                            "meta/argument_specs.yml (or .yaml), or embed "
+                            "an argument_specs key in meta/main.yml."
+                        ),
                         filename=target,
                     ),
                 ]
