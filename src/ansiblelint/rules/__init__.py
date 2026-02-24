@@ -432,7 +432,9 @@ class RulesCollection:
         # When we have a profile we unload some of the rules
         # But we do include all rules when listing all rules or tags
         if profile_name and not (self.options.list_rules or self.options.list_tags):
-            filter_rules_with_profile(self.rules, profile_name, self.options.enable_list)
+            filter_rules_with_profile(
+                self.rules, profile_name, self.options.enable_list
+            )
 
     def register(self, obj: AnsibleLintRule, *, conditional: bool = False) -> None:
         """Register a rule."""

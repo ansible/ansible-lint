@@ -33,9 +33,7 @@ def test_profile_min_with_enable_list(empty_rule_collection: RulesCollection) ->
     empty_rule_collection.register(rule)
     assert len(empty_rule_collection.rules) == 5, "Failed to register new rule."
 
-    filter_rules_with_profile(
-        empty_rule_collection.rules, "min", enable_list=[rule.id]
-    )
+    filter_rules_with_profile(empty_rule_collection.rules, "min", enable_list=[rule.id])
     assert len(empty_rule_collection.rules) == 5, (
         "enable_list rule was incorrectly removed by profile filtering."
     )
