@@ -109,6 +109,7 @@ pmrun
 portchannel
 posargs
 preexec
+prek
 prerun
 pyargs
 pymdownx

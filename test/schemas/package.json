@@ -4,18 +4,18 @@
     "js-yaml": "^4.1.1",
     "safe-stable-stringify": "^2.5.0",
     "ts-node": "^10.9.2",
-    "vscode-json-languageservice": "^5.6.1"
+    "vscode-json-languageservice": "^5.7.2"
   },
   "devDependencies": {
-    "@types/chai": "^5.2.2",
+    "@types/chai": "^5.2.3",
     "@types/js-yaml": "^4.0.9",
     "@types/minimatch": "^6.0.0",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^24.2.1",
-    "chai": "^5.2.1",
-    "minimatch": "^10.0.3",
-    "mocha": "^11.7.1",
-    "typescript": "^5.9.2"
+    "@types/node": "^25.3.0",
+    "chai": "^6.2.2",
+    "minimatch": "^10.2.3",
+    "mocha": "^11.7.5",
+    "typescript": "^5.9.3"
   },
   "directories": {
     "test": "./src"

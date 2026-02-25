@@ -71,3 +71,12 @@ def test_run_skip_rule() -> None:
     )
     assert result.returncode == 0
     assert not result.stdout
+
+
+def test_skip_specific_subrule(collection: RulesCollection) -> None:
+    """Verify skipping one yaml subrule does not skip others."""
+    lintable = "examples/playbooks/with-multiple-yaml-violations.yml"
+    errs = Runner(lintable, rules=collection, skip_list=["yaml[trailing-spaces]"]).run()
+    found_tags = {e.tag for e in errs}
+    assert "yaml[trailing-spaces]" not in found_tags
+    assert "yaml[colons]" in found_tags

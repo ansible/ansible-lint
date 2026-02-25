@@ -403,10 +403,17 @@ class HandleChildren:
             return []
 
         result = path_dwim(basedir, file)
-        while basedir not in ["", "/"]:
+        while True:
             if os.path.exists(result):
                 break
-            basedir = os.path.dirname(basedir)
+            tasks_result = path_dwim(os.path.join(basedir, "tasks"), file)
+            if os.path.exists(tasks_result):
+                result = tasks_result
+                break
+            new_basedir = os.path.dirname(basedir)
+            if new_basedir == basedir:
+                break
+            basedir = new_basedir
             result = path_dwim(basedir, file)
 
         return [Lintable(result, kind=parent_type)]
@@ -696,10 +703,17 @@ def _get_task_handler_children_for_tasks_or_playbooks(
                 # ignore invalid data (syntax check will outside the scope)
                 continue
             f = path_dwim(basedir, file_name)
-            while basedir not in ["", "/"]:
+            while True:
                 if os.path.exists(f):
                     break
-                basedir = os.path.dirname(basedir)
+                tasks_f = path_dwim(os.path.join(basedir, "tasks"), file_name)
+                if os.path.exists(tasks_f):
+                    f = tasks_f
+                    break
+                new_basedir = os.path.dirname(basedir)
+                if new_basedir == basedir:
+                    break
+                basedir = new_basedir
                 f = path_dwim(basedir, file_name)
             return Lintable(f, kind=child_type)
     msg = f"The node contains none of: {', '.join(sorted(INCLUSION_ACTION_NAMES))}"
