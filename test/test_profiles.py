@@ -25,6 +25,20 @@ def test_profile_min(empty_rule_collection: RulesCollection) -> None:
     )
 
 
+def test_profile_min_with_enable_list(empty_rule_collection: RulesCollection) -> None:
+    """Asserts that enable_list rules survive profile filtering."""
+    assert len(empty_rule_collection.rules) == 4, "Unexpected number of implicit rules."
+
+    rule = ShellWithoutPipefail()
+    empty_rule_collection.register(rule)
+    assert len(empty_rule_collection.rules) == 5, "Failed to register new rule."
+
+    filter_rules_with_profile(empty_rule_collection.rules, "min", enable_list=[rule.id])
+    assert len(empty_rule_collection.rules) == 5, (
+        "enable_list rule was incorrectly removed by profile filtering."
+    )
+
+
 def test_profile_listing(capfd: CaptureFixture[str]) -> None:
     """Test that run without arguments it will detect and lint the entire repository."""
     cmd = [
