@@ -85,12 +85,11 @@ dev = [
   "pytest>=9",
   "pytest-instafail>=0.5.0",
   "pytest-mock>=3.15.0",
-  "pytest-plus>=0.8.1",
-  "pytest-sugar>=1.1.1",
   "pytest-xdist[psutil,setproctitle]>=2.1.0",
   "pyyaml>=6.0.1",
   "ruamel-yaml>=0.18.11",
   "ruamel-yaml-clib>=0.2.12 ; python_full_version < '3.14'",
+  "tombi>=0.7.26",
   "tox>=4.24.2",
   "tox-extra>=2.1",
   "tox-uv>=1.25",
@@ -101,8 +100,7 @@ dev = [
 docs = ["markdown-exec[ansi]>=1.11.0", "mkdocs-ansible>=25.5.0", "six>=1.16.0"]
 lint = [
   "pip>=25.2",
-  "pre-commit>=4.1",
-  "pre-commit-uv>=4.1.4",
+  "prek>=0.3.1",
   "pytest>=9",
   "ruff>=0.14.10",
   "setuptools>=51.1.1",
@@ -198,7 +196,7 @@ bad-names = [
 # pylint defaults + f,fh,v,id
 good-names = ["i", "j", "k", "Run", "_", "f", "fh", "v", "id", "T"]
 # Ignore as being generated:
-ignore-paths = "^(examples|build|test/schemas/node_modules|.eggs|.cache|.direnv|.tox|src/ansiblelint/_version|.config/).*$"
+ignore-paths = "^(examples|build|test/schemas/node_modules|.eggs|.cache|.direnv|.venv|venv|.mypy_cache|dist|.tox|src/ansiblelint/_version|.config/).*$"
 
 [tool.pylint.REPORTING]
 output-format = "colorized"
@@ -642,7 +640,7 @@ skip_install = true
 [tool.tox.env.deps]
 commands = [
   [
-    "pre-commit",
+    "prek",
     "run",
     "--all-files",
     "--show-diff-on-failure",
@@ -650,7 +648,7 @@ commands = [
     "manual",
     "deps",
   ],
-  ["pre-commit", "autoupdate"],
+  ["prek", "autoupdate"],
   ["sh", "-c", "cd test/schemas && npm run deps"],
   ["tox", "-e", "lint"],
 ]
@@ -697,10 +695,10 @@ description = "Perform ecosystem impact (downstream testing) https://github.com/
 [tool.tox.env.hook]
 commands = [["{tox_root}/tools/test-hook.sh"]]
 dependency_groups = ["lint"]
-description = "Validate pre-commit hook definition"
+description = "Validate prek hook definition"
 
 [tool.tox.env.lint]
-commands = [["pre-commit", "run", "--all-files", "--show-diff-on-failure"]]
+commands = [["prek", "run", "--all-files", "--show-diff-on-failure"]]
 commands_pre = []
 dependency_groups = ["lint"]
 description = "Run all linters"

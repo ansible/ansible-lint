@@ -6,9 +6,12 @@ ci:
   autofix_commit_msg: "chore: auto fixes from pre-commit.com hooks"
   skip:
     # https://github.com/pre-commit-ci/issues/issues/55
+    # uv not present on pre-commit.ci
+    - mypy
+    - pylint
+    - ruff
+    - toml
     - pyright
-    - tombi-format
-    - tombi-lint
     - schemas
   submodules: true
 exclude: >
@@ -29,8 +32,17 @@ repos:
   - repo: meta
     hooks:
       - id: check-useless-excludes
+
+  - repo: https://github.com/ansible/actions
+    rev: v0.3.1
+    hooks:
+      - id: toml
+      - id: ruff
+      - id: mypy
+      - id: pylint
+
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.9.24
+    rev: 0.10.6
     hooks:
       - id: uv-sync
       - id: uv-lock
@@ -59,14 +71,14 @@ repos:
           - "-o"
           - ".config/requirements-lock.txt"
   - repo: https://github.com/biomejs/pre-commit
-    rev: "v2.3.11"
+    rev: "v2.4.4"
     hooks:
       - id: biome-check
         name: biome
         alias: biome
         args: [--unsafe]
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v9.4.0
+    rev: v9.7.0
     hooks:
       - id: cspell
         entry: bash
@@ -81,7 +93,7 @@ repos:
           ]
         name: cspell + remove unused and sort dictionary
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.36.0
+    rev: 0.36.2
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
@@ -104,7 +116,7 @@ repos:
       - id: trailing-whitespace
         exclude: >
           (?x)^(
-            examples/playbooks/(with-skip-tag-id|unicode).yml|
+            examples/playbooks/(with-skip-tag-id|unicode|with-multiple-yaml-violations).yml|
             examples/playbooks/example.yml|
             examples/yamllint/.*|
             test/eco/.*.result|
@@ -131,7 +143,7 @@ repos:
         additional_dependencies:
           - tomli
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.37.1
+    rev: v1.38.0
     hooks:
       - id: yamllint
         exclude: >
@@ -148,7 +160,7 @@ repos:
         entry: yamllint --strict
 
   - repo: https://github.com/tombi-toml/tombi-pre-commit
-    rev: v0.7.16
+    rev: v0.7.32
     hooks:
       - id: tombi-format
         alias: toml
@@ -156,7 +168,7 @@ repos:
         alias: toml
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.11
+    rev: v0.15.2
     hooks:
       - id: ruff-format
         alias: ruff
@@ -194,7 +206,7 @@ repos:
       - id: pyright
         additional_dependencies: *deps
   - repo: https://github.com/pycqa/pylint
-    rev: v4.0.4
+    rev: v4.0.5
     hooks:
       - id: pylint
         args:
@@ -205,7 +217,7 @@ repos:
     hooks:
       - id: vulture
   - repo: https://github.com/ansible/team-devtools
-    rev: v26.1.0
+    rev: v26.2.0
     hooks:
       - id: check-platform-constraints
   - # keep at bottom as these are slower

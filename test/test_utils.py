@@ -647,3 +647,57 @@ def test_import_role_children_subdirs() -> None:
         },
     )
     assert "Failed " not in result.stderr
+
+
+def test_include_children_climbing(tmp_path: Path) -> None:
+    """Verify that include_children climbs to find tasks in a tasks/ directory."""
+    project = tmp_path / "project"
+    project.mkdir()
+    tasks_dir = project / "tasks"
+    tasks_dir.mkdir()
+
+    site_yml = project / "site.yml"
+    site_yml.write_text("- import_tasks: imported_task.yml", encoding="utf-8")
+
+    imported_task = tasks_dir / "imported_task.yml"
+    imported_task.write_text("- debug: msg=hello", encoding="utf-8")
+
+    from ansiblelint.app import App
+    from ansiblelint.config import options as lint_options
+    from ansiblelint.rules import RulesCollection
+
+    app = App(options=lint_options)
+    rules = RulesCollection(app=app)
+    handler = utils.HandleChildren(rules=rules, app=app)
+
+    with cwd(project):
+        lintable = Lintable(site_yml)
+        children = handler.include_children(
+            lintable, k="import_tasks", v="imported_task.yml", parent_type="tasks"
+        )
+
+        assert len(children) == 1
+        assert children[0].path.resolve() == imported_task.resolve()
+
+
+def test_get_task_handler_children_climbing(tmp_path: Path) -> None:
+    """Verify that task handler resolution climbs to find tasks in a tasks/ directory."""
+    project = tmp_path / "project"
+    project.mkdir()
+    tasks_dir = project / "tasks"
+    tasks_dir.mkdir()
+
+    imported_task = tasks_dir / "imported_task.yml"
+    imported_task.write_text("- debug: msg=hello", encoding="utf-8")
+
+    task_handler = {"import_tasks": "imported_task.yml"}
+
+    with cwd(project):
+        child = utils._get_task_handler_children_for_tasks_or_playbooks(  # noqa: SLF001
+            task_handler=task_handler,
+            basedir=str(project),
+            k="import_tasks",
+            parent_type="tasks",
+        )
+
+        assert child.path.resolve() == imported_task.resolve()
