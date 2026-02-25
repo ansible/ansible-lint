@@ -208,7 +208,7 @@ class Runner:
                 )
         return sorted(matches)
 
-    def _run(self) -> list[MatchError]:
+    def _run(self) -> list[MatchError]:  # noqa: C901
         """Run the linting (inner loop)."""
         files: list[Lintable] = []
         matches: list[MatchError] = []
