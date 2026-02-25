@@ -10,11 +10,7 @@ from typing import TYPE_CHECKING, Any, NamedTuple
 from ansible.vars.reserved import get_reserved_names
 
 from ansiblelint.config import Options, options
-from ansiblelint.constants import (
-    ANNOTATION_KEYS,
-    PLAYBOOK_ROLE_KEYWORDS,
-    RC,
-)
+from ansiblelint.constants import ANNOTATION_KEYS, PLAYBOOK_ROLE_KEYWORDS, RC
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import AnsibleLintRule, RulesCollection
 from ansiblelint.runner import Runner
@@ -45,6 +41,7 @@ class VariableNamingRule(AnsibleLintRule):
     needs_raw_task = True
     re_pattern_str = options.var_naming_pattern or "^[a-z_][a-z0-9_]*$"
     re_pattern = re.compile(re_pattern_str)
+    re_role_var_prefix_pattern_str = options.role_var_prefix or "^_*{role}_"
     reserved_names = get_reserved_names()
     # List of special variables that should be treated as read-only. This list
     # does not include connection variables, which we expect users to tune in
@@ -179,13 +176,16 @@ class VariableNamingRule(AnsibleLintRule):
 
         if (
             prefix
-            and not ident.lstrip("_").startswith(f"{prefix.value}_")
+            and not re.match(
+                self.re_role_var_prefix_pattern_str.format(role=prefix.value),
+                ident,
+            )
             and not has_jinja(prefix.value)
             and is_fqcn_or_name(prefix.value)
         ):
             return self.create_matcherror(
                 tag="var-naming[no-role-prefix]",
-                message=f"Variables names from within roles should use {prefix.value}_ as a prefix.",
+                message=f"Variables names from within roles should use /{self.re_role_var_prefix_pattern_str.format(role=prefix.value)}/ pattern as a prefix.",
                 filename=file,
                 data=ident,
             )
@@ -347,8 +347,8 @@ class VariableNamingRule(AnsibleLintRule):
 if "pytest" in sys.modules:
     import pytest
 
-    from ansiblelint.testing import (  # pylint: disable=ungrouped-imports
-        run_ansible_lint,
+    from ansiblelint.testing import (
+        run_ansible_lint,  # pylint: disable=ungrouped-imports
     )
 
     @pytest.mark.parametrize(
@@ -431,6 +431,17 @@ if "pytest" in sys.modules:
         assert len(results) == 4
         for result in results:
             assert result.tag == "var-naming[no-role-prefix]"
+
+    def test_var_naming_with_custom_role_prefix() -> None:
+        """Test rule matches."""
+        role_path = "examples/roles/role_vars_prefix_detection"
+        conf_path = "examples/roles/role_vars_prefix_detection/.ansible-lint"
+        result = run_ansible_lint(
+            f"--config-file={conf_path}",
+            role_path,
+        )
+        assert result.returncode == RC.SUCCESS
+        assert "var-naming[no-role-prefix]" not in result.stdout
 
     @pytest.mark.libyaml
     def test_var_naming_with_role_prefix_plays(
