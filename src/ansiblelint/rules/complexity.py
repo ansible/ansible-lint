@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import re
 import sys
 from typing import TYPE_CHECKING, Any
 
@@ -17,14 +16,18 @@ if TYPE_CHECKING:
 
 
 class ComplexityRule(AnsibleLintRule):
-    """Rule for limiting number of tasks inside a file."""
+    """Sets maximum complexity to avoid complex plays."""
 
     id = "complexity"
-    description = "There should be limited tasks executed inside any file"
+    description = "Checks for complex plays and tasks"
+    link = "https://ansible.readthedocs.io/projects/lint/rules/complexity/"
     severity = "MEDIUM"
-    tags = ["experimental", "idiom"]
-    version_changed = "6.18.0"
-    _re_templated_inside = re.compile(r".*\{\{.*\}\}.*\w.*$")
+    tags = ["experimental"]
+
+    def __init__(self) -> None:
+        """Initialize the rule."""
+        super().__init__()
+        self._collection: RulesCollection | None = None
 
     def matchplay(self, file: Lintable, data: dict[str, Any]) -> list[MatchError]:
         """Call matchplay for up to no_of_max_tasks inside file and return aggregate results."""
@@ -68,6 +71,44 @@ class ComplexityRule(AnsibleLintRule):
                 )
         return results
 
+    def matchtasks(self, file: Lintable) -> list[MatchError]:
+        """Call matchtask for each task and check total task count."""
+        matches: list[MatchError] = []
+
+        if not isinstance(self._collection, RulesCollection):  # pragma: no cover
+            msg = "Rules cannot be run outside a rule collection."
+            raise TypeError(msg)
+
+        # Call parent's matchtasks to get all individual task violations
+        matches = super().matchtasks(file)
+
+        # Only check total task count for task files and handler files
+        # Playbooks use the complexity[play] check instead
+        if file.kind in ["handlers", "tasks"]:
+            # pylint: disable=import-outside-toplevel
+            from ansiblelint.utils import task_in_list
+
+            task_count = sum(
+                1
+                for _ in task_in_list(
+                    data=file.data,
+                    file=file,
+                    kind=file.kind,
+                )
+            )
+
+            # Check if total task count exceeds limit
+            if task_count > self._collection.options.max_tasks:
+                matches.append(
+                    self.create_matcherror(
+                        message=f"File contains {task_count} tasks, exceeding the maximum of {self._collection.options.max_tasks}. Consider using `ansible.builtin.include_tasks` to split the tasks into smaller files.",
+                        tag=f"{self.id}[tasks]",
+                        filename=file,
+                    ),
+                )
+
+        return matches
+
     def calculate_block_depth(self, task: Task) -> int:
         """Recursively calculate the block depth of a task."""
         if not isinstance(task.position, str):  # pragma: no cover
@@ -93,6 +134,11 @@ if "pytest" in sys.modules:
                 "examples/playbooks/rule-complexity-fail.yml",
                 ["complexity[play]", "complexity[nesting]"],
                 id="fail",
+            ),
+            pytest.param(
+                "examples/playbooks/tasks/rule-complexity-tasks-fail.yml",
+                ["complexity[tasks]"],
+                id="tasks",
             ),
         ),
     )

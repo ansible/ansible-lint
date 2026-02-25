@@ -1,0 +1,26 @@
+---
+# This is a task file (not a playbook) to test complexity[tasks] rule
+# It contains 6 tasks, exceeding the maximum of 5
+- name: Task 1
+  ansible.builtin.debug:
+    msg: "This is task 1"
+
+- name: Task 2
+  ansible.builtin.debug:
+    msg: "This is task 2"
+
+- name: Task 3
+  ansible.builtin.debug:
+    msg: "This is task 3"
+
+- name: Task 4
+  ansible.builtin.debug:
+    msg: "This is task 4"
+
+- name: Task 5
+  ansible.builtin.debug:
+    msg: "This is task 5"
+
+- name: Task 6
+  ansible.builtin.debug:
+    msg: "This is task 6"
