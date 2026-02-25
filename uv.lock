@@ -144,7 +144,6 @@ dev = [
     { name = "pytest" },
     { name = "pytest-instafail" },
     { name = "pytest-mock" },
-    { name = "pytest-plus" },
     { name = "pytest-sugar" },
     { name = "pytest-xdist", extra = ["psutil", "setproctitle"] },
     { name = "pyyaml" },
@@ -226,7 +225,6 @@ dev = [
     { name = "pytest", specifier = ">=9" },
     { name = "pytest-instafail", specifier = ">=0.5.0" },
     { name = "pytest-mock", specifier = ">=3.15.0" },
-    { name = "pytest-plus", specifier = ">=0.8.1" },
     { name = "pytest-sugar", specifier = ">=1.1.1" },
     { name = "pytest-xdist", extras = ["psutil", "setproctitle"], specifier = ">=2.1.0" },
     { name = "pyyaml", specifier = ">=6.0.1" },
@@ -2408,18 +2406,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/68/14/eb014d26be205d38ad5ad20d9a80f7d201472e08167f0bb4361e251084a9/pytest_mock-3.15.1.tar.gz", hash = "sha256:1849a238f6f396da19762269de72cb1814ab44416fa73a8686deac10b0d87a0f", size = 34036, upload-time = "2025-09-16T16:37:27.081Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/5a/cc/06253936f4a7fa2e0f48dfe6d851d9c56df896a9ab09ac019d70b760619c/pytest_mock-3.15.1-py3-none-any.whl", hash = "sha256:0a25e2eb88fe5168d535041d09a4529a188176ae608a6d249ee65abc0949630d", size = 10095, upload-time = "2025-09-16T16:37:25.734Z" },
-]
-
-[[package]]
-name = "pytest-plus"
-version = "0.8.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pytest" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/83/8d/c5acdd43847e975b31173f12fe3660174fb4f274f5bbe0b7efb5fa5d91fb/pytest_plus-0.8.1.tar.gz", hash = "sha256:02dfb28f1a914e8df3b6e3525df7e94feabc0681ecea626912e8028e9355f02c", size = 15444, upload-time = "2025-02-02T10:05:05.071Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/12/ae/35aac382af0d72c57df397deb753bca71a879a0a51f52b3ce77b3d2e7643/pytest_plus-0.8.1-py3-none-any.whl", hash = "sha256:2b8e9037716c9d7b708074863933897681f86d852d9c4e9717271be143dbdfb6", size = 6235, upload-time = "2025-02-02T10:05:03.701Z" },
 ]
 
 [[package]]
