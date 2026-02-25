@@ -18,13 +18,13 @@ click==8.3.1
     # via black
 colorama==0.4.6 ; sys_platform == 'win32'
     # via click
-cryptography==46.0.3
+cryptography==46.0.5
     # via
     #   ansible-core
     #   ansible-lint
 distro==1.9.0
     # via ansible-lint
-filelock==3.20.3
+filelock==3.24.3
     # via ansible-lint
 jinja2==3.1.6
     # via ansible-core
@@ -44,16 +44,16 @@ packaging==26.0
     #   ansible-core
     #   ansible-lint
     #   black
-pathspec==1.0.3
+pathspec==1.0.4
     # via
     #   ansible-lint
     #   black
     #   yamllint
-platformdirs==4.5.1
+platformdirs==4.9.2
     # via black
 pycparser==3.0 ; implementation_name != 'PyPy'
     # via cffi
-pytokens==0.4.0
+pytokens==0.4.1
     # via black
 pyyaml==6.0.3
     # via
@@ -70,7 +70,7 @@ rpds-py==0.30.0
     # via
     #   jsonschema
     #   referencing
-ruamel-yaml==0.18.17
+ruamel-yaml==0.19.1
     # via ansible-lint
 subprocess-tee==0.4.2
     # via
