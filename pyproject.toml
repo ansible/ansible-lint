@@ -85,7 +85,6 @@ dev = [
   "pytest>=9",
   "pytest-instafail>=0.5.0",
   "pytest-mock>=3.15.0",
-  "pytest-plus>=0.8.1",
   "pytest-sugar>=1.1.1",
   "pytest-xdist[psutil,setproctitle]>=2.1.0",
   "pyyaml>=6.0.1",
