@@ -432,7 +432,9 @@ class RulesCollection:
         # When we have a profile we unload some of the rules
         # But we do include all rules when listing all rules or tags
         if profile_name and not (self.options.list_rules or self.options.list_tags):
-            filter_rules_with_profile(self.rules, profile_name)
+            filter_rules_with_profile(
+                self.rules, profile_name, self.options.enable_list
+            )
 
     def register(self, obj: AnsibleLintRule, *, conditional: bool = False) -> None:
         """Register a rule."""
@@ -597,9 +599,14 @@ class RulesCollection:
         return result
 
 
-def filter_rules_with_profile(rule_col: list[BaseRule], profile: str) -> None:
+def filter_rules_with_profile(
+    rule_col: list[BaseRule],
+    profile: str,
+    enable_list: list[str] | None = None,
+) -> None:
     """Unload rules that are not part of the specified profile."""
     included = set()
+    enabled = set(enable_list or [])
     extends = profile
     total_rules = len(rule_col)
     while extends:
@@ -610,7 +617,7 @@ def filter_rules_with_profile(rule_col: list[BaseRule], profile: str) -> None:
     for rule in rule_col.copy():
         if rule.unloadable:
             continue
-        if rule.id not in included:
+        if rule.id not in included and rule.id not in enabled:
             _logger.debug(
                 "Unloading %s rule due to not being part of %s profile.",
                 rule.id,
