@@ -10,6 +10,6 @@
 
     - name: Deploy template with wrong extension # <-- 2nd
       ansible.builtin.template:
-        src: app.conf.tmpl
+        src: app.conf.template
         dest: /etc/myapp/app.conf
         mode: "0644"
