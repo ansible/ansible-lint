@@ -431,6 +431,15 @@ def get_app(*, offline: bool | None = None, cached: bool = False) -> App:
     # mocking must happen before prepare_environment or galaxy install might
     # fail.
     _perform_mockings(options=app.options)
+
+    # https://github.com/ansible/ansible-lint/issues/4973
+    collections_cache_path = app.runtime.cache_dir / "collections"
+    if (
+        collections_cache_path.exists()
+        and str(collections_cache_path) not in app.runtime.config.collections_paths
+    ):
+        app.runtime.config.collections_paths.insert(0, str(collections_cache_path))
+
     app.runtime.prepare_environment(
         install_local=(not offline),
         offline=offline,
