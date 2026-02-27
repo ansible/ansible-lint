@@ -1,1 +1,0 @@
-../../src/ansiblelint/rules/jinja2_template_extension.md

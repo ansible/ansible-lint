@@ -1,5 +1,5 @@
 ---
-- name: Fixture for jinja2-template-extension (fail)
+- name: Fixture for jinja-template-extension (fail)
   hosts: localhost
   tasks:
     - name: Deploy config without .j2 extension # <-- 1st

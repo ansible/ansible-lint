@@ -1,4 +1,4 @@
-"""Implementation of the jinja2-template-extension rule."""
+"""Implementation of the jinja-template-extension rule."""
 
 from __future__ import annotations
 
@@ -12,10 +12,10 @@ if TYPE_CHECKING:
     from ansiblelint.utils import Task
 
 
-class Jinja2TemplateExtensionRule(AnsibleLintRule):
+class JinjaTemplateExtensionRule(AnsibleLintRule):
     """Template files should have a .j2 extension."""
 
-    id = "jinja2-template-extension"
+    id = "jinja-template-extension"
     description = (
         "Template source files should end in ``.j2`` to clearly distinguish "
         "them from static files and enable proper editor syntax highlighting."
@@ -52,26 +52,26 @@ if "pytest" in sys.modules:
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
 
-    def test_jinja2_template_extension_fail(
+    def test_jinja_template_extension_fail(
         empty_rule_collection: RulesCollection,
     ) -> None:
         """Test rule catches template src without .j2 extension."""
-        empty_rule_collection.register(Jinja2TemplateExtensionRule())
+        empty_rule_collection.register(JinjaTemplateExtensionRule())
         results = Runner(
-            "examples/playbooks/rule-jinja2-template-extension-fail.yml",
+            "examples/playbooks/rule-jinja-template-extension-fail.yml",
             rules=empty_rule_collection,
         ).run()
         assert len(results) == 2
         for result in results:
-            assert result.rule.id == Jinja2TemplateExtensionRule.id
+            assert result.rule.id == JinjaTemplateExtensionRule.id
 
-    def test_jinja2_template_extension_pass(
+    def test_jinja_template_extension_pass(
         empty_rule_collection: RulesCollection,
     ) -> None:
         """Test rule allows template src with .j2 extension."""
-        empty_rule_collection.register(Jinja2TemplateExtensionRule())
+        empty_rule_collection.register(JinjaTemplateExtensionRule())
         results = Runner(
-            "examples/playbooks/rule-jinja2-template-extension-pass.yml",
+            "examples/playbooks/rule-jinja-template-extension-pass.yml",
             rules=empty_rule_collection,
         ).run()
         assert len(results) == 0, results

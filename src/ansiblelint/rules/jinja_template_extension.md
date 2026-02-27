@@ -1,4 +1,4 @@
-# jinja2-template-extension
+# jinja-template-extension
 
 This rule checks that files used with `ansible.builtin.template` have a
 `.j2` extension.
@@ -17,7 +17,7 @@ You must enable it in your Ansible-lint configuration as follows:
 
 ```yaml
 enable_list:
-  - jinja2-template-extension
+  - jinja-template-extension
 ```
 
 ## Problematic Code

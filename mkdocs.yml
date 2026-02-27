@@ -89,7 +89,7 @@ nav:
       - rules/inline-env-var.md
       - rules/internal-error.md
       - rules/jinja.md
-      - rules/jinja2-template-extension.md
+      - rules/jinja-template-extension.md
       - rules/key-order.md
       - rules/latest.md
       - rules/literal-compare.md

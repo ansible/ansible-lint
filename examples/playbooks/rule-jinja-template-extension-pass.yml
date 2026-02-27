@@ -1,5 +1,5 @@
 ---
-- name: Fixture for jinja2-template-extension (pass)
+- name: Fixture for jinja-template-extension (pass)
   hosts: localhost
   tasks:
     - name: Deploy config with .j2 extension
