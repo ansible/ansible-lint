@@ -24,7 +24,7 @@ cryptography==46.0.5
     #   ansible-lint
 distro==1.9.0
     # via ansible-lint
-filelock==3.20.3
+filelock==3.24.3
     # via ansible-lint
 jinja2==3.1.6
     # via ansible-core
@@ -49,7 +49,7 @@ pathspec==1.0.4
     #   ansible-lint
     #   black
     #   yamllint
-platformdirs==4.5.1
+platformdirs==4.9.2
     # via black
 pycparser==3.0 ; implementation_name != 'PyPy'
     # via cffi
