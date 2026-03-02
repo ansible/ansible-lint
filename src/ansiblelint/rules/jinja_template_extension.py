@@ -39,7 +39,7 @@ class JinjaTemplateExtensionRule(AnsibleLintRule):
             return False
 
         src = task["action"].get("src", "")
-        if not isinstance(src, str) or not src:
+        if not isinstance(src, str) or not src or "{{" in src:
             return False
 
         if not src.endswith(".j2"):
