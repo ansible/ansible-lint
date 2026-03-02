@@ -1,0 +1,15 @@
+---
+- name: Fixture for jinja-template-extension (pass)
+  hosts: localhost
+  tasks:
+    - name: Deploy config with .j2 extension
+      ansible.builtin.template:
+        src: httpd.conf.j2
+        dest: /etc/httpd/conf/httpd.conf
+        mode: "0644"
+
+    - name: Deploy app config with .j2 extension
+      ansible.builtin.template:
+        src: app.conf.j2
+        dest: /etc/myapp/app.conf
+        mode: "0644"
