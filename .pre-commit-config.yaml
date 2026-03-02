@@ -34,7 +34,7 @@ repos:
       - id: check-useless-excludes
 
   - repo: https://github.com/ansible/actions
-    rev: v0.5.1
+    rev: v1.0.0
     hooks:
       - id: toml
       - id: ruff
@@ -160,7 +160,7 @@ repos:
         entry: yamllint --strict
 
   - repo: https://github.com/tombi-toml/tombi-pre-commit
-    rev: v0.7.33
+    rev: v0.8.0
     hooks:
       - id: tombi-format
         alias: toml
