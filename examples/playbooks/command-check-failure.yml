@@ -11,3 +11,10 @@
       args:
         chdir: X
       become_method: xx
+
+    - name: shell without checks
+      ansible.builtin.shell: echo blah
+      args:
+        chdir: X
+      async: 600
+      poll: 30
