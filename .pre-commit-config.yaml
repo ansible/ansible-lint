@@ -34,7 +34,7 @@ repos:
       - id: check-useless-excludes
 
   - repo: https://github.com/ansible/actions
-    rev: v1.0.0
+    rev: v1.0.1
     hooks:
       - id: toml
       - id: ruff
@@ -42,7 +42,7 @@ repos:
       - id: pylint
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.10.7
+    rev: 0.10.9
     hooks:
       - id: uv-sync
       - id: uv-lock
@@ -71,7 +71,7 @@ repos:
           - "-o"
           - ".config/requirements-lock.txt"
   - repo: https://github.com/biomejs/pre-commit
-    rev: "v2.4.4"
+    rev: "v2.4.6"
     hooks:
       - id: biome-check
         name: biome
@@ -129,7 +129,7 @@ repos:
       - id: debug-statements
         language_version: python3
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.1
+    rev: v2.4.2
     hooks:
       - id: codespell
         exclude: >
@@ -160,7 +160,7 @@ repos:
         entry: yamllint --strict
 
   - repo: https://github.com/tombi-toml/tombi-pre-commit
-    rev: v0.8.0
+    rev: v0.9.4
     hooks:
       - id: tombi-format
         alias: toml
@@ -168,7 +168,7 @@ repos:
         alias: toml
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.4
+    rev: v0.15.5
     hooks:
       - id: ruff-format
         alias: ruff
@@ -213,11 +213,11 @@ repos:
           - --output-format=colorized
         additional_dependencies: *deps
   - repo: https://github.com/jendrikseipp/vulture
-    rev: v2.14
+    rev: v2.15
     hooks:
       - id: vulture
   - repo: https://github.com/ansible/team-devtools
-    rev: v26.2.0
+    rev: v26.2.1
     hooks:
       - id: check-platform-constraints
   - # keep at bottom as these are slower
