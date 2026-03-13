@@ -29,12 +29,9 @@ Possible errors messages:
 !!! note
 
     When using `include_role` or `import_role` with `vars`, vars should start
-    with included role name prefix. As this role might not be compliant
-    with this rule yet, you might need to temporarily disable this rule using
-    a `# noqa: var-naming[no-role-prefix]` comment.
-
-    In all other task types variable names defined in `vars` are considered
-    task-scoped and do not require the role prefix.
+    with included role name prefix. If you want to tweak the role vars'
+    prefix pattern such as prefixing them with the collection name, you could
+    use `role_var_prefix` configuration option.
 
 ## Settings
 
