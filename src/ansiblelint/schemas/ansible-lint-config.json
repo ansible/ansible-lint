@@ -49,6 +49,25 @@
       "title": "Extra Vars",
       "type": "object"
     },
+    "format": {
+      "default": "brief",
+      "enum": [
+        "brief",
+        "full",
+        "json",
+        "codeclimate",
+        "quiet",
+        "pep8",
+        "sarif",
+        null
+      ],
+      "title": "Output format",
+      "description": "stdout formatting, json being an alias for codeclimate.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "kinds": {
       "items": {
         "additionalProperties": {
@@ -112,7 +131,10 @@
         null
       ],
       "title": "Profile",
-      "type": ["null", "string"]
+      "type": [
+        "null",
+        "string"
+      ]
     },
     "progressive": {
       "default": false,
@@ -122,7 +144,10 @@
     "project_dir": {
       "default": null,
       "title": "Project Directory",
-      "type": ["string", "null"]
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "quiet": {
       "default": true,
@@ -226,7 +251,10 @@
     "sarif_file": {
       "default": null,
       "title": "SARIF Output filename",
-      "type": ["null", "string"]
+      "type": [
+        "null",
+        "string"
+      ]
     },
     "skip_action_validation": {
       "default": false,
