@@ -1,0 +1,15 @@
+---
+- name: Fixture for jinja-template-extension (fail)
+  hosts: localhost
+  tasks:
+    - name: Deploy config without .j2 extension # <-- 1st
+      ansible.builtin.template:
+        src: httpd.conf
+        dest: /etc/httpd/conf/httpd.conf
+        mode: "0644"
+
+    - name: Deploy template with wrong extension # <-- 2nd
+      ansible.builtin.template:
+        src: app.conf.template
+        dest: /etc/myapp/app.conf
+        mode: "0644"

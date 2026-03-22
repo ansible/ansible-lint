@@ -23,6 +23,7 @@ class ComplexityRule(AnsibleLintRule):
     link = "https://ansible.readthedocs.io/projects/lint/rules/complexity/"
     severity = "MEDIUM"
     tags = ["experimental"]
+    version_changed = "26.2.0"
 
     def __init__(self) -> None:
         """Initialize the rule."""
