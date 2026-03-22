@@ -1,2 +1,2 @@
 ---
-role_var_prefix: "^_*({role}_|fo|bar)"
+role_var_prefix: "^_*({role}_|the|foo|bar)"
