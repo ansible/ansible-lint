@@ -392,6 +392,17 @@ def _sanitize_list_options(tag_list: list[str]) -> list[str]:
     return sorted(set(tags))
 
 
+def _add_collections_path_if_needed(
+    options: Options,
+    collections_paths: list[str],
+) -> None:
+    """Add mock collections path to collections_paths if collection mocks exist."""
+    if options.has_collection_mocks():
+        mock_path = options.mock_collections_path
+        if mock_path and str(mock_path) not in collections_paths:
+            collections_paths.insert(0, str(mock_path))
+
+
 def get_app(*, offline: bool | None = None, cached: bool = False) -> App:
     """Return the application instance, caching the return value."""
     # Avoids ever running the app initialization twice if cached argument
@@ -431,6 +442,10 @@ def get_app(*, offline: bool | None = None, cached: bool = False) -> App:
     # mocking must happen before prepare_environment or galaxy install might
     # fail.
     _perform_mockings(options=app.options)
+
+    # https://github.com/ansible/ansible-lint/issues/4973
+    _add_collections_path_if_needed(app.options, app.runtime.config.collections_paths)
+
     app.runtime.prepare_environment(
         install_local=(not offline),
         offline=offline,

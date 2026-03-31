@@ -199,6 +199,19 @@ class Options:  # pylint: disable=too-many-instance-attributes
         """Returns list of ansible versions that are considered supported."""
         return sorted([*self._default_supported, *self.supported_ansible_also])
 
+    @property
+    def mock_collections_path(self) -> Path | None:
+        """Return the mock collections path if cache_dir is set."""
+        if self.cache_dir is None:
+            return None
+        return self.cache_dir / "collections"
+
+    def has_collection_mocks(self) -> bool:
+        """Check if any mock roles or modules use collection format (ns.coll.name)."""
+        return any(len(r.split(".")) >= 3 for r in self.mock_roles) or any(
+            len(m.split(".")) >= 3 for m in self.mock_modules
+        )
+
 
 options = Options()
 

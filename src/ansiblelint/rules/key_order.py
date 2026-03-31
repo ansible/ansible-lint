@@ -82,7 +82,7 @@ class KeyOrderRule(AnsibleLintRule, TransformMixin):
         result: list[MatchError] = []
         if file.kind != "playbook":
             return result
-        keys = [str(key) for key, val in data.items() if key not in ANNOTATION_KEYS]
+        keys = [str(key) for key in list(data.keys()) if key not in ANNOTATION_KEYS]
         sorted_keys = sorted(keys, key=functools.cmp_to_key(task_property_sorter))
         if keys != sorted_keys:
             result.append(
