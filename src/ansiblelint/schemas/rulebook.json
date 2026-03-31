@@ -487,6 +487,10 @@
                             "items": {
                                 "type": "string"
                             }
+                        },
+                        "add_event_uuid_label": {
+                            "type": "boolean",
+                            "default": false
                         }
                     },
                     "required": [
@@ -549,6 +553,10 @@
                             "items": {
                                 "type": "string"
                             }
+                        },
+                        "add_event_uuid_label": {
+                            "type": "boolean",
+                            "default": false
                         }
                     },
                     "required": [
