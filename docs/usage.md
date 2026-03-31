@@ -16,7 +16,7 @@ Ansible-lint prints output on both `stdout` and `stderr`.
 - `stdout` displays rule violations.
 - `stderr` displays logging and free-form messages like statistics.
 
-Most `ansible-lint` examples use pep8 as the output format (`-p`) which is
+Most `ansible-lint` examples use pep8 as the output format (`-f pep8`) which is
 machine parsable.
 
 Ansible-lint also print errors using their [annotation] format when it detects
@@ -89,7 +89,7 @@ can run `ansible-lint` on the example playbooks to observe Ansible-lint in
 action, as follows:
 
 ```console exec="1" source="console" returncode="2"
-$ ansible-lint --offline -p examples/playbooks/example.yml
+$ ansible-lint --offline -f pep8 examples/playbooks/example.yml
 ```
 
 Ansible-lint also handles playbooks that include other playbooks, tasks,
@@ -97,7 +97,7 @@ handlers, or roles, as the `examples/playbooks/include.yml` example
 demonstrates.
 
 ```console exec="1" source="console" returncode="2"
-$ ansible-lint --offline -q -p examples/playbooks/include.yml
+$ ansible-lint --offline -q -f pep8 examples/playbooks/include.yml
 ```
 
 ## Output formats
@@ -191,9 +191,9 @@ with the `experimental` tag:
 $ ansible-lint -w experimental playbook.yml
 ```
 
-By default, the `WARN_LIST` includes the `['experimental']` tag. If you define a
-custom `WARN_LIST` you must add `'experimental'` so that Ansible-lint does not
-fail against experimental rules.
+By default, the `WARN_LIST` includes `['experimental', 'jinja[spacing]', 'fqcn[deep]']`.
+If you define a custom `WARN_LIST`, those defaults are replaced, so include any
+you want to keep to avoid those rules being treated as errors.
 
 ## Muting warnings to avoid false positives
 
