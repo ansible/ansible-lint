@@ -33,7 +33,7 @@ classifiers = [
   "Topic :: Utilities",
 ]
 dependencies = [
-  "ansible-compat>=25.8.2",
+  "ansible-compat>=26.3.0",
   "ansible-core>=2.16.14",
   "black>=24.3.0",
   "cffi>=1.15.1",  # indirect dependency of ruamel-yaml
