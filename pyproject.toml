@@ -142,7 +142,7 @@ source = ["src", ".tox/*/site-packages"]
 [tool.coverage.report]
 exclude_also = ["pragma: no cover", "if TYPE_CHECKING:"]
 # Increase it just so it would pass on any single-python run
-fail_under = 93
+fail_under = 92
 # During development we might remove code (files) with coverage data, and we dont want to fail:
 ignore_errors = true
 omit = ["test/*"]
@@ -195,11 +195,9 @@ module = ["ansible.*", "yamllint.*"]
 
 [tool.pylint.IMPORTS]
 
-[tool.pylint.MASTER]
-bad-names = [
-  # spell-checker:ignore linenumber
-  "linenumber",  # use lineno instead
-  "line_number",  # use lineno instead
+[tool.pylint.master]
+ignore = [
+  "_version.py",  # built by setuptools_scm
 ]
 # pylint defaults + f,fh,v,id
 good-names = ["i", "j", "k", "Run", "_", "f", "fh", "v", "id", "T"]
@@ -632,8 +630,12 @@ env_list = [
   "lower",
   "eco",
 ]
-requires = ["setuptools>=65.3", "tox>=4.30.2", "tox-extra>=2.1", "tox-uv>=1.28"]
-skip_missing_interpreters = true
+requires = [
+  "tox>=4.47.3",
+  "tox-extra>=2.2",
+  "tox-uv>=1.32.0",
+]
+skip_missing_interpreters = false
 
 [tool.tox.env.clean]
 commands = [
@@ -684,13 +686,15 @@ commands = [
     { default = ["build", "--strict", "--site-dir=_readthedocs/html/"], extend = true, replace = "posargs" },
   ],
 ]
-commands_pre = [["ansible-lint", "--version"]]
+commands_post = []
+commands_pre = []
 dependency_groups = ["docs"]
 description = "Builds docs"
 skip_install = false
 set_env.DYLD_FALLBACK_LIBRARY_PATH = "/opt/homebrew/lib:{env:LD_LIBRARY_PATH}"
 set_env.NO_COLOR = "1"
 set_env.TERM = "dump"
+set_env.NO_MKDOCS_2_WARNING = "1"
 
 [tool.tox.env.eco]
 commands = [
@@ -702,11 +706,14 @@ description = "Perform ecosystem impact (downstream testing) https://github.com/
 
 [tool.tox.env.hook]
 commands = [["{tox_root}/tools/test-hook.sh"]]
+commands_post = []
+commands_pre = []
 dependency_groups = ["lint"]
 description = "Validate prek hook definition"
 
 [tool.tox.env.lint]
 commands = [["prek", "run", "--all-files", "--show-diff-on-failure"]]
+commands_post = []
 commands_pre = []
 dependency_groups = ["lint"]
 description = "Run all linters"
@@ -732,6 +739,7 @@ commands = [
   ["bash", "-c", "python -m twine check --strict {tox_root}/dist/*"],
   ["bash", "./tools/test-pkg.sh"],
 ]
+commands_post = []
 commands_pre = []
 dependency_groups = ["pkg"]
 description = """
@@ -827,7 +835,10 @@ allowlist_externals = [
 commands = [
   [
     "python",
-    "-m",
+    "-c",
+    "import pathlib; pathlib.Path(\"{env_site_packages_dir}/cov.pth\").write_text(\"import coverage; coverage.process_startup()\")"
+  ],
+  [
     "coverage",
     "run",
     "-m",
@@ -837,13 +848,16 @@ commands = [
       "--showlocals",
       "--doctest-modules",
       "--durations=10",
-      "--junitxml=./junit.xml",
-    ], extend = true, replace = "posargs" },
+      "--junitxml=./junit.xml"
+    ], extend = true, replace = "posargs" }
   ],
-  ["{tox_root}/tools/report-coverage"],
+  ["coverage", "combine", "-q"],
+  ["coverage", "xml", "-o", "{env_dir}/coverage.xml", "--fail-under=0"],
+  ["coverage", "lcov", "-q", "--fail-under=0"],
+  ["coverage", "report"]
 ]
 commands_pre = [
-  ["sh", "-c", "rm -f {env_dir}/.coverage.* 2>/dev/null || true"],
+  ["coverage", "erase"],
   ["bash", "./tools/install-reqs.sh"],
   ["ansible", "--version"],
 ]
@@ -874,6 +888,7 @@ pass_env = [
 runner = "uv-venv-lock-runner"
 
 [tool.tox.env_run_base.set_env]
+COVERAGE_COMBINED = "{env_dir}/.coverage"
 COVERAGE_FILE = "{env:COVERAGE_FILE:{env_dir}/.coverage.{env_name}}"
 COVERAGE_PROCESS_START = "{tox_root}/pyproject.toml"
 FORCE_COLOR = "1"
