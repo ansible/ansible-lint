@@ -5,7 +5,6 @@
     "github.vscode-github-actions",
     "hbenl.vscode-test-explorer",
     "ms-python.mypy-type-checker",
-    "ms-python.pylint",
     "ms-python.python",
     "ms-python.vscode-pylance",
     "ms-vscode.live-server",
