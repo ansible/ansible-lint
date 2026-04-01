@@ -87,7 +87,6 @@ junitxml
 kdump
 keepends
 keypair
-keyserver
 kubevirt
 languageservice
 libyaml

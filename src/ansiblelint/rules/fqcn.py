@@ -25,7 +25,6 @@ _logger = logging.getLogger(__name__)
 builtins = [
     "add_host",
     "apt",
-    "apt_key",
     "apt_repository",
     "assemble",
     "assert",
