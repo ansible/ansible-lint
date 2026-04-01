@@ -42,4 +42,5 @@ def test_import_playbook_invalid(
     assert len(runner.lintables) == 1
     assert len(results) == 1
     assert results[0].tag == "syntax-check[specific]"
-    assert results[0].lineno == 2
+    # ansible-core devel changes line number reported to 4 (better)
+    assert results[0].lineno in (2, 4)
