@@ -49,10 +49,10 @@ In its current form, this rule presents the following limitations:
 
 - Jinja2 blocks that have newlines in them will not be reformatted because we
   consider that the user deliberately wanted to format them in a particular way.
-- Jinja2 blocks that use tilde as a binary operation are ignored because black
+- Jinja2 blocks that use tilde as a binary operation are ignored because block
   does not support tilde as a binary operator. Example: `{{ a ~ b }}`.
 - Jinja2 blocks that use dot notation with numbers are ignored because python
-  and black do not allow it. Example: `{{ foo.0.bar }}`
+  and block do not allow it. Example: `{{ foo.0.bar }}`
 
 !!! note
 
