@@ -134,12 +134,11 @@ def kind_from_path(path: Path, *, base: bool = False) -> FileType:
     When called with base=True, it will return the base file type instead
     of the explicit one. That is expected to return 'yaml' for any yaml files.
     """
-    
     # Ensure Python files are never treated as YAML.
     # This prevents generated mock modules (mock_modules) from being
     # incorrectly linted by yamllint.
-    if path.suffix.lower() == ".py":
-        return "text/x-python" if base else "python"
+    if path.suffix.lower() == ".py" and ".ansible/collections" in str(path):
+        return ""
 
     # We attempt to use a relative path to the project root for glob matching.
     # This prevents parent directory names (like 'tasks') from triggering
