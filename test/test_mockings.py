@@ -61,3 +61,21 @@ def test_options_collection_mocks() -> None:
 
     opts.mock_modules = ["ns.coll.mod"]
     assert opts.has_collection_mocks() is True
+
+
+def test_mock_modules_stub_is_lintable(tmp_path: Path) -> None:
+    """Ensure generated mock module docs do not trip yaml/doc parsing."""
+    (tmp_path / ".ansible-lint.yml").write_text(
+        "mock_modules:\n  - some_ns.some_coll.some_module\n"
+    )
+    (tmp_path / "playbook.yml").write_text(
+        "---\n"
+        "- name: test mocked module\n"
+        "  hosts: localhost\n"
+        "  gather_facts: false\n"
+        "  tasks:\n"
+        "    - name: run mocked module\n"
+        "      some_ns.some_coll.some_module:\n"
+    )
+    result = run_ansible_lint("playbook.yml", cwd=tmp_path, offline=False)
+    assert result.returncode == 0, result.stdout

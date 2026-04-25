@@ -55,8 +55,12 @@ description: Mocked
 author:
     - ansible-lint (@nobody)
 '''
-EXAMPLES = '''mocked'''
-RETURN = '''mocked'''
+EXAMPLES = '''\
+- name: Mocked module example
+  {name}:
+'''
+RETURN = r\"\"\"
+# \"\"\"
 
 
 def main():

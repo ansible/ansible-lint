@@ -68,6 +68,8 @@ def _write_module_stub(
         collection=collection,
         namespace=namespace,
     )
+    if not body.endswith("\n"):
+        body += "\n"
     with open(filename, "w", encoding="utf-8") as f:
         f.write(body)
 
