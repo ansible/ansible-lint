@@ -134,7 +134,6 @@ def kind_from_path(path: Path, *, base: bool = False) -> FileType:
     When called with base=True, it will return the base file type instead
     of the explicit one. That is expected to return 'yaml' for any yaml files.
     """
-
     # We attempt to use a relative path to the project root for glob matching.
     # This prevents parent directory names (like 'tasks') from triggering
     # false positives in kind discovery. See #4763.
