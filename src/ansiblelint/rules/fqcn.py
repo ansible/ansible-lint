@@ -254,6 +254,10 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
                     continue
                 k, v = target_task.popitem(False)
                 target_task[new_action if k == current_action else k] = v
+                # Preserve trailing comments: ruamel.yaml does not remap `ca.items`
+                # when a key is renamed, so we move the association manually.
+                if k == current_action and k in target_task.ca.items:
+                    target_task.ca.items[new_action] = target_task.ca.items.pop(k)
             match.fixed = True
 
 
