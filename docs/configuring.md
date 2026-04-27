@@ -8,8 +8,10 @@ Ansible-lint loads configuration from a file in the project root directory (curr
 working directory) or from a file that you specify in the command line. Executing the
 linter from the project root is required for correct file discovery and dependency resolution.
 
-Any configuration option that is passed from the command line will override
-the one specified inside the configuration file.
+Any scalar configuration option that is passed from the command line will
+override the one specified inside the configuration file. List values
+such as `skip_list`, `warn_list`, and `exclude_paths` are extended
+(appended to), not replaced.
 
 ## Using local configuration files
 

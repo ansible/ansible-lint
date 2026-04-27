@@ -19,4 +19,4 @@ def test_command_changes_negative(empty_rule_collection: RulesCollection) -> Non
     failure = "examples/playbooks/command-check-failure.yml"
     bad_runner = Runner(failure, rules=empty_rule_collection)
     errs = bad_runner.run()
-    assert len(errs) == 2
+    assert len(errs) == 3

@@ -31,7 +31,7 @@ releases:
       trivial:
         - something that is not included in release notes
       known_issues:
-        - som other
+        - some other
       xxx:
         - we should ignore unknown keys because user can define custom section in changelogs/config.yaml file
     modules:

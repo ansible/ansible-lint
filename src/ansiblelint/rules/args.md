@@ -95,16 +95,18 @@ Possible messages:
 In some complex cases where you are using jinja expressions, the linter may not
 able to fully validate all the possible values and report a false positive. The
 example below would usually report
-`parameters are mutually exclusive: data|file|keyserver|url` but because we
+`parameters are mutually exclusive: src|content` but because we
 added `# noqa: args[module]` it will just pass.
 
 ```yaml
-- name: Add apt keys # noqa: args[module]
+- name: Copy files # noqa: args[module]
   become: true
-  ansible.builtin.apt_key:
-    url: "{{ zj_item['url'] | default(omit) }}"
-    data: "{{ zj_item['data'] | default(omit) }}"
-  loop: "{{ repositories_keys }}"
+  ansible.builtin.copy:
+    src: "{{ zj_item['src'] | default(omit) }}"
+    content: "{{ zj_item['content'] | default(omit) }}"
+    dest: "{{ zj_item['dest'] }}"
+    mode: "0644"
+  loop: "{{ copy_items }}"
   loop_control:
     loop_var: zj_item
 ```
