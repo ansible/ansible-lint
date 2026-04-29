@@ -2,6 +2,8 @@
 # comment without space
 #
 # second comment after blank
+### multi-hash comment
+### multi-hash without space
 - name: Fixture
   hosts: localhost
   tasks:
