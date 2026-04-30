@@ -97,7 +97,7 @@
           "items": {
             "type": "string"
           },
-          "markdownDescription": "List of strings representing filenames of changelog framents.",
+          "markdownDescription": "List of strings representing filenames of changelog fragments.",
           "type": "array"
         },
         "modules": {
