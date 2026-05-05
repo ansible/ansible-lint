@@ -153,9 +153,7 @@ class EventQueryRule(AnsibleLintRule):
                 )
             else:
                 # Extract device_type value and validate against taxonomy
-                dt_match = re.search(
-                    r'device_type\s*:\s*["\']([^"\']+)["\']', query
-                )
+                dt_match = re.search(r'device_type\s*:\s*["\']([^"\']+)["\']', query)
                 if dt_match:
                     device_type = dt_match.group(1)
                     normalized = device_type.lower().replace(" ", "_")
@@ -177,9 +175,7 @@ class EventQueryRule(AnsibleLintRule):
 
             # Check canonical_facts has at least one identifier
             # Look for key-value patterns inside canonical_facts block
-            cf_match = re.search(
-                r"canonical_facts\s*:\s*\{([^}]*)\}", query, re.DOTALL
-            )
+            cf_match = re.search(r"canonical_facts\s*:\s*\{([^}]*)\}", query, re.DOTALL)
             if cf_match:
                 cf_content = cf_match.group(1).strip()
                 # Filter out only null assignments and empty content
