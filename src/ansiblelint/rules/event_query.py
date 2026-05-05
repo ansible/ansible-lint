@@ -85,7 +85,7 @@ class EventQueryRule(AnsibleLintRule):
 
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Validate event_query.yml files."""
-        if not file.path.name == "event_query.yml":
+        if file.path.name != "event_query.yml":
             return []
 
         # Only match files under extensions/audit/
@@ -132,17 +132,15 @@ class EventQueryRule(AnsibleLintRule):
                 continue
 
             # Validate query output contains required fields
-            for field in _REQUIRED_OUTPUT_KEYS:
-                # Check that the field appears as a key in the jq output object
-                # Matches patterns like: name:, "name":, canonical_facts:
-                if not re.search(rf'\b{field}\s*:', query):
-                    results.append(
-                        self.create_matcherror(
-                            message=f"Module '{module_key}' query output is missing required field '{field}'.",
-                            tag="event-query[query-missing-field]",
-                            filename=file,
-                        ),
-                    )
+            results.extend(
+                self.create_matcherror(
+                    message=f"Module '{module_key}' query output is missing required field '{field}'.",
+                    tag="event-query[query-missing-field]",
+                    filename=file,
+                )
+                for field in _REQUIRED_OUTPUT_KEYS
+                if not re.search(rf"\b{field}\s*:", query)
+            )
 
             # Check for device_type in facts section
             if "device_type" not in query:
@@ -180,7 +178,7 @@ class EventQueryRule(AnsibleLintRule):
             # Check canonical_facts has at least one identifier
             # Look for key-value patterns inside canonical_facts block
             cf_match = re.search(
-                r'canonical_facts\s*:\s*\{([^}]*)\}', query, re.DOTALL
+                r"canonical_facts\s*:\s*\{([^}]*)\}", query, re.DOTALL
             )
             if cf_match:
                 cf_content = cf_match.group(1).strip()
