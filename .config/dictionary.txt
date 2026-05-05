@@ -61,6 +61,7 @@ dotconfig
 dzdo
 ematcher
 ematchtestfile
+esxi
 facelessuser
 facter
 fakerole
@@ -108,6 +109,7 @@ matchyaml
 mkdocstrings
 mockings
 modifyitems
+moid
 mytag
 namedtempfile
 nestedincludes
