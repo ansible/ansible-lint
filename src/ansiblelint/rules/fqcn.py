@@ -231,20 +231,19 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
         lintable: Lintable,
         data: CommentedMap | CommentedSeq | str,
     ) -> None:
-        if match.tag not in self.ids():
-            return
-        target_task = self.seek(match.yaml_path, data)
-        current_action, new_action = self._extract_action_names(match)
-        for _ in range(len(target_task)):
-            if isinstance(target_task, CommentedSeq):
-                continue
-            k, v = target_task.popitem(False)
-            target_task[new_action if k == current_action else k] = v
-            # Preserve trailing comments: ruamel.yaml does not remap `ca.items`
-            # when a key is renamed, so we move the association manually.
-            if k == current_action and k in target_task.ca.items:
-                target_task.ca.items[new_action] = target_task.ca.items.pop(k)
-        match.fixed = True
+        if match.tag in self.ids():
+            target_task = self.seek(match.yaml_path, data)
+            current_action, new_action = self._extract_action_names(match)
+            for _ in range(len(target_task)):
+                if isinstance(target_task, CommentedSeq):
+                    continue
+                k, v = target_task.popitem(False)
+                target_task[new_action if k == current_action else k] = v
+                # Preserve trailing comments: ruamel.yaml does not remap `ca.items`
+                # when a key is renamed, so we move the association manually.
+                if k == current_action and k in target_task.ca.items:
+                    target_task.ca.items[new_action] = target_task.ca.items.pop(k)
+            match.fixed = True
 
     @staticmethod
     def _extract_action_names(match: MatchError) -> tuple[str, str]:
