@@ -2,7 +2,7 @@
 #    uv export --no-default-groups --no-dev --no-emit-package ansible-core --no-emit-package resolvelib --no-emit-package ruamel-yaml-clib --no-emit-package tomli --no-emit-package typing-extensions --no-emit-project --no-hashes -o .config/requirements-lock.txt
 ansible-compat==26.3.0
     # via ansible-lint
-attrs==25.4.0
+attrs==26.1.0
     # via
     #   jsonschema
     #   referencing
@@ -14,17 +14,17 @@ cffi==2.0.0
     # via
     #   ansible-lint
     #   cryptography
-click==8.3.1
+click==8.3.3
     # via black
 colorama==0.4.6 ; sys_platform == 'win32'
     # via click
-cryptography==46.0.6
+cryptography==48.0.0
     # via
     #   ansible-core
     #   ansible-lint
 distro==1.9.0
     # via ansible-lint
-filelock==3.25.2
+filelock==3.29.0
     # via ansible-lint
 jinja2==3.1.6
     # via ansible-core
@@ -38,18 +38,18 @@ markupsafe==3.0.3
     # via jinja2
 mypy-extensions==1.1.0
     # via black
-packaging==26.0
+packaging==26.2
     # via
     #   ansible-compat
     #   ansible-core
     #   ansible-lint
     #   black
-pathspec==1.0.4
+pathspec==1.1.1
     # via
     #   ansible-lint
     #   black
     #   yamllint
-platformdirs==4.9.4
+platformdirs==4.9.6
     # via black
 pycparser==3.0 ; implementation_name != 'PyPy'
     # via cffi

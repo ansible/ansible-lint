@@ -19,7 +19,7 @@ repos:
       - id: check-useless-excludes
         priority: 0
   - repo: https://github.com/ansible/actions
-    rev: v1.1.0
+    rev: v1.1.2
     hooks:
       - id: toml
         priority: 0
@@ -38,7 +38,7 @@ repos:
       # - id: shellcheck
       #   priority: 0
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.10.9
+    rev: 0.11.12
     hooks:
       - id: uv-sync
       - id: uv-lock
@@ -67,7 +67,7 @@ repos:
           - "-o"
           - ".config/requirements-lock.txt"
   - repo: https://github.com/biomejs/pre-commit
-    rev: "v2.4.6"
+    rev: "v2.4.14"
     hooks:
       - id: biome-check
         name: biome
@@ -124,11 +124,11 @@ repos:
         entry: yamllint --strict
 
   - repo: https://github.com/jendrikseipp/vulture
-    rev: v2.14
+    rev: v2.16
     hooks:
       - id: vulture
   - repo: https://github.com/ansible/team-devtools
-    rev: v26.2.1
+    rev: v26.4.0
     hooks:
       - id: check-platform-constraints
         priority: 1
