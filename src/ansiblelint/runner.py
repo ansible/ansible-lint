@@ -662,9 +662,9 @@ class Runner:
 
     def plugin_children(self, lintable: Lintable) -> list[Lintable]:
         """Collect lintable sections from plugin file."""
-        offset, content = parse_examples_from_plugin(lintable)
-        if not content:
-            # No examples, nothing to see here
+        offset, content, content_type = parse_examples_from_plugin(lintable)
+        if not content or content_type != "yaml":
+            # No (YAML) examples, nothing to see here
             return []
         examples = Lintable(
             name=lintable.name,
