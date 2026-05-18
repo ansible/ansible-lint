@@ -76,7 +76,11 @@ def load_config(
         config_path = os.path.abspath(config_file)
         if not os.path.exists(config_path):
             msg = f"Config file not found '{config_path}'"
-            if any(isinstance(h, logging.FileHandler) and h.baseFilename != os.path.abspath(os.devnull) for h in logging.root.handlers):
+            if any(
+                isinstance(h, logging.FileHandler)
+                and h.baseFilename != os.path.abspath(os.devnull)
+                for h in logging.root.handlers
+            ):
                 _logger.error(msg)
             console_stderr.print(f"[error]{msg}[/]")
             sys.exit(RC.INVALID_CONFIG)
@@ -95,7 +99,11 @@ def load_config(
 
     for error in validate_file_schema(config_lintable):
         msg = f"Invalid configuration file {config_path}. {error}"
-        if any(isinstance(h, logging.FileHandler) and h.baseFilename != os.path.abspath(os.devnull) for h in logging.root.handlers):
+        if any(
+            isinstance(h, logging.FileHandler)
+            and h.baseFilename != os.path.abspath(os.devnull)
+            for h in logging.root.handlers
+        ):
             _logger.error(msg)
         console_stderr.print(f"[error]{msg}[/]")
         sys.exit(RC.INVALID_CONFIG)
