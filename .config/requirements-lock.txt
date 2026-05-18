@@ -18,7 +18,7 @@ click==8.3.3
     # via black
 colorama==0.4.6 ; sys_platform == 'win32'
     # via click
-cryptography==47.0.0
+cryptography==48.0.0
     # via
     #   ansible-core
     #   ansible-lint
@@ -44,7 +44,7 @@ packaging==26.2
     #   ansible-core
     #   ansible-lint
     #   black
-pathspec==1.0.4
+pathspec==1.1.1
     # via
     #   ansible-lint
     #   black
