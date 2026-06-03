@@ -21,6 +21,12 @@ skip_list:
   - yaml[indentation]
 ```
 
+These settings control whether YAML violations are reported. They do not disable
+YAML reformatting performed by [`--fix`](../autofix.md). When `--fix` is used,
+Ansible-lint can still update YAML formatting for files that contain skipped
+`yaml[...]` violations. Run without `--fix` if you need to leave those formatting
+details untouched.
+
 If you want Ansible-lint to report YAML syntax violations as warnings, and not
 fatal errors, add tag identifiers to the `warn_list` in your configuration, for
 example:
