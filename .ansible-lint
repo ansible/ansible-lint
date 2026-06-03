@@ -84,7 +84,8 @@ warn_list:
 # Some rules can transform files to fix (or make it easier to fix) identified
 # errors. `ansible-lint --fix` will reformat YAML files and run these transforms.
 # By default it will run all transforms (effectively `write_list: ["all"]`).
-# You can disable running transforms by setting `write_list: ["none"]`.
+# You can disable running rule-specific transforms by setting `write_list: ["none"]`.
+# This does not disable YAML reformatting when `--fix` is used.
 # Or only enable a subset of rule transforms by listing rules/tags here.
 # write_list:
 #   - all
