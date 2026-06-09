@@ -91,7 +91,7 @@ from ansiblelint.constants import (
     FileType,
 )
 from ansiblelint.errors import MatchError
-from ansiblelint.file_utils import Lintable, discover_lintables
+from ansiblelint.file_utils import Lintable, discover_lintables, find_role_dir
 from ansiblelint.skip_utils import is_nested_task
 from ansiblelint.text import has_jinja, is_fqcn, removeprefix
 from ansiblelint.types import (
@@ -1332,24 +1332,21 @@ def get_lintables(
 
         # stage 2: guess roles from current lintables, as there is no unique
         # file that must be present in any kind of role.
-        _extend_with_roles(lintables)
+        extend_with_roles(lintables)
 
     return lintables
 
 
-def _extend_with_roles(lintables: list[Lintable]) -> None:
+def extend_with_roles(lintables: list[Lintable]) -> None:
     """Detect roles among lintables and adds them to the list."""
     for lintable in lintables:
-        parts = lintable.path.parent.parts
-        if "roles" in parts:
-            role = lintable.path
-            while role.parent.name != "roles" and role.name:
-                role = role.parent
-            if role.exists() and not role.is_file():
-                lintable = Lintable(role)
-                if lintable.kind == "role" and lintable not in lintables:
-                    _logger.debug("Added role: %s", lintable)
-                    lintables.append(lintable)
+        role_path = find_role_dir(lintable.path)
+        if role_path is None:
+            continue
+        role_lintable = Lintable(role_path)
+        if role_lintable.kind == "role" and role_lintable not in lintables:
+            _logger.debug("Added role: %s", role_lintable)
+            lintables.append(role_lintable)
 
 
 def convert_to_boolean(value: Any) -> bool:
