@@ -907,8 +907,10 @@ class Task(Mapping[str, Any]):
 
     raw_task: MutableMapping[str, Any]
     filename: str = ""
-    _normalized_task: MutableMapping[str, Any] = field(
-        init=False, repr=False, default=MISSING  # type: ignore[assignment]
+    _normalized_task: MutableMapping[str, Any] | Any = field(
+        init=False,
+        repr=False,
+        default=MISSING,
     )
     error: MatchError | None = None
     position: str = ""
