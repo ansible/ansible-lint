@@ -28,16 +28,19 @@ the `GITHUB_ACTIONS=true` and `GITHUB_WORKFLOW=...` variables.
 ## Caching
 
 For optimal performance, Ansible-lint creates caches with installed or mocked
-roles, collections, and modules in the `{project_dir}/.cache` folder. The
+roles, collections, and modules in the `{project_dir}/.ansible` folder. The
 location of `{project_dir}` is passed with a command line argument, determined
 by the location of the configuration file, git project top-level directory, or
 user home directory.
 
+Ansible-lint can create this project cache during lint runs, including offline
+runs that only use mocked roles, collections, or modules.
+
 To perform faster re-runs, Ansible-lint does not automatically clean the cache.
-If required you can do this manually by simply deleting the `.cache` folder.
+If required you can do this manually by simply deleting the `.ansible` folder.
 Ansible-lint creates a new cache on the next invocation.
 
-You should add the `.cache` folder to the `.gitignore` file in your git
+You should add the `.ansible` folder to the `.gitignore` file in your git
 repositories.
 
 ## Gradual adoption
