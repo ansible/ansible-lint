@@ -39,7 +39,9 @@ from collections.abc import (
     MutableMapping,
     Sequence,
 )
-from dataclasses import _MISSING_TYPE, dataclass, field
+from dataclasses import MISSING, dataclass, field
+
+_MISSING_TYPE = type(MISSING)
 from functools import cache, lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
