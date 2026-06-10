@@ -2,8 +2,10 @@
 
 from pathlib import Path
 
+from ansiblelint.__main__ import _rule_is_skipped
 from ansiblelint.constants import RC
 from ansiblelint.file_utils import Lintable
+from ansiblelint.loaders import IgnoreRule, IgnoreRuleQualifier
 from ansiblelint.testing import run_ansible_lint
 
 
@@ -115,6 +117,16 @@ def test_ignore_file_without_skip_and_strict(tmp_path: Path) -> None:
 
     # Should return 2 because there's a warning and we're in strict mode
     assert result.returncode == RC.VIOLATIONS_FOUND
+
+
+def test_rule_is_skipped_checks_all_ignore_rules() -> None:
+    """Validate that skip qualifier lookup does not stop at an unrelated rule."""
+    rules = (
+        IgnoreRule("yaml[truthy]", frozenset()),
+        IgnoreRule("yaml[indentation]", frozenset({IgnoreRuleQualifier.SKIP})),
+    )
+
+    assert _rule_is_skipped("yaml[indentation]", rules)
 
 
 def test_skip_list_and_strict(tmp_path: Path) -> None:
