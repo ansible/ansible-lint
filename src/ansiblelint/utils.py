@@ -39,7 +39,7 @@ from collections.abc import (
     MutableMapping,
     Sequence,
 )
-from dataclasses import _MISSING_TYPE, dataclass, field
+from dataclasses import MISSING, dataclass, field
 from functools import cache, lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -911,8 +911,10 @@ class Task(Mapping[str, Any]):
 
     raw_task: MutableMapping[str, Any]
     filename: str = ""
-    _normalized_task: MutableMapping[str, Any] | _MISSING_TYPE = field(
-        init=False, repr=False
+    _normalized_task: MutableMapping[str, Any] | Any = field(
+        init=False,
+        repr=False,
+        default=MISSING,
     )
     error: MatchError | None = None
     position: str = ""
@@ -973,7 +975,7 @@ class Task(Mapping[str, Any]):
                 # When we cannot normalize it, we just use the raw task instead
                 # to avoid adding extra complexity to the rules.
                 self._normalized_task = self.raw_task
-        if isinstance(self._normalized_task, _MISSING_TYPE):
+        if self._normalized_task is MISSING:
             msg = "Task was not normalized"
             raise TypeError(msg)
         return self._normalized_task
