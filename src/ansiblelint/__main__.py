@@ -72,6 +72,8 @@ from ansiblelint.version import __version__
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
+    from ansiblelint.errors import MatchError
+
     # RulesCollection must be imported lazily or ansible gets imported too early.
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import LintResult
@@ -212,6 +214,92 @@ def support_banner() -> None:
     """Display support banner when running on unsupported platform."""
 
 
+def _is_warn_list_match(match: MatchError, warn_list: list[str]) -> bool:
+    return not {match.tag, match.rule.id, *match.rule.tags}.isdisjoint(warn_list)
+
+
+def _handle_warn_list_rerun(
+    idx: int,
+    match: MatchError,
+    new_results: LintResult,
+    result: LintResult,
+    warn_list: list[str],
+) -> bool:
+    """Refresh warn_list matches after rerun. Returns True if handled."""
+    if not _is_warn_list_match(match, warn_list):
+        return False
+    for new_match in new_results.matches:
+        if new_match.tag == match.tag and new_match.filename == match.filename:
+            result.matches[idx] = new_match
+            _logger.debug("Still warned: %s", new_match)
+            break
+    else:
+        _logger.debug("Warn_list match retained: %s", match)
+    return True
+
+
+def _apply_rerun_outcome(
+    idx: int,
+    match: MatchError,
+    new_results: LintResult,
+    result: LintResult,
+    resolved: list[tuple[str, str]],
+) -> None:
+    """Update matches after yaml rerun based on new results."""
+    uid = (match.rule.id, match.filename)
+    if not new_results.matches:
+        _logger.debug("Newly resolved: %s", match)
+        result.matches.pop(idx)
+        resolved.append(uid)
+        return
+    if match in new_results.matches:
+        _logger.debug("Still found: %s", match)
+        return
+    _logger.debug("Fixed, removed: %s", match)
+    result.matches.pop(idx)
+
+
+def _process_fix_rerun_matches(
+    runtime_options: Options,
+    result: LintResult,
+    rules: RulesCollection,
+    match_count: int,
+) -> None:
+    """Rerun yaml rule matches and update the result list after transforms."""
+    rerun = ["yaml"]
+    resolved: list[tuple[str, str]] = []
+    for idx, match in reversed(list(enumerate(result.matches))):
+        _logger.debug("Fixing: (%s of %s) %s", match_count - idx, match_count, match)
+        if match.fixed:
+            _logger.debug("Fixed, removed: %s", match)
+            result.matches.pop(idx)
+            continue
+        if match.rule.id not in rerun:
+            _logger.debug("Not rerun eligible: %s", match)
+            continue
+
+        uid = (match.rule.id, match.filename)
+        if uid in resolved:
+            _logger.debug("Previously resolved: %s", match)
+            result.matches.pop(idx)
+            continue
+
+        _logger.debug("Rerunning: %s", match)
+        runtime_options.tags = [match.rule.id]
+        runtime_options.lintables = [match.filename]
+        runtime_options._skip_ansible_syntax_check = True  # noqa: SLF001
+        new_results = get_matches(rules, runtime_options)
+        if _handle_warn_list_rerun(
+            idx,
+            match,
+            new_results,
+            result,
+            runtime_options.warn_list,
+        ):
+            continue
+        _apply_rerun_outcome(idx, match, new_results, result, resolved)
+
+
 def fix(runtime_options: Options, result: LintResult, rules: RulesCollection) -> None:
     """Fix the linting errors.
 
@@ -247,39 +335,7 @@ def fix(runtime_options: Options, result: LintResult, rules: RulesCollection) ->
         )
         sys.exit(RC.INVALID_CONFIG)
     _do_transform(result, options)
-
-    rerun = ["yaml"]
-    resolved = []
-    for idx, match in reversed(list(enumerate(result.matches))):
-        _logger.debug("Fixing: (%s of %s) %s", match_count - idx, match_count, match)
-        if match.fixed:
-            _logger.debug("Fixed, removed: %s", match)
-            result.matches.pop(idx)
-            continue
-        if match.rule.id not in rerun:
-            _logger.debug("Not rerun eligible: %s", match)
-            continue
-
-        uid = (match.rule.id, match.filename)
-        if uid in resolved:
-            _logger.debug("Previously resolved: %s", match)
-            result.matches.pop(idx)
-            continue
-        _logger.debug("Rerunning: %s", match)
-        runtime_options.tags = [match.rule.id]
-        runtime_options.lintables = [match.filename]
-        runtime_options._skip_ansible_syntax_check = True  # noqa: SLF001
-        new_results = get_matches(rules, runtime_options)
-        if not new_results.matches:
-            _logger.debug("Newly resolved: %s", match)
-            result.matches.pop(idx)
-            resolved.append(uid)
-            continue
-        if match in new_results.matches:
-            _logger.debug("Still found: %s", match)
-            continue
-        _logger.debug("Fixed, removed: %s", match)
-        result.matches.pop(idx)
+    _process_fix_rerun_matches(runtime_options, result, rules, match_count)
 
 
 # By default, matches ignored in .ansible-lint-ignore are treated

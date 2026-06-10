@@ -328,6 +328,29 @@ def test_effective_write_set(write_list: list[str], expected: set[str]) -> None:
 
 
 @pytest.mark.parametrize(
+    ("write_list", "warn_list", "expected"),
+    (
+        pytest.param(["name"], ["yaml[line-length]"], True, id="warn-line-length"),
+        pytest.param(["yaml"], ["yaml[line-length]"], False, id="write-yaml"),
+        pytest.param(["all"], ["yaml[line-length]"], False, id="write-all"),
+        pytest.param(["name"], [], False, id="no-warn"),
+        pytest.param(["name"], ["yaml"], True, id="warn-yaml"),
+    ),
+)
+def test_should_preserve_long_lines(
+    write_list: list[str],
+    warn_list: list[str],
+    expected: bool,
+    config_options: Options,
+) -> None:
+    """Long lines must not fold on dump when line-length is warn-only."""
+    config_options.write_list = write_list
+    config_options.warn_list = warn_list
+    transformer = Transformer(LintResult([], set()), config_options)
+    assert transformer._should_preserve_long_lines() is expected
+
+
+@pytest.mark.parametrize(
     ("write_list", "write_exclude_list", "rules"),
     (
         (

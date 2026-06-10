@@ -378,6 +378,8 @@ class Lintable:
                 # new file
                 self._original_content = ""
         self.updated = self._original_content != value
+        if value != self._content:
+            self.state = States.NOT_LOADED
         self._content = value
 
     @content.deleter
