@@ -70,8 +70,9 @@ from ansiblelint.skip_utils import normalize_tag
 from ansiblelint.version import __version__
 
 if TYPE_CHECKING:
-    # RulesCollection must be imported lazily or ansible gets imported too early.
+    from collections.abc import Iterable
 
+    # RulesCollection must be imported lazily or ansible gets imported too early.
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import LintResult
 
@@ -286,10 +287,10 @@ def fix(runtime_options: Options, result: LintResult, rules: RulesCollection) ->
 # to the rule, it is treated as skipped here and does not show up
 # even as a warning.
 # [1] https://github.com/ansible/ansible-lint/issues/3068
-def _rule_is_skipped(tag: str, rules: set[IgnoreRule]) -> bool:
+def _rule_is_skipped(tag: str, rules: Iterable[IgnoreRule]) -> bool:
     for rule in rules:
         if tag != rule.rule:
-            return False
+            continue
         return IgnoreRuleQualifier.SKIP in rule.qualifiers
     return False
 
