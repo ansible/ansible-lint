@@ -32,7 +32,7 @@ jobs:
         lint-pkg-schemas-eco:tox -e lint;tox -e pkg;tox -e schemas;tox -e eco
         hook
         docs
-        py312-devel
+        py313-devel
         py310-lower
         py312-lower
         py314-devel
