@@ -55,6 +55,8 @@ except ImportError:  # pragma: no branch
         to_bytes,
     )
 
+from ansible import constants as ansible_constants
+from ansible.cli import CLI
 from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.mod_args import ModuleArgsParser
@@ -106,9 +108,7 @@ from ansiblelint.types import (
 if TYPE_CHECKING:
     from ansiblelint.app import App
     from ansiblelint.rules import RulesCollection
-# ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
-# string as the password to enable such yaml files to be opened and parsed
-# successfully.
+# Fallback vault password used when no vault configuration is found.
 DEFAULT_VAULT_PASSWORD = "x"  # noqa: S105
 
 PLAYBOOK_DIR = os.environ.get("ANSIBLE_PLAYBOOK_DIR", None)
@@ -119,14 +119,66 @@ LINE_COLUMN_REGEX = re.compile(
 
 _logger = logging.getLogger(__name__)
 
+# Cached vault secrets, initialized on first use.
+_vault_secrets: list[tuple[str, Any]] | None = None
+
+
+def _get_vault_secrets() -> list[tuple[str, Any]]:
+    """Return vault secrets from Ansible configuration, falling back to a dummy password."""
+    # pylint: disable=global-statement
+    global _vault_secrets
+    if _vault_secrets is not None:
+        return _vault_secrets
+
+    loader = DataLoader()  # type: ignore[no-untyped-call,unused-ignore]
+
+    vault_ids = list(
+        getattr(ansible_constants, "DEFAULT_VAULT_IDENTITY_LIST", None) or []
+    )
+
+    try:
+        kwargs: dict[str, Any] = {
+            "ask_vault_pass": False,
+            "auto_prompt": False,
+        }
+        # initialize_context was added in ansible-core 2.19
+        if "initialize_context" in inspect.getfullargspec(CLI.setup_vault_secrets).args:
+            kwargs["initialize_context"] = False
+        secrets = CLI.setup_vault_secrets(  # type: ignore[no-untyped-call]
+            loader,
+            vault_ids=vault_ids,
+            **kwargs,
+        )
+        if secrets:
+            _vault_secrets = secrets
+            return _vault_secrets
+    except (AnsibleError, RuntimeError, Warning):
+        _logger.debug(
+            "Failed to load vault secrets from configuration",
+            exc_info=True,
+        )
+
+    # Fall back to dummy password for backward compatibility
+    _vault_secrets = [
+        (
+            "default",
+            PromptVaultSecret(_bytes=to_bytes(DEFAULT_VAULT_PASSWORD)),  # type: ignore[no-untyped-call]
+        ),
+    ]
+    return _vault_secrets
+
+
+def _make_dataloader() -> DataLoader:
+    """Create a DataLoader with vault secrets from Ansible configuration."""
+    loader = DataLoader()  # type: ignore[no-untyped-call,unused-ignore]
+    if hasattr(loader, "set_vault_secrets"):
+        loader.set_vault_secrets(_get_vault_secrets())
+    return loader
+
 
 def parse_yaml_from_file(filepath: str) -> AnsibleJSON:
     """Extract a decrypted YAML object from file."""
-    dataloader = DataLoader()  # type: ignore[no-untyped-call,unused-ignore]
-    if hasattr(dataloader, "set_vault_secrets"):
-        dataloader.set_vault_secrets([
-            ("default", PromptVaultSecret(_bytes=to_bytes(DEFAULT_VAULT_PASSWORD)))  # type: ignore[no-untyped-call]
-        ])
+    dataloader = _make_dataloader()
     result: object = dataloader.load_from_file(filepath)
     if result is None:
         return result
@@ -139,7 +191,7 @@ def parse_yaml_from_file(filepath: str) -> AnsibleJSON:
 
 def path_dwim(basedir: str, given: str) -> str:
     """Convert a given path do-what-I-mean style."""
-    dataloader = DataLoader()  # type: ignore[no-untyped-call,unused-ignore]
+    dataloader = _make_dataloader()
     dataloader.set_basedir(basedir)
     return str(dataloader.path_dwim(given))
 
@@ -154,7 +206,7 @@ def ansible_templar(basedir: Path, templatevars: Any) -> Templar:
     if basedir.name == "tasks":
         basedir = basedir.parent
 
-    dataloader = DataLoader()  # type: ignore[no-untyped-call,unused-ignore]
+    dataloader = _make_dataloader()
     dataloader.set_basedir(str(basedir))
     templar = Templar(dataloader, variables=templatevars)
     return templar
