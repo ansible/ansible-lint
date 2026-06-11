@@ -144,6 +144,54 @@ def path_dwim(basedir: str, given: str) -> str:
     return str(dataloader.path_dwim(given))
 
 
+def _include_search_basedirs(lintable: Lintable | None, basedir: str) -> list[str]:
+    """Return basedirs to use while resolving nested task includes."""
+    basedirs = [basedir]
+    parent = lintable.parent if lintable else None
+    while parent:
+        if parent.path.is_absolute():
+            parent_basedir = str(parent.path.parent)
+            if parent_basedir not in basedirs:
+                basedirs.append(parent_basedir)
+        parent = parent.parent
+    return basedirs
+
+
+def _resolve_include_path(
+    lintable: Lintable | None,
+    basedir: str,
+    file_name: str,
+) -> str:
+    """Resolve a task include path, accounting for nested include context."""
+    search_basedirs = _include_search_basedirs(lintable, basedir)
+
+    for search_basedir in search_basedirs:
+        for candidate in (
+            path_dwim(search_basedir, file_name),
+            path_dwim(os.path.join(search_basedir, "tasks"), file_name),
+        ):
+            if os.path.exists(candidate):
+                return candidate
+
+    # Keep the historical upward search as a fallback for role layouts and
+    # task files that rely on project-root-relative include paths. When no
+    # candidate exists, return the same final path the old climbing logic used
+    # so missing external-ish includes are not pulled back into the current role.
+    result = path_dwim(basedir, file_name)
+    search_basedir = basedir
+    while True:
+        if os.path.exists(result):
+            return result
+        tasks_result = path_dwim(os.path.join(search_basedir, "tasks"), file_name)
+        if os.path.exists(tasks_result):
+            return tasks_result
+        new_basedir = os.path.dirname(search_basedir)
+        if new_basedir == search_basedir:
+            return result
+        search_basedir = new_basedir
+        result = path_dwim(search_basedir, file_name)
+
+
 def ansible_templar(basedir: Path, templatevars: Any) -> Templar:
     """Create an Ansible Templar using templatevars."""
     # `basedir` is the directory containing the lintable file.
@@ -402,21 +450,11 @@ class HandleChildren:
         else:
             return []
 
-        result = path_dwim(basedir, file)
-        while True:
-            if os.path.exists(result):
-                break
-            tasks_result = path_dwim(os.path.join(basedir, "tasks"), file)
-            if os.path.exists(tasks_result):
-                result = tasks_result
-                break
-            new_basedir = os.path.dirname(basedir)
-            if new_basedir == basedir:
-                break
-            basedir = new_basedir
-            result = path_dwim(basedir, file)
+        result = _resolve_include_path(lintable, basedir, file)
+        child = Lintable(result, kind=parent_type)
+        child.parent = lintable
 
-        return [Lintable(result, kind=parent_type)]
+        return [child]
 
     def taskshandlers_children(
         self,
@@ -445,6 +483,7 @@ class HandleChildren:
                     basedir,
                     k,
                     parent_type,
+                    lintable=lintable,
                 )
                 results.append(children)
                 continue
@@ -673,6 +712,7 @@ def _get_task_handler_children_for_tasks_or_playbooks(
     basedir: str,
     k: Any,
     parent_type: FileType,
+    lintable: Lintable | None = None,
 ) -> Lintable:
     """Try to get children of taskhandler for include/import tasks/playbooks."""
     child_type = k if parent_type == "playbook" else parent_type
@@ -702,20 +742,11 @@ def _get_task_handler_children_for_tasks_or_playbooks(
             if not file_name:
                 # ignore invalid data (syntax check will outside the scope)
                 continue
-            f = path_dwim(basedir, file_name)
-            while True:
-                if os.path.exists(f):
-                    break
-                tasks_f = path_dwim(os.path.join(basedir, "tasks"), file_name)
-                if os.path.exists(tasks_f):
-                    f = tasks_f
-                    break
-                new_basedir = os.path.dirname(basedir)
-                if new_basedir == basedir:
-                    break
-                basedir = new_basedir
-                f = path_dwim(basedir, file_name)
-            return Lintable(f, kind=child_type)
+            f = _resolve_include_path(lintable, basedir, file_name)
+            child = Lintable(f, kind=child_type)
+            if lintable:
+                child.parent = lintable
+            return child
     msg = f"The node contains none of: {', '.join(sorted(INCLUSION_ACTION_NAMES))}"
     raise LookupError(msg)
 
