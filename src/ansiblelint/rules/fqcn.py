@@ -233,28 +233,37 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
     ) -> None:
         if match.tag in self.ids():
             target_task = self.seek(match.yaml_path, data)
-            # Unfortunately, a lot of data about Ansible content gets lost here, you only get a simple dict.
-            # For now, just parse the error messages for the data about action names etc. and fix this later.
-            current_action = ""
-            new_action = ""
-            if match.tag == "fqcn[action-core]":
-                # split at the first bracket, cut off the last bracket and dot
-                current_action = match.message.split("(")[1][:-2]
-                # This will always replace builtin modules with "ansible.builtin" versions, not "ansible.legacy".
-                # The latter is technically more correct in what ansible has executed so far, the former is most likely better understood and more robust.
-                new_action = match.details.split("`")[1]
-            elif match.tag == "fqcn[action]":
-                current_action = match.details.split("`")[1]
-                new_action = match.message.split("`")[1]
-            elif match.tag == "fqcn[canonical]":
-                current_action = match.message.split("`")[3]
-                new_action = match.message.split("`")[1]
+            current_action, new_action = self._extract_action_names(match)
             for _ in range(len(target_task)):
                 if isinstance(target_task, CommentedSeq):
                     continue
                 k, v = target_task.popitem(False)
                 target_task[new_action if k == current_action else k] = v
+                # Preserve trailing comments: ruamel.yaml does not remap `ca.items`
+                # when a key is renamed, so we move the association manually.
+                if k == current_action and k in target_task.ca.items:
+                    target_task.ca.items[new_action] = target_task.ca.items.pop(k)
             match.fixed = True
+
+    @staticmethod
+    def _extract_action_names(match: MatchError) -> tuple[str, str]:
+        # Unfortunately, a lot of data about Ansible content gets lost here, you only get a simple dict.
+        # For now, just parse the error messages for the data about action names etc. and fix this later.
+        current_action = ""
+        new_action = ""
+        if match.tag == "fqcn[action-core]":
+            # split at the first bracket, cut off the last bracket and dot
+            current_action = match.message.split("(")[1][:-2]
+            # This will always replace builtin modules with "ansible.builtin" versions, not "ansible.legacy".
+            # The latter is technically more correct in what ansible has executed so far, the former is most likely better understood and more robust.
+            new_action = match.details.split("`")[1]
+        elif match.tag == "fqcn[action]":
+            current_action = match.details.split("`")[1]
+            new_action = match.message.split("`")[1]
+        elif match.tag == "fqcn[canonical]":
+            current_action = match.message.split("`")[3]
+            new_action = match.message.split("`")[1]
+        return current_action, new_action
 
 
 # testing code to be loaded only with pytest or when executed the rule file
