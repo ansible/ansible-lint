@@ -221,7 +221,7 @@ def fixture_runner_result(
         ),
         pytest.param(
             "examples/playbooks/transform-yaml-comments.yml",
-            3,
+            4,
             True,
             True,
             id="yaml-comments",
