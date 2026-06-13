@@ -116,6 +116,10 @@ LINE_COLUMN_REGEX = re.compile(
     r".*line (?P<line>\d+), column (?P<column>\d+).*", flags=re.MULTILINE
 )
 
+# cspell: ignore yamllinter
+# Taken from ansible-core's test/lib/ansible_test/_util/controller/sanity/yamllint/yamllinter.py
+FMT_RE = re.compile(r"^# fmt:\s+(\S+)")
+
 
 _logger = logging.getLogger(__name__)
 
@@ -1353,7 +1357,7 @@ def convert_to_boolean(value: Any) -> bool:
     return bool(boolean(value))  # type: ignore[no-untyped-call]
 
 
-def parse_examples_from_plugin(lintable: Lintable) -> tuple[int, str]:
+def parse_examples_from_plugin(lintable: Lintable) -> tuple[int, str, str]:
     """Parse yaml inside plugin EXAMPLES string.
 
     Store a line number offset to realign returned line numbers later
@@ -1368,11 +1372,22 @@ def parse_examples_from_plugin(lintable: Lintable) -> tuple[int, str]:
                 break
 
     docs = read_docstring(str(lintable.path.resolve(strict=False)))  # type: ignore[no-untyped-call]
-    examples = docs["plainexamples"]
+    examples = docs["plainexamples"] or ""
+
+    # Extract example format type (if present).
+    # See https://github.com/ansible/ansible/pull/71184 and https://github.com/ansible/ansible-lint/issues/5037
+    examples_type = "yaml"
+    if examples:
+        fmt_match = FMT_RE.match(examples.lstrip())
+        if fmt_match:
+            examples_type = fmt_match.group(1)
 
     # Ignore the leading newline and lack of document start
     # as including those in EXAMPLES would be weird.
-    return offset, (f"---{examples}" if examples else "")
+    if examples_type == "yaml":
+        examples = f"---{examples}" if examples else ""
+
+    return offset, examples, examples_type
 
 
 @lru_cache
