@@ -7,6 +7,7 @@ import sys
 import tempfile
 import time
 from collections.abc import Mapping
+from copy import deepcopy
 from http.client import RemoteDisconnected
 from os.path import abspath
 from pathlib import Path
@@ -119,6 +120,41 @@ def test_get_version_warning_offline(mocker: MockerFixture) -> None:
         mocker.patch("ansiblelint.config.CACHE_DIR", Path(temporary_directory))
         options.offline = True
         assert get_version_warning() == ""  # noqa: PLC1901
+
+
+@pytest.mark.parametrize(
+    ("offline", "cache_created"),
+    (
+        pytest.param(True, False, id="offline"),
+        pytest.param(False, True, id="online"),
+    ),
+)
+def test_initialize_options_cache_dir_creation(
+    tmp_path: Path,
+    offline: bool,
+    cache_created: bool,
+) -> None:
+    """Check that offline mode does not create an isolated cache directory."""
+    from ansiblelint.__main__ import initialize_options
+
+    old_options = deepcopy(options)
+    project_dir = tmp_path / "project"
+    project_dir.mkdir()
+    cache_dir = project_dir / ".ansible"
+
+    arguments = ["--config-file", "/dev/null", "--project-dir", str(project_dir)]
+    if offline:
+        arguments.append("--offline")
+
+    cache_dir_lock = initialize_options(arguments)
+    try:
+        assert cache_dir.exists() is cache_created
+    finally:
+        if cache_dir_lock:
+            cache_dir_lock.release()
+            Path(cache_dir_lock.lock_file).unlink(missing_ok=True)
+        options.__dict__.clear()
+        options.__dict__.update(old_options.__dict__)
 
 
 @pytest.mark.parametrize(

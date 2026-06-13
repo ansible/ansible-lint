@@ -49,7 +49,7 @@ class App:
         # Without require_module, our _set_collections_basedir may fail
         self.runtime = Runtime(
             project_dir=Path(options.project_dir),
-            isolated=True,
+            isolated=not options.offline,
             require_module=True,
             verbosity=options.verbosity,
         )
