@@ -199,6 +199,13 @@ def fixture_runner_result(
             id="name_casing_prefix",
         ),
         pytest.param(
+            "examples/roles/name_prefix/tasks/foo/destroy.yml",
+            1,
+            True,
+            True,
+            id="name_casing_prefix_nested",
+        ),
+        pytest.param(
             "examples/roles/name_casing/tasks/main.yml",
             2,
             True,

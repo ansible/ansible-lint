@@ -28,10 +28,9 @@ notes:
 """
 
 EXAMPLES = """
-- name: test task-1
-  company_name.coll_1.mod_1:
-    foo: some value
-    bar: candidate
+# fmt: text
+
+This is some text. Nothing to see.
 """
 
 RETURN = """
