@@ -148,6 +148,12 @@ def test_initialize_options_cache_dir_creation(
 
     cache_dir_lock = initialize_options(arguments)
     try:
+        expected_cache_dir = (
+            Path(os.environ.get("ANSIBLE_HOME", "~/.ansible")).expanduser()
+            if offline
+            else cache_dir
+        )
+        assert options.cache_dir == expected_cache_dir
         assert cache_dir.exists() is cache_created
     finally:
         if cache_dir_lock:
