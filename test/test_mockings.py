@@ -77,5 +77,5 @@ def test_mock_modules_stub_is_lintable(tmp_path: Path) -> None:
         "    - name: Run mocked module\n"
         "      some_ns.some_coll.some_module:\n"
     )
-    result = run_ansible_lint("playbook.yml", cwd=tmp_path, offline=False)
+    result = run_ansible_lint("playbook.yml", cwd=tmp_path)
     assert result.returncode == 0, result.stdout
