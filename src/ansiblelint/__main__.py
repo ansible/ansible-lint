@@ -143,26 +143,28 @@ def initialize_options(arguments: list[str] | None = None) -> BaseFileLock | Non
         or options.list_rules
         or options.list_tags
     ):
-        options.cache_dir = get_cache_dir(pathlib.Path(options.project_dir))
+        options.cache_dir = get_cache_dir(
+            pathlib.Path(options.project_dir),
+            isolated=not options.offline,
+        )
 
     options.project_dir = Path(options.project_dir).resolve().as_posix()
 
     # add a lock file so we do not have two instances running inside at the same time
-    if options.cache_dir:
+    if options.cache_dir and not options.offline:
         options.cache_dir.mkdir(parents=True, exist_ok=True)
 
         # lock file can only be used if cache_dir is set and writable
-        if not options.offline:  # pragma: no cover
-            cache_dir_lock = FileLock(
-                f"{options.cache_dir}/.lock",
+        cache_dir_lock = FileLock(
+            f"{options.cache_dir}/.lock",
+        )
+        try:
+            cache_dir_lock.acquire(timeout=180)
+        except Timeout:  # pragma: no cover
+            _logger.error(  # noqa: TRY400
+                "Timeout waiting for another instance of ansible-lint to release the lock.",
             )
-            try:
-                cache_dir_lock.acquire(timeout=180)
-            except Timeout:  # pragma: no cover
-                _logger.error(  # noqa: TRY400
-                    "Timeout waiting for another instance of ansible-lint to release the lock.",
-                )
-                sys.exit(RC.LOCK_TIMEOUT)
+            sys.exit(RC.LOCK_TIMEOUT)
 
     # Avoid extra output noise from Ansible about using devel versions
     if "ANSIBLE_DEVEL_WARNING" not in os.environ:  # pragma: no branch

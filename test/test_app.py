@@ -79,6 +79,36 @@ def test_app_fixed_violations_coverage(tmp_path: Path) -> None:
     assert exit_code == RC.FIXED_VIOLATIONS
 
 
+def test_add_module_path_for_plain_mock_modules(tmp_path: Path) -> None:
+    """Plain module mocks are exposed through Ansible's module path."""
+    from ansiblelint.app import _add_module_path_if_needed
+    from ansiblelint.config import Options
+
+    options = Options()
+    options.cache_dir = tmp_path / ".ansible"
+    options.mock_modules = ["zuul_return", "ns.coll.mod"]
+    module_paths = ["/usr/share/ansible/plugins/modules"]
+
+    _add_module_path_if_needed(options, module_paths)
+
+    assert module_paths[0] == str(options.cache_dir / "modules")
+
+
+def test_add_module_path_skips_collection_only_mocks(tmp_path: Path) -> None:
+    """Collection module mocks are exposed through collection paths instead."""
+    from ansiblelint.app import _add_module_path_if_needed
+    from ansiblelint.config import Options
+
+    options = Options()
+    options.cache_dir = tmp_path / ".ansible"
+    options.mock_modules = ["ns.coll.mod"]
+    module_paths = ["/usr/share/ansible/plugins/modules"]
+
+    _add_module_path_if_needed(options, module_paths)
+
+    assert module_paths == ["/usr/share/ansible/plugins/modules"]
+
+
 def test_ignore_file_with_skip_and_strict(tmp_path: Path) -> None:
     """Test that .ansible-lint-ignore with skip qualifier returns exit code 0 with --strict.
 
