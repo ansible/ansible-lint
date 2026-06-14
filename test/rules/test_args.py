@@ -80,7 +80,6 @@ def test_args_module_import_restores_existing_module(
     module_name = "tmp.module_with_existing_import"
     module_path.write_text("VALUE = 'loaded'\n", encoding="utf-8")
     existing_module = ModuleType(module_name)
-    existing_module.VALUE = "existing"
 
     monkeypatch.setattr(
         "ansiblelint.rules.args.load_plugin",
