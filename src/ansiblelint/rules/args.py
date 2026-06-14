@@ -216,9 +216,9 @@ class ArgsRule(AnsibleLintRule):
                     return []
 
                 buffer = io.BytesIO(
-                    json.dumps(
-                        {"ANSIBLE_MODULE_ARGS": clean_json(module_args)}
-                    ).encode()
+                    json.dumps({
+                        "ANSIBLE_MODULE_ARGS": clean_json(module_args)
+                    }).encode()
                 )
                 with (
                     patch.object(
