@@ -50,6 +50,10 @@ class Transformer:
         """Initialize a Transformer instance."""
         self.write_set = self.effective_write_set(options.write_list)
         self.write_exclude_set = self.effective_write_set(options.write_exclude_list)
+        self.fix_comment_spaces = not any(
+            tag in (options.skip_list or [])
+            for tag in ("yaml[comments]", "yaml")
+        )
 
         self.matches: list[MatchError] = result.matches
         self.files: set[Lintable] = result.files
@@ -110,6 +114,7 @@ class Transformer:
                 yaml = FormattedYAML(
                     # Ansible only uses YAML 1.1, but others files should use newer 1.2 (ruamel.yaml defaults to 1.2)
                     version=(1, 1) if file.is_owned_by_ansible() else None,
+                    fix_comment_spaces=self.fix_comment_spaces,
                 )
 
                 ruamel_data = yaml.load(data)
