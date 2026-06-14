@@ -86,7 +86,8 @@ runs:
 
     - name: Set up uv
       if: inputs.setup_python == 'true'
-      uses: astral-sh/setup-uv@v8.1.0
+      # astral-sh/setup-uv v8.1.0
+      uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
       with:
         enable-cache: true
         python-version: ${{ inputs.python_version }}
