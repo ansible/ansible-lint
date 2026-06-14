@@ -371,6 +371,35 @@ def template(
     return value
 
 
+def _playbook_dir(lintable: Lintable) -> str | None:
+    """Return the outer playbook directory for an included lintable."""
+    playbook: Lintable | None = None
+    current: Lintable | None = lintable
+    while current:
+        if current.kind == "playbook":
+            playbook = current
+        current = current.parent
+    return str(playbook.path.parent) if playbook else None
+
+
+def _resolve_include_path(basedir: str, file: str) -> str:
+    """Resolve an include path using current ansible-lint search behavior."""
+    result = path_dwim(basedir, file)
+    while True:
+        if os.path.exists(result):
+            break
+        tasks_result = path_dwim(os.path.join(basedir, "tasks"), file)
+        if os.path.exists(tasks_result):
+            result = tasks_result
+            break
+        new_basedir = os.path.dirname(basedir)
+        if new_basedir == basedir:
+            break
+        basedir = new_basedir
+        result = path_dwim(basedir, file)
+    return result
+
+
 @dataclass
 class HandleChildren:
     """Parse task, roles and children."""
@@ -406,21 +435,12 @@ class HandleChildren:
         else:
             return []
 
-        result = path_dwim(basedir, file)
-        while True:
-            if os.path.exists(result):
-                break
-            tasks_result = path_dwim(os.path.join(basedir, "tasks"), file)
-            if os.path.exists(tasks_result):
-                result = tasks_result
-                break
-            new_basedir = os.path.dirname(basedir)
-            if new_basedir == basedir:
-                break
-            basedir = new_basedir
-            result = path_dwim(basedir, file)
+        result = _resolve_include_path(basedir, file)
+        playbook_dir = _playbook_dir(lintable)
+        if playbook_dir and playbook_dir != basedir and not os.path.exists(result):
+            result = _resolve_include_path(playbook_dir, file)
 
-        return [Lintable(result, kind=parent_type)]
+        return [Lintable(result, kind=parent_type, parent=lintable)]
 
     def taskshandlers_children(
         self,
@@ -446,6 +466,7 @@ class HandleChildren:
             with contextlib.suppress(LookupError):
                 children = _get_task_handler_children_for_tasks_or_playbooks(
                     task_handler,
+                    lintable,
                     basedir,
                     k,
                     parent_type,
@@ -674,6 +695,7 @@ class HandleChildren:
 
 def _get_task_handler_children_for_tasks_or_playbooks(
     task_handler: dict[str, Any],
+    lintable: Lintable,
     basedir: str,
     k: Any,
     parent_type: FileType,
@@ -706,20 +728,11 @@ def _get_task_handler_children_for_tasks_or_playbooks(
             if not file_name:
                 # ignore invalid data (syntax check will outside the scope)
                 continue
-            f = path_dwim(basedir, file_name)
-            while True:
-                if os.path.exists(f):
-                    break
-                tasks_f = path_dwim(os.path.join(basedir, "tasks"), file_name)
-                if os.path.exists(tasks_f):
-                    f = tasks_f
-                    break
-                new_basedir = os.path.dirname(basedir)
-                if new_basedir == basedir:
-                    break
-                basedir = new_basedir
-                f = path_dwim(basedir, file_name)
-            return Lintable(f, kind=child_type)
+            f = _resolve_include_path(basedir, file_name)
+            playbook_dir = _playbook_dir(lintable)
+            if playbook_dir and playbook_dir != basedir and not os.path.exists(f):
+                f = _resolve_include_path(playbook_dir, file_name)
+            return Lintable(f, kind=child_type, parent=lintable)
     msg = f"The node contains none of: {', '.join(sorted(INCLUSION_ACTION_NAMES))}"
     raise LookupError(msg)
 

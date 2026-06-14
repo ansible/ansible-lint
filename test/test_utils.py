@@ -687,6 +687,9 @@ def test_get_task_handler_children_climbing(tmp_path: Path) -> None:
     tasks_dir = project / "tasks"
     tasks_dir.mkdir()
 
+    site_yml = project / "site.yml"
+    site_yml.write_text("- import_tasks: imported_task.yml", encoding="utf-8")
+
     imported_task = tasks_dir / "imported_task.yml"
     imported_task.write_text("- debug: msg=hello", encoding="utf-8")
 
@@ -695,6 +698,7 @@ def test_get_task_handler_children_climbing(tmp_path: Path) -> None:
     with cwd(project):
         child = utils._get_task_handler_children_for_tasks_or_playbooks(  # noqa: SLF001
             task_handler=task_handler,
+            lintable=Lintable(site_yml, kind="playbook"),
             basedir=str(project),
             k="import_tasks",
             parent_type="tasks",

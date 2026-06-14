@@ -276,7 +276,7 @@ class Lintable:
         self.base_kind = base_kind or kind_from_path(self.path, base=True)
         self.abspath = self.path.expanduser().absolute()
 
-        if self.kind == "tasks":
+        if self.kind == "tasks" and self.parent is None:
             self.parent = _guess_parent(self)
 
         if self.kind == "yaml":
