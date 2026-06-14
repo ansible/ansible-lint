@@ -2,7 +2,7 @@
 
 import sys
 from pathlib import Path
-from types import SimpleNamespace
+from types import ModuleType, SimpleNamespace
 from typing import TYPE_CHECKING, Any, cast
 
 import pytest
@@ -69,3 +69,41 @@ def test_args_module_import_keeps_module_registered(
 
     assert results == []
     assert module_name not in sys.modules
+
+
+def test_args_module_import_restores_existing_module(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """Ensure args validation restores an existing module after import."""
+    module_path = tmp_path / "module_with_existing_import.py"
+    module_name = "tmp.module_with_existing_import"
+    module_path.write_text("VALUE = 'loaded'\n", encoding="utf-8")
+    existing_module = ModuleType(module_name)
+    existing_module.VALUE = "existing"
+
+    monkeypatch.setattr(
+        "ansiblelint.rules.args.load_plugin",
+        lambda module_name: SimpleNamespace(
+            plugin_resolved_path=str(module_path),
+            plugin_resolved_name=module_name,
+            resolved_fqcn="tmp.module_with_existing_import",
+        ),
+    )
+    monkeypatch.setitem(sys.modules, module_name, existing_module)
+
+    class MockTask:
+        action: dict[str, Any] = {"__ansible_module_original__": module_name}
+        raw_task: dict[str, Any] = {"args": {}}
+        line = 1
+
+        def __getitem__(self, key: str) -> object:
+            return getattr(self, key)
+
+    results = ArgsRule().matchtask(
+        cast("Task", MockTask()),
+        file=Lintable("test.yml", kind="tasks"),
+    )
+
+    assert results == []
+    assert sys.modules[module_name] is existing_module
