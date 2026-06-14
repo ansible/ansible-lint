@@ -198,7 +198,15 @@ class ArgsRule(AnsibleLintRule):
                 return []
             assert spec.loader is not None
             module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
+            previous_module = sys.modules.get(spec.name)
+            sys.modules[spec.name] = module
+            try:
+                spec.loader.exec_module(module)
+            finally:
+                if previous_module is None:
+                    sys.modules.pop(spec.name, None)
+                else:
+                    sys.modules[spec.name] = previous_module
 
             try:
                 if not hasattr(module, "main"):
@@ -208,9 +216,9 @@ class ArgsRule(AnsibleLintRule):
                     return []
 
                 buffer = io.BytesIO(
-                    json.dumps({
-                        "ANSIBLE_MODULE_ARGS": clean_json(module_args)
-                    }).encode()
+                    json.dumps(
+                        {"ANSIBLE_MODULE_ARGS": clean_json(module_args)}
+                    ).encode()
                 )
                 with (
                     patch.object(
