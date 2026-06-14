@@ -620,6 +620,10 @@ class FormattedEmitter(Emitter):
 
     _in_empty_flow_map = False
 
+    # Set to False when yaml[comments] is in skip_list to avoid reformatting
+    # comments even while other fixes are applied. See github issue #5048.
+    fix_comment_spaces = True
+
     @property
     def _is_root_level_sequence(self) -> bool:
         """Return True if this is a sequence at the root level of the yaml document."""
@@ -831,7 +835,8 @@ class FormattedEmitter(Emitter):
             # single blank lines in post comments
             value = self._re_repeat_blank_lines.sub("\n\n", value)
 
-        value = self._re_missing_comment_space.sub(r"\1 ", value)
+        if self.fix_comment_spaces:
+            value = self._re_missing_comment_space.sub(r"\1 ", value)
 
         comment.value = value
 
@@ -871,6 +876,7 @@ class FormattedYAML(YAML):
         plug_ins: list[str] | None = None,
         version: tuple[int, int] | None = None,
         config: dict[str, bool | int | str] | None = None,
+        fix_comment_spaces: bool = True,
     ):
         """Return a configured ``ruamel.yaml.YAML`` instance.
 
@@ -964,6 +970,16 @@ class FormattedYAML(YAML):
 
         # If someone doesn't want our FormattedEmitter, they can change it.
         self.Emitter = FormattedEmitter
+
+        # When yaml[comments] is in skip_list, disable the comment-space
+        # reformatting in the emitter so --fix doesn't touch comments even
+        # while applying other transforms (see github issue #5048).
+        if not fix_comment_spaces:
+
+            class _FormattedEmitterNoCommentFix(FormattedEmitter):
+                fix_comment_spaces = False
+
+            self.Emitter = _FormattedEmitterNoCommentFix
 
         # ignore invalid preferred_quote setting
         if preferred_quote in ['"', "'"]:
