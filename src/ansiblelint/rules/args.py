@@ -200,7 +200,7 @@ class ArgsRule(AnsibleLintRule):
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
 
-            try:
+            try:  # noqa: PLW0717
                 if not hasattr(module, "main"):
                     # skip validation for module options that are implemented as action plugin
                     # as the option values can be changed in action plugin and are not passed
