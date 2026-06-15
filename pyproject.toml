@@ -321,6 +321,7 @@ ignore = [
   "PERF203",
   "PLR",
   "PLW0603",  # global lock file in cache dir
+  "PLW0717",  # try-too-many-statements, too many to refactor now
   "RUF012",  # Mutable class attributes should be annotated with `typing.ClassVar`
   "RUF045",  # Assignment without annotation found in dataclass body
   # part of preview rules:
