@@ -141,7 +141,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
         file: Lintable | None = None,
     ) -> list[MatchError]:
         result = []
-        try:
+        try:  # noqa: PLW0717
             for key, v, path in nested_items_path(
                 task,
                 ignored_keys=("block", "ansible.builtin.block", "ansible.legacy.block"),
@@ -415,7 +415,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
         expr_type = None
         verb_skipped = True
         lineno = 1
-        try:
+        try:  # noqa: PLW0717
             for token in self.lex(text):
                 if (
                     expr_type
