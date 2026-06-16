@@ -422,6 +422,23 @@ class Lintable:
             for match in self.matches
         )
 
+    def _load_yaml_state(self) -> None:
+        """Load and process YAML content, guessing kind and appending skip rules."""
+        from ansiblelint.utils import (  # pylint: disable=import-outside-toplevel
+            parse_yaml_linenumbers,
+        )
+
+        self.state = parse_yaml_linenumbers(self)
+        if self.kind == "yaml":
+            self._guess_kind()
+        if "append_skipped_rules" not in globals():
+            # pylint: disable=import-outside-toplevel
+            from ansiblelint.skip_utils import append_skipped_rules
+
+        # pylint: disable=possibly-used-before-assignment
+        if self.state:
+            self.state = append_skipped_rules(self.state, self)
+
     @property
     def data(self) -> Any:
         """Return loaded data representation for current file, if possible."""
@@ -431,27 +448,7 @@ class Lintable:
                 return self.state
             try:
                 if str(self.base_kind) == "text/yaml":
-                    from ansiblelint.utils import (  # pylint: disable=import-outside-toplevel
-                        parse_yaml_linenumbers,
-                    )
-
-                    self.state = parse_yaml_linenumbers(self)
-                    # now that _data is not empty, we can try guessing if playbook or rulebook
-                    # it has to be done before append_skipped_rules() call as it's relying
-                    # on self.kind.
-                    if self.kind == "yaml":
-                        self._guess_kind()
-                    # Lazy import to avoid delays and cyclic-imports
-                    if "append_skipped_rules" not in globals():
-                        # pylint: disable=import-outside-toplevel
-                        from ansiblelint.skip_utils import append_skipped_rules
-
-                    # pylint: disable=possibly-used-before-assignment
-                    if self.state:
-                        self.state = append_skipped_rules(
-                            self.state,
-                            self,
-                        )
+                    self._load_yaml_state()
                 else:
                     _logger.debug(
                         "data set to None for %s due to being '%s' (%s) kind.",
