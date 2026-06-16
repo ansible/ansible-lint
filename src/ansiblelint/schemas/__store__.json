@@ -24,7 +24,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/inventory.json"
   },
   "meta": {
-    "etag": "ba8c4cacfbfddcf74f63113ba593af84567cb762fa2b33fefe121090f4de5076",
+    "etag": "7ebcf3f8341cb445cde52df9e1e0c954fd2954268b20faa38d8b6b33f6709c4c",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/meta.json"
   },
   "meta-runtime": {
@@ -48,7 +48,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/requirements.json"
   },
   "role-arg-spec": {
-    "etag": "cb7ac0c4f8d55736f8c53e27bc6984f67d12fda5eadca1991f50d5d78fcdfb63",
+    "etag": "463a7fb4954d737753958ea97ec6434f47f4c3720badfb396f0e47447d50c3ed",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/role-arg-spec.json"
   },
   "rulebook": {
