@@ -453,8 +453,18 @@
           "title": "Port"
         },
         "register": {
-          "title": "Register",
-          "type": "string"
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            }
+          ],
+          "title": "Register"
         },
         "remote_user": {
           "title": "Remote User",
