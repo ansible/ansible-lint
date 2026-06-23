@@ -198,9 +198,17 @@ class ArgsRule(AnsibleLintRule):
                 return []
             assert spec.loader is not None
             module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-
+            previous_module = sys.modules.get(spec.name)
+            sys.modules[spec.name] = module
             try:
+                spec.loader.exec_module(module)
+            finally:
+                if previous_module is None:
+                    sys.modules.pop(spec.name, None)
+                else:
+                    sys.modules[spec.name] = previous_module
+
+            try:  # noqa: PLW0717
                 if not hasattr(module, "main"):
                     # skip validation for module options that are implemented as action plugin
                     # as the option values can be changed in action plugin and are not passed

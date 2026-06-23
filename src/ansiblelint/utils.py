@@ -1233,7 +1233,7 @@ def parse_yaml_linenumbers(  # type: ignore[no-any-unimported]
         mapping[FILENAME_KEY] = lintable.path
         return mapping
 
-    try:
+    try:  # noqa: PLW0717
         kwargs = {}
         if "vault_password" in inspect.getfullargspec(AnsibleLoader.__init__).args:
             kwargs["vault_password"] = DEFAULT_VAULT_PASSWORD
