@@ -12,15 +12,19 @@ from typing import TYPE_CHECKING, Any
 import pytest
 
 from ansiblelint import cli, file_utils
+from ansiblelint.config import options
 from ansiblelint.file_utils import (
     Lintable,
     cwd,
+    expand_dirs_in_lintables,
     expand_path_vars,
     expand_paths_vars,
     find_project_root,
+    find_role_dir,
     kind_from_path,
     normpath,
     normpath_path,
+    path_is_inside,
 )
 from ansiblelint.runner import Runner
 
@@ -596,3 +600,52 @@ def test_kind_from_path_outside_project_root(tmp_path: Path) -> None:
     kind = kind_from_path(outside_file)
 
     assert kind == "yaml"
+
+
+def test_find_role_dir_namespace_subdir(tmp_path: Path) -> None:
+    """Roles nested under a namespace directory resolve to the role root."""
+    role_dir = tmp_path / "roles" / "my_namespace" / "myBadRoleName"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.write_text("---\n- debug: msg=hi\n", encoding="utf-8")
+
+    assert find_role_dir(task_file) == role_dir
+    assert find_role_dir(role_dir.parent) is None
+
+
+def test_kind_from_path_namespace_folder_is_not_role(tmp_path: Path) -> None:
+    """Namespace folders under roles/ must not be classified as roles."""
+    project_dir = tmp_path / "project"
+    namespace_dir = project_dir / "roles" / "my_namespace"
+    role_dir = namespace_dir / "myBadRoleName"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    (project_dir / ".git").mkdir()
+
+    assert kind_from_path(namespace_dir) != "role"
+    assert kind_from_path(role_dir) == "role"
+
+
+def test_expand_dirs_in_lintables_relative_paths(tmp_path: Path) -> None:
+    """Directory expansion must work when the lintable path is '.'."""
+    project_dir = tmp_path / "project"
+    role_dir = project_dir / "roles" / "my_namespace" / "myBadRoleName"
+    (role_dir / "tasks").mkdir(parents=True)
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.write_text("---\n- debug: msg=hi\n", encoding="utf-8")
+
+    original_cwd = Path.cwd()
+    try:
+        os.chdir(project_dir)
+        lintables: set[Lintable] = {Lintable(".")}
+        options.lintables = ["."]
+        options.exclude_paths = []
+        expand_dirs_in_lintables(lintables)
+        assert any(
+            path_is_inside(lintable.path, project_dir)
+            and lintable.path.name == "main.yml"
+            for lintable in lintables
+        )
+    finally:
+        os.chdir(original_cwd)
