@@ -16,7 +16,10 @@ from pytest_mock import MockerFixture
 
 from ansiblelint.config import get_version_warning, options
 from ansiblelint.constants import RC
+from ansiblelint.errors import MatchError
+from ansiblelint.file_utils import Lintable
 from ansiblelint.loaders import yaml_load_safe
+from ansiblelint.runner import LintResult
 
 
 @pytest.mark.parametrize(
@@ -208,3 +211,76 @@ def test_ro_venv(tmp_path: Path) -> None:
         assert result.returncode == 0, (
             f"Got {result.returncode} running {cmd}\n\tstderr: {result.stderr}\n\tstdout: {result.stdout}"
         )
+
+
+def _yaml_line_length_match(lintable_name: str = "roles/demo/tasks/main.yml") -> MatchError:
+    from ansiblelint.rules.yaml_rule import YamllintRule
+
+    rule = YamllintRule()
+    lintable = Lintable(lintable_name, content="---\n- debug: msg=hi\n")
+    return MatchError(
+        message="Line too long (267 > 160 characters)",
+        lintable=lintable,
+        tag="yaml[line-length]",
+        lineno=5,
+        rule=rule,
+    )
+
+
+def test_is_warn_list_match() -> None:
+    """warn_list membership must match rule id, tag, or rule tags."""
+    from ansiblelint.__main__ import _is_warn_list_match
+
+    match = _yaml_line_length_match()
+    assert _is_warn_list_match(match, ["yaml[line-length]"])
+    assert _is_warn_list_match(match, ["yaml"])
+    assert not _is_warn_list_match(match, ["name"])
+
+
+def test_handle_warn_list_rerun() -> None:
+    """warn_list yaml matches must be refreshed, not dropped, after rerun."""
+    from ansiblelint.__main__ import _handle_warn_list_rerun
+
+    match = _yaml_line_length_match()
+    result = LintResult([match], {match.lintable})
+    refreshed = MatchError(
+        message=match.message,
+        lintable=match.lintable,
+        tag="yaml[line-length]",
+        lineno=6,
+        rule=match.rule,
+    )
+    new_results = LintResult([refreshed], set())
+
+    assert _handle_warn_list_rerun(0, match, new_results, result, ["yaml[line-length]"])
+    assert result.matches[0].lineno == 6
+    assert not _handle_warn_list_rerun(0, match, new_results, result, ["name"])
+
+
+def test_apply_rerun_outcome() -> None:
+    """Non-warn yaml rerun outcomes must update the match list."""
+    from ansiblelint.__main__ import _apply_rerun_outcome
+
+    match = _yaml_line_length_match()
+    result = LintResult([match], set())
+    resolved: list[tuple[str, str]] = []
+
+    _apply_rerun_outcome(0, match, LintResult([], set()), result, resolved)
+    assert result.matches == []
+    assert resolved == [("yaml", match.filename)]
+
+    result = LintResult([match], set())
+    _apply_rerun_outcome(0, match, LintResult([match], set()), result, resolved)
+    assert len(result.matches) == 1
+
+    other = MatchError(
+        message="Wrong indentation",
+        lintable=match.lintable,
+        tag="yaml[indentation]",
+        lineno=1,
+        rule=match.rule,
+    )
+    result = LintResult([match], set())
+    _apply_rerun_outcome(0, match, LintResult([other], set()), result, resolved)
+    assert result.matches == []
+
