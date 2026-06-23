@@ -234,6 +234,25 @@ def test_run_role_identified_prefix_missing(local_test_dir: Path) -> None:
     assert (
         "Variables names from within roles should use bar_ as a prefix" in result.stdout
     )
-    assert (
-        "Variables names from within roles should use bar_ as a prefix" in result.stdout
-    )
+
+
+def test_role_name_namespace_subdir_autodiscovery() -> None:
+    """Role-specific rules apply to roles under namespace subdirectories.
+
+    See https://github.com/ansible/ansible-lint/issues/5079
+    """
+    cwd = Path(__file__).resolve().parent.parent / "examples" / "namespace_roles_repro"
+    env = {"NO_COLOR": "1"}
+    expected = "role-name: Role name myBadRoleName does not match"
+
+    result = run_ansible_lint(".", cwd=cwd, env=env)
+    assert result.returncode == RC.VIOLATIONS_FOUND, result.stdout
+    assert expected in strip_ansi_escape(result.stdout)
+
+    result = run_ansible_lint("roles/my_namespace/", cwd=cwd, env=env)
+    assert result.returncode == RC.VIOLATIONS_FOUND, result.stdout
+    assert expected in strip_ansi_escape(result.stdout)
+
+    result = run_ansible_lint("roles/my_namespace/myBadRoleName/", cwd=cwd, env=env)
+    assert result.returncode == RC.VIOLATIONS_FOUND, result.stdout
+    assert expected in strip_ansi_escape(result.stdout)
