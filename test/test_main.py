@@ -213,7 +213,9 @@ def test_ro_venv(tmp_path: Path) -> None:
         )
 
 
-def _yaml_line_length_match(lintable_name: str = "roles/demo/tasks/main.yml") -> MatchError:
+def _yaml_line_length_match(
+    lintable_name: str = "roles/demo/tasks/main.yml",
+) -> MatchError:
     from ansiblelint.rules.yaml_rule import YamllintRule
 
     rule = YamllintRule()
@@ -283,4 +285,3 @@ def test_apply_rerun_outcome() -> None:
     result = LintResult([match], set())
     _apply_rerun_outcome(0, match, LintResult([other], set()), result, resolved)
     assert result.matches == []
-

@@ -347,7 +347,7 @@ def test_should_preserve_long_lines(
     config_options.write_list = write_list
     config_options.warn_list = warn_list
     transformer = Transformer(LintResult([], set()), config_options)
-    assert transformer._should_preserve_long_lines() is expected
+    assert transformer._should_preserve_long_lines() is expected  # noqa: SLF001
 
 
 @pytest.mark.parametrize(
