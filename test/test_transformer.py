@@ -350,6 +350,58 @@ def test_should_preserve_long_lines(
     assert transformer._should_preserve_long_lines() is expected  # noqa: SLF001
 
 
+@mock.patch.dict(os.environ, {"ANSIBLE_LINT_WRITE_TMP": "1"}, clear=True)
+@pytest.mark.libyaml
+def test_transformer_sets_wide_yaml_dump_for_warn_line_length(
+    tmp_path: Path,
+    config_options: Options,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Dump must use a wide line width when line-length is warn-only (#5030)."""
+    from ansiblelint.rules.yaml_rule import YamllintRule
+    from ansiblelint.yaml_utils import FormattedYAML
+
+    yaml_instances: list[FormattedYAML] = []
+    original_init = FormattedYAML.__init__
+
+    def tracking_init(self: FormattedYAML, *args: Any, **kwargs: Any) -> None:
+        original_init(self, *args, **kwargs)
+        yaml_instances.append(self)
+
+    monkeypatch.setattr(FormattedYAML, "__init__", tracking_init)
+
+    long_msg = "x" * 200
+    content = (
+        "---\n"
+        "- name: Test task\n"
+        f"  ansible.builtin.debug:\n    msg: \"{long_msg}\"\n"
+    )
+    tasks_dir = tmp_path / "roles" / "demo" / "tasks"
+    tasks_dir.mkdir(parents=True)
+    task_file = tasks_dir / "main.yml"
+    task_file.write_text(content, encoding="utf-8")
+
+    lintable = Lintable(task_file)
+    rule = YamllintRule()
+    match = MatchError(
+        message="Line too long (267 > 160 characters)",
+        lintable=lintable,
+        tag="yaml[line-length]",
+        lineno=4,
+        rule=rule,
+    )
+    result = LintResult([match], {lintable})
+
+    config_options.write_list = ["name"]
+    config_options.warn_list = ["yaml[line-length]"]
+
+    transformer = Transformer(result=result, options=config_options)
+    transformer.run()
+
+    assert yaml_instances
+    assert yaml_instances[-1].width == 4096
+
+
 @pytest.mark.parametrize(
     ("write_list", "write_exclude_list", "rules"),
     (
@@ -762,3 +814,4 @@ def test_transform_not_applied(
     log_2 = f"{transformer.DUMP_MSG} {TransformTests.rewrite_part()}"
     assert logs[2].message == log_2
     assert logs[2].levelname == "DEBUG"
+
