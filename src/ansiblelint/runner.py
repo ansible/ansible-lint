@@ -48,6 +48,7 @@ from ansiblelint.types import (  # pyright: ignore[reportAttributeAccessIssue]
 from ansiblelint.utils import (
     PLAYBOOK_DIR,
     HandleChildren,
+    extend_with_roles,
     parse_examples_from_plugin,
     template,
 )
@@ -99,6 +100,11 @@ class Runner:
         if exclude_paths is None:
             exclude_paths = []
 
+        had_directory_lintable = any(
+            (item.path if isinstance(item, Lintable) else Path(item)).is_dir()
+            for item in lintables
+        )
+
         # Assure consistent type and configure given lintables as explicit (so
         # excludes paths would not apply on them).
         for item in lintables:
@@ -109,6 +115,10 @@ class Runner:
 
         # Expand folders (roles) to their components
         expand_dirs_in_lintables(self.lintables)
+        if had_directory_lintable:
+            expanded = list(self.lintables)
+            extend_with_roles(expanded)
+            self.lintables.update(expanded)
 
         self.tags = tags
         self.skip_list = skip_list
