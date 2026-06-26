@@ -129,3 +129,54 @@ def test_file_path_evaluation(
 
     assert len(result) == 1
     assert result[0].rule.id == "fqcn"
+
+
+def test_include_tasks_file_path_uses_parent_playbook_context(
+    tmp_path: Path,
+    default_rules_collection: RulesCollection,
+) -> None:
+    """Check include_tasks file paths in nested tasks can use playbook context."""
+    ansible_project_layout = {
+        "extensions/molecule/shared/playbooks/prepare.yml": textwrap.dedent(
+            """\
+            ---
+            - name: Fixture
+              hosts: localhost
+              gather_facts: false
+              tasks:
+                - name: Include scenario prepare tasks
+                  ansible.builtin.include_tasks: ../../default/tasks/prepare/all.yml
+            """,
+        ),
+        "extensions/molecule/default/tasks/prepare/all.yml": textwrap.dedent(
+            """\
+            ---
+            - name: Init state via shared task
+              ansible.builtin.include_tasks:
+                file: ../tasks/state_update.yml
+            """,
+        ),
+        "extensions/molecule/shared/tasks/state_update.yml": textwrap.dedent(
+            """\
+            ---
+            - name: Merge update into state
+              ansible.builtin.debug:
+                msg: State updated
+            """,
+        ),
+    }
+    for file_path, file_content in ansible_project_layout.items():
+        full_path = tmp_path / file_path
+        full_path.parent.mkdir(parents=True, exist_ok=True)
+        full_path.write_text(file_content)
+
+    runner = Runner(
+        str(tmp_path / "extensions/molecule/shared/playbooks/prepare.yml"),
+        rules=default_rules_collection,
+    )
+    result = runner.run()
+
+    assert not [match for match in result if match.rule.id == "load-failure"]
+    assert any(
+        lintable.path.name == "state_update.yml" for lintable in runner.lintables
+    )
