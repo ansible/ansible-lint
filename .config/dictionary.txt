@@ -8,6 +8,7 @@ LIBYAML
 LINEINFILE
 Lineinfile
 Lintable
+MOID
 MYSQLD
 MYTAG
 NODEPS
@@ -60,6 +61,7 @@ dotconfig
 dzdo
 ematcher
 ematchtestfile
+esxi
 facelessuser
 facter
 fakerole
@@ -106,6 +108,7 @@ matchvar
 matchyaml
 mockings
 modifyitems
+moid
 mytag
 namedtempfile
 nestedincludes
