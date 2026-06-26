@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import textwrap
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
@@ -10,8 +11,6 @@ import pytest
 from ansiblelint.runner import Runner
 
 if TYPE_CHECKING:
-    from pathlib import Path
-
     from ansiblelint.rules import RulesCollection
 
 LAYOUT_IMPORTS: dict[str, str] = {
@@ -129,3 +128,53 @@ def test_file_path_evaluation(
 
     assert len(result) == 1
     assert result[0].rule.id == "fqcn"
+
+
+def test_include_tasks_file_path_relative_to_playbook_dir(
+    tmp_path: Path,
+    default_rules_collection: RulesCollection,
+) -> None:
+    """Verify include_tasks file paths can resolve relative to the playbook dir."""
+    project = tmp_path / "project"
+    layout = {
+        "extensions/molecule/shared/playbooks/prepare.yml": textwrap.dedent(
+            """\
+            ---
+            - name: Prepare
+              hosts: localhost
+              gather_facts: false
+              tasks:
+                - name: Include scenario prepare tasks
+                  ansible.builtin.include_tasks: ../../default/tasks/prepare/all.yml
+            """,
+        ),
+        "extensions/molecule/default/tasks/prepare/all.yml": textwrap.dedent(
+            """\
+            ---
+            - name: Init state via shared task
+              ansible.builtin.include_tasks:
+                file: ../tasks/state_update.yml
+            """,
+        ),
+        "extensions/molecule/shared/tasks/state_update.yml": textwrap.dedent(
+            """\
+            ---
+            - name: Merge update into state
+              debug:
+                msg: update
+            """,
+        ),
+    }
+    for file_path, file_content in layout.items():
+        full_path = project / file_path
+        full_path.parent.mkdir(parents=True, exist_ok=True)
+        full_path.write_text(file_content)
+
+    playbook = project / "extensions/molecule/shared/playbooks/prepare.yml"
+    included_task = project / "extensions/molecule/shared/tasks/state_update.yml"
+
+    result = Runner(str(playbook), rules=default_rules_collection).run()
+
+    assert len(result) == 1
+    assert result[0].rule.id == "fqcn"
+    assert Path(result[0].filename).resolve() == included_task.resolve()
