@@ -50,6 +50,7 @@ class Transformer:
         """Initialize a Transformer instance."""
         self.write_set = self.effective_write_set(options.write_list)
         self.write_exclude_set = self.effective_write_set(options.write_exclude_list)
+        self.warn_list = set(options.warn_list)
 
         self.matches: list[MatchError] = result.matches
         self.files: set[Lintable] = result.files
@@ -87,6 +88,12 @@ class Transformer:
         if "all" in write_list:
             return {"all"}
         return set(write_list)
+
+    def _should_preserve_long_lines(self) -> bool:
+        """Return true when warned line-length must not be reformatted on dump."""
+        if self.write_set == {"all"} or "yaml" in self.write_set:
+            return False
+        return "yaml[line-length]" in self.warn_list or "yaml" in self.warn_list
 
     def run(self) -> None:
         """For each file, read it, execute transforms on it, then write it."""
@@ -127,6 +134,10 @@ class Transformer:
                     self._do_transforms(
                         file, ruamel_data or data, file_is_yaml, matches
                     )
+
+                if self._should_preserve_long_lines():
+                    # Avoid folding long scalars when line-length is warn-only (#5030).
+                    yaml.width = 4096
 
                 _logger.debug("%s %s, version=%s", self.DUMP_MSG, file, yaml.version)
                 # noinspection PyUnboundLocalVariable

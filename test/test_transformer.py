@@ -328,6 +328,79 @@ def test_effective_write_set(write_list: list[str], expected: set[str]) -> None:
 
 
 @pytest.mark.parametrize(
+    ("write_list", "warn_list", "expected"),
+    (
+        pytest.param(["name"], ["yaml[line-length]"], True, id="warn-line-length"),
+        pytest.param(["yaml"], ["yaml[line-length]"], False, id="write-yaml"),
+        pytest.param(["all"], ["yaml[line-length]"], False, id="write-all"),
+        pytest.param(["name"], [], False, id="no-warn"),
+        pytest.param(["name"], ["yaml"], True, id="warn-yaml"),
+    ),
+)
+def test_should_preserve_long_lines(
+    write_list: list[str],
+    warn_list: list[str],
+    expected: bool,
+    config_options: Options,
+) -> None:
+    """Long lines must not fold on dump when line-length is warn-only."""
+    config_options.write_list = write_list
+    config_options.warn_list = warn_list
+    transformer = Transformer(LintResult([], set()), config_options)
+    assert transformer._should_preserve_long_lines() is expected  # noqa: SLF001
+
+
+@mock.patch.dict(os.environ, {"ANSIBLE_LINT_WRITE_TMP": "1"}, clear=True)
+@pytest.mark.libyaml
+def test_transformer_sets_wide_yaml_dump_for_warn_line_length(
+    tmp_path: Path,
+    config_options: Options,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Dump must use a wide line width when line-length is warn-only (#5030)."""
+    from ansiblelint.rules.yaml_rule import YamllintRule
+    from ansiblelint.yaml_utils import FormattedYAML
+
+    yaml_instances: list[FormattedYAML] = []
+    original_init = FormattedYAML.__init__
+
+    def tracking_init(self: FormattedYAML, *args: Any, **kwargs: Any) -> None:
+        original_init(self, *args, **kwargs)
+        yaml_instances.append(self)
+
+    monkeypatch.setattr(FormattedYAML, "__init__", tracking_init)
+
+    long_msg = "x" * 200
+    content = (
+        f'---\n- name: Test task\n  ansible.builtin.debug:\n    msg: "{long_msg}"\n'
+    )
+    tasks_dir = tmp_path / "roles" / "demo" / "tasks"
+    tasks_dir.mkdir(parents=True)
+    task_file = tasks_dir / "main.yml"
+    task_file.write_text(content, encoding="utf-8")
+
+    lintable = Lintable(task_file)
+    rule = YamllintRule()
+    match = MatchError(
+        message="Line too long (267 > 160 characters)",
+        lintable=lintable,
+        tag="yaml[line-length]",
+        lineno=4,
+        rule=rule,
+    )
+    result = LintResult([match], {lintable})
+
+    config_options.write_list = ["name"]
+    config_options.warn_list = ["yaml[line-length]"]
+
+    transformer = Transformer(result=result, options=config_options)
+    transformer.run()
+
+    assert yaml_instances
+    assert yaml_instances[-1].width == 4096
+
+
+@pytest.mark.parametrize(
     ("write_list", "write_exclude_list", "rules"),
     (
         (

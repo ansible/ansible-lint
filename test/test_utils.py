@@ -701,3 +701,100 @@ def test_get_task_handler_children_climbing(tmp_path: Path) -> None:
         )
 
         assert child.path.resolve() == imported_task.resolve()
+
+
+def test_parse_yaml_linenumbers_rereads_changed_content(tmp_path: Path) -> None:
+    """Updated lintable content must not reuse stale cached parse results."""
+    task_file = tmp_path / "tasks.yml"
+    task_file.write_text("- name: lowercase task\n  debug: msg=hi\n", encoding="utf-8")
+    lintable = Lintable(task_file)
+
+    first = utils.parse_yaml_linenumbers(lintable)
+    assert first[0]["name"] == "lowercase task"  # type: ignore[index]
+
+    lintable.content = "- name: Uppercase task\n  debug: msg=hi\n"
+    second = utils.parse_yaml_linenumbers(lintable)
+
+    assert second[0]["name"] == "Uppercase task"  # type: ignore[index]
+
+
+def test_warn_list_preserves_line_length_after_name_fix(tmp_path: Path) -> None:
+    """warn_list rules must not be auto-fixed after another rule rewrites the file (#5030)."""
+    (tmp_path / ".ansible-lint").write_text(
+        "write_list:\n  - name\nwarn_list:\n  - yaml[line-length]\n",
+        encoding="utf-8",
+    )
+    tasks_dir = tmp_path / "roles" / "demo" / "tasks"
+    tasks_dir.mkdir(parents=True)
+    long_expr = "".join(f" | regex_replace('k{i}', 'v{i}')" for i in range(12))
+    shell_line = f"  ansible.builtin.shell: \"{{{{ lookup('template', 'long.j2'){long_expr} }}}}\""
+    assert len(shell_line) > 160
+    (tasks_dir / "main.yml").write_text(
+        "---\n"
+        "- name: check service status\n"
+        "  ansible.builtin.command: systemctl status nginx\n\n"
+        "- name: run complex command\n"
+        f"{shell_line}\n",
+        encoding="utf-8",
+    )
+
+    result = run_ansible_lint(
+        "--fix",
+        "roles/demo/",
+        cwd=tmp_path,
+        env={"ANSIBLE_LINT_NODEPS": "1"},
+    )
+    output = result.stdout + result.stderr
+    assert "Error trying to append skipped rules" not in output
+    assert "yaml[line-length]" in output
+
+    text = (tasks_dir / "main.yml").read_text(encoding="utf-8")
+    assert "Check service status" in text
+    assert "Run complex command" in text
+    shell_lines = [
+        line for line in text.splitlines() if "ansible.builtin.shell" in line
+    ]
+    assert len(shell_lines) == 1
+    assert len(shell_lines[0]) > 160
+
+
+def test_warn_list_preserves_line_length_repro5030_content(tmp_path: Path) -> None:
+    """warn_list must keep long lines intact for typical repro5030 shell tasks (#5030)."""
+    (tmp_path / ".ansible-lint").write_text(
+        "write_list:\n  - name\nwarn_list:\n  - yaml[line-length]\n",
+        encoding="utf-8",
+    )
+    tasks_dir = tmp_path / "roles" / "demo" / "tasks"
+    tasks_dir.mkdir(parents=True)
+    shell_line = (
+        "  ansible.builtin.shell: \"{{ lookup('template', 'long.j2') | join(' ')"
+        " | regex_replace('foo', 'bar') | regex_replace('baz', 'qux')"
+        " | regex_replace('alpha', 'beta') | regex_replace('gamma', 'delta')"
+        " | regex_replace('epsilon', 'zeta') | regex_replace('eta', 'theta') }}\""
+    )
+    assert len(shell_line) > 160
+    (tasks_dir / "main.yml").write_text(
+        "---\n"
+        "- name: check service status\n"
+        "  ansible.builtin.command: systemctl status nginx\n"
+        "- name: run complex command\n"
+        f"{shell_line}\n",
+        encoding="utf-8",
+    )
+
+    result = run_ansible_lint(
+        "--fix",
+        "roles/demo/",
+        cwd=tmp_path,
+        env={"ANSIBLE_LINT_NODEPS": "1"},
+    )
+    output = result.stdout + result.stderr
+    assert "Error trying to append skipped rules" not in output
+    assert "yaml[line-length]" in output
+
+    text = (tasks_dir / "main.yml").read_text(encoding="utf-8")
+    shell_lines = [
+        line for line in text.splitlines() if "ansible.builtin.shell" in line
+    ]
+    assert len(shell_lines) == 1
+    assert len(shell_lines[0]) > 160

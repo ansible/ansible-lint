@@ -15,9 +15,13 @@ from pathlib import Path
 import pytest
 from pytest_mock import MockerFixture
 
-from ansiblelint.config import get_version_warning, options
+from ansiblelint.config import Options, get_version_warning, options
 from ansiblelint.constants import RC
+from ansiblelint.errors import MatchError
+from ansiblelint.file_utils import Lintable
 from ansiblelint.loaders import yaml_load_safe
+from ansiblelint.rules import RulesCollection
+from ansiblelint.runner import LintResult
 
 
 @pytest.mark.parametrize(
@@ -250,3 +254,183 @@ def test_ro_venv(tmp_path: Path) -> None:
         assert result.returncode == 0, (
             f"Got {result.returncode} running {cmd}\n\tstderr: {result.stderr}\n\tstdout: {result.stdout}"
         )
+
+
+def _yaml_line_length_match(
+    lintable_name: str = "roles/demo/tasks/main.yml",
+) -> MatchError:
+    from ansiblelint.rules.yaml_rule import YamllintRule
+
+    rule = YamllintRule()
+    lintable = Lintable(lintable_name, content="---\n- debug: msg=hi\n")
+    return MatchError(
+        message="Line too long (267 > 160 characters)",
+        lintable=lintable,
+        tag="yaml[line-length]",
+        lineno=5,
+        rule=rule,
+    )
+
+
+def test_is_warn_list_match() -> None:
+    """warn_list membership must match rule id, tag, or rule tags."""
+    from ansiblelint.__main__ import _is_warn_list_match
+
+    match = _yaml_line_length_match()
+    assert _is_warn_list_match(match, ["yaml[line-length]"])
+    assert _is_warn_list_match(match, ["yaml"])
+    assert not _is_warn_list_match(match, ["name"])
+
+
+def test_handle_warn_list_rerun() -> None:
+    """warn_list yaml matches must be refreshed, not dropped, after rerun."""
+    from ansiblelint.__main__ import _handle_warn_list_rerun
+
+    match = _yaml_line_length_match()
+    result = LintResult([match], {match.lintable})
+    refreshed = MatchError(
+        message=match.message,
+        lintable=match.lintable,
+        tag="yaml[line-length]",
+        lineno=6,
+        rule=match.rule,
+    )
+    new_results = LintResult([refreshed], set())
+
+    assert _handle_warn_list_rerun(0, match, new_results, result, ["yaml[line-length]"])
+    assert result.matches[0].lineno == 6
+    assert not _handle_warn_list_rerun(0, match, new_results, result, ["name"])
+
+
+def test_apply_rerun_outcome() -> None:
+    """Non-warn yaml rerun outcomes must update the match list."""
+    from ansiblelint.__main__ import _apply_rerun_outcome
+
+    match = _yaml_line_length_match()
+    result = LintResult([match], set())
+    resolved: list[tuple[str, str]] = []
+
+    _apply_rerun_outcome(0, match, LintResult([], set()), result, resolved)
+    assert result.matches == []
+    assert resolved == [("yaml", match.filename)]
+
+    result = LintResult([match], set())
+    _apply_rerun_outcome(0, match, LintResult([match], set()), result, resolved)
+    assert len(result.matches) == 1
+
+    other = MatchError(
+        message="Wrong indentation",
+        lintable=match.lintable,
+        tag="yaml[indentation]",
+        lineno=1,
+        rule=match.rule,
+    )
+    result = LintResult([match], set())
+    _apply_rerun_outcome(0, match, LintResult([other], set()), result, resolved)
+    assert result.matches == []
+
+
+def test_handle_warn_list_rerun_retains_when_no_refresh_match() -> None:
+    """warn_list matches must stay when rerun finds no same-tag refresh."""
+    from ansiblelint.__main__ import _handle_warn_list_rerun
+
+    match = _yaml_line_length_match()
+    result = LintResult([match], set())
+    other = MatchError(
+        message="Wrong indentation",
+        lintable=match.lintable,
+        tag="yaml[indentation]",
+        lineno=1,
+        rule=match.rule,
+    )
+
+    assert _handle_warn_list_rerun(
+        0,
+        match,
+        LintResult([other], set()),
+        result,
+        ["yaml[line-length]"],
+    )
+    assert result.matches[0] is match
+
+
+def test_process_fix_rerun_matches(
+    mocker: MockerFixture,
+    config_options: Options,
+    default_rules_collection: RulesCollection,
+) -> None:
+    """Post-fix yaml reruns must honor fixed, skipped, resolved, and warn_list paths."""
+    from ansiblelint.__main__ import _process_fix_rerun_matches
+    from ansiblelint.rules.name import NameRule
+
+    yaml_match = _yaml_line_length_match()
+    fixed_match = _yaml_line_length_match()
+    fixed_match.fixed = True
+
+    name_rule = NameRule()
+    name_match = MatchError(
+        message=name_rule.shortdesc,
+        lintable=Lintable("play.yml", content="---\n- name: x\n  debug: msg=hi\n"),
+        tag="name[casing]",
+        lineno=2,
+        rule=name_rule,
+    )
+
+    config_options.warn_list = ["yaml[line-length]"]
+    refreshed = MatchError(
+        message=yaml_match.message,
+        lintable=yaml_match.lintable,
+        tag="yaml[line-length]",
+        lineno=8,
+        rule=yaml_match.rule,
+    )
+    mocker.patch(
+        "ansiblelint.__main__.get_matches",
+        return_value=LintResult([refreshed], set()),
+    )
+
+    result = LintResult(
+        [fixed_match, name_match, yaml_match],
+        {yaml_match.lintable},
+    )
+    match_count = len(result.matches)
+
+    _process_fix_rerun_matches(
+        config_options,
+        result,
+        default_rules_collection,
+        match_count,
+    )
+
+    assert fixed_match not in result.matches
+    assert name_match in result.matches
+    yaml_matches = [m for m in result.matches if m.tag == "yaml[line-length]"]
+    assert len(yaml_matches) == 1
+    assert yaml_matches[0].lineno == 8
+
+
+def test_process_fix_rerun_matches_drops_previously_resolved(
+    mocker: MockerFixture,
+    config_options: Options,
+    default_rules_collection: RulesCollection,
+) -> None:
+    """Second yaml match for the same file must drop after the first resolves."""
+    from ansiblelint.__main__ import _process_fix_rerun_matches
+
+    yaml_match = _yaml_line_length_match()
+    yaml_dup = _yaml_line_length_match()
+    config_options.warn_list = []
+    mocker.patch(
+        "ansiblelint.__main__.get_matches",
+        return_value=LintResult([], set()),
+    )
+
+    result = LintResult([yaml_match, yaml_dup], set())
+    _process_fix_rerun_matches(
+        config_options,
+        result,
+        default_rules_collection,
+        len(result.matches),
+    )
+
+    assert result.matches == []
