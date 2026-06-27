@@ -38,7 +38,7 @@ repos:
       # - id: shellcheck
       #   priority: 0
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.11.21
+    rev: 0.11.24
     hooks:
       - id: uv-sync
       - id: uv-lock
@@ -67,7 +67,7 @@ repos:
           - "-o"
           - ".config/requirements-lock.txt"
   - repo: https://github.com/biomejs/pre-commit
-    rev: "v2.5.0"
+    rev: "v2.5.1"
     hooks:
       - id: biome-check
         name: biome
