@@ -392,4 +392,3 @@ def test_process_fix_rerun_matches_drops_previously_resolved(
     )
 
     assert result.matches == []
-

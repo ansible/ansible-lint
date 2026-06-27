@@ -383,14 +383,14 @@ def test_lintable_content_change_resets_yaml_state(tmp_path: Path) -> None:
     lintable = Lintable(task_file)
 
     first_data = lintable.data
-    assert first_data[0]["name"] == "first"  # type: ignore[index]
+    assert first_data[0]["name"] == "first"
     assert lintable.state != States.NOT_LOADED
 
     lintable.content = "- name: second\n  debug: msg=hi\n"
     assert lintable.state == States.NOT_LOADED
 
     second_data = lintable.data
-    assert second_data[0]["name"] == "second"  # type: ignore[index]
+    assert second_data[0]["name"] == "second"
 
 
 @pytest.mark.parametrize(
@@ -668,4 +668,3 @@ def test_expand_dirs_in_lintables_relative_paths(tmp_path: Path) -> None:
         )
     finally:
         os.chdir(original_cwd)
-
