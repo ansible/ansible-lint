@@ -372,9 +372,7 @@ def test_transformer_sets_wide_yaml_dump_for_warn_line_length(
 
     long_msg = "x" * 200
     content = (
-        "---\n"
-        "- name: Test task\n"
-        f"  ansible.builtin.debug:\n    msg: \"{long_msg}\"\n"
+        f'---\n- name: Test task\n  ansible.builtin.debug:\n    msg: "{long_msg}"\n'
     )
     tasks_dir = tmp_path / "roles" / "demo" / "tasks"
     tasks_dir.mkdir(parents=True)
@@ -814,4 +812,3 @@ def test_transform_not_applied(
     log_2 = f"{transformer.DUMP_MSG} {TransformTests.rewrite_part()}"
     assert logs[2].message == log_2
     assert logs[2].levelname == "DEBUG"
-
