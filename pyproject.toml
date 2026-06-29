@@ -37,7 +37,7 @@ dependencies = [
   "ansible-core>=2.16.14",
   "black>=24.3.0",
   "cffi>=1.15.1",  # indirect dependency of ruamel-yaml
-  "cryptography>=37",
+  "cryptography>=46.0.6",
   "distro>=1.9.0",
   "filelock>=3.8.2",
   "jsonschema>=4.10.0",
@@ -664,6 +664,7 @@ PRE_COMMIT_COLOR = "always"
 [tool.uv]
 package = true
 default-groups = "all"
+override-dependencies = ["cairosvg>=2.9.0"]
 
 [tool.vulture]
 exclude = [
