@@ -748,6 +748,9 @@ class FormattedEmitter(Emitter):
     # "/n/n" results in one blank line (end the previous line, then newline).
     # So, "/n/n/n" or more is too many new lines. Clean it up.
     _re_repeat_blank_lines: Pattern[str] = re.compile(r"\n{3,}")
+    # Insert a space after a leading "#" run when it is missing ("#foo" -> "# foo",
+    # "##foo" -> "## foo"); leave "## foo" and bare "##" untouched.
+    _re_missing_comment_space: Pattern[str] = re.compile(r"^(#+)(?=[^#\s])")
 
     @staticmethod
     def add_octothorpe_protection(string: str) -> str:
@@ -828,9 +831,7 @@ class FormattedEmitter(Emitter):
             # single blank lines in post comments
             value = self._re_repeat_blank_lines.sub("\n\n", value)
 
-        # make sure that comments have a space after #
-        if value.startswith("#") and not value.startswith("# ") and value[1:].strip():
-            value = "# " + value[1:]
+        value = self._re_missing_comment_space.sub(r"\1 ", value)
 
         comment.value = value
 

@@ -87,6 +87,13 @@ def fixture_runner_result(
         pytest.param("examples/playbooks/vars/empty.yml", 1, False, True, id="empty"),
         pytest.param("examples/playbooks/fqcn.yml", 3, True, True, id="fqcn"),
         pytest.param(
+            "examples/playbooks/fqcn-blank-lines.yml",
+            3,
+            True,
+            True,
+            id="fqcn_blank_lines",
+        ),
+        pytest.param(
             "examples/playbooks/multi_yaml_doc.yml",
             1,
             False,
@@ -192,6 +199,13 @@ def fixture_runner_result(
             id="name_casing_prefix",
         ),
         pytest.param(
+            "examples/roles/name_prefix/tasks/foo/destroy.yml",
+            1,
+            True,
+            True,
+            id="name_casing_prefix_nested",
+        ),
+        pytest.param(
             "examples/roles/name_casing/tasks/main.yml",
             2,
             True,
@@ -214,7 +228,7 @@ def fixture_runner_result(
         ),
         pytest.param(
             "examples/playbooks/transform-yaml-comments.yml",
-            3,
+            4,
             True,
             True,
             id="yaml-comments",

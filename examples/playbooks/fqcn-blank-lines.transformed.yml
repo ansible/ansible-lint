@@ -1,0 +1,15 @@
+---
+- name: FQCN transform should preserve blank lines between tasks
+  hosts: localhost
+  tasks:
+    - name: Task1
+      ansible.builtin.debug:
+        msg: hello
+
+    - name: Task2
+      ansible.builtin.debug:
+        msg: hello
+
+    - name: Task3
+      ansible.builtin.debug:
+        msg: hello

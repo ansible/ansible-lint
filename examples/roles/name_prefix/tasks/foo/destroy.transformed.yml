@@ -1,0 +1,4 @@
+---
+- name: foo | destroy | Terminate server
+  ansible.builtin.debug:
+    msg: terminate

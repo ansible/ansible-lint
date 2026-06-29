@@ -39,7 +39,7 @@ from collections.abc import (
     MutableMapping,
     Sequence,
 )
-from dataclasses import _MISSING_TYPE, dataclass, field
+from dataclasses import MISSING, dataclass, field
 from functools import cache, lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -91,7 +91,7 @@ from ansiblelint.constants import (
     FileType,
 )
 from ansiblelint.errors import MatchError
-from ansiblelint.file_utils import Lintable, discover_lintables
+from ansiblelint.file_utils import Lintable, discover_lintables, find_role_dir
 from ansiblelint.skip_utils import is_nested_task
 from ansiblelint.text import has_jinja, is_fqcn, removeprefix
 from ansiblelint.types import (
@@ -115,6 +115,10 @@ PLAYBOOK_DIR = os.environ.get("ANSIBLE_PLAYBOOK_DIR", None)
 LINE_COLUMN_REGEX = re.compile(
     r".*line (?P<line>\d+), column (?P<column>\d+).*", flags=re.MULTILINE
 )
+
+# cspell: ignore yamllinter
+# Taken from ansible-core's test/lib/ansible_test/_util/controller/sanity/yamllint/yamllinter.py
+FMT_RE = re.compile(r"^# fmt:\s+(\S+)")
 
 
 _logger = logging.getLogger(__name__)
@@ -907,8 +911,10 @@ class Task(Mapping[str, Any]):
 
     raw_task: MutableMapping[str, Any]
     filename: str = ""
-    _normalized_task: MutableMapping[str, Any] | _MISSING_TYPE = field(
-        init=False, repr=False
+    _normalized_task: MutableMapping[str, Any] | Any = field(
+        init=False,
+        repr=False,
+        default=MISSING,
     )
     error: MatchError | None = None
     position: str = ""
@@ -969,7 +975,7 @@ class Task(Mapping[str, Any]):
                 # When we cannot normalize it, we just use the raw task instead
                 # to avoid adding extra complexity to the rules.
                 self._normalized_task = self.raw_task
-        if isinstance(self._normalized_task, _MISSING_TYPE):
+        if self._normalized_task is MISSING:
             msg = "Task was not normalized"
             raise TypeError(msg)
         return self._normalized_task
@@ -1196,7 +1202,7 @@ def parse_yaml_linenumbers(  # type: ignore[no-any-unimported]
         mapping[FILENAME_KEY] = lintable.path
         return mapping
 
-    try:
+    try:  # noqa: PLW0717
         kwargs = {}
         if "vault_password" in inspect.getfullargspec(AnsibleLoader.__init__).args:
             kwargs["vault_password"] = DEFAULT_VAULT_PASSWORD
@@ -1326,24 +1332,21 @@ def get_lintables(
 
         # stage 2: guess roles from current lintables, as there is no unique
         # file that must be present in any kind of role.
-        _extend_with_roles(lintables)
+        extend_with_roles(lintables)
 
     return lintables
 
 
-def _extend_with_roles(lintables: list[Lintable]) -> None:
+def extend_with_roles(lintables: list[Lintable]) -> None:
     """Detect roles among lintables and adds them to the list."""
     for lintable in lintables:
-        parts = lintable.path.parent.parts
-        if "roles" in parts:
-            role = lintable.path
-            while role.parent.name != "roles" and role.name:
-                role = role.parent
-            if role.exists() and not role.is_file():
-                lintable = Lintable(role)
-                if lintable.kind == "role" and lintable not in lintables:
-                    _logger.debug("Added role: %s", lintable)
-                    lintables.append(lintable)
+        role_path = find_role_dir(lintable.path)
+        if role_path is None:
+            continue
+        role_lintable = Lintable(role_path)
+        if role_lintable.kind == "role" and role_lintable not in lintables:
+            _logger.debug("Added role: %s", role_lintable)
+            lintables.append(role_lintable)
 
 
 def convert_to_boolean(value: Any) -> bool:
@@ -1351,7 +1354,7 @@ def convert_to_boolean(value: Any) -> bool:
     return bool(boolean(value))  # type: ignore[no-untyped-call]
 
 
-def parse_examples_from_plugin(lintable: Lintable) -> tuple[int, str]:
+def parse_examples_from_plugin(lintable: Lintable) -> tuple[int, str, str]:
     """Parse yaml inside plugin EXAMPLES string.
 
     Store a line number offset to realign returned line numbers later
@@ -1366,11 +1369,22 @@ def parse_examples_from_plugin(lintable: Lintable) -> tuple[int, str]:
                 break
 
     docs = read_docstring(str(lintable.path.resolve(strict=False)))  # type: ignore[no-untyped-call]
-    examples = docs["plainexamples"]
+    examples = docs["plainexamples"] or ""
+
+    # Extract example format type (if present).
+    # See https://github.com/ansible/ansible/pull/71184 and https://github.com/ansible/ansible-lint/issues/5037
+    examples_type = "yaml"
+    if examples:
+        fmt_match = FMT_RE.match(examples.lstrip())
+        if fmt_match:
+            examples_type = fmt_match.group(1)
 
     # Ignore the leading newline and lack of document start
     # as including those in EXAMPLES would be weird.
-    return offset, (f"---{examples}" if examples else "")
+    if examples_type == "yaml":
+        examples = f"---{examples}" if examples else ""
+
+    return offset, examples, examples_type
 
 
 @lru_cache

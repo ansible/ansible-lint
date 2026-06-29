@@ -1,7 +1,6 @@
 CLICOLOR
 Chamoulaud
 Codeclimate
-DOTGLOB
 FQCN
 FQCNs
 Fimport
@@ -107,7 +106,6 @@ matchtask
 matchtasks
 matchvar
 matchyaml
-mkdocstrings
 mockings
 modifyitems
 moid
