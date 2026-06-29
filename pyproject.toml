@@ -37,7 +37,7 @@ dependencies = [
   "ansible-core>=2.16.14",
   "black>=24.3.0",
   "cffi>=1.15.1",  # indirect dependency of ruamel-yaml
-  "cryptography>=49.0.0",
+  "cryptography>=37",
   "distro>=1.9.0",
   "filelock>=3.8.2",
   "jsonschema>=4.10.0",
@@ -334,6 +334,7 @@ ignore = [
   "FURB113",
   "FURB118",
   "PLC0207",  # maxsplit with [-1] preview rule
+  "D421",  # property-docstring-starts-with-verb (preview, too many existing violations)
   "PLC0415",
   "PLC2701",
   "PLW1641",

@@ -38,11 +38,11 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "cryptography" },
-    { name = "jinja2" },
-    { name = "packaging" },
-    { name = "pyyaml" },
-    { name = "resolvelib", version = "1.0.1", source = { registry = "https://pypi.org/simple" } },
+    { name = "cryptography", marker = "python_full_version < '3.11'" },
+    { name = "jinja2", marker = "python_full_version < '3.11'" },
+    { name = "packaging", marker = "python_full_version < '3.11'" },
+    { name = "pyyaml", marker = "python_full_version < '3.11'" },
+    { name = "resolvelib", version = "1.0.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/ff/80/2925a0564f6f99a8002c3be3885b83c3a1dc5f57ebf00163f528889865f5/ansible_core-2.17.14.tar.gz", hash = "sha256:7c17fee39f8c29d70e3282a7e9c10bd70d5cd4fd13ddffc5dcaa52adbd142ff8", size = 3119687, upload-time = "2025-09-08T18:28:03.158Z" }
 wheels = [
@@ -57,11 +57,11 @@ resolution-markers = [
     "python_full_version == '3.11.*'",
 ]
 dependencies = [
-    { name = "cryptography" },
-    { name = "jinja2" },
-    { name = "packaging" },
-    { name = "pyyaml" },
-    { name = "resolvelib", version = "1.2.1", source = { registry = "https://pypi.org/simple" } },
+    { name = "cryptography", marker = "python_full_version == '3.11.*'" },
+    { name = "jinja2", marker = "python_full_version == '3.11.*'" },
+    { name = "packaging", marker = "python_full_version == '3.11.*'" },
+    { name = "pyyaml", marker = "python_full_version == '3.11.*'" },
+    { name = "resolvelib", version = "1.2.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/59/db/7d3c7be76df6fc3707db05a151b530a298bb37080fc9ecc669dbd7e82b28/ansible_core-2.19.11.tar.gz", hash = "sha256:e8d541720050fc0a7ddb568cde779cce25a9cf470aa489e63ee10d1c94df4248", size = 3430025, upload-time = "2026-06-18T19:37:36.721Z" }
 wheels = [
@@ -78,11 +78,11 @@ resolution-markers = [
     "python_full_version >= '3.12' and python_full_version < '3.14'",
 ]
 dependencies = [
-    { name = "cryptography" },
-    { name = "jinja2" },
-    { name = "packaging" },
-    { name = "pyyaml" },
-    { name = "resolvelib", version = "1.2.1", source = { registry = "https://pypi.org/simple" } },
+    { name = "cryptography", marker = "python_full_version >= '3.12'" },
+    { name = "jinja2", marker = "python_full_version >= '3.12'" },
+    { name = "packaging", marker = "python_full_version >= '3.12'" },
+    { name = "pyyaml", marker = "python_full_version >= '3.12'" },
+    { name = "resolvelib", version = "1.2.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/26/6d/38d7eaea1df4a95c3b137e780f6ad2208d7886334a291cadde5d645f08a1/ansible_core-2.21.1.tar.gz", hash = "sha256:a5536ece95be84de15212b3644cdbbe9cbd9efd62e4e8a544cd6b0b27a083039", size = 3384534, upload-time = "2026-06-18T19:35:02.887Z" }
 wheels = [
@@ -193,7 +193,7 @@ requires-dist = [
     { name = "ansible-core", specifier = ">=2.16.14" },
     { name = "black", specifier = ">=24.3.0" },
     { name = "cffi", specifier = ">=1.15.1" },
-    { name = "cryptography", specifier = ">=49.0.0" },
+    { name = "cryptography", specifier = ">=37" },
     { name = "distro", specifier = ">=1.9.0" },
     { name = "filelock", specifier = ">=3.8.2" },
     { name = "jsonschema", specifier = ">=4.10.0" },
@@ -1000,7 +1000,7 @@ name = "exceptiongroup"
 version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/50/79/66800aadf48771f6b62f7eb014e352e5d06856655206165d775e675a02c9/exceptiongroup-1.3.1.tar.gz", hash = "sha256:8b412432c6055b0b7d14c310000ae93352ed6754f70fa8f7c34141f91c4e3219", size = 30371, upload-time = "2025-11-21T23:01:54.787Z" }
 wheels = [
@@ -1122,7 +1122,7 @@ name = "importlib-metadata"
 version = "9.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "zipp" },
+    { name = "zipp", marker = "python_full_version < '3.12'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/a9/01/15bb152d77b21318514a96f43af312635eb2500c96b55398d020c93d86ea/importlib_metadata-9.0.0.tar.gz", hash = "sha256:a4f57ab599e6a2e3016d7595cfd72eb4661a5106e787a95bcc90c7105b831efc", size = 56405, upload-time = "2026-03-20T06:42:56.999Z" }
 wheels = [
@@ -1161,17 +1161,17 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
-    { name = "decorator" },
-    { name = "exceptiongroup" },
-    { name = "jedi" },
-    { name = "matplotlib-inline" },
-    { name = "pexpect", marker = "sys_platform != 'emscripten' and sys_platform != 'win32'" },
-    { name = "prompt-toolkit" },
-    { name = "pygments" },
-    { name = "stack-data" },
-    { name = "traitlets" },
-    { name = "typing-extensions" },
+    { name = "colorama", marker = "python_full_version < '3.11' and sys_platform == 'win32'" },
+    { name = "decorator", marker = "python_full_version < '3.11'" },
+    { name = "exceptiongroup", marker = "python_full_version < '3.11'" },
+    { name = "jedi", marker = "python_full_version < '3.11'" },
+    { name = "matplotlib-inline", marker = "python_full_version < '3.11'" },
+    { name = "pexpect", marker = "python_full_version < '3.11' and sys_platform != 'emscripten' and sys_platform != 'win32'" },
+    { name = "prompt-toolkit", marker = "python_full_version < '3.11'" },
+    { name = "pygments", marker = "python_full_version < '3.11'" },
+    { name = "stack-data", marker = "python_full_version < '3.11'" },
+    { name = "traitlets", marker = "python_full_version < '3.11'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/40/18/f8598d287006885e7136451fdea0755af4ebcbfe342836f24deefaed1164/ipython-8.39.0.tar.gz", hash = "sha256:4110ae96012c379b8b6db898a07e186c40a2a1ef5d57a7fa83166047d9da7624", size = 5513971, upload-time = "2026-03-27T10:02:13.94Z" }
 wheels = [
@@ -1189,18 +1189,18 @@ resolution-markers = [
     "python_full_version == '3.11.*'",
 ]
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
-    { name = "decorator" },
-    { name = "ipython-pygments-lexers" },
-    { name = "jedi" },
-    { name = "matplotlib-inline" },
-    { name = "pexpect", marker = "sys_platform != 'emscripten' and sys_platform != 'win32'" },
-    { name = "prompt-toolkit" },
-    { name = "psutil", marker = "sys_platform != 'cygwin' and sys_platform != 'emscripten'" },
-    { name = "pygments" },
-    { name = "stack-data" },
-    { name = "traitlets" },
-    { name = "typing-extensions", marker = "python_full_version < '3.12'" },
+    { name = "colorama", marker = "python_full_version >= '3.11' and sys_platform == 'win32'" },
+    { name = "decorator", marker = "python_full_version >= '3.11'" },
+    { name = "ipython-pygments-lexers", marker = "python_full_version >= '3.11'" },
+    { name = "jedi", marker = "python_full_version >= '3.11'" },
+    { name = "matplotlib-inline", marker = "python_full_version >= '3.11'" },
+    { name = "pexpect", marker = "python_full_version >= '3.11' and sys_platform != 'emscripten' and sys_platform != 'win32'" },
+    { name = "prompt-toolkit", marker = "python_full_version >= '3.11'" },
+    { name = "psutil", marker = "python_full_version >= '3.11' and sys_platform != 'cygwin' and sys_platform != 'emscripten'" },
+    { name = "pygments", marker = "python_full_version >= '3.11'" },
+    { name = "stack-data", marker = "python_full_version >= '3.11'" },
+    { name = "traitlets", marker = "python_full_version >= '3.11'" },
+    { name = "typing-extensions", marker = "python_full_version == '3.11.*'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/53/59/165d3b4d75cc34add3122c4417ecb229085140ac573103c223cd01dde96f/ipython-9.15.0.tar.gz", hash = "sha256:da2819ce2aa83135257df830660b1176d986c3d2876db24df01974fa955b2756", size = 4442580, upload-time = "2026-06-26T11:03:35.913Z" }
 wheels = [
@@ -1212,7 +1212,7 @@ name = "ipython-pygments-lexers"
 version = "1.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "pygments" },
+    { name = "pygments", marker = "python_full_version >= '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/ef/4c/5dd1d8af08107f88c7f741ead7a40854b8ac24ddf9ae850afbcf698aa552/ipython_pygments_lexers-1.1.1.tar.gz", hash = "sha256:09c0138009e56b6854f9535736f4171d855c8c08a563a0dcd8022f78355c7e81", size = 8393, upload-time = "2025-01-17T11:24:34.505Z" }
 wheels = [
@@ -1657,21 +1657,21 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "cairosvg" },
-    { name = "linkchecker" },
-    { name = "markdown-exec" },
-    { name = "markdown-include" },
-    { name = "mkdocs" },
-    { name = "mkdocs-gen-files" },
-    { name = "mkdocs-htmlproofer-plugin" },
-    { name = "mkdocs-macros-plugin" },
-    { name = "mkdocs-material" },
-    { name = "mkdocs-material-extensions" },
-    { name = "mkdocs-minify-plugin" },
-    { name = "mkdocstrings" },
-    { name = "mkdocstrings-python" },
-    { name = "pillow" },
-    { name = "pymdown-extensions" },
+    { name = "cairosvg", marker = "python_full_version < '3.11'" },
+    { name = "linkchecker", marker = "python_full_version < '3.11'" },
+    { name = "markdown-exec", marker = "python_full_version < '3.11'" },
+    { name = "markdown-include", marker = "python_full_version < '3.11'" },
+    { name = "mkdocs", marker = "python_full_version < '3.11'" },
+    { name = "mkdocs-gen-files", marker = "python_full_version < '3.11'" },
+    { name = "mkdocs-htmlproofer-plugin", marker = "python_full_version < '3.11'" },
+    { name = "mkdocs-macros-plugin", marker = "python_full_version < '3.11'" },
+    { name = "mkdocs-material", marker = "python_full_version < '3.11'" },
+    { name = "mkdocs-material-extensions", marker = "python_full_version < '3.11'" },
+    { name = "mkdocs-minify-plugin", marker = "python_full_version < '3.11'" },
+    { name = "mkdocstrings", marker = "python_full_version < '3.11'" },
+    { name = "mkdocstrings-python", marker = "python_full_version < '3.11'" },
+    { name = "pillow", marker = "python_full_version < '3.11'" },
+    { name = "pymdown-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0c/42/9bb1dc927030aa2dede32f5ea01d7205ffa6718f43f936f650f438438e58/mkdocs_ansible-25.5.0.tar.gz", hash = "sha256:867dd4c21920c9d5ded0e4800a3093f33cb9e1138a9718135c702096075d8377", size = 46417, upload-time = "2025-05-13T13:35:59.15Z" }
 wheels = [
@@ -1689,22 +1689,22 @@ resolution-markers = [
     "python_full_version == '3.11.*'",
 ]
 dependencies = [
-    { name = "cairosvg" },
-    { name = "cffi" },
-    { name = "linkchecker" },
-    { name = "markdown-exec" },
-    { name = "markdown-include" },
-    { name = "mkdocs" },
-    { name = "mkdocs-gen-files" },
-    { name = "mkdocs-htmlproofer-plugin" },
-    { name = "mkdocs-macros-plugin" },
-    { name = "mkdocs-material" },
-    { name = "mkdocs-material-extensions" },
-    { name = "mkdocs-minify-plugin" },
-    { name = "mkdocstrings" },
-    { name = "mkdocstrings-python" },
-    { name = "pillow" },
-    { name = "pymdown-extensions" },
+    { name = "cairosvg", marker = "python_full_version >= '3.11'" },
+    { name = "cffi", marker = "python_full_version >= '3.11'" },
+    { name = "linkchecker", marker = "python_full_version >= '3.11'" },
+    { name = "markdown-exec", marker = "python_full_version >= '3.11'" },
+    { name = "markdown-include", marker = "python_full_version >= '3.11'" },
+    { name = "mkdocs", marker = "python_full_version >= '3.11'" },
+    { name = "mkdocs-gen-files", marker = "python_full_version >= '3.11'" },
+    { name = "mkdocs-htmlproofer-plugin", marker = "python_full_version >= '3.11'" },
+    { name = "mkdocs-macros-plugin", marker = "python_full_version >= '3.11'" },
+    { name = "mkdocs-material", marker = "python_full_version >= '3.11'" },
+    { name = "mkdocs-material-extensions", marker = "python_full_version >= '3.11'" },
+    { name = "mkdocs-minify-plugin", marker = "python_full_version >= '3.11'" },
+    { name = "mkdocstrings", marker = "python_full_version >= '3.11'" },
+    { name = "mkdocstrings-python", marker = "python_full_version >= '3.11'" },
+    { name = "pillow", marker = "python_full_version >= '3.11'" },
+    { name = "pymdown-extensions", marker = "python_full_version >= '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/fb/5a/7927815081eb614108077425c2aae5f0e23a6db4afe576cae4c3b369f064/mkdocs_ansible-26.4.0.tar.gz", hash = "sha256:03745e71ad9e6716821d3be56b36f1d335bbfc207a3eddbc72aa4b9ecd6b0520", size = 157038, upload-time = "2026-04-01T12:48:34.249Z" }
 wheels = [
