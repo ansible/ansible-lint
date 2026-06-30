@@ -28,6 +28,7 @@ import collections.abc
 import contextlib
 import copy
 import inspect
+import json
 import logging
 import os
 import re
@@ -589,6 +590,27 @@ class HandleChildren:
             elif not self.app.runtime.has_playbook(
                 str(possible_path),
             ):
+                extra_vars = self.app.options.extra_vars
+                is_collection = bool(namespace_name and collection_name)
+                # has_playbook() runs its syntax check without our configured
+                # extra_vars, so it wrongly fails on a local playbook that only
+                # loads once those vars are defined. Re-check with them before
+                # giving up, while still reporting genuinely broken playbooks.
+                if (
+                    extra_vars
+                    and not is_collection
+                    and self.app.runtime.run(
+                        [
+                            "ansible-playbook",
+                            "--syntax-check",
+                            str(possible_path),
+                            "--extra-vars",
+                            json.dumps(extra_vars),
+                        ],
+                    ).returncode
+                    == 0
+                ):
+                    return [Lintable(possible_path, kind=parent_type)]
                 msg = f"Failed to load {v} playbook due to failing syntax check."
                 break
             elif namespace_name and collection_name:
