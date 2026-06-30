@@ -567,7 +567,7 @@ class CustomConstructor(RoundTripConstructor):
             value_su = self.construct_scalar(node)
             try:
                 v = value_su.rstrip("_")
-                underscore = [len(v) - v.rindex("_") - 1, False, False]  # type: Any
+                underscore: Any = [len(v) - v.rindex("_") - 1, False, False]
             except ValueError:
                 underscore = None
             except IndexError:  # pragma: no cover
