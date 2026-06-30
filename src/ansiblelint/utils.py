@@ -1163,15 +1163,14 @@ def add_action_type(  # type: ignore[no-any-unimported]
 
 
 @cache
-def parse_yaml_linenumbers(  # type: ignore[no-any-unimported]
-    lintable: Lintable,
+def _parse_yaml_linenumbers_cached(  # type: ignore[no-any-unimported]
+    abspath: str,
+    content: str,
 ) -> AnsibleBaseYAMLObject | None:
-    """Parse yaml as ansible.utils.parse_yaml but with linenumbers.
-
-    The line numbers are stored in each node's LINE_NUMBER_KEY key.
-    """
+    """Parse yaml content with linenumbers, cached by path and content."""
     loader: AnsibleLoader  # type: ignore[valid-type]
     result = AnsibleSequence()
+    filename = Path(abspath)
 
     # signature of Composer.compose_node
     def compose_node(parent: yaml.nodes.Node | None, index: int) -> yaml.nodes.Node:
@@ -1199,7 +1198,7 @@ def parse_yaml_linenumbers(  # type: ignore[no-any-unimported]
         else:
             if hasattr(mapping, "_line_number"):
                 mapping[LINE_NUMBER_KEY] = mapping._line_number  # noqa: SLF001
-        mapping[FILENAME_KEY] = lintable.path
+        mapping[FILENAME_KEY] = filename
         return mapping
 
     try:  # noqa: PLW0717
@@ -1208,7 +1207,7 @@ def parse_yaml_linenumbers(  # type: ignore[no-any-unimported]
             kwargs["vault_password"] = DEFAULT_VAULT_PASSWORD
         # WARNING: 'unused-ignore' is needed below in order to allow mypy to
         # be passing with both pre-2.19 and post-2.19 versions of Ansible core.
-        loader = AnsibleLoader(lintable.content, **kwargs)
+        loader = AnsibleLoader(content, **kwargs)
         # redefine Composer.compose_node
         loader.compose_node = compose_node  # type: ignore[attr-defined,unused-ignore]
         # redefine AnsibleConstructor.construct_mapping
@@ -1228,7 +1227,7 @@ def parse_yaml_linenumbers(  # type: ignore[no-any-unimported]
         ruamel.yaml.parser.ParserError,
     ) as exc:
         msg = "Failed to load YAML file"
-        raise RuntimeError(msg, lintable.path) from exc
+        raise RuntimeError(msg, filename) from exc
 
     if len(result) == 0:
         return None  # empty documents
@@ -1238,6 +1237,16 @@ def parse_yaml_linenumbers(  # type: ignore[no-any-unimported]
             raise TypeError(msg)
         return result[0]
     return result
+
+
+def parse_yaml_linenumbers(  # type: ignore[no-any-unimported]
+    lintable: Lintable,
+) -> AnsibleBaseYAMLObject | None:
+    """Parse yaml as ansible.utils.parse_yaml but with linenumbers.
+
+    The line numbers are stored in each node's LINE_NUMBER_KEY key.
+    """
+    return _parse_yaml_linenumbers_cached(str(lintable.abspath), lintable.content)
 
 
 def get_cmd_args(task: Mapping[str, Any]) -> str:
