@@ -416,6 +416,27 @@ def _add_module_path_if_needed(
             module_paths.insert(0, str(mock_path))
 
 
+def _add_roles_path_if_needed(
+    options: Options,
+    roles_paths: list[str],
+) -> None:
+    """Add plain mock roles path to roles_paths if plain-name role mocks exist.
+
+    This is needed because :meth:`ansible_compat.runtime.Runtime._prepare_ansible_paths`
+    only adds ``cache_dir/roles`` to ``ANSIBLE_ROLES_PATH`` when ``isolated=True``.
+    Since ``isolated=not options.offline``, using ``--offline`` sets ``isolated=False``,
+    which causes plain-name role mocks to be silently omitted from the search path.
+
+    See https://github.com/ansible/ansible-lint/issues/5096 for details.
+    """
+    if options.cache_dir and any(
+        len(role_name.split(".")) < 3 for role_name in options.mock_roles
+    ):
+        mock_path = options.cache_dir / "roles"
+        if str(mock_path) not in roles_paths:
+            roles_paths.insert(0, str(mock_path))
+
+
 def get_app(*, offline: bool | None = None, cached: bool = False) -> App:
     """Return the application instance, caching the return value."""
     # Avoids ever running the app initialization twice if cached argument
@@ -459,6 +480,7 @@ def get_app(*, offline: bool | None = None, cached: bool = False) -> App:
     # https://github.com/ansible/ansible-lint/issues/4973
     _add_collections_path_if_needed(app.options, app.runtime.config.collections_paths)
     _add_module_path_if_needed(app.options, app.runtime.config.default_module_path)
+    _add_roles_path_if_needed(app.options, app.runtime.config.default_roles_path)
 
     app.runtime.prepare_environment(
         install_local=(not offline),
