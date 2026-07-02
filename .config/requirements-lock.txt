@@ -8,13 +8,13 @@ attrs==26.1.0
     #   referencing
 black==26.5.1
     # via ansible-lint
-bracex==2.6
+bracex==2.7
     # via wcmatch
 cffi==2.0.0
     # via
     #   ansible-lint
     #   cryptography
-click==8.4.1
+click==8.4.2
     # via black
 colorama==0.4.6 ; sys_platform == 'win32'
     # via click
