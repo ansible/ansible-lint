@@ -495,9 +495,13 @@ class RulesCollection:
 
         is_targeted = any(t.startswith(f"{rule.id}[") for t in tags)
 
-        if tags and not rule.has_dynamic_tags:
-            if set(rule.tags).union([rule.id]).isdisjoint(tags) and not is_targeted:
-                return False
+        if (
+            tags
+            and not rule.has_dynamic_tags
+            and set(rule.tags).union([rule.id]).isdisjoint(tags)
+            and not is_targeted
+        ):
+            return False
 
         if (
             tags
