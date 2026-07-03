@@ -255,6 +255,20 @@ def load_yaml_formatting_fixtures(fixture_filename: str) -> tuple[str, str, str]
             None,
             id="13",
         ),
+        # Multi-hash comments (##, ###, ...) keep their leading run intact
+        # and only get a space inserted when one is missing.
+        pytest.param(
+            "---\n### multi-hash space\nfoo: bar\n",
+            "---\n### multi-hash space\nfoo: bar\n",
+            None,
+            id="multi-hash-preserved",
+        ),
+        pytest.param(
+            "---\n###multi-hash no space\nfoo: bar\n",
+            "---\n### multi-hash no space\nfoo: bar\n",
+            None,
+            id="multi-hash-missing-space",
+        ),
     ),
 )
 def test_fmt(before: str, after: str, version: tuple[int, int] | None) -> None:

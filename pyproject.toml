@@ -334,6 +334,7 @@ ignore = [
   "FURB113",
   "FURB118",
   "PLC0207",  # maxsplit with [-1] preview rule
+  "D421",  # property-docstring-starts-with-verb (preview, too many existing violations)
   "PLC0415",
   "PLC2701",
   "PLW1641",
@@ -664,6 +665,7 @@ PRE_COMMIT_COLOR = "always"
 [tool.uv]
 package = true
 default-groups = "all"
+override-dependencies = ["cairosvg>=2.9.0"]
 
 [tool.vulture]
 exclude = [

@@ -1,0 +1,9 @@
+---
+- name: Register projection example
+  hosts: localhost
+  tasks:
+    - name: Ask for username
+      ansible.builtin.pause:
+        prompt: "Enter username [default: my_username]"
+      register:
+        username: _task.result.user_input | ansible.builtin.default('my_username', true)

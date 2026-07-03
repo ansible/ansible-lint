@@ -2,8 +2,10 @@
 
 from pathlib import Path
 
+from ansiblelint.__main__ import _rule_is_skipped
 from ansiblelint.constants import RC
 from ansiblelint.file_utils import Lintable
+from ansiblelint.loaders import IgnoreRule, IgnoreRuleQualifier
 from ansiblelint.testing import run_ansible_lint
 
 
@@ -75,3 +77,103 @@ def test_app_fixed_violations_coverage(tmp_path: Path) -> None:
     exit_code = app.report_outcome(result)
 
     assert exit_code == RC.FIXED_VIOLATIONS
+
+
+def test_add_module_path_for_plain_mock_modules(tmp_path: Path) -> None:
+    """Plain module mocks are exposed through Ansible's module path."""
+    from ansiblelint.app import _add_module_path_if_needed
+    from ansiblelint.config import Options
+
+    options = Options()
+    options.cache_dir = tmp_path / ".ansible"
+    options.mock_modules = ["zuul_return", "ns.coll.mod"]
+    module_paths = ["/usr/share/ansible/plugins/modules"]
+
+    _add_module_path_if_needed(options, module_paths)
+
+    assert module_paths[0] == str(options.cache_dir / "modules")
+
+
+def test_add_module_path_skips_collection_only_mocks(tmp_path: Path) -> None:
+    """Collection module mocks are exposed through collection paths instead."""
+    from ansiblelint.app import _add_module_path_if_needed
+    from ansiblelint.config import Options
+
+    options = Options()
+    options.cache_dir = tmp_path / ".ansible"
+    options.mock_modules = ["ns.coll.mod"]
+    module_paths = ["/usr/share/ansible/plugins/modules"]
+
+    _add_module_path_if_needed(options, module_paths)
+
+    assert module_paths == ["/usr/share/ansible/plugins/modules"]
+
+
+def test_ignore_file_with_skip_and_strict(tmp_path: Path) -> None:
+    """Test that .ansible-lint-ignore with skip qualifier returns exit code 0 with --strict.
+
+    When all violations are skipped using 'skip' in .ansible-lint-ignore,
+    the exit code should be 0, even with --strict flag.
+    """
+    lintable = Lintable(tmp_path / "test.yml")
+    lintable.content = "bad_indentation:\n- blah: plop\n  zz: 42\n"
+    lintable.write(force=True)
+
+    # Create ignore file with skip qualifier
+    ignore_file = tmp_path / ".ansible-lint-ignore"
+    ignore_file.write_text("test.yml yaml[indentation] skip")
+
+    result = run_ansible_lint(lintable.filename, "--strict", cwd=tmp_path)
+
+    # Should return 0 because all violations are skipped
+    assert result.returncode == RC.SUCCESS
+
+
+def test_ignore_file_without_skip_and_strict(tmp_path: Path) -> None:
+    """Test that .ansible-lint-ignore without skip qualifier returns exit code 2 with --strict.
+
+    When violations are ignored (but not skipped) in .ansible-lint-ignore,
+    they should be treated as warnings, and --strict should cause exit code 2.
+    """
+    lintable = Lintable(tmp_path / "test.yml")
+    lintable.content = "bad_indentation:\n- blah: plop\n  zz: 42\n"
+    lintable.write(force=True)
+
+    # Create ignore file without skip qualifier
+    ignore_file = tmp_path / ".ansible-lint-ignore"
+    ignore_file.write_text("test.yml yaml[indentation]")
+
+    result = run_ansible_lint(lintable.filename, "--strict", cwd=tmp_path)
+
+    # Should return 2 because there's a warning and we're in strict mode
+    assert result.returncode == RC.VIOLATIONS_FOUND
+
+
+def test_rule_is_skipped_checks_all_ignore_rules() -> None:
+    """Validate that skip qualifier lookup does not stop at an unrelated rule."""
+    rules = (
+        IgnoreRule("yaml[truthy]", frozenset()),
+        IgnoreRule("yaml[indentation]", frozenset({IgnoreRuleQualifier.SKIP})),
+    )
+
+    assert _rule_is_skipped("yaml[indentation]", rules)
+
+
+def test_skip_list_and_strict(tmp_path: Path) -> None:
+    """Test that skip_list returns exit code 0 with --strict.
+
+    When all rules generating violations are skipped using 'skip_list',
+    the exit code should be 0, even with --strict flag.
+    """
+    lintable = Lintable(tmp_path / "test.yml")
+    lintable.content = "bad_indentation:\n- blah: plop\n  zz: 42\n"
+    lintable.write(force=True)
+
+    # Create config file with skip_list
+    config_file = tmp_path / ".ansible-lint"
+    config_file.write_text("skip_list:\n  - yaml[indentation]\n")
+
+    result = run_ansible_lint(lintable.filename, "--strict", cwd=tmp_path)
+
+    # Should return 0 because rule is in skip_list
+    assert result.returncode == RC.SUCCESS

@@ -45,6 +45,34 @@ def get_schema(kind: str) -> Any:
 _schema_cache = SchemaCacheDict()
 
 
+def _fetch_and_store_schema(
+    request: Request,
+    kind: str,
+    path: Path,
+    data: dict[str, Any],
+    schema: dict[str, Any],
+) -> int:
+    """Fetch a schema from URL and save it to disk. Returns 1 if changed, 0 otherwise."""
+    with urllib.request.urlopen(request, timeout=10) as response:  # noqa: S310
+        if response.status == 200:  # pragma: no cover
+            content = response.read().decode("utf-8").rstrip()
+            etag = response.headers["etag"].strip('"')
+            changed = 0
+            if etag != data.get("etag", "") or not schema:
+                JSON_SCHEMAS[kind]["etag"] = etag
+                changed = 1
+            with path.open("w", encoding="utf-8") as f_out:
+                _logger.info("Schema %s was updated", kind)
+                f_out.write(content)
+                f_out.write("\n")  # prettier/editors
+                f_out.truncate()
+                os.fsync(f_out.fileno())
+                if kind in _schema_cache:  # pragma: no cover
+                    del _schema_cache[kind]
+            return changed
+    return 0  # pragma: no cover
+
+
 def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
     """Refresh JSON schemas by downloading latest versions.
 
@@ -88,22 +116,7 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
         if etag:
             request.add_header("If-None-Match", f'"{data.get("etag")}"')
         try:
-            with urllib.request.urlopen(request, timeout=10) as response:  # noqa: S310
-                if response.status == 200:  # pragma: no cover
-                    content = response.read().decode("utf-8").rstrip()
-                    etag = response.headers["etag"].strip('"')
-                    if etag != data.get("etag", "") or not schema:
-                        JSON_SCHEMAS[kind]["etag"] = etag
-                        changed += 1
-                    with path.open("w", encoding="utf-8") as f_out:
-                        _logger.info("Schema %s was updated", kind)
-                        f_out.write(content)
-                        f_out.write("\n")  # prettier/editors
-                        f_out.truncate()
-                        os.fsync(f_out.fileno())
-                        # unload possibly loaded schema
-                        if kind in _schema_cache:  # pragma: no cover
-                            del _schema_cache[kind]
+            changed += _fetch_and_store_schema(request, kind, path, data, schema)
         except (ConnectionError, OSError, HTTPException) as exc:
             if isinstance(exc, HTTPError) and getattr(exc, "code", None) == 304:
                 _logger.debug("Schema %s is not modified", url)

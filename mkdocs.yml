@@ -147,19 +147,6 @@ plugins:
   - material/tags
   # https://github.com/manuzhang/mkdocs-htmlproofer-plugin
   # - htmlproofer
-  - mkdocstrings:
-      handlers:
-        python:
-          paths: [src]
-          options:
-            # Sphinx is for historical reasons, but we could consider switching if needed
-            # https://mkdocstrings.github.io/griffe/docstrings/
-            docstring_style: sphinx
-            merge_init_into_class: yes
-            show_submodules: yes
-          inventories:
-            - url: https://docs.ansible.com/projects/ansible/latest/objects.inv
-              domains: [py, std]
 
 markdown_extensions:
   - markdown_include.include:

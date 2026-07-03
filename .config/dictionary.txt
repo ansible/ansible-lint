@@ -104,7 +104,6 @@ matchtask
 matchtasks
 matchvar
 matchyaml
-mkdocstrings
 mockings
 modifyitems
 mytag

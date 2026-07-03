@@ -68,3 +68,17 @@
         cmd: |
           $ProgressPreference = 'this | that'
       changed_when: false
+
+    - name: "Pipe only inside a multi-line jinja expression, bug #3879"
+      # https://github.com/ansible/ansible-lint/issues/3879
+      vars:
+        values:
+          - itemA
+          - itemB
+      ansible.builtin.shell:
+        executable: /usr/bin/bash
+        cmd: >-
+          echo {{
+            values | first
+          }}
+      changed_when: false

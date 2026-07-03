@@ -46,9 +46,11 @@ match_types = {
     "matchplay": "play",  # called by matchyaml
     "matchdir": "dir",
 }
-RE_JINJA_EXPRESSION = re.compile(r"{{.+?}}")
-RE_JINJA_STATEMENT = re.compile(r"{%.+?%}")
-RE_JINJA_COMMENT = re.compile(r"{#.+?#}")
+# re.DOTALL so that a `.` also matches newlines, allowing multi-line Jinja
+# expressions/statements/comments to be stripped (see issue #3879).
+RE_JINJA_EXPRESSION = re.compile(r"{{.+?}}", re.DOTALL)
+RE_JINJA_STATEMENT = re.compile(r"{%.+?%}", re.DOTALL)
+RE_JINJA_COMMENT = re.compile(r"{#.+?#}", re.DOTALL)
 
 
 class AnsibleLintRule(BaseRule):
