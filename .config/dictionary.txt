@@ -1,7 +1,6 @@
 CLICOLOR
 Chamoulaud
 Codeclimate
-DOTGLOB
 FQCN
 FQCNs
 Fimport
