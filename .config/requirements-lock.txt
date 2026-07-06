@@ -8,7 +8,7 @@ attrs==26.1.0
     #   referencing
 black==26.5.1
     # via ansible-lint
-bracex==2.7
+bracex==3.0
     # via wcmatch
 cffi==2.0.0
     # via
@@ -70,7 +70,7 @@ rpds-py==0.30.0 ; python_full_version < '3.11'
     # via
     #   jsonschema
     #   referencing
-rpds-py==2026.6.3 ; python_full_version >= '3.11'
+rpds-py==2026.5.1 ; python_full_version >= '3.11'
     # via
     #   jsonschema
     #   referencing
