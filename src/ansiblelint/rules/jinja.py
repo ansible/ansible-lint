@@ -6,10 +6,10 @@ import logging
 import os
 import re
 import sys
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, NamedTuple
+from typing import TYPE_CHECKING, Any, NamedTuple
 
 import black
 import jinja2
@@ -103,6 +103,89 @@ class JinjaRuleTMetaSpacing(RuleMatchTransformMeta):
     def __str__(self) -> str:
         """Return string representation."""
         return f"{self.key}={self.value} at {self.path} fixed to {self.fixed}"
+
+
+def _is_broken_rewrite(
+    env: jinja2.Environment, original: str, reformatted: str
+) -> bool:
+    """Return True if the reformatted text has a syntax error while the original does not."""
+    try:
+        env.parse(reformatted)
+    except jinja2.exceptions.TemplateSyntaxError:
+        try:
+            env.parse(original)
+        except jinja2.exceptions.TemplateSyntaxError:
+            return False
+        else:
+            return True
+    else:
+        return False
+
+
+def _cook(value: str, *, implicit: bool = False) -> str:
+    """Prepare an implicit string for jinja parsing when needed."""
+    if not implicit:
+        return value
+    if value.startswith("{{") and value.endswith("}}"):
+        # maybe we should make this an error?
+        return value
+    return f"{{{{ {value} }}}}"
+
+
+def _uncook(value: str, *, implicit: bool = False) -> str:
+    """Restore an string to original form when it was an implicit one."""
+    if not implicit:
+        return value
+    return value[3:-3]
+
+
+def _process_jinja_tokens(lex: Callable[[str], Any], text: str) -> list[Token]:
+    tokens: list[Token] = []
+    begin_types = ("variable_begin", "comment_begin", "block_begin")
+    end_types = ("variable_end", "comment_end", "block_end")
+
+    expr_str = None
+    expr_type = None
+    verb_skipped = True
+    lineno = 1
+
+    for token in lex(text):
+        if (
+            expr_type
+            and expr_type.startswith("{%")
+            and token.token_type in ("name", "whitespace")
+            and not verb_skipped
+        ):
+            # on {% blocks we do not take first word as part of the expression
+            tokens.append(token)
+            if token.token_type != "whitespace":
+                verb_skipped = True
+        elif token.token_type in begin_types:
+            tokens.append(token)
+            expr_type = token.value  # such {#, {{, {%
+            expr_str = ""
+            verb_skipped = False
+        elif token.token_type in end_types and expr_str is not None:
+            # process expression
+            if isinstance(expr_str, str) and "\n" in expr_str:
+                raise NotImplementedError
+            leading_spaces = " " * (len(expr_str) - len(expr_str.lstrip()))
+            expr_str = leading_spaces + blacken(expr_str.lstrip())
+            if tokens[-1].token_type != "whitespace" and not expr_str.startswith(" "):
+                expr_str = " " + expr_str
+            if not expr_str.endswith(" "):
+                expr_str += " "
+            tokens.append(Token(lineno, "data", expr_str))
+            tokens.append(token)
+            expr_str = None
+            expr_type = None
+        elif expr_str is not None:
+            expr_str += token.value
+        else:
+            tokens.append(token)
+        lineno = token.lineno
+
+    return tokens
 
 
 class JinjaRule(AnsibleLintRule, TransformMixin):
@@ -351,22 +434,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
 
         return result
 
-    def _is_broken_rewrite(self, original: str, reformatted: str) -> bool:
-        """Return True if the reformatted text has a syntax error while the original does not."""
-        try:
-            self.env.parse(reformatted)
-        except jinja2.exceptions.TemplateSyntaxError:
-            try:
-                self.env.parse(original)
-            except jinja2.exceptions.TemplateSyntaxError:
-                return False
-            else:
-                return True
-        else:
-            return False
-
-    # pylint: disable=too-many-locals
-    def check_whitespace(  # noqa: C901
+    def check_whitespace(
         self,
         text: str,
         key: str,
@@ -379,22 +447,6 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
 
         :returns: (string, string, string)  reformatted text, detailed error, error tag
         """
-
-        def cook(value: str, *, implicit: bool = False) -> str:
-            """Prepare an implicit string for jinja parsing when needed."""
-            if not implicit:
-                return value
-            if value.startswith("{{") and value.endswith("}}"):
-                # maybe we should make this an error?
-                return value
-            return f"{{{{ {value} }}}}"
-
-        def uncook(value: str, *, implicit: bool = False) -> str:
-            """Restore an string to original form when it was an implicit one."""
-            if not implicit:
-                return value
-            return value[3:-3]
-
         # Detect original line ending style to preserve it
         # Only preserve \r\n (Windows CRLF), let \r (Mac classic) be normalized to \n
         # as per jinja 3.0.0 behavior (see test case 44)
@@ -402,10 +454,6 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
         if "\r\n" in text:
             original_line_ending = "\r\n"
 
-        tokens = []
-        details = ""
-        begin_types = ("variable_begin", "comment_begin", "block_begin")
-        end_types = ("variable_end", "comment_end", "block_end")
         implicit = False
 
         # implicit templates do not have the {{ }} wrapping
@@ -419,55 +467,14 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
             )
         ):
             implicit = True
-            text = cook(text, implicit=implicit)
+            text = _cook(text, implicit=implicit)
 
         # don't try to lex strings that have no jinja inside them
         if not has_jinja(text):
             return text, "", "spacing"
 
-        expr_str = None
-        expr_type = None
-        verb_skipped = True
-        lineno = 1
         try:
-            for token in self.lex(text):
-                if (
-                    expr_type
-                    and expr_type.startswith("{%")
-                    and token.token_type in ("name", "whitespace")
-                    and not verb_skipped
-                ):
-                    # on {% blocks we do not take first word as part of the expression
-                    tokens.append(token)
-                    if token.token_type != "whitespace":
-                        verb_skipped = True
-                elif token.token_type in begin_types:
-                    tokens.append(token)
-                    expr_type = token.value  # such {#, {{, {%
-                    expr_str = ""
-                    verb_skipped = False
-                elif token.token_type in end_types and expr_str is not None:
-                    # process expression
-                    # pylint: disable=unsupported-membership-test
-                    if isinstance(expr_str, str) and "\n" in expr_str:
-                        raise NotImplementedError  # noqa: TRY301
-                    leading_spaces = " " * (len(expr_str) - len(expr_str.lstrip()))
-                    expr_str = leading_spaces + blacken(expr_str.lstrip())
-                    if tokens[
-                        -1
-                    ].token_type != "whitespace" and not expr_str.startswith(" "):
-                        expr_str = " " + expr_str
-                    if not expr_str.endswith(" "):
-                        expr_str += " "
-                    tokens.append(Token(lineno, "data", expr_str))
-                    tokens.append(token)
-                    expr_str = None
-                    expr_type = None
-                elif expr_str is not None:
-                    expr_str += token.value
-                else:
-                    tokens.append(token)
-                lineno = token.lineno
+            tokens = _process_jinja_tokens(self.lex, text)
 
         except jinja2.exceptions.TemplateSyntaxError as exc:
             return "", str(exc.message), "invalid"
@@ -478,16 +485,16 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
             # newlines, as we decided to not touch them yet.
             # These both are documented as known limitations.
             _logger.debug("Ignored jinja internal error %s", exc)
-            return uncook(text, implicit=implicit), "", "spacing"
+            return _uncook(text, implicit=implicit), "", "spacing"
 
         # finalize
         reformatted = self.unlex(tokens, original_line_ending)
         failed = reformatted != text
 
-        if failed and self._is_broken_rewrite(text, reformatted):
-            return uncook(text, implicit=implicit), "", "spacing"
+        if failed and _is_broken_rewrite(self.env, text, reformatted):
+            return _uncook(text, implicit=implicit), "", "spacing"
 
-        reformatted = uncook(reformatted, implicit=implicit)
+        reformatted = _uncook(reformatted, implicit=implicit)
         details = (
             f"Jinja2 template rewrite recommendation: `{reformatted}`."
             if failed
