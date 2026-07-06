@@ -3,6 +3,12 @@
   "extends": ["github>ansible/actions//config/renovate.json"],
   "packageRules": [
     {
+      "description": "Pin astral-sh/setup-uv in action.yml to commit SHA (tag preserved in comment)",
+      "matchManagers": ["github-actions"],
+      "matchPackageNames": ["astral-sh/setup-uv"],
+      "pinDigests": true
+    },
+    {
       "allowedVersions": "<2.17",
       "description": "Platform compatibility constraint",
       "matchPackageNames": ["ansible-core"]

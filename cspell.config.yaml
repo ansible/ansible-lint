@@ -12,6 +12,8 @@ dictionaries:
   - python
   - python-common
   - words
+words:
+  - DOTGLOB
 enabled: true
 useGitignore: true
 ignorePaths:

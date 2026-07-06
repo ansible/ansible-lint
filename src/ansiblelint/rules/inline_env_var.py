@@ -35,10 +35,7 @@ class EnvVarsInCommandRule(AnsibleLintRule):
     """Command module does not accept setting environment variables inline."""
 
     id = "inline-env-var"
-    description = (
-        "Use ``environment:`` to set environment variables "
-        "or use ``shell`` module which accepts both"
-    )
+    description = "Use ``environment:`` to set environment variables."
     severity = "VERY_HIGH"
     tags = ["command-shell", "idiom"]
     version_changed = "5.0.11"

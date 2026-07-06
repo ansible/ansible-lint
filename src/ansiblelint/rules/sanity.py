@@ -97,7 +97,7 @@ class CheckSanityIgnoreFiles(AnsibleLintRule):
                     if base_ignore_dir in check_dirs:
                         try:
                             if "#" in entry:
-                                entry, _ = entry.split("#")
+                                entry, _ = entry.split("#", 1)
                             (_, test) = entry.split()
                             if test not in self.allowed_ignores:
                                 results.append(

@@ -139,6 +139,27 @@ def _uncook(value: str, *, implicit: bool = False) -> str:
     return value[3:-3]
 
 
+def _is_verb_token(expr_type: str | None, token: Any, verb_skipped: bool) -> bool:
+    return bool(
+        expr_type
+        and expr_type.startswith("{%")
+        and token.token_type in ("name", "whitespace")
+        and not verb_skipped
+    )
+
+
+def _format_expression(expr_str: str, last_token: Any) -> str:
+    if isinstance(expr_str, str) and "\n" in expr_str:
+        raise NotImplementedError
+    leading_spaces = " " * (len(expr_str) - len(expr_str.lstrip()))
+    expr_str = leading_spaces + blacken(expr_str.lstrip())
+    if last_token.token_type != "whitespace" and not expr_str.startswith(" "):
+        expr_str = " " + expr_str
+    if not expr_str.endswith(" "):
+        expr_str += " "
+    return expr_str
+
+
 def _process_jinja_tokens(lex: Callable[[str], Any], text: str) -> list[Token]:
     tokens: list[Token] = []
     begin_types = ("variable_begin", "comment_begin", "block_begin")
@@ -150,12 +171,7 @@ def _process_jinja_tokens(lex: Callable[[str], Any], text: str) -> list[Token]:
     lineno = 1
 
     for token in lex(text):
-        if (
-            expr_type
-            and expr_type.startswith("{%")
-            and token.token_type in ("name", "whitespace")
-            and not verb_skipped
-        ):
+        if _is_verb_token(expr_type, token, verb_skipped):
             # on {% blocks we do not take first word as part of the expression
             tokens.append(token)
             if token.token_type != "whitespace":
@@ -167,15 +183,8 @@ def _process_jinja_tokens(lex: Callable[[str], Any], text: str) -> list[Token]:
             verb_skipped = False
         elif token.token_type in end_types and expr_str is not None:
             # process expression
-            if isinstance(expr_str, str) and "\n" in expr_str:
-                raise NotImplementedError
-            leading_spaces = " " * (len(expr_str) - len(expr_str.lstrip()))
-            expr_str = leading_spaces + blacken(expr_str.lstrip())
-            if tokens[-1].token_type != "whitespace" and not expr_str.startswith(" "):
-                expr_str = " " + expr_str
-            if not expr_str.endswith(" "):
-                expr_str += " "
-            tokens.append(Token(lineno, "data", expr_str))
+            formatted = _format_expression(expr_str, tokens[-1])
+            tokens.append(Token(lineno, "data", formatted))
             tokens.append(token)
             expr_str = None
             expr_type = None
@@ -224,7 +233,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
         file: Lintable | None = None,
     ) -> list[MatchError]:
         result = []
-        try:
+        try:  # noqa: PLW0717
             for key, v, path in nested_items_path(
                 task,
                 ignored_keys=("block", "ansible.builtin.block", "ansible.legacy.block"),

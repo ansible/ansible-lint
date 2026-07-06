@@ -1,0 +1,7 @@
+---
+galaxy_info:
+  author: test
+  description: reproducer for issue 5079
+  license: MIT
+  min_ansible_version: "2.16"
+dependencies: []

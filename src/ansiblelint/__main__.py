@@ -70,8 +70,9 @@ from ansiblelint.skip_utils import normalize_tag
 from ansiblelint.version import __version__
 
 if TYPE_CHECKING:
-    # RulesCollection must be imported lazily or ansible gets imported too early.
+    from collections.abc import Iterable
 
+    # RulesCollection must be imported lazily or ansible gets imported too early.
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import LintResult
 
@@ -142,26 +143,28 @@ def initialize_options(arguments: list[str] | None = None) -> BaseFileLock | Non
         or options.list_rules
         or options.list_tags
     ):
-        options.cache_dir = get_cache_dir(pathlib.Path(options.project_dir))
+        options.cache_dir = get_cache_dir(
+            pathlib.Path(options.project_dir),
+            isolated=not options.offline,
+        )
 
     options.project_dir = Path(options.project_dir).resolve().as_posix()
 
     # add a lock file so we do not have two instances running inside at the same time
-    if options.cache_dir:
+    if options.cache_dir and not options.offline:
         options.cache_dir.mkdir(parents=True, exist_ok=True)
 
         # lock file can only be used if cache_dir is set and writable
-        if not options.offline:  # pragma: no cover
-            cache_dir_lock = FileLock(
-                f"{options.cache_dir}/.lock",
+        cache_dir_lock = FileLock(
+            f"{options.cache_dir}/.lock",
+        )
+        try:
+            cache_dir_lock.acquire(timeout=180)
+        except Timeout:  # pragma: no cover
+            _logger.error(  # noqa: TRY400
+                "Timeout waiting for another instance of ansible-lint to release the lock.",
             )
-            try:
-                cache_dir_lock.acquire(timeout=180)
-            except Timeout:  # pragma: no cover
-                _logger.error(  # noqa: TRY400
-                    "Timeout waiting for another instance of ansible-lint to release the lock.",
-                )
-                sys.exit(RC.LOCK_TIMEOUT)
+            sys.exit(RC.LOCK_TIMEOUT)
 
     # Avoid extra output noise from Ansible about using devel versions
     if "ANSIBLE_DEVEL_WARNING" not in os.environ:  # pragma: no branch
@@ -286,10 +289,10 @@ def fix(runtime_options: Options, result: LintResult, rules: RulesCollection) ->
 # to the rule, it is treated as skipped here and does not show up
 # even as a warning.
 # [1] https://github.com/ansible/ansible-lint/issues/3068
-def _rule_is_skipped(tag: str, rules: set[IgnoreRule]) -> bool:
+def _rule_is_skipped(tag: str, rules: Iterable[IgnoreRule]) -> bool:
     for rule in rules:
         if tag != rule.rule:
-            return False
+            continue
         return IgnoreRuleQualifier.SKIP in rule.qualifiers
     return False
 
@@ -393,9 +396,6 @@ def main(argv: list[str] | None = None) -> int:
 
     mark_as_success = True
 
-    if options.strict and result.matches:
-        mark_as_success = False
-
     # Remove skip_list items from the result
     result.matches = [m for m in result.matches if m.tag not in app.options.skip_list]
     # load ignore file
@@ -404,6 +404,12 @@ def main(argv: list[str] | None = None) -> int:
     result.matches = [
         m for m in result.matches if not _rule_is_skipped(m.tag, ignore_map[m.filename])
     ]
+
+    # For strict option, decide of success or failure after we have pruned the skipped ones
+    # from both the skip_list and the ignore file.
+    if options.strict and result.matches:
+        mark_as_success = False
+
     # others entries are ignored
     for match in result.matches:
         if match.tag in [

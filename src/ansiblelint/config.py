@@ -254,7 +254,7 @@ def guess_install_method() -> str:
 
     # By default we assume pip is not safe to be used
     use_pip = False
-    try:
+    try:  # noqa: PLW0717
         # Use pip to detect if is safe to use it to upgrade the package.
         # We do imports here to for performance and reasons, and also in order
         # to avoid errors if pip internals change. Also we want to avoid having
