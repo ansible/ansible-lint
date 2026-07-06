@@ -351,8 +351,22 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
 
         return result
 
+    def _is_broken_rewrite(self, original: str, reformatted: str) -> bool:
+        """Return True if the reformatted text has a syntax error while the original does not."""
+        try:
+            self.env.parse(reformatted)
+        except jinja2.exceptions.TemplateSyntaxError:
+            try:
+                self.env.parse(original)
+            except jinja2.exceptions.TemplateSyntaxError:
+                return False
+            else:
+                return True
+        else:
+            return False
+
     # pylint: disable=too-many-locals
-    def check_whitespace(
+    def check_whitespace(  # noqa: C901
         self,
         text: str,
         key: str,
@@ -469,6 +483,10 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
         # finalize
         reformatted = self.unlex(tokens, original_line_ending)
         failed = reformatted != text
+
+        if failed and self._is_broken_rewrite(text, reformatted):
+            return uncook(text, implicit=implicit), "", "spacing"
+
         reformatted = uncook(reformatted, implicit=implicit)
         details = (
             f"Jinja2 template rewrite recommendation: `{reformatted}`."
@@ -808,6 +826,12 @@ if "pytest" in sys.modules:
                 "Created on {{ '%Y-%m-%d %H:%M:%S %Z' | strftime }}.\r\n",
                 "spacing",
                 id="46",
+            ),
+            pytest.param(
+                "'{ {{- item.limits -}} }'",
+                "'{ {{- item.limits -}} }'",
+                "spacing",
+                id="47",
             ),
         ),
     )
