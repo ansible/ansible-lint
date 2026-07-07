@@ -55,6 +55,7 @@ except ImportError:  # pragma: no branch
         to_bytes,
     )
 
+from ansible import constants as ansible_constants
 from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.mod_args import ModuleArgsParser
@@ -106,9 +107,7 @@ from ansiblelint.types import (
 if TYPE_CHECKING:
     from ansiblelint.app import App
     from ansiblelint.rules import RulesCollection
-# ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
-# string as the password to enable such yaml files to be opened and parsed
-# successfully.
+# Fallback vault password used when no vault configuration is found.
 DEFAULT_VAULT_PASSWORD = "x"  # noqa: S105
 
 PLAYBOOK_DIR = os.environ.get("ANSIBLE_PLAYBOOK_DIR", None)
@@ -123,14 +122,79 @@ FMT_RE = re.compile(r"^# fmt:\s+(\S+)")
 
 _logger = logging.getLogger(__name__)
 
+# Vault secrets are resolved on first use and cached for the process lifetime.
+_vault_secrets: list[tuple[str, Any]] | None = None
+
+
+def _configured_vault_secrets() -> list[tuple[str, Any]] | None:
+    """Load vault secrets from Ansible configuration, or None when unavailable."""
+    try:
+        # Deferred import: importing ansible.cli initializes the locale and
+        # raises SystemExit on systems without a UTF-8 locale.
+        from ansible.cli import CLI
+    except SystemExit:  # NOSONAR
+        # Deliberately not re-raised: when ansible.cli refuses to load, vault
+        # support degrades to the fallback password instead of terminating
+        # the calling process.
+        _logger.debug("Unable to import ansible.cli", exc_info=True)
+        return None
+
+    loader = DataLoader()  # type: ignore[no-untyped-call,unused-ignore]
+
+    vault_ids = list(
+        getattr(ansible_constants, "DEFAULT_VAULT_IDENTITY_LIST", None) or []
+    )
+
+    kwargs: dict[str, Any] = {
+        "ask_vault_pass": False,
+        "auto_prompt": False,
+    }
+    # initialize_context was added in ansible-core 2.19
+    if "initialize_context" in inspect.getfullargspec(CLI.setup_vault_secrets).args:
+        kwargs["initialize_context"] = False
+
+    try:
+        secrets: list[tuple[str, Any]] = CLI.setup_vault_secrets(  # type: ignore[no-untyped-call]
+            loader,
+            vault_ids=vault_ids,
+            **kwargs,
+        )
+    except (AnsibleError, RuntimeError, Warning):
+        _logger.debug(
+            "Failed to load vault secrets from configuration",
+            exc_info=True,
+        )
+        return None
+    return secrets or None
+
+
+def _get_vault_secrets() -> list[tuple[str, Any]]:
+    """Return vault secrets from Ansible configuration, falling back to a dummy password."""
+    # pylint: disable=global-statement
+    global _vault_secrets
+    if _vault_secrets is None:
+        # Fall back to the dummy password for backward compatibility when no
+        # vault configuration is available.
+        _vault_secrets = _configured_vault_secrets() or [
+            (
+                "default",
+                PromptVaultSecret(_bytes=to_bytes(DEFAULT_VAULT_PASSWORD)),  # type: ignore[no-untyped-call]
+            ),
+        ]
+    return _vault_secrets
+
+
+def _make_dataloader() -> DataLoader:
+    """Create a DataLoader with vault secrets from Ansible configuration."""
+    loader = DataLoader()  # type: ignore[no-untyped-call,unused-ignore]
+    if hasattr(loader, "set_vault_secrets"):
+        loader.set_vault_secrets(_get_vault_secrets())
+    return loader
+
 
 def parse_yaml_from_file(filepath: str) -> AnsibleJSON:
     """Extract a decrypted YAML object from file."""
-    dataloader = DataLoader()  # type: ignore[no-untyped-call,unused-ignore]
-    if hasattr(dataloader, "set_vault_secrets"):
-        dataloader.set_vault_secrets([
-            ("default", PromptVaultSecret(_bytes=to_bytes(DEFAULT_VAULT_PASSWORD)))  # type: ignore[no-untyped-call]
-        ])
+    dataloader = _make_dataloader()
     result: object = dataloader.load_from_file(filepath)
     if result is None:
         return result
@@ -143,7 +207,7 @@ def parse_yaml_from_file(filepath: str) -> AnsibleJSON:
 
 def path_dwim(basedir: str, given: str) -> str:
     """Convert a given path do-what-I-mean style."""
-    dataloader = DataLoader()  # type: ignore[no-untyped-call,unused-ignore]
+    dataloader = _make_dataloader()
     dataloader.set_basedir(basedir)
     return str(dataloader.path_dwim(given))
 
@@ -158,7 +222,7 @@ def ansible_templar(basedir: Path, templatevars: Any) -> Templar:
     if basedir.name == "tasks":
         basedir = basedir.parent
 
-    dataloader = DataLoader()  # type: ignore[no-untyped-call,unused-ignore]
+    dataloader = _make_dataloader()
     dataloader.set_basedir(str(basedir))
     templar = Templar(dataloader, variables=templatevars)
     return templar
