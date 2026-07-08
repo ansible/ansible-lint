@@ -32,6 +32,25 @@ def test_mock_roles_with_collection_name(tmp_path: Path) -> None:
     assert "was not found" not in result.stdout
 
 
+def test_mock_plain_name_roles_with_offline(tmp_path: Path) -> None:
+    """Test mock_roles with plain-name roles when --offline is used.
+
+    Regression test for https://github.com/ansible/ansible-lint/issues/5096
+    where plain-name roles (e.g. 'my_role') were not found during syntax
+    check when using --offline because cache_dir/roles was omitted from
+    ANSIBLE_ROLES_PATH.
+    """
+    (tmp_path / ".ansible-lint.yml").write_text(
+        "mock_roles:\n  - my_role\n"
+    )
+    (tmp_path / "playbook.yml").write_text(
+        "---\n- name: Test\n  hosts: localhost\n  roles:\n    - my_role\n"
+    )
+    result = run_ansible_lint("playbook.yml", cwd=tmp_path, offline=True)
+    assert "was not found" not in result.stdout
+    assert result.returncode == 0, result.stdout
+
+
 def test_add_collections_path_if_needed(tmp_path: Path) -> None:
     """Test _add_collections_path_if_needed helper."""
     from ansiblelint.app import _add_collections_path_if_needed
@@ -50,6 +69,28 @@ def test_add_collections_path_if_needed(tmp_path: Path) -> None:
     options.mock_roles = ["simple"]
     paths2: list[str] = []
     _add_collections_path_if_needed(options, paths2)
+    assert not paths2
+
+
+def test_add_roles_path_if_needed(tmp_path: Path) -> None:
+    """Test _add_roles_path_if_needed helper."""
+    from ansiblelint.app import _add_roles_path_if_needed
+
+    options = Options()
+    options.cache_dir = tmp_path
+    options.mock_roles = ["my_role"]
+    paths: list[str] = []
+
+    _add_roles_path_if_needed(options, paths)
+    assert str(tmp_path / "roles") in paths
+
+    _add_roles_path_if_needed(options, paths)
+    assert paths.count(str(tmp_path / "roles")) == 1
+
+    # Collection-style roles should not add the plain roles path
+    options.mock_roles = ["ns.coll.role"]
+    paths2: list[str] = []
+    _add_roles_path_if_needed(options, paths2)
     assert not paths2
 
 
