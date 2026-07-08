@@ -40,7 +40,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/play-argspec.json"
   },
   "playbook": {
-    "etag": "09d087fd7fe850790857de197c778bbce80ec360234e3240e2eff964f773aa8c",
+    "etag": "3a703ff75b757c2f62a9322ce67cd10f6d53e3c9b6d2a44c80f6c368b136ed3b",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/playbook.json"
   },
   "requirements": {
@@ -56,7 +56,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-rulebook/main/ansible_rulebook/schema/ruleset_schema.json"
   },
   "tasks": {
-    "etag": "0e94cba9067e983083040bd661515801b5b1d4fd5660019f34234bba7ec8de1a",
+    "etag": "d95fa51d1e73fa96d28ca009822e158c5cf38d5e0b2329938674da3b356a5cee",
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/tasks.json"
   },
   "vars": {
