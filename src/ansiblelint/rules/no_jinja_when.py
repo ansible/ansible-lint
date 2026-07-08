@@ -108,28 +108,32 @@ class NoFormattingInWhenRule(AnsibleLintRule, TransformMixin):
             match.fixed = changed
 
 
+def _fix_value(value: Any) -> Any:
+    """Apply _strip_redundant_jinja to a string or a list of strings."""
+    if isinstance(value, list):
+        return [
+            _strip_redundant_jinja(item) if isinstance(item, str) else item
+            for item in value
+        ]
+    if isinstance(value, str):
+        return _strip_redundant_jinja(value)
+    return value
+
+
 def transform_for_roles(v: list[Any], key_to_check: tuple[str, ...]) -> bool:
     """Additional transform logic in case of roles.
 
     Returns whether any value was actually changed.
     """
     changed = False
-    for idx, new_dict in enumerate(v):
+    for new_dict in v:
         for new_key, new_value in new_dict.items():
-            if new_key in key_to_check:
-                if isinstance(new_value, list):
-                    fixed_list = [
-                        _strip_redundant_jinja(item) if isinstance(item, str) else item
-                        for item in new_value
-                    ]
-                    if fixed_list != new_value:
-                        v[idx][new_key] = fixed_list
-                        changed = True
-                elif isinstance(new_value, str):
-                    fixed_str = _strip_redundant_jinja(new_value)
-                    if fixed_str != new_value:
-                        v[idx][new_key] = fixed_str
-                        changed = True
+            if new_key not in key_to_check:
+                continue
+            fixed_value = _fix_value(new_value)
+            if fixed_value != new_value:
+                new_dict[new_key] = fixed_value
+                changed = True
     return changed
 
 
