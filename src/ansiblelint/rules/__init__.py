@@ -629,6 +629,7 @@ def filter_rules_with_profile(
 ) -> None:
     """Unload rules that are not part of the specified profile."""
     included = set()
+    skipped = set()
     enabled = set(enable_list or [])
     extends = profile
     total_rules = len(rule_col)
@@ -636,6 +637,9 @@ def filter_rules_with_profile(
         for rule in PROFILES[extends]["rules"]:
             _logger.debug("Activating rule `%s` due to profile `%s`", rule, extends)
             included.add(rule)
+        for rule in PROFILES[extends].get("skip_list", []):
+            _logger.debug("Skipping rule `%s` due to profile `%s`", rule, extends)
+            skipped.add(rule)
         extends = PROFILES[extends].get("extends", None)
     for rule in rule_col.copy():
         if rule.unloadable:
@@ -645,6 +649,12 @@ def filter_rules_with_profile(
                 "Unloading %s rule due to not being part of %s profile.",
                 rule.id,
                 profile,
+            )
+            rule_col.remove(rule)
+        elif rule.id in skipped:
+            _logger.debug(
+                "Unloading %s rule due to profile skip_list.",
+                rule.id,
             )
             rule_col.remove(rule)
     _logger.debug("%s/%s rules included in the profile", len(rule_col), total_rules)
