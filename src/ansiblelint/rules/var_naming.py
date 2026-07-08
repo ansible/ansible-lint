@@ -293,15 +293,28 @@ class VariableNamingRule(AnsibleLintRule):
         # If the task registers a variable
         registered_var = task.get("register", None)
         if registered_var:
-            match_error = self.get_var_naming_matcherror(
-                registered_var,
-                prefix=role_prefix,
-                file=file or Lintable(""),
-            )
-            if match_error:
-                match_error.message += f" (register: {registered_var})"
-                match_error.lineno = task.line
-                results.append(match_error)
+            # Handle register projections (dict) by checking each key
+            if isinstance(registered_var, dict):
+                for reg_key in registered_var:
+                    match_error = self.get_var_naming_matcherror(
+                        reg_key,
+                        prefix=role_prefix,
+                        file=file or Lintable(""),
+                    )
+                    if match_error:
+                        match_error.message += f" (register: {reg_key})"
+                        match_error.lineno = task.line
+                        results.append(match_error)
+            else:
+                match_error = self.get_var_naming_matcherror(
+                    registered_var,
+                    prefix=role_prefix,
+                    file=file or Lintable(""),
+                )
+                if match_error:
+                    match_error.message += f" (register: {registered_var})"
+                    match_error.lineno = task.line
+                    results.append(match_error)
 
         return results
 
