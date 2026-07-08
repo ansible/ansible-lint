@@ -70,7 +70,7 @@ rpds-py==0.30.0 ; python_full_version < '3.11'
     # via
     #   jsonschema
     #   referencing
-rpds-py==2026.5.1 ; python_full_version >= '3.11'
+rpds-py==2026.6.3 ; python_full_version >= '3.11'
     # via
     #   jsonschema
     #   referencing
