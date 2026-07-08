@@ -20,16 +20,11 @@ RE_JINJA = re.compile(r"{{ (.*?) }}")
 RE_QUOTED_STRING = re.compile(r'"[^"]*"|\'[^\']*\'')
 
 
-def _is_whole_jinja_block(text: str) -> bool:
-    text = text.strip()
-    return text.startswith("{{") and text.endswith("}}") and text.count("{{") == 1
-
-
 def _strip_redundant_jinja(value: str) -> str:
     for quoted in RE_QUOTED_STRING.findall(value):
         inner = quoted[1:-1]
-        if "{{" in inner and not _is_whole_jinja_block(inner):
-            # {{ }} embedded in a quoted string, skip it
+        if "{{" in inner:
+            # {{ }} embedded in a quoted string changes meaning if stripped; skip it
             return value
     return RE_JINJA.sub(r"\1", value)
 
