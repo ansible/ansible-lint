@@ -19,3 +19,18 @@
     - role: hello
       when:
         - "'1' = '1'"
+- name: Four
+  hosts: all
+  tasks:
+    - name: Test when with jinja2 embedded in a larger expression # noqa: jinja[spacing]
+      ansible.builtin.debug:
+        msg: text
+      when: not installed_file.stat.exists or "version={{ expected_version }}" not in installed_file_content.stdout_lines
+
+- name: Five
+  hosts: all
+  tasks:
+    - name: Test when with two independent jinja2 expressions # noqa: jinja[spacing]
+      ansible.builtin.debug:
+        msg: text
+      when: "ansible_facts['os_family'] == 'Debian' or ansible_facts['os_family'] == 'RedHat'"

@@ -17,6 +17,21 @@ if TYPE_CHECKING:
     from ansiblelint.utils import Task
 
 RE_JINJA = re.compile(r"{{ (.*?) }}")
+RE_QUOTED_STRING = re.compile(r'"[^"]*"|\'[^\']*\'')
+
+
+def _is_whole_jinja_block(text: str) -> bool:
+    text = text.strip()
+    return text.startswith("{{") and text.endswith("}}") and text.count("{{") == 1
+
+
+def _strip_redundant_jinja(value: str) -> str:
+    for quoted in RE_QUOTED_STRING.findall(value):
+        inner = quoted[1:-1]
+        if "{{" in inner and not _is_whole_jinja_block(inner):
+            # {{ }} embedded in a quoted string, skip it
+            return value
+    return RE_JINJA.sub(r"\1", value)
 
 
 class NoFormattingInWhenRule(AnsibleLintRule, TransformMixin):
@@ -81,28 +96,46 @@ class NoFormattingInWhenRule(AnsibleLintRule, TransformMixin):
         if match.tag == self.id:
             task = self.seek(match.yaml_path, data)
             key_to_check = ("when", "changed_when", "failed_when")
+            changed = False
             for _ in range(len(task)):
                 if isinstance(task, MutableMapping):
                     for k, v in task.items():
                         if k == "roles" and isinstance(v, list):
-                            transform_for_roles(v, key_to_check=key_to_check)
-                        elif k in key_to_check:
-                            v = RE_JINJA.sub(r"\1", v)
-                            task[k] = v
-            match.fixed = True
+                            changed = (
+                                transform_for_roles(v, key_to_check=key_to_check)
+                                or changed
+                            )
+                        elif k in key_to_check and isinstance(v, str):
+                            new_v = _strip_redundant_jinja(v)
+                            if new_v != v:
+                                task[k] = new_v
+                                changed = True
+            match.fixed = changed
 
 
-def transform_for_roles(v: list[Any], key_to_check: tuple[str, ...]) -> None:
-    """Additional transform logic in case of roles."""
+def transform_for_roles(v: list[Any], key_to_check: tuple[str, ...]) -> bool:
+    """Additional transform logic in case of roles.
+
+    Returns whether any value was actually changed.
+    """
+    changed = False
     for idx, new_dict in enumerate(v):
         for new_key, new_value in new_dict.items():
             if new_key in key_to_check:
                 if isinstance(new_value, list):
-                    for index, nested_value in enumerate(new_value):
-                        new_value[index] = RE_JINJA.sub(r"\1", nested_value)
-                    v[idx][new_key] = new_value
-                if isinstance(new_value, str):
-                    v[idx][new_key] = RE_JINJA.sub(r"\1", new_value)
+                    fixed_list = [
+                        _strip_redundant_jinja(item) if isinstance(item, str) else item
+                        for item in new_value
+                    ]
+                    if fixed_list != new_value:
+                        v[idx][new_key] = fixed_list
+                        changed = True
+                elif isinstance(new_value, str):
+                    fixed_str = _strip_redundant_jinja(new_value)
+                    if fixed_str != new_value:
+                        v[idx][new_key] = fixed_str
+                        changed = True
+    return changed
 
 
 if "pytest" in sys.modules:

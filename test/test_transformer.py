@@ -130,7 +130,7 @@ def fixture_runner_result(
         ),
         pytest.param(
             "examples/playbooks/transform-no-jinja-when.yml",
-            3,
+            5,
             True,
             True,
             id="no_jinja_when",
