@@ -19,6 +19,7 @@
     - role: hello
       when:
         - "'1' = '1'"
+
 - name: Four
   hosts: all
   tasks:
