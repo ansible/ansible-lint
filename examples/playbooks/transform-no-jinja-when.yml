@@ -20,6 +20,7 @@
       when:
         - "{{ '1' = '1' }}"
 
+# Jinja is embedded inside a larger quoted string; stripping {{ }} would change the meaning, so skip.
 - name: Four
   hosts: all
   tasks:
@@ -28,6 +29,7 @@
         msg: text
       when: not "version={{ expected_version }}" in stdout
 
+# The quoted string is exactly a jinja block, but stripping it still changes meaning, so skip too.
 - name: Five
   hosts: all
   tasks:
