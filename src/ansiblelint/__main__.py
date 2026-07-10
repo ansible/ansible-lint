@@ -143,9 +143,11 @@ def initialize_options(arguments: list[str] | None = None) -> BaseFileLock | Non
         or options.list_rules
         or options.list_tags
     ):
+        is_isolated = not options.offline if "ANSIBLE_HOME" not in os.environ else False
+
         options.cache_dir = get_cache_dir(
             pathlib.Path(options.project_dir),
-            isolated=not options.offline,
+            isolated=is_isolated,
         )
 
     options.project_dir = Path(options.project_dir).resolve().as_posix()
