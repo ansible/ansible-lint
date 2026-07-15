@@ -293,15 +293,23 @@ class VariableNamingRule(AnsibleLintRule):
         # If the task registers a variable
         registered_var = task.get("register", None)
         if registered_var:
-            match_error = self.get_var_naming_matcherror(
-                registered_var,
-                prefix=role_prefix,
-                file=file or Lintable(""),
+            registered_vars = (
+                registered_var.keys()
+                if isinstance(registered_var, dict)
+                else (registered_var,)
             )
-            if match_error:
-                match_error.message += f" (register: {registered_var})"
-                match_error.lineno = task.line
-                results.append(match_error)
+            for key in registered_vars:
+                if isinstance(key, str) and key.startswith("__"):
+                    continue
+                match_error = self.get_var_naming_matcherror(
+                    key,
+                    prefix=role_prefix,
+                    file=file or Lintable(""),
+                )
+                if match_error:
+                    match_error.message += f" (register: {key})"
+                    match_error.lineno = task.line
+                    results.append(match_error)
 
         return results
 
@@ -490,6 +498,19 @@ if "pytest" in sys.modules:
         result = run_ansible_lint(role_path)
         assert result.returncode == RC.SUCCESS
         assert "var-naming" not in result.stdout
+
+    def test_var_naming_with_register_projection(
+        config_options: Options,
+        app: App,
+    ) -> None:
+        """Test with register projection syntax."""
+        rules = RulesCollection(app=app, options=config_options)
+        rules.register(VariableNamingRule())
+        results = Runner(
+            Lintable("test/schemas/test/playbooks/register_projection.yml"),
+            rules=rules,
+        ).run()
+        assert not results
 
     def test_var_naming_with_include_role_import_role() -> None:
         """Test with include role and import role."""
