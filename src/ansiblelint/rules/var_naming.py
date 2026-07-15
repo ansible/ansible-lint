@@ -503,7 +503,7 @@ if "pytest" in sys.modules:
         config_options: Options,
         app: App,
     ) -> None:
-        """Test with register projection syntax."""
+        """Test register projection variable names."""
         rules = RulesCollection(app=app, options=config_options)
         rules.register(VariableNamingRule())
         results = Runner(
