@@ -732,6 +732,17 @@ def test_remove_task_internal_keys_nested_lists() -> None:
     assert "__line__" not in inner["ansible.builtin.debug"]
     assert cleaned["block"][1] == "not-a-mapping"
 
+    # Call the extracted helpers directly so coverage maps to the new symbols.
+    nested = {
+        "block": [{"__line__": 1, "debug": {"msg": "x"}}],
+        "__file__": "x.yml",
+    }
+    utils._strip_internal_keys_from_mapping(nested)  # noqa: SLF001
+    assert "__file__" not in nested
+    assert "__line__" not in nested["block"][0]
+    utils._strip_internal_keys_from_value([{"__line__": 2}, "skip"])  # noqa: SLF001
+    assert utils._remove_task_internal_keys({"__line__": 3}) == {}  # noqa: SLF001
+
 
 def test_set_normalized_action_copies_line() -> None:
     """Normalized action should preserve __line__ from the raw task module map."""

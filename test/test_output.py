@@ -25,3 +25,5 @@ def test_console_render_unknown_tag_preserves_raw() -> None:
     rendered = plain.render("[unknown]x[/] [bold]y[/]")
     assert "[unknown]x" in rendered
     assert "y" in rendered
+    # Force PlainStyle mapping paths (uncolored) including notset/failed/success.
+    assert "plain" in plain.render("[notset]plain[/] [failed]f[/] [success]s[/]")

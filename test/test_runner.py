@@ -316,19 +316,36 @@ def test_build_load_failure_match_empty_args(
     """Empty exception args and missing exc must be handled safely."""
     from yaml.scanner import ScannerError
 
+    from ansiblelint.constants import States
+
     runner = Runner(
         "examples/playbooks/become.yml",
         rules=default_rules_collection,
     )
     lintable = Lintable("broken.yml", content=":")
-    lintable.exc = Exception()
+    lintable.exc = Exception("boom")
     cause = ScannerError("while scanning", None, "problem", None)
     lintable.exc.__cause__ = cause
 
     match = runner._build_load_failure_match(lintable)  # noqa: SLF001
     assert match.rule.id == "load-failure"
     assert match.tag.startswith("load-failure[")
+    assert match.message == "boom"
 
     lintable.exc = None
     with pytest.raises(RuntimeError, match=r"Expected lintable\.exc"):
         runner._build_load_failure_match(lintable)  # noqa: SLF001
+
+    lintable.state = States.LOAD_FAILED
+    lintable.exc = Exception("still broken")
+    matches: list[Any] = []
+    assert runner._process_load_error_lintable(lintable, matches) is False  # noqa: SLF001
+    assert len(matches) == 1
+    assert lintable.stop_processing is True
+
+    assert (
+        runner._is_lintable_excluded_by_paths(  # noqa: SLF001
+            Lintable("examples/playbooks/become.yml"),
+        )
+        is False
+    )

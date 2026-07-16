@@ -159,6 +159,33 @@ def test_version_cache_helpers(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
     )
 
 
+def test_fetch_latest_release_writes_cache(
+    tmp_path: Path,
+    mocker: MockerFixture,
+) -> None:
+    """Successful GitHub release fetch should persist JSON cache."""
+    from io import BytesIO
+    from urllib.error import URLError
+
+    from ansiblelint import config
+
+    payload = b'{"html_url": "https://example.invalid", "tag_name": "v2.0.0"}'
+    mocker.patch(
+        "ansiblelint.config.urllib.request.urlopen",
+        return_value=BytesIO(payload),
+    )
+    cache_file = tmp_path / "latest.json"
+    data = config._fetch_latest_release(str(cache_file))  # noqa: SLF001
+    assert data["tag_name"] == "v2.0.0"
+    assert cache_file.is_file()
+
+    mocker.patch(
+        "ansiblelint.config.urllib.request.urlopen",
+        side_effect=URLError("offline"),
+    )
+    assert config._fetch_latest_release(str(tmp_path / "fail.json")) == {}  # noqa: SLF001
+
+
 @pytest.mark.parametrize(
     ("offline", "cache_created"),
     (
