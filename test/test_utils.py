@@ -762,3 +762,66 @@ def test_set_normalized_action_copies_line() -> None:
     )
     assert result["action"]["__ansible_module__"] == "debug"
     assert result["action"]["__line__"] == 9
+
+    with pytest.raises(TypeError, match="Task actions can only be strings"):
+        utils._set_normalized_action(result, 123, {}, task)  # type: ignore[arg-type]  # noqa: SLF001
+
+
+def test_parser_error_helpers_cover_extracted_branches(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Cover parser-error helpers extracted for Sonar complexity limits."""
+    from ansible.errors import AnsibleParserError
+
+    from ansiblelint.errors import MatchError
+
+    raw_with_line = {"name": "x", "__line__": 7}
+    exc_with_coords = AnsibleParserError("failed at line 9, column 4")
+    assert utils._parser_error_line_column(exc_with_coords, raw_with_line) == (  # noqa: SLF001
+        7,
+        None,
+    )
+
+    # Avoid ansible Origin tagging quirks on plain dicts; force the regex/fallback paths.
+    from ansiblelint import yaml_utils
+
+    monkeypatch.setattr(yaml_utils, "get_line_column", lambda *_a, **_k: (0, None))
+    exc_regex_only = AnsibleParserError("failed at line 9, column 4")
+    assert utils._parser_error_line_column(exc_regex_only, {"name": "x"}) == (  # noqa: SLF001
+        9,
+        4,
+    )
+    assert utils._parser_error_line_column(  # noqa: SLF001
+        AnsibleParserError("no coordinates"),
+        {"name": "x"},
+    ) == (0, 0)
+
+    task = utils.Task({"name": "broken"}, filename="tasks.yml")
+    with pytest.raises(MatchError, match="unexpected parse failure"):
+        utils._handle_parser_error(  # noqa: SLF001
+            AnsibleParserError("unexpected parse failure"),
+            task.raw_task,
+            {"name": "broken"},
+            task,
+        )
+
+    action, result = utils._handle_parser_error(  # noqa: SLF001
+        AnsibleParserError(
+            "Complex args containing variables cannot use bare variables: foo",
+        ),
+        task.raw_task,
+        {"action": "debug", "name": "broken"},
+        task,
+    )
+    assert action == "debug"
+    assert result["action"] == "debug"
+
+    with pytest.raises(NotImplementedError, match="Unable to normalize task"):
+        utils._handle_parser_error(  # noqa: SLF001
+            AnsibleParserError(
+                "Complex args containing variables cannot use bare variables: foo",
+            ),
+            task.raw_task,
+            {"name": "broken"},
+            task,
+        )
