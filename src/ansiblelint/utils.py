@@ -786,21 +786,33 @@ def _get_task_handler_children_for_tasks_or_playbooks(
     raise LookupError(msg)
 
 
+_TASK_INTERNAL_KEYS = (SKIPPED_RULES_KEY, FILENAME_KEY, LINE_NUMBER_KEY)
+
+
+def _strip_internal_keys_from_mapping(obj: MutableMapping[str, Any]) -> None:
+    """Remove ansible-lint internal keys from a mapping and nested values."""
+    for key in _TASK_INTERNAL_KEYS:
+        obj.pop(key, None)
+    for value in obj.values():
+        _strip_internal_keys_from_value(value)
+
+
+def _strip_internal_keys_from_value(value: Any) -> None:
+    """Recurse into nested mappings/lists while stripping internal keys."""
+    if isinstance(value, MutableMapping):
+        _strip_internal_keys_from_mapping(value)
+    elif isinstance(value, list):
+        for item in value:
+            if isinstance(item, MutableMapping):
+                _strip_internal_keys_from_mapping(item)
+
+
 def _remove_task_internal_keys(
     obj: MutableMapping[str, Any],
 ) -> MutableMapping[str, Any]:
     """Recursively remove internally used keys from a nested dictionary."""
     if isinstance(obj, MutableMapping):
-        for key in [SKIPPED_RULES_KEY, FILENAME_KEY, LINE_NUMBER_KEY]:
-            if key in obj:
-                del obj[key]
-        for value in obj.values():
-            if isinstance(value, MutableMapping):
-                _remove_task_internal_keys(value)
-            elif isinstance(value, list):
-                for item in value:
-                    if isinstance(item, MutableMapping):
-                        _remove_task_internal_keys(item)
+        _strip_internal_keys_from_mapping(obj)
     return obj
 
 

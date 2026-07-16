@@ -183,10 +183,11 @@ def _append_skipped_rules_to_tasks(  # type: ignore[no-any-unimported]
     pyyaml_data: AnsibleBaseYAMLObject,
     ruamel_data: Any,
     lintable: Lintable,
-) -> AnsibleBaseYAMLObject:
+) -> None:
+    """Mutate ``pyyaml_data`` in place by attaching skipped rules to tasks."""
     blocks_pair = _get_task_blocks_pair(pyyaml_data, ruamel_data, lintable)
     if blocks_pair is None:
-        return pyyaml_data
+        return
 
     pyyaml_task_blocks, ruamel_task_blocks = blocks_pair
     pyyaml_tasks = _get_tasks_from_blocks(pyyaml_task_blocks)
@@ -204,7 +205,6 @@ def _append_skipped_rules_to_tasks(  # type: ignore[no-any-unimported]
             ruamel_task,
             lintable,
         )
-    return pyyaml_data
 
 
 def _append_skipped_rules(  # type: ignore[no-any-unimported]
@@ -236,7 +236,8 @@ def _append_skipped_rules(  # type: ignore[no-any-unimported]
         return _apply_skipped_rules_to_metadata(pyyaml_data, skipped_rules, lintable)
 
     if lintable.kind in ("tasks", "handlers", "playbook"):
-        return _append_skipped_rules_to_tasks(pyyaml_data, ruamel_data, lintable)
+        _append_skipped_rules_to_tasks(pyyaml_data, ruamel_data, lintable)
+        return pyyaml_data
 
     # For unsupported file types, we return empty skip lists
     return None
