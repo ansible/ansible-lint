@@ -797,18 +797,20 @@ def test_parser_error_helpers_cover_extracted_branches(
     ) == (0, 0)
 
     task = utils.Task({"name": "broken"}, filename="tasks.yml")
+    unexpected_exc = AnsibleParserError("unexpected parse failure")
     with pytest.raises(MatchError, match="unexpected parse failure"):
         utils._handle_parser_error(  # noqa: SLF001
-            AnsibleParserError("unexpected parse failure"),
+            unexpected_exc,
             task.raw_task,
             {"name": "broken"},
             task,
         )
 
+    bare_var_exc = AnsibleParserError(
+        "Complex args containing variables cannot use bare variables: foo",
+    )
     action, result = utils._handle_parser_error(  # noqa: SLF001
-        AnsibleParserError(
-            "Complex args containing variables cannot use bare variables: foo",
-        ),
+        bare_var_exc,
         task.raw_task,
         {"action": "debug", "name": "broken"},
         task,
@@ -818,9 +820,7 @@ def test_parser_error_helpers_cover_extracted_branches(
 
     with pytest.raises(NotImplementedError, match="Unable to normalize task"):
         utils._handle_parser_error(  # noqa: SLF001
-            AnsibleParserError(
-                "Complex args containing variables cannot use bare variables: foo",
-            ),
+            bare_var_exc,
             task.raw_task,
             {"name": "broken"},
             task,
