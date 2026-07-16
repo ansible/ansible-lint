@@ -701,3 +701,127 @@ def test_get_task_handler_children_climbing(tmp_path: Path) -> None:
         )
 
         assert child.path.resolve() == imported_task.resolve()
+
+
+def test_remove_task_internal_keys_nested_lists() -> None:
+    """Internal keys nested inside lists must be stripped during sanitization."""
+    task = {
+        "name": "nested",
+        "block": [
+            {
+                "name": "inner",
+                "__line__": 2,
+                "__file__": "tasks.yml",
+                "__skipped_rules__": ["fqcn"],
+                "ansible.builtin.debug": {"msg": "hi", "__line__": 3},
+            },
+            "not-a-mapping",
+        ],
+        "__line__": 1,
+        "__file__": "tasks.yml",
+    }
+
+    cleaned = utils._sanitize_task(task)  # noqa: SLF001
+
+    assert "__line__" not in cleaned
+    assert "__file__" not in cleaned
+    inner = cleaned["block"][0]
+    assert "__line__" not in inner
+    assert "__file__" not in inner
+    assert "__skipped_rules__" not in inner
+    assert "__line__" not in inner["ansible.builtin.debug"]
+    assert cleaned["block"][1] == "not-a-mapping"
+
+    # Call the extracted helpers directly so coverage maps to the new symbols.
+    nested = {
+        "block": [{"__line__": 1, "debug": {"msg": "x"}}],
+        "__file__": "x.yml",
+    }
+    utils._strip_internal_keys_from_mapping(nested)  # noqa: SLF001
+    assert "__file__" not in nested
+    assert "__line__" not in nested["block"][0]
+    utils._strip_internal_keys_from_value([{"__line__": 2}, "skip"])  # noqa: SLF001
+    assert utils._remove_task_internal_keys({"__line__": 3}) == {}  # noqa: SLF001
+
+
+def test_set_normalized_action_copies_line() -> None:
+    """Normalized action should preserve __line__ from the raw task module map."""
+    task = utils.Task(
+        {
+            "name": "copy line",
+            "ansible.builtin.debug": {"msg": "x", "__line__": 9},
+        },
+        filename="tasks.yml",
+    )
+    result: dict[str, Any] = {}
+    utils._set_normalized_action(  # noqa: SLF001
+        result,
+        "ansible.builtin.debug",
+        {"msg": "x"},
+        task,
+    )
+    assert result["action"]["__ansible_module__"] == "debug"
+    assert result["action"]["__line__"] == 9
+
+    with pytest.raises(TypeError, match="Task actions can only be strings"):
+        utils._set_normalized_action(result, 123, {}, task)  # type: ignore[arg-type]  # noqa: SLF001
+
+
+def test_parser_error_helpers_cover_extracted_branches(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Cover parser-error helpers extracted for Sonar complexity limits."""
+    from ansible.errors import AnsibleParserError
+
+    from ansiblelint.errors import MatchError
+
+    raw_with_line = {"name": "x", "__line__": 7}
+    exc_with_coords = AnsibleParserError("failed at line 9, column 4")
+    assert utils._parser_error_line_column(exc_with_coords, raw_with_line) == (  # noqa: SLF001
+        7,
+        None,
+    )
+
+    # Avoid ansible Origin tagging quirks on plain dicts; force the regex/fallback paths.
+    from ansiblelint import yaml_utils
+
+    monkeypatch.setattr(yaml_utils, "get_line_column", lambda *_a, **_k: (0, None))
+    exc_regex_only = AnsibleParserError("failed at line 9, column 4")
+    assert utils._parser_error_line_column(exc_regex_only, {"name": "x"}) == (  # noqa: SLF001
+        9,
+        4,
+    )
+    assert utils._parser_error_line_column(  # noqa: SLF001
+        AnsibleParserError("no coordinates"),
+        {"name": "x"},
+    ) == (0, 0)
+
+    task = utils.Task({"name": "broken"}, filename="tasks.yml")
+    unexpected_exc = AnsibleParserError("unexpected parse failure")
+    with pytest.raises(MatchError, match="unexpected parse failure"):
+        utils._handle_parser_error(  # noqa: SLF001
+            unexpected_exc,
+            task.raw_task,
+            {"name": "broken"},
+            task,
+        )
+
+    bare_var_exc = AnsibleParserError(
+        "Complex args containing variables cannot use bare variables: foo",
+    )
+    action, result = utils._handle_parser_error(  # noqa: SLF001
+        bare_var_exc,
+        task.raw_task,
+        {"action": "debug", "name": "broken"},
+        task,
+    )
+    assert action == "debug"
+    assert result["action"] == "debug"
+
+    with pytest.raises(NotImplementedError, match="Unable to normalize task"):
+        utils._handle_parser_error(  # noqa: SLF001
+            bare_var_exc,
+            task.raw_task,
+            {"name": "broken"},
+            task,
+        )

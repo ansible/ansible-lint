@@ -107,10 +107,7 @@ def test_get_version_warning_no_pip(mocker: MockerFixture) -> None:
 def test_get_version_warning_remote_disconnect(mocker: MockerFixture) -> None:
     """Test that we can handle remote disconnect when fetching release url."""
     mocker.patch("urllib.request.urlopen", side_effect=RemoteDisconnected)
-    try:
-        get_version_warning()
-    except RemoteDisconnected:
-        pytest.fail("Failed to handle a remote disconnect")
+    get_version_warning()
 
 
 def test_get_version_warning_offline(mocker: MockerFixture) -> None:
@@ -120,6 +117,73 @@ def test_get_version_warning_offline(mocker: MockerFixture) -> None:
         mocker.patch("ansiblelint.config.CACHE_DIR", Path(temporary_directory))
         options.offline = True
         assert get_version_warning() == ""  # noqa: PLC1901
+
+
+def test_version_cache_helpers(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Exercise version-cache helper branches used by get_version_warning."""
+    from packaging.version import Version
+
+    from ansiblelint import config
+
+    missing = str(tmp_path / "missing.json")
+    assert config._version_cache_needs_refresh(missing) is True  # noqa: SLF001
+
+    cache_file = tmp_path / "latest.json"
+    cache_file.write_text(
+        '{"html_url": "https://example.invalid", "tag_name": "v9.9.9"}',
+        encoding="utf-8",
+    )
+    assert config._version_cache_needs_refresh(str(cache_file)) is False  # noqa: SLF001
+
+    monkeypatch.setattr(os.path, "getmtime", lambda _path: time.time() - 25 * 60 * 60)
+    assert config._version_cache_needs_refresh(str(cache_file)) is True  # noqa: SLF001
+
+    data = config._load_version_cache(str(cache_file))  # noqa: SLF001
+    assert data["tag_name"] == "v9.9.9"
+
+    assert not config._format_version_upgrade_message(Version("1.0.0"), {}, "pip")  # noqa: SLF001
+    assert "pre-release" in config._format_version_upgrade_message(  # noqa: SLF001
+        Version("99.0.0"),
+        data,
+        "pip",
+    )
+    assert "new release" in config._format_version_upgrade_message(  # noqa: SLF001
+        Version("1.0.0"),
+        data,
+        "pip",
+    )
+    assert not config._format_version_upgrade_message(  # noqa: SLF001
+        Version("9.9.9"),
+        data,
+        "pip",
+    )
+
+
+def test_fetch_latest_release_writes_cache(
+    tmp_path: Path,
+    mocker: MockerFixture,
+) -> None:
+    """Successful GitHub release fetch should persist JSON cache."""
+    from io import BytesIO
+    from urllib.error import URLError
+
+    from ansiblelint import config
+
+    payload = b'{"html_url": "https://example.invalid", "tag_name": "v2.0.0"}'
+    mocker.patch(
+        "ansiblelint.config.urllib.request.urlopen",
+        return_value=BytesIO(payload),
+    )
+    cache_file = tmp_path / "latest.json"
+    data = config._fetch_latest_release(str(cache_file))  # noqa: SLF001
+    assert data["tag_name"] == "v2.0.0"
+    assert cache_file.is_file()
+
+    mocker.patch(
+        "ansiblelint.config.urllib.request.urlopen",
+        side_effect=URLError("offline"),
+    )
+    assert config._fetch_latest_release(str(tmp_path / "fail.json")) == {}  # noqa: SLF001
 
 
 @pytest.mark.parametrize(

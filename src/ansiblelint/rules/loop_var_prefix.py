@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import re
 import sys
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 from ansiblelint.config import LOOP_VAR_PREFIX, options
 from ansiblelint.rules import AnsibleLintRule
@@ -14,6 +17,15 @@ if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
     from ansiblelint.utils import Task
+
+
+def _detect_loop_in_task(raw_task: Mapping[str, Any]) -> tuple[bool, Any]:
+    if "loop" in raw_task:
+        return True, raw_task["loop"]
+    for key in raw_task:
+        if key.startswith("with_"):
+            return True, key
+    return False, None
 
 
 class RoleLoopVarPrefix(AnsibleLintRule):
@@ -37,6 +49,32 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
     }
     version_changed = "6.7.0"
 
+    def _loop_var_prefix_matches(
+        self,
+        file: Lintable,
+        loop_var: str,
+        data: Any,
+    ) -> list[MatchError]:
+        if loop_var:
+            if not self.prefix.match(loop_var):
+                return [
+                    self.create_matcherror(
+                        message=f"Loop variable name does not match /{options.loop_var_prefix}/ regex, where role={toidentifier(file.role)}.",
+                        filename=file,
+                        data=loop_var,
+                        tag="loop-var-prefix[wrong]",
+                    ),
+                ]
+            return []
+        return [
+            self.create_matcherror(
+                message=f"Replace unsafe implicit `item` loop variable by adding a `loop_var` that is matching /{options.loop_var_prefix}/ regex.",
+                filename=file,
+                data=data,
+                tag="loop-var-prefix[missing]",
+            ),
+        ]
+
     def matchtask(
         self,
         task: Task,
@@ -49,42 +87,13 @@ Looping inside roles has the risk of clashing with loops from user-playbooks.\
         self.prefix = re.compile(
             options.loop_var_prefix.format(role=toidentifier(file.role)),
         )
-        has_loop = False
-        if "loop" in task.raw_task:
-            data = task.raw_task["loop"]
-            has_loop = True
-        else:
-            for key in task.raw_task:
-                if key.startswith("with_"):
-                    data = key
-                    has_loop = True
-                    break
+        has_loop, data = _detect_loop_in_task(task.raw_task)
+        if not has_loop:
+            return []
 
-        if has_loop:
-            loop_control = task.raw_task.get("loop_control", {})
-            loop_var = loop_control.get("loop_var", "")
-
-            if loop_var:
-                if not self.prefix.match(loop_var):
-                    return [
-                        self.create_matcherror(
-                            message=f"Loop variable name does not match /{options.loop_var_prefix}/ regex, where role={toidentifier(file.role)}.",
-                            filename=file,
-                            data=loop_var,
-                            tag="loop-var-prefix[wrong]",
-                        ),
-                    ]
-            else:
-                return [
-                    self.create_matcherror(
-                        message=f"Replace unsafe implicit `item` loop variable by adding a `loop_var` that is matching /{options.loop_var_prefix}/ regex.",
-                        filename=file,
-                        data=data,
-                        tag="loop-var-prefix[missing]",
-                    ),
-                ]
-
-        return []
+        loop_control = task.raw_task.get("loop_control", {})
+        loop_var = loop_control.get("loop_var", "")
+        return self._loop_var_prefix_matches(file, loop_var, data)
 
 
 # testing code to be loaded only with pytest or when executed the rule file

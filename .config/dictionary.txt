@@ -6,6 +6,7 @@ FQCNs
 Fimport
 LIBYAML
 LINEINFILE
+LINTABLE
 Lineinfile
 Lintable
 MYSQLD
