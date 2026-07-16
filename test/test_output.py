@@ -30,7 +30,7 @@ def test_console_render_unknown_tag_preserves_raw() -> None:
     assert "plain" in plain.render("[notset]plain[/] [failed]f[/] [success]s[/]")
 
 
-def test_bbcode_helper_edge_cases() -> None:
+def test_bb_helper_edge_cases() -> None:
     """Cover param substitution, empty close, and stack flush branches."""
     mapping = {"bold": ("<b param={param}>", "</b>"), "info": ("<i>", "</i>")}
     stack: list[tuple[str, str | None]] = []
