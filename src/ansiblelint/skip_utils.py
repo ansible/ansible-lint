@@ -145,7 +145,7 @@ def load_data(file_text: str) -> Any:
         return yaml.load_all(file_text)
 
 
-def _apply_skipped_rules_to_metadata(
+def _apply_skipped_rules_to_metadata(  # type: ignore[no-any-unimported]
     pyyaml_data: AnsibleBaseYAMLObject,
     skipped_rules: Sequence[Any],
     _lintable: Lintable,
@@ -161,7 +161,7 @@ def _apply_skipped_rules_to_metadata(
     return pyyaml_data
 
 
-def _get_task_blocks_pair(
+def _get_task_blocks_pair(  # type: ignore[no-any-unimported]
     pyyaml_data: AnsibleBaseYAMLObject,
     ruamel_data: Any,
     lintable: Lintable,
@@ -179,7 +179,7 @@ def _get_task_blocks_pair(
         return None
 
 
-def _append_skipped_rules_to_tasks(
+def _append_skipped_rules_to_tasks(  # type: ignore[no-any-unimported]
     pyyaml_data: AnsibleBaseYAMLObject,
     ruamel_data: Any,
     lintable: Lintable,

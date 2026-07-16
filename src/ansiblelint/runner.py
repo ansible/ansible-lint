@@ -225,35 +225,37 @@ class Runner:
         )
 
     def _build_load_failure_match(self, lintable: Lintable) -> MatchError:
+        exc = lintable.exc
+        if exc is None:
+            msg = "Expected lintable.exc to be set for load-failure"
+            raise RuntimeError(msg)
+
         line = 1
         column = None
         detail = ""
         sub_tag = ""
         message = None
-        if lintable.exc.__cause__ and isinstance(
-            lintable.exc.__cause__,
+        cause = exc.__cause__
+        if cause and isinstance(
+            cause,
             ScannerError | ParserError | RuamelParserError,
         ):
             sub_tag = "yaml"
-            if isinstance(lintable.exc.args, tuple):
-                message = lintable.exc.args[0]
-            detail = (
-                str(lintable.exc.__cause__.problem)
-                if lintable.exc.__cause__.problem
-                else ""
-            )
-            if lintable.exc.__cause__.problem_mark:
-                line = lintable.exc.__cause__.problem_mark.line + 1
-                column = lintable.exc.__cause__.problem_mark.column + 1
+            if isinstance(exc.args, tuple):
+                message = exc.args[0]
+            detail = str(cause.problem) if cause.problem else ""
+            if cause.problem_mark:
+                line = cause.problem_mark.line + 1
+                column = cause.problem_mark.column + 1
 
         return MatchError(
             lintable=lintable,
-            message=message or str(lintable.exc),
-            details=detail or str(lintable.exc.__cause__),
+            message=message or str(exc),
+            details=detail or str(cause),
             rule=self.rules["load-failure"],
             lineno=line,
             column=column,
-            tag=f"load-failure[{sub_tag or lintable.exc.__class__.__name__.lower()}]",
+            tag=f"load-failure[{sub_tag or exc.__class__.__name__.lower()}]",
         )
 
     def _process_load_error_lintable(
