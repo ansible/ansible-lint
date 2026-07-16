@@ -330,5 +330,5 @@ def test_build_load_failure_match_empty_args(
     assert match.tag.startswith("load-failure[")
 
     lintable.exc = None
-    with pytest.raises(RuntimeError, match="Expected lintable.exc"):
+    with pytest.raises(RuntimeError, match=r"Expected lintable\.exc"):
         runner._build_load_failure_match(lintable)  # noqa: SLF001

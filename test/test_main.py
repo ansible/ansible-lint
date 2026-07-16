@@ -141,7 +141,7 @@ def test_version_cache_helpers(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
     data = config._load_version_cache(str(cache_file))  # noqa: SLF001
     assert data["tag_name"] == "v9.9.9"
 
-    assert config._format_version_upgrade_message(Version("1.0.0"), {}, "pip") == ""  # noqa: SLF001
+    assert not config._format_version_upgrade_message(Version("1.0.0"), {}, "pip")  # noqa: SLF001
     assert "pre-release" in config._format_version_upgrade_message(  # noqa: SLF001
         Version("99.0.0"),
         data,
@@ -152,9 +152,10 @@ def test_version_cache_helpers(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
         data,
         "pip",
     )
-    assert (
-        config._format_version_upgrade_message(Version("9.9.9"), data, "pip")  # noqa: SLF001
-        == ""
+    assert not config._format_version_upgrade_message(  # noqa: SLF001
+        Version("9.9.9"),
+        data,
+        "pip",
     )
 
 
