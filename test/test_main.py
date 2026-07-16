@@ -119,6 +119,45 @@ def test_get_version_warning_offline(mocker: MockerFixture) -> None:
         assert get_version_warning() == ""  # noqa: PLC1901
 
 
+def test_version_cache_helpers(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Exercise version-cache helper branches used by get_version_warning."""
+    from packaging.version import Version
+
+    from ansiblelint import config
+
+    missing = str(tmp_path / "missing.json")
+    assert config._version_cache_needs_refresh(missing) is True  # noqa: SLF001
+
+    cache_file = tmp_path / "latest.json"
+    cache_file.write_text(
+        '{"html_url": "https://example.invalid", "tag_name": "v9.9.9"}',
+        encoding="utf-8",
+    )
+    assert config._version_cache_needs_refresh(str(cache_file)) is False  # noqa: SLF001
+
+    monkeypatch.setattr(os.path, "getmtime", lambda _path: time.time() - 25 * 60 * 60)
+    assert config._version_cache_needs_refresh(str(cache_file)) is True  # noqa: SLF001
+
+    data = config._load_version_cache(str(cache_file))  # noqa: SLF001
+    assert data["tag_name"] == "v9.9.9"
+
+    assert config._format_version_upgrade_message(Version("1.0.0"), {}, "pip") == ""  # noqa: SLF001
+    assert "pre-release" in config._format_version_upgrade_message(  # noqa: SLF001
+        Version("99.0.0"),
+        data,
+        "pip",
+    )
+    assert "new release" in config._format_version_upgrade_message(  # noqa: SLF001
+        Version("1.0.0"),
+        data,
+        "pip",
+    )
+    assert (
+        config._format_version_upgrade_message(Version("9.9.9"), data, "pip")  # noqa: SLF001
+        == ""
+    )
+
+
 @pytest.mark.parametrize(
     ("offline", "cache_created"),
     (

@@ -138,3 +138,18 @@ if "pytest" in sys.modules:
         bad_runner = Runner(failure, rules=empty_rule_collection)
         errs = bad_runner.run()
         assert len(errs) == 3
+
+    def test_transform_when_value_preserves_non_strings() -> None:
+        """Autofix must leave non-string when list items untouched."""
+        assert _transform_when_value([True, "{{ foo }}", 1]) == [True, "foo", 1]
+        assert _transform_when_value(True) is True
+
+    def test_transform_for_roles_skips_shorthand_strings() -> None:
+        """Shorthand role strings must not break transform iteration."""
+        roles: list[Any] = [
+            "geerlingguy.nginx",
+            {"role": "demo", "when": "{{ bar }}"},
+        ]
+        transform_for_roles(roles, key_to_check=_WHEN_KEYS)
+        assert roles[0] == "geerlingguy.nginx"
+        assert roles[1]["when"] == "bar"

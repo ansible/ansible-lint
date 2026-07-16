@@ -44,12 +44,20 @@ PLAYBOOK_WITH_NOQA = """\
     (
         pytest.param("foo # noqa: bar", "bar", id="0"),
         pytest.param("foo # noqa bar", "bar", id="1"),
+        pytest.param("  # noqa", [], id="bare"),
     ),
 )
-def test_get_rule_skips_from_line(line: str, expected: str) -> None:
+def test_get_rule_skips_from_line(line: str, expected: str | list[str]) -> None:
     """Validate get_rule_skips_from_line."""
+    from ansiblelint import skip_utils
+
     v = get_rule_skips_from_line(line, lintable=Lintable(""))
-    assert v == [expected]
+    if expected == []:
+        assert v == []
+        assert skip_utils._noqa_comment_line_re.fullmatch(line)  # noqa: SLF001
+        assert skip_utils._noqa_comment_re.match(line)  # noqa: SLF001
+    else:
+        assert v == [expected]
 
 
 def test_playbook_noqa(default_text_runner: RunFromText) -> None:

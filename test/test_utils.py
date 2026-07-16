@@ -701,3 +701,53 @@ def test_get_task_handler_children_climbing(tmp_path: Path) -> None:
         )
 
         assert child.path.resolve() == imported_task.resolve()
+
+
+def test_remove_task_internal_keys_nested_lists() -> None:
+    """Internal keys nested inside lists must be stripped during sanitization."""
+    task = {
+        "name": "nested",
+        "block": [
+            {
+                "name": "inner",
+                "__line__": 2,
+                "__file__": "tasks.yml",
+                "__skipped_rules__": ["fqcn"],
+                "ansible.builtin.debug": {"msg": "hi", "__line__": 3},
+            },
+            "not-a-mapping",
+        ],
+        "__line__": 1,
+        "__file__": "tasks.yml",
+    }
+
+    cleaned = utils._sanitize_task(task)  # noqa: SLF001
+
+    assert "__line__" not in cleaned
+    assert "__file__" not in cleaned
+    inner = cleaned["block"][0]
+    assert "__line__" not in inner
+    assert "__file__" not in inner
+    assert "__skipped_rules__" not in inner
+    assert "__line__" not in inner["ansible.builtin.debug"]
+    assert cleaned["block"][1] == "not-a-mapping"
+
+
+def test_set_normalized_action_copies_line() -> None:
+    """Normalized action should preserve __line__ from the raw task module map."""
+    task = utils.Task(
+        {
+            "name": "copy line",
+            "ansible.builtin.debug": {"msg": "x", "__line__": 9},
+        },
+        filename="tasks.yml",
+    )
+    result: dict[str, Any] = {}
+    utils._set_normalized_action(  # noqa: SLF001
+        result,
+        "ansible.builtin.debug",
+        {"msg": "x"},
+        task,
+    )
+    assert result["action"]["__ansible_module__"] == "debug"
+    assert result["action"]["__line__"] == 9

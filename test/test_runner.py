@@ -308,3 +308,27 @@ def test_with_full_path(default_rules_collection: RulesCollection) -> None:
     result = runner.run()
     assert len(result) == 1
     assert result[0].tag == "name[casing]"
+
+
+def test_build_load_failure_match_empty_args(
+    default_rules_collection: RulesCollection,
+) -> None:
+    """Empty exception args and missing exc must be handled safely."""
+    from yaml.scanner import ScannerError
+
+    runner = Runner(
+        "examples/playbooks/become.yml",
+        rules=default_rules_collection,
+    )
+    lintable = Lintable("broken.yml", content=":")
+    lintable.exc = Exception()
+    cause = ScannerError("while scanning", None, "problem", None)
+    lintable.exc.__cause__ = cause
+
+    match = runner._build_load_failure_match(lintable)  # noqa: SLF001
+    assert match.rule.id == "load-failure"
+    assert match.tag.startswith("load-failure[")
+
+    lintable.exc = None
+    with pytest.raises(RuntimeError, match="Expected lintable.exc"):
+        runner._build_load_failure_match(lintable)  # noqa: SLF001

@@ -602,6 +602,23 @@ def test_kind_from_path_outside_project_root(tmp_path: Path) -> None:
     assert kind == "yaml"
 
 
+def test_get_project_root_for_dir_is_cached(tmp_path: Path) -> None:
+    """Project-root discovery helper should return a stable cached Path."""
+    from ansiblelint import file_utils
+
+    project = tmp_path / "proj"
+    project.mkdir()
+    (project / ".git").mkdir()
+    nested = project / "roles" / "demo"
+    nested.mkdir(parents=True)
+
+    file_utils._get_project_root_for_dir.cache_clear()  # noqa: SLF001
+    first = file_utils._get_project_root_for_dir(str(nested.resolve()))  # noqa: SLF001
+    second = file_utils._get_project_root_for_dir(str(nested.resolve()))  # noqa: SLF001
+    assert first == second == project.resolve()
+    assert file_utils._get_project_root_for_dir.cache_info().hits >= 1  # noqa: SLF001
+
+
 def test_find_role_dir_namespace_subdir(tmp_path: Path) -> None:
     """Roles nested under a namespace directory resolve to the role root."""
     role_dir = tmp_path / "roles" / "my_namespace" / "myBadRoleName"
