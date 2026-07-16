@@ -6,6 +6,7 @@ import copy
 import itertools
 import logging
 import os
+import re
 import sys
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -416,6 +417,20 @@ def _add_module_path_if_needed(
             module_paths.insert(0, str(mock_path))
 
 
+def _add_roles_path_if_needed(
+    options: Options,
+    roles_path: list[str],
+) -> None:
+    """Add plain-name mock roles path to roles_path if plain-name role mocks exist."""
+    if options.cache_dir and any(
+        not re.match(r"\w+\.\w+\.\w+$", role_name)
+        for role_name in options.mock_roles
+    ):
+        mock_path = options.cache_dir / "roles"
+        if str(mock_path) not in roles_path:
+            roles_path.insert(0, str(mock_path))
+
+
 def get_app(*, offline: bool | None = None, cached: bool = False) -> App:
     """Return the application instance, caching the return value."""
     # Avoids ever running the app initialization twice if cached argument
@@ -459,6 +474,7 @@ def get_app(*, offline: bool | None = None, cached: bool = False) -> App:
     # https://github.com/ansible/ansible-lint/issues/4973
     _add_collections_path_if_needed(app.options, app.runtime.config.collections_paths)
     _add_module_path_if_needed(app.options, app.runtime.config.default_module_path)
+    _add_roles_path_if_needed(app.options, app.runtime.config.default_roles_path)
 
     app.runtime.prepare_environment(
         install_local=(not offline),
