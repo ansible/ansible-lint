@@ -1,6 +1,6 @@
 """Console support: coloring and terminal code."""
 
-# cspell: ignore mdcat, mdless, bbcode, noteset
+# cspell: ignore mdcat, mdless, bbcode
 
 from __future__ import annotations
 
@@ -227,7 +227,7 @@ def _bbcode_to_ansi_mappings(style: type[PlainStyle]) -> dict[str, tuple[str, st
         "error": (style.error, style.normal),
         "info": (style.info, style.normal),
         "debug": (style.debug, style.normal),
-        "noteset": (style.notset, style.normal),
+        "notset": (style.notset, style.normal),
         "repr.path": (style.path, style.normal),
         "repr.number": (style.number, style.normal),
         "repr.link": (style.link, style.normal),
@@ -255,7 +255,10 @@ def _append_bb_open_tag(
 ) -> None:
     if tag not in bbcode_to_ansi:
         result.append(raw)
-        stack.append(("unknown", None))
+        # Link tags are closed by [/link] (handled later); do not push onto the
+        # generic [/] stack or nested tag closing will become misaligned.
+        if tag != "link":
+            stack.append(("unknown", None))
         return
     stack.append((tag, param))
     opening, _ = bbcode_to_ansi[tag]

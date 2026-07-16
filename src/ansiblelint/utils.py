@@ -797,6 +797,10 @@ def _remove_task_internal_keys(
         for value in obj.values():
             if isinstance(value, MutableMapping):
                 _remove_task_internal_keys(value)
+            elif isinstance(value, list):
+                for item in value:
+                    if isinstance(item, MutableMapping):
+                        _remove_task_internal_keys(item)
     return obj
 
 

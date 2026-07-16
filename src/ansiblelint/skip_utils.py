@@ -57,8 +57,8 @@ if TYPE_CHECKING:
 
 _logger = logging.getLogger(__name__)
 _found_deprecated_tags: set[str] = set()
-_noqa_comment_re = re.compile(r"^\s*# noqa[\s:]", flags=re.MULTILINE)
-_noqa_comment_line_re = re.compile(r"^\s*# noqa[\s:].*$")
+_noqa_comment_re = re.compile(r"^\s*# noqa(?:[\s:]|$)", flags=re.MULTILINE)
+_noqa_comment_line_re = re.compile(r"^\s*# noqa(?:[\s:].*)?$")
 
 # playbook: Sequence currently expects only instances of one of the two
 # classes below but we should consider avoiding this chimera.

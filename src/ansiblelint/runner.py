@@ -241,7 +241,7 @@ class Runner:
             ScannerError | ParserError | RuamelParserError,
         ):
             sub_tag = "yaml"
-            if isinstance(exc.args, tuple):
+            if isinstance(exc.args, tuple) and exc.args:
                 message = exc.args[0]
             detail = str(cause.problem) if cause.problem else ""
             if cause.problem_mark:
@@ -314,9 +314,6 @@ class Runner:
     ) -> list[list[MatchError]]:
         try:
             pool = multiprocessing.pool.ThreadPool(processes=threads())
-            return_list = pool.map(worker, files, chunksize=1)
-            pool.close()
-            pool.join()
         except OSError:
             _logger.info(
                 "ThreadPool creation failed (likely missing /dev/shm), "
@@ -326,8 +323,12 @@ class Runner:
                 max_workers=threads()
             ) as executor:
                 return list(executor.map(worker, files))
-        else:
-            return return_list
+
+        try:
+            return pool.map(worker, files, chunksize=1)
+        finally:
+            pool.close()
+            pool.join()
 
     def _run_syntax_check_phase(
         self,

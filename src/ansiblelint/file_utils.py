@@ -8,6 +8,7 @@ import os
 import sys
 from collections import defaultdict
 from contextlib import contextmanager
+from functools import lru_cache
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Any, cast
@@ -149,13 +150,22 @@ def expand_paths_vars(paths: list[str]) -> list[str]:
     return paths
 
 
+@lru_cache(maxsize=128)
+def _get_project_root_for_dir(dir_path: str) -> Path:
+    """Cache project-root discovery per directory to avoid repeated FS walks."""
+    project_root, _ = find_project_root([dir_path])
+    return project_root
+
+
 def _resolve_kind_glob_path(path: Path) -> wcmatch.pathlib.PurePath:
     """Return a PurePath usable for glob matching against kind patterns."""
     # We attempt to use a relative path to the project root for glob matching.
     # This prevents parent directory names (like 'tasks') from triggering
     # false positives in kind discovery. See #4763.
     try:
-        project_root, _ = find_project_root([str(path)])
+        # Project root is shared by siblings; cache by directory to cut FS walks.
+        lookup_path = path if path.is_dir() else path.parent
+        project_root = _get_project_root_for_dir(str(lookup_path.resolve()))
         # .resolve() ensures we handle symlinks and double-dots correctly
         rel_path = path.resolve().relative_to(project_root.resolve())
         return wcmatch.pathlib.PurePath(str(rel_path))
@@ -184,11 +194,7 @@ def _match_kind_from_globs(
             matched_kind = str(k)
             # Namespace folders under roles/ can match **/roles/*/ without
             # being role roots themselves. See #5079.
-            if (
-                matched_kind == "role"
-                and path.is_dir()
-                and not _has_role_subdirs(path)
-            ):
+            if matched_kind == "role" and path.is_dir() and not _has_role_subdirs(path):
                 continue
             return matched_kind  # type: ignore[return-value]
     return None

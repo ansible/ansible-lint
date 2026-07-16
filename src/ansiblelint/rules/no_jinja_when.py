@@ -89,7 +89,10 @@ class NoFormattingInWhenRule(AnsibleLintRule, TransformMixin):
 
 def _transform_when_value(value: Any) -> Any:
     if isinstance(value, list):
-        return [RE_JINJA.sub(r"\1", item) for item in value]
+        return [
+            RE_JINJA.sub(r"\1", item) if isinstance(item, str) else item
+            for item in value
+        ]
     if isinstance(value, str):
         return RE_JINJA.sub(r"\1", value)
     return value
@@ -109,6 +112,8 @@ def _transform_when_keys(
 def transform_for_roles(v: list[Any], key_to_check: tuple[str, ...]) -> None:
     """Additional transform logic in case of roles."""
     for role in v:
+        if not isinstance(role, MutableMapping):
+            continue
         for key, value in role.items():
             if key in key_to_check:
                 role[key] = _transform_when_value(value)
