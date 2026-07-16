@@ -111,6 +111,9 @@ if "pytest" in sys.modules:
         """Test for _coerce function."""
         assert _coerce("1.0") == Version("1.0")
         assert _coerce(1.0) == Version("1.0")
-        expected = "Unable to coerce object type"
-        with pytest.raises(NotImplementedError, match=expected):
-            _coerce(type(Version))
+
+    def test_coerce_invalid_type() -> None:
+        """Test that _coerce rejects unsupported types."""
+        invalid_type = type(Version)
+        with pytest.raises(NotImplementedError, match="Unable to coerce object type"):
+            _coerce(invalid_type)

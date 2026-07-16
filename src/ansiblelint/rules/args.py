@@ -323,9 +323,12 @@ class ArgsRule(AnsibleLintRule):
 
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
+    from typing import cast
+
     import pytest  # noqa: TC002
 
     from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
+    from ansiblelint.utils import Task
 
     def test_args_module_fail(default_rules_collection: RulesCollection) -> None:
         """Test rule invalid module options."""
@@ -389,13 +392,13 @@ if "pytest" in sys.modules:
                 return getattr(self, key)
 
         rule = ArgsRule()
-        task = MockTask()
+        task = cast("Task", MockTask())
         failed_msg = '{"msg": "value of default must be one of: allow, deny, reject"}'
 
         # pylint: disable=protected-access
         results = rule._parse_failed_msg(  # noqa: SLF001
             failed_msg,
-            task,  # type: ignore[arg-type]
+            task,
             "ufw",
         )
 

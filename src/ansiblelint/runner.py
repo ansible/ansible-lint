@@ -218,68 +218,72 @@ class Runner:
                 )
         return sorted(matches)
 
-    def _run(self) -> list[MatchError]:  # noqa: C901
-        """Run the linting (inner loop)."""
-        files: list[Lintable] = []
-        matches: list[MatchError] = []
+    def _is_lintable_excluded_by_paths(self, lintable: Lintable) -> bool:
+        abs_path = str(lintable.abspath)
+        return any(
+            abs_path.startswith(p) or fnmatch(abs_path, p) for p in self.exclude_paths
+        )
 
-        # remove exclusions
+    def _build_load_failure_match(self, lintable: Lintable) -> MatchError:
+        line = 1
+        column = None
+        detail = ""
+        sub_tag = ""
+        message = None
+        if lintable.exc.__cause__ and isinstance(
+            lintable.exc.__cause__,
+            ScannerError | ParserError | RuamelParserError,
+        ):
+            sub_tag = "yaml"
+            if isinstance(lintable.exc.args, tuple):
+                message = lintable.exc.args[0]
+            detail = (
+                str(lintable.exc.__cause__.problem)
+                if lintable.exc.__cause__.problem
+                else ""
+            )
+            if lintable.exc.__cause__.problem_mark:
+                line = lintable.exc.__cause__.problem_mark.line + 1
+                column = lintable.exc.__cause__.problem_mark.column + 1
+
+        return MatchError(
+            lintable=lintable,
+            message=message or str(lintable.exc),
+            details=detail or str(lintable.exc.__cause__),
+            rule=self.rules["load-failure"],
+            lineno=line,
+            column=column,
+            tag=f"load-failure[{sub_tag or lintable.exc.__class__.__name__.lower()}]",
+        )
+
+    def _process_load_error_lintable(
+        self,
+        lintable: Lintable,
+        matches: list[MatchError],
+    ) -> bool:
+        """Handle load errors. Return True if lintable was removed."""
+        if not (isinstance(lintable.data, States) and lintable.exc):
+            return False
+        # Even if it's 'explicit', if it's broken, we check the exclude_paths
+        # one last time before reporting a 'load-failure'. (#4745)
+        if self._is_lintable_excluded_by_paths(lintable):
+            self.lintables.remove(lintable)
+            return True
+
+        matches.append(self._build_load_failure_match(lintable))
+        lintable.stop_processing = True
+        return False
+
+    def _remove_excluded_and_preprocess(self, matches: list[MatchError]) -> None:
         for lintable in self.lintables.copy():
-            # 1. Standard exclusion check
             if self.is_excluded(lintable):
                 _logger.debug("Excluded %s", lintable)
                 self.lintables.remove(lintable)
                 continue
 
-            # 2. Handle load errors (This is where SOPS/Broken YAML crashes)
-            if isinstance(lintable.data, States) and lintable.exc:
-                # --- NEW LOGIC FOR #4745 ---
-                # Even if it's 'explicit', if it's broken, we check the exclude_paths
-                # one last time before reporting a 'load-failure'.
-                abs_path = str(lintable.abspath)
-                if any(
-                    abs_path.startswith(p) or fnmatch(abs_path, p)
-                    for p in self.exclude_paths
-                ):
-                    self.lintables.remove(lintable)
-                    continue
-                # --- END NEW LOGIC ---
+            if self._process_load_error_lintable(lintable, matches):
+                continue
 
-                line = 1
-                column = None
-                detail = ""
-                sub_tag = ""
-                lintable.exc.__class__.__name__.lower()
-                message = None
-                if lintable.exc.__cause__ and isinstance(
-                    lintable.exc.__cause__,
-                    ScannerError | ParserError | RuamelParserError,
-                ):
-                    sub_tag = "yaml"
-                    if isinstance(lintable.exc.args, tuple):
-                        message = lintable.exc.args[0]
-                    detail = (
-                        str(lintable.exc.__cause__.problem)
-                        if lintable.exc.__cause__.problem
-                        else ""
-                    )
-                    if lintable.exc.__cause__.problem_mark:
-                        line = lintable.exc.__cause__.problem_mark.line + 1
-                        column = lintable.exc.__cause__.problem_mark.column + 1
-
-                matches.append(
-                    MatchError(
-                        lintable=lintable,
-                        message=message or str(lintable.exc),
-                        details=detail or str(lintable.exc.__cause__),
-                        rule=self.rules["load-failure"],
-                        lineno=line,
-                        column=column,
-                        tag=f"load-failure[{sub_tag or lintable.exc.__class__.__name__.lower()}]",
-                    ),
-                )
-                lintable.stop_processing = True
-            # identify missing files/folders
             if not lintable.path.exists():
                 matches.append(
                     MatchError(
@@ -290,71 +294,87 @@ class Runner:
                     ),
                 )
 
-        # -- phase 1 : syntax check in parallel --
-        if not self.skip_ansible_syntax_check:
+    def _collect_syntax_check_files(self) -> list[Lintable]:
+        files: list[Lintable] = []
+        for lintable in self.lintables:
+            if (
+                lintable.kind not in ("playbook", "role", "pattern")
+                or lintable.stop_processing
+            ):
+                continue
+            files.append(lintable)
+        return files
 
-            def worker(lintable: Lintable) -> list[MatchError]:
-                return self._get_ansible_syntax_check_matches(
-                    lintable=lintable,
-                    app=self.app,
-                )
+    def _map_syntax_check_workers(
+        self,
+        worker: Any,
+        files: list[Lintable],
+    ) -> list[list[MatchError]]:
+        try:
+            pool = multiprocessing.pool.ThreadPool(processes=threads())
+            return_list = pool.map(worker, files, chunksize=1)
+            pool.close()
+            pool.join()
+        except OSError:
+            _logger.info(
+                "ThreadPool creation failed (likely missing /dev/shm), "
+                "falling back to concurrent.futures.ThreadPoolExecutor"
+            )
+            with concurrent.futures.ThreadPoolExecutor(
+                max_workers=threads()
+            ) as executor:
+                return list(executor.map(worker, files))
+        else:
+            return return_list
 
+    def _run_syntax_check_phase(
+        self,
+        matches: list[MatchError],
+    ) -> list[Lintable]:
+        if self.skip_ansible_syntax_check:
+            return []
+
+        def worker(lintable: Lintable) -> list[MatchError]:
+            return self._get_ansible_syntax_check_matches(
+                lintable=lintable,
+                app=self.app,
+            )
+
+        files = self._collect_syntax_check_files()
+
+        # avoid resource leak warning, https://github.com/python/cpython/issues/90549
+        # pylint: disable=unused-variable
+        with contextlib.suppress(OSError):
+            global_resource = multiprocessing.Semaphore()  # noqa: F841
+
+        return_list = self._map_syntax_check_workers(worker, files)
+        for data in return_list:
+            matches.extend(data)
+
+        matches[:] = self._filter_excluded_matches(matches)
+        return files
+
+    def _mark_failed_lintables_stop_processing(self, matches: list[MatchError]) -> None:
+        for match in matches:
+            if not match.lintable.failed():
+                continue
+            match.lintable.stop_processing = True
+            # Look into making lintables singletons to avoid having to update them
             for lintable in self.lintables:
-                if (
-                    lintable.kind not in ("playbook", "role", "pattern")
-                    or lintable.stop_processing
-                ):
-                    continue
-                files.append(lintable)
+                if lintable == match.lintable:
+                    lintable.stop_processing = True
+                    break
 
-            # avoid resource leak warning, https://github.com/python/cpython/issues/90549
-            # pylint: disable=unused-variable
-            with contextlib.suppress(OSError):
-                global_resource = multiprocessing.Semaphore()  # noqa: F841
-
-            # In environments without /dev/shm (e.g., AWS Lambda/CodeBuild),
-            # multiprocessing.pool.ThreadPool fails because it still uses
-            # multiprocessing primitives (locks, queues). Fall back to
-            # concurrent.futures.ThreadPoolExecutor which is a pure threading
-            # implementation that doesn't require shared memory.
-            try:
-                pool = multiprocessing.pool.ThreadPool(processes=threads())
-                return_list = pool.map(worker, files, chunksize=1)
-                pool.close()
-                pool.join()
-            except (OSError, FileNotFoundError):
-                _logger.info(
-                    "ThreadPool creation failed (likely missing /dev/shm), "
-                    "falling back to concurrent.futures.ThreadPoolExecutor"
-                )
-                with concurrent.futures.ThreadPoolExecutor(
-                    max_workers=threads()
-                ) as executor:
-                    return_list = list(executor.map(worker, files))
-            for data in return_list:
-                matches.extend(data)
-
-            matches = self._filter_excluded_matches(matches)
-
-        # -- phase 2 ---
-        # do our processing only when ansible syntax check passed in order
-        # to avoid causing runtime exceptions. Our processing is not as
-        # resilient to be able process garbage.
+    def _run_rules_phase(
+        self,
+        files: list[Lintable],
+        matches: list[MatchError],
+    ) -> None:
         matches.extend(
             self._emit_matches([file for file in files if not file.failed()])
         )
-        # mark failed failed lintables as stop processing in order to avoid
-        # duplicated errors from further processing of the other rules
-        for match in matches:
-            if match.lintable.failed():
-                match.lintable.stop_processing = True
-                # Look into making lintables singletons to avoid having to update them
-                for lintable in self.lintables:
-                    if lintable == match.lintable:
-                        lintable.stop_processing = True
-                        break
-        # remove duplicates from files list
-        files = list(dict.fromkeys(files))
+        self._mark_failed_lintables_stop_processing(matches)
+
         for file in self.lintables:
             if (
                 file in self.checked_files
@@ -373,12 +393,17 @@ class Runner:
                 self.rules.run(file, tags=set(self.tags), skip_list=self.skip_list),
             )
 
-        # update list of checked files
         self.checked_files.update(self.lintables)
 
-        # remove any matches made inside excluded files
-        matches = self._filter_excluded_matches(matches)
+    def _run(self) -> list[MatchError]:
+        """Run the linting (inner loop)."""
+        matches: list[MatchError] = []
 
+        self._remove_excluded_and_preprocess(matches)
+        files = self._run_syntax_check_phase(matches)
+        self._run_rules_phase(files, matches)
+
+        matches = self._filter_excluded_matches(matches)
         return sorted(set(matches))
 
     # pylint: disable=too-many-locals,too-many-statements

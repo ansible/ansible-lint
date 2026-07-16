@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from ansiblelint.utils import Task
 
 RE_JINJA = re.compile(r"{{ (.*?) }}")
+_WHEN_KEYS = ("when", "changed_when", "failed_when")
 
 
 class NoFormattingInWhenRule(AnsibleLintRule, TransformMixin):
@@ -78,31 +79,39 @@ class NoFormattingInWhenRule(AnsibleLintRule, TransformMixin):
         lintable: Lintable,
         data: CommentedMap | CommentedSeq | str,
     ) -> None:
-        if match.tag == self.id:
-            task = self.seek(match.yaml_path, data)
-            key_to_check = ("when", "changed_when", "failed_when")
-            for _ in range(len(task)):
-                if isinstance(task, MutableMapping):
-                    for k, v in task.items():
-                        if k == "roles" and isinstance(v, list):
-                            transform_for_roles(v, key_to_check=key_to_check)
-                        elif k in key_to_check:
-                            v = RE_JINJA.sub(r"\1", v)
-                            task[k] = v
-            match.fixed = True
+        if match.tag != self.id:
+            return
+        task = self.seek(match.yaml_path, data)
+        if isinstance(task, MutableMapping):
+            _transform_when_keys(task, _WHEN_KEYS)
+        match.fixed = True
+
+
+def _transform_when_value(value: Any) -> Any:
+    if isinstance(value, list):
+        return [RE_JINJA.sub(r"\1", item) for item in value]
+    if isinstance(value, str):
+        return RE_JINJA.sub(r"\1", value)
+    return value
+
+
+def _transform_when_keys(
+    task: MutableMapping[str, Any],
+    key_to_check: tuple[str, ...],
+) -> None:
+    for key, value in task.items():
+        if key == "roles" and isinstance(value, list):
+            transform_for_roles(value, key_to_check=key_to_check)
+        elif key in key_to_check:
+            task[key] = _transform_when_value(value)
 
 
 def transform_for_roles(v: list[Any], key_to_check: tuple[str, ...]) -> None:
     """Additional transform logic in case of roles."""
-    for idx, new_dict in enumerate(v):
-        for new_key, new_value in new_dict.items():
-            if new_key in key_to_check:
-                if isinstance(new_value, list):
-                    for index, nested_value in enumerate(new_value):
-                        new_value[index] = RE_JINJA.sub(r"\1", nested_value)
-                    v[idx][new_key] = new_value
-                if isinstance(new_value, str):
-                    v[idx][new_key] = RE_JINJA.sub(r"\1", new_value)
+    for role in v:
+        for key, value in role.items():
+            if key in key_to_check:
+                role[key] = _transform_when_value(value)
 
 
 if "pytest" in sys.modules:

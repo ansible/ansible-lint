@@ -3,14 +3,14 @@
 import logging
 import os
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
+from pytest_mock import MockerFixture
 
 from ansiblelint import cli
 
 
-def test_config_error_with_log_path(tmp_path: Path) -> None:
+def test_config_error_with_log_path(tmp_path: Path, mocker: MockerFixture) -> None:
     """Verify that configuration errors are printed to stderr and logged to log_path."""
     # 1. Setup temporary paths
     ansible_cfg = tmp_path / "ansible.cfg"
@@ -32,11 +32,9 @@ def test_config_error_with_log_path(tmp_path: Path) -> None:
     logging.root.addHandler(handler)
 
     try:
-        with (
-            patch("ansiblelint.cli.console_stderr.print") as mock_print,
-            patch("ansiblelint.cli._logger.error") as mock_error,
-            pytest.raises(SystemExit) as exc,
-        ):
+        mock_print = mocker.patch("ansiblelint.cli.console_stderr.print")
+        mock_error = mocker.patch("ansiblelint.cli._logger.error")
+        with pytest.raises(SystemExit) as exc:
             cli.get_config(["-c", str(lint_cfg)])
 
         assert exc.value.code == 3
@@ -57,7 +55,10 @@ def test_config_error_with_log_path(tmp_path: Path) -> None:
         logging.root.handlers = original_handlers
 
 
-def test_config_error_without_log_path(tmp_path: Path) -> None:
+def test_config_error_without_log_path(
+    tmp_path: Path,
+    mocker: MockerFixture,
+) -> None:
     """Verify that configuration errors are printed to stderr but NOT logged via _logger to avoid duplicates."""
     # 1. Setup temporary paths
     lint_cfg = tmp_path / ".ansible-lint"
@@ -69,11 +70,9 @@ def test_config_error_without_log_path(tmp_path: Path) -> None:
 
     # 3. Run cli.get_config and verify only console_stderr.print is called
     try:
-        with (
-            patch("ansiblelint.cli.console_stderr.print") as mock_print,
-            patch("ansiblelint.cli._logger.error") as mock_error,
-            pytest.raises(SystemExit) as exc,
-        ):
+        mock_print = mocker.patch("ansiblelint.cli.console_stderr.print")
+        mock_error = mocker.patch("ansiblelint.cli._logger.error")
+        with pytest.raises(SystemExit) as exc:
             cli.get_config(["-c", str(lint_cfg)])
 
         assert exc.value.code == 3
@@ -90,7 +89,10 @@ def test_config_error_without_log_path(tmp_path: Path) -> None:
         logging.root.handlers = original_handlers
 
 
-def test_missing_config_error_with_log_path(tmp_path: Path) -> None:
+def test_missing_config_error_with_log_path(
+    tmp_path: Path,
+    mocker: MockerFixture,
+) -> None:
     """Verify that missing configuration file errors are printed to stderr and logged even with log_path."""
     ansible_cfg = tmp_path / "ansible.cfg"
     log_file = tmp_path / "ansible-lint.log"
@@ -105,11 +107,9 @@ def test_missing_config_error_with_log_path(tmp_path: Path) -> None:
     logging.root.addHandler(handler)
 
     try:
-        with (
-            patch("ansiblelint.cli.console_stderr.print") as mock_print,
-            patch("ansiblelint.cli._logger.error") as mock_error,
-            pytest.raises(SystemExit) as exc,
-        ):
+        mock_print = mocker.patch("ansiblelint.cli.console_stderr.print")
+        mock_error = mocker.patch("ansiblelint.cli._logger.error")
+        with pytest.raises(SystemExit) as exc:
             cli.get_config(["-c", str(missing_cfg)])
 
         assert exc.value.code == 3
@@ -127,17 +127,18 @@ def test_missing_config_error_with_log_path(tmp_path: Path) -> None:
         logging.root.handlers = original_handlers
 
 
-def test_missing_config_error_without_log_path(tmp_path: Path) -> None:
+def test_missing_config_error_without_log_path(
+    tmp_path: Path,
+    mocker: MockerFixture,
+) -> None:
     """Verify that missing configuration file errors are printed but not logged via _logger when log_path is not set."""
     missing_cfg = tmp_path / "non-existent.yml"
     original_handlers = list(logging.root.handlers)
 
     try:
-        with (
-            patch("ansiblelint.cli.console_stderr.print") as mock_print,
-            patch("ansiblelint.cli._logger.error") as mock_error,
-            pytest.raises(SystemExit) as exc,
-        ):
+        mock_print = mocker.patch("ansiblelint.cli.console_stderr.print")
+        mock_error = mocker.patch("ansiblelint.cli._logger.error")
+        with pytest.raises(SystemExit) as exc:
             cli.get_config(["-c", str(missing_cfg)])
 
         assert exc.value.code == 3

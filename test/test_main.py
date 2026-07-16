@@ -107,10 +107,7 @@ def test_get_version_warning_no_pip(mocker: MockerFixture) -> None:
 def test_get_version_warning_remote_disconnect(mocker: MockerFixture) -> None:
     """Test that we can handle remote disconnect when fetching release url."""
     mocker.patch("urllib.request.urlopen", side_effect=RemoteDisconnected)
-    try:
-        get_version_warning()
-    except RemoteDisconnected:
-        pytest.fail("Failed to handle a remote disconnect")
+    get_version_warning()
 
 
 def test_get_version_warning_offline(mocker: MockerFixture) -> None:

@@ -605,11 +605,6 @@ if "pytest" in sys.modules:
             assert result.tag == "jinja[spacing]"
             assert result.lineno == lineno_list[index]
 
-        # error_lines_difference = list(
-        #     set(error_expected_lines).symmetric_difference(set(lint_error_lines)),
-        # )
-        # assert len(error_lines_difference) == 0
-
     def test_jinja_spacing_vars(empty_rule_collection: RulesCollection) -> None:
         """Ensure that expected error details are matching found linting error details."""
         empty_rule_collection.register(JinjaRule())

@@ -86,14 +86,8 @@ def deannotate(data: Any) -> Any:
     return data
 
 
-def load_yamllint_config(yamllint_file: Path | None = None) -> CustomYamlLintConfig:
-    """Load our default yamllint config and any customized override file."""
-    config = CustomYamlLintConfig(file=Path(__file__).parent / "data" / ".yamllint")
-    config.incompatible = ""
-    # Declare local yamllint config file locations.
-    # If we detect local yamllint config we use it but raise a warning
-    # as this is likely to get out of sync with our internal config.
-    yamllint_config_locations = [
+def _yamllint_config_locations(yamllint_file: Path | None = None) -> list[str]:
+    locations = [
         ".yamllint",
         ".yamllint.yaml",
         ".yamllint.yml",
@@ -101,10 +95,17 @@ def load_yamllint_config(yamllint_file: Path | None = None) -> CustomYamlLintCon
         os.getenv("XDG_CONFIG_HOME", "~/.config") + "/yamllint/config",
     ]
     if yamllint_file:
-        # Ensure the CLI option yamllint_file config is the first
-        # file to be loaded
-        yamllint_config_locations.insert(0, str(yamllint_file))
-    for path in yamllint_config_locations:
+        locations.insert(0, str(yamllint_file))
+    return locations
+
+
+def _load_custom_yamllint_config(
+    base_config: CustomYamlLintConfig,
+    yamllint_file: Path | None = None,
+) -> tuple[CustomYamlLintConfig, Path | None]:
+    config = base_config
+    loaded_file: Path | None = None
+    for path in _yamllint_config_locations(yamllint_file):
         file = Path(path).expanduser()
         if file.is_file():
             _logger.debug(
@@ -115,9 +116,15 @@ def load_yamllint_config(yamllint_file: Path | None = None) -> CustomYamlLintCon
             custom_config = CustomYamlLintConfig(file=str(file))
             custom_config.extend(config)  # type: ignore[no-untyped-call]
             config = custom_config
+            loaded_file = file
             break
+    return config, loaded_file
 
-    # Look for settings incompatible with our reformatting
+
+def _validate_yamllint_compatibility(
+    config: CustomYamlLintConfig,
+    loaded_file: Path | None,
+) -> None:
     checks: list[tuple[str, str | int | bool]] = [
         (
             "comments.min-spaces-from-content",
@@ -143,16 +150,6 @@ def load_yamllint_config(yamllint_file: Path | None = None) -> CustomYamlLintCon
             "octal-values.forbid-explicit-octal",
             True,
         ),
-        # (
-        #     "key-duplicates.forbid-duplicated-merge-keys", # v1.34.0+
-        #     True,
-        # ),
-        # (
-        #   "quoted-strings.quote-type", "double",
-        # ),
-        # (
-        #   "quoted-strings.required", "only-when-needed",
-        # ),
     ]
     errors = []
     for setting, expected_value in checks:
@@ -168,9 +165,16 @@ def load_yamllint_config(yamllint_file: Path | None = None) -> CustomYamlLintCon
             errors.append(msg)
     if errors:
         nl = "\n"
-        msg = f"Found incompatible custom yamllint configuration ({file}), please either remove the file or edit it to comply with:{nl}  - {(nl + '  - ').join(errors)}.{nl}{nl}Read https://docs.ansible.com/projects/lint/rules/yaml/ for more details regarding why we have these requirements. Fix mode will not be available."
+        msg = f"Found incompatible custom yamllint configuration ({loaded_file}), please either remove the file or edit it to comply with:{nl}  - {(nl + '  - ').join(errors)}.{nl}{nl}Read https://docs.ansible.com/projects/lint/rules/yaml/ for more details regarding why we have these requirements. Fix mode will not be available."
         config.incompatible = msg
 
+
+def load_yamllint_config(yamllint_file: Path | None = None) -> CustomYamlLintConfig:
+    """Load our default yamllint config and any customized override file."""
+    config = CustomYamlLintConfig(file=Path(__file__).parent / "data" / ".yamllint")
+    config.incompatible = ""
+    config, loaded_file = _load_custom_yamllint_config(config, yamllint_file)
+    _validate_yamllint_compatibility(config, loaded_file)
     _logger.debug("Effective yamllint rules used: %s", config.rules)
     return config
 
@@ -1285,7 +1289,7 @@ def clean_json(
     :param func: a callable that takes a key in argument and return True for each key to delete
     """
     if isinstance(obj, dict):
-        for key in list(obj.keys()):
+        for key in tuple(obj):
             if func(key):
                 del obj[key]
             else:

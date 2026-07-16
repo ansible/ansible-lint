@@ -67,10 +67,8 @@ def get_ignore_rule(rule: str, qualifiers: str) -> IgnoreRule:
     return IgnoreRule(rule, frozenset(s))
 
 
-def load_ignore_txt(filepath: Path | None = None) -> dict[str, set[IgnoreRule]]:
-    """Return a list of rules to ignore."""
-    result = defaultdict(set)
-
+def _resolve_ignore_file(filepath: Path | None) -> str | None:
+    """Return the path to the ignore file to use, if any."""
     ignore_file = None
 
     if filepath:
@@ -83,21 +81,38 @@ def load_ignore_txt(filepath: Path | None = None) -> dict[str, set[IgnoreRule]]:
     elif os.path.isfile(IGNORE_FILE.alternative):
         ignore_file = IGNORE_FILE.alternative
 
+    return ignore_file
+
+
+def _parse_ignore_file(
+    ignore_file: str,
+    result: defaultdict[str, set[IgnoreRule]],
+) -> None:
+    """Parse an ignore file, populating result in place."""
+    with open(ignore_file, encoding="utf-8") as ignore_file_h:
+        _logger.debug("Loading ignores from '%s'", ignore_file)
+        for line in ignore_file_h:
+            entry = line.split("#")[0].rstrip()
+            if not entry:
+                continue
+            try:
+                fields = entry.split()
+                path = fields[0]
+                rule = fields[1]
+                qualifiers = fields[2] if len(fields) == 3 else ""
+                result[path].add(get_ignore_rule(rule, qualifiers))
+            except ValueError as exc:  # pragma: no cover
+                msg = f"Unable to parse line '{line}' from {ignore_file} file."
+                raise RuntimeError(msg) from exc
+
+
+def load_ignore_txt(filepath: Path | None = None) -> dict[str, set[IgnoreRule]]:
+    """Return a list of rules to ignore."""
+    result: defaultdict[str, set[IgnoreRule]] = defaultdict(set)
+
+    ignore_file = _resolve_ignore_file(filepath)
     if ignore_file:
-        with open(ignore_file, encoding="utf-8") as ignore_file_h:
-            _logger.debug("Loading ignores from '%s'", ignore_file)
-            for line in ignore_file_h:
-                entry = line.split("#")[0].rstrip()
-                if entry:
-                    try:
-                        fields = entry.split()
-                        path = fields[0]
-                        rule = fields[1]
-                        qualifiers = fields[2] if len(fields) == 3 else ""
-                        result[path].add(get_ignore_rule(rule, qualifiers))
-                    except ValueError as exc:  # pragma: no cover
-                        msg = f"Unable to parse line '{line}' from {ignore_file} file."
-                        raise RuntimeError(msg) from exc
+        _parse_ignore_file(ignore_file, result)
     return result
 
 

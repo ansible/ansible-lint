@@ -62,6 +62,30 @@ def expand_to_normalized_paths(
         config[paths_var] = normalized_paths
 
 
+def _fatal_config_error(msg: str) -> None:
+    """Log a fatal configuration error and terminate the process."""
+    if any(
+        isinstance(h, logging.FileHandler)
+        and h.baseFilename != os.path.abspath(os.devnull)
+        for h in logging.root.handlers
+    ):
+        _logger.error(msg)
+    console_stderr.print(f"[error]{msg}[/]")
+    sys.exit(RC.INVALID_CONFIG)
+
+
+def _resolve_config_project_dir(config: dict[str, Any], config_path: str) -> None:
+    """Resolve a relative project_dir in config against the config file location."""
+    if (
+        "project_dir" in config
+        and config["project_dir"]
+        and config["project_dir"][0] not in ("/", "~")
+    ):
+        config["project_dir"] = (
+            (Path(config_path).parent / config["project_dir"]).resolve().as_posix()
+        )
+
+
 def load_config(
     config_file: str | None = None, project_path: str | None = None
 ) -> tuple[dict[Any, Any], str | None]:
@@ -75,15 +99,7 @@ def load_config(
     if config_file:
         config_path = os.path.abspath(config_file)
         if not os.path.exists(config_path):
-            msg = f"Config file not found '{config_path}'"
-            if any(
-                isinstance(h, logging.FileHandler)
-                and h.baseFilename != os.path.abspath(os.devnull)
-                for h in logging.root.handlers
-            ):
-                _logger.error(msg)
-            console_stderr.print(f"[error]{msg}[/]")
-            sys.exit(RC.INVALID_CONFIG)
+            _fatal_config_error(f"Config file not found '{config_path}'")
     config_path = config_path or get_config_path(None, project_path=project_path)
     if not config_path or not os.path.exists(config_path):
         # a missing default config file should not trigger an error
@@ -98,15 +114,7 @@ def load_config(
     )
 
     for error in validate_file_schema(config_lintable):
-        msg = f"Invalid configuration file {config_path}. {error}"
-        if any(
-            isinstance(h, logging.FileHandler)
-            and h.baseFilename != os.path.abspath(os.devnull)
-            for h in logging.root.handlers
-        ):
-            _logger.error(msg)
-        console_stderr.print(f"[error]{msg}[/]")
-        sys.exit(RC.INVALID_CONFIG)
+        _fatal_config_error(f"Invalid configuration file {config_path}. {error}")
 
     config = clean_json(config_lintable.data)
     if not isinstance(config, dict):
@@ -116,14 +124,7 @@ def load_config(
     config_dir = os.path.dirname(config_path)
     expand_to_normalized_paths(config, config_dir)
 
-    if (
-        "project_dir" in config
-        and config["project_dir"]
-        and config["project_dir"][0] not in ("/", "~")
-    ):
-        config["project_dir"] = (
-            (Path(config_path).parent / config["project_dir"]).resolve().as_posix()
-        )
+    _resolve_config_project_dir(config, config_path)
 
     return config, config_path
 
