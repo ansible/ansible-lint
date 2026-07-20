@@ -68,7 +68,10 @@ DEFAULT_KINDS = [
     {
         "requirements": "**/molecule/*/{collections,requirements}.{yaml,yml}",
     },  # molecule old collection requirements (v1), ansible 2.8 only
-    {"yaml": "**/molecule/*/{base,molecule}.{yaml,yml}"},  # molecule config
+    {"molecule": "**/molecule/*/molecule.{yaml,yml}"},  # molecule scenario config
+    # base.yml is a config fragment molecule merges before validating, so it is
+    # not a standalone whole-file document; keep it as plain yaml.
+    {"yaml": "**/molecule/*/base.{yaml,yml}"},  # molecule base config fragment
     {"requirements": "**/requirements.{yaml,yml}"},  # v2 and v1
     {"playbook": "**/molecule/*/*.{yaml,yml}"},  # molecule playbooks
     {"yaml": "**/{.ansible-lint,.yamllint}"},
