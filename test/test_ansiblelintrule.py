@@ -36,15 +36,15 @@ def test_yaml_string_load_failure_branches(
 
     parsed = Lintable("x.yml", content="---\n")
     parsed.state = [{"hosts": "all"}]
-    assert rule._yaml_string_load_failure(parsed) is None  # noqa: SLF001
+    assert rule._yaml_string_load_failure(parsed) is None  # ruff:ignore[private-member-access]
 
     vault = Lintable("v.yml", content="")
     vault.state = "$ANSIBLE_VAULT;1.1;AES256\n0000"
-    assert rule._yaml_string_load_failure(vault) == []  # noqa: SLF001
+    assert rule._yaml_string_load_failure(vault) == []  # ruff:ignore[private-member-access]
 
     broken = Lintable("b.yml", content="")
     broken.state = "not-yaml-structure"
-    matches = rule._yaml_string_load_failure(broken)  # noqa: SLF001
+    matches = rule._yaml_string_load_failure(broken)  # ruff:ignore[private-member-access]
     assert matches is not None
     assert matches[0].rule.id == "load-failure"
 
@@ -66,5 +66,5 @@ def test_rule_config(
 
     for rule in empty_rule_collection:
         if rule.id == rule_name:
-            assert rule._collection  # noqa: SLF001
+            assert rule._collection  # ruff:ignore[private-member-access]
             assert rule.rule_config == rule_config

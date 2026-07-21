@@ -192,11 +192,11 @@ class WriteArgAction(argparse.Action):
         nargs: int | str | None = None,
         const: Any = None,
         default: Any = None,
-        type: Callable[[str], Any] | None = None,  # noqa: A002
+        type: Callable[[str], Any] | None = None,  # ruff:ignore[builtin-argument-shadowing]
         choices: list[Any] | None = None,
         *,
         required: bool = False,
-        help: str | None = None,  # noqa: A002
+        help: str | None = None,  # ruff:ignore[builtin-argument-shadowing]
         metavar: str | None = None,
     ) -> None:
         """Create the argparse action with WriteArg-specific defaults."""
@@ -548,7 +548,7 @@ def merge_config(file_config: dict[Any, Any], cli_config: Options) -> Options:
                 setattr(cli_config, entry, default)
         if cli_config.write_list is None:
             cli_config.write_list = []
-        elif cli_config.write_list == [WriteArgAction._default]:  # noqa: SLF001 # pragma: no cover
+        elif cli_config.write_list == [WriteArgAction._default]:  # ruff:ignore[private-member-access] # pragma: no cover
             cli_config.write_list = ["all"]
         return cli_config
 

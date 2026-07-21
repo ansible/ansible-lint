@@ -101,7 +101,7 @@ def test_get_version_warning(
 def test_get_version_warning_no_pip(mocker: MockerFixture) -> None:
     """Test that we do not display any message if install method is not pip."""
     mocker.patch("ansiblelint.config.guess_install_method", return_value="")
-    assert get_version_warning() == ""  # noqa: PLC1901
+    assert get_version_warning() == ""  # ruff:ignore[compare-to-empty-string]
 
 
 def test_get_version_warning_remote_disconnect(mocker: MockerFixture) -> None:
@@ -116,7 +116,7 @@ def test_get_version_warning_offline(mocker: MockerFixture) -> None:
         # ensures a real cache_file is not loaded
         mocker.patch("ansiblelint.config.CACHE_DIR", Path(temporary_directory))
         options.offline = True
-        assert get_version_warning() == ""  # noqa: PLC1901
+        assert get_version_warning() == ""  # ruff:ignore[compare-to-empty-string]
 
 
 def test_version_cache_helpers(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -126,33 +126,33 @@ def test_version_cache_helpers(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
     from ansiblelint import config
 
     missing = str(tmp_path / "missing.json")
-    assert config._version_cache_needs_refresh(missing) is True  # noqa: SLF001
+    assert config._version_cache_needs_refresh(missing) is True  # ruff:ignore[private-member-access]
 
     cache_file = tmp_path / "latest.json"
     cache_file.write_text(
         '{"html_url": "https://example.invalid", "tag_name": "v9.9.9"}',
         encoding="utf-8",
     )
-    assert config._version_cache_needs_refresh(str(cache_file)) is False  # noqa: SLF001
+    assert config._version_cache_needs_refresh(str(cache_file)) is False  # ruff:ignore[private-member-access]
 
     monkeypatch.setattr(os.path, "getmtime", lambda _path: time.time() - 25 * 60 * 60)
-    assert config._version_cache_needs_refresh(str(cache_file)) is True  # noqa: SLF001
+    assert config._version_cache_needs_refresh(str(cache_file)) is True  # ruff:ignore[private-member-access]
 
-    data = config._load_version_cache(str(cache_file))  # noqa: SLF001
+    data = config._load_version_cache(str(cache_file))  # ruff:ignore[private-member-access]
     assert data["tag_name"] == "v9.9.9"
 
-    assert not config._format_version_upgrade_message(Version("1.0.0"), {}, "pip")  # noqa: SLF001
-    assert "pre-release" in config._format_version_upgrade_message(  # noqa: SLF001
+    assert not config._format_version_upgrade_message(Version("1.0.0"), {}, "pip")  # ruff:ignore[private-member-access]
+    assert "pre-release" in config._format_version_upgrade_message(  # ruff:ignore[private-member-access]
         Version("99.0.0"),
         data,
         "pip",
     )
-    assert "new release" in config._format_version_upgrade_message(  # noqa: SLF001
+    assert "new release" in config._format_version_upgrade_message(  # ruff:ignore[private-member-access]
         Version("1.0.0"),
         data,
         "pip",
     )
-    assert not config._format_version_upgrade_message(  # noqa: SLF001
+    assert not config._format_version_upgrade_message(  # ruff:ignore[private-member-access]
         Version("9.9.9"),
         data,
         "pip",
@@ -175,7 +175,7 @@ def test_fetch_latest_release_writes_cache(
         return_value=BytesIO(payload),
     )
     cache_file = tmp_path / "latest.json"
-    data = config._fetch_latest_release(str(cache_file))  # noqa: SLF001
+    data = config._fetch_latest_release(str(cache_file))  # ruff:ignore[private-member-access]
     assert data["tag_name"] == "v2.0.0"
     assert cache_file.is_file()
 
@@ -183,7 +183,7 @@ def test_fetch_latest_release_writes_cache(
         "ansiblelint.config.urllib.request.urlopen",
         side_effect=URLError("offline"),
     )
-    assert config._fetch_latest_release(str(tmp_path / "fail.json")) == {}  # noqa: SLF001
+    assert config._fetch_latest_release(str(tmp_path / "fail.json")) == {}  # ruff:ignore[private-member-access]
 
 
 @pytest.mark.parametrize(
@@ -303,7 +303,7 @@ def test_ro_venv(tmp_path: Path) -> None:
         # running with a ro venv and default cwd
         f"{venv_path}/bin/ansible-lint --version",
         # running from a read-only cwd:
-        f"cd / && {abspath(venv_path)}/bin/ansible-lint --version",  # noqa: PTH100
+        f"cd / && {abspath(venv_path)}/bin/ansible-lint --version",  # ruff:ignore[os-path-abspath]
         # running with a ro venv and a custom project path in forced non-online mode, so it will need to install requirements
         f"{venv_path}/bin/ansible-lint -vv --nocolor --no-offline --project-dir {tmp_path.as_posix()} ./examples/reqs_v2/",
     ]

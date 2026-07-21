@@ -36,7 +36,7 @@ def test_bb_helper_edge_cases() -> None:
     stack: list[tuple[str, str | None]] = []
     result: list[str] = []
 
-    output._append_bb_open_tag(  # noqa: SLF001
+    output._append_bb_open_tag(  # ruff:ignore[private-member-access]
         "bold",
         "x",
         "[bold=x]",
@@ -47,8 +47,8 @@ def test_bb_helper_edge_cases() -> None:
     assert result == ["<b param=x>"]
     assert stack == [("bold", "x")]
 
-    output._append_bb_close_tag([], result, mapping)  # noqa: SLF001
+    output._append_bb_close_tag([], result, mapping)  # ruff:ignore[private-member-access]
     assert result[-1] == "[/]"
 
-    output._flush_bb_stack([("info", None), ("unknown", None)], result, mapping)  # noqa: SLF001
+    output._flush_bb_stack([("info", None), ("unknown", None)], result, mapping)  # ruff:ignore[private-member-access]
     assert "</i>" in result

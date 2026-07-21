@@ -277,7 +277,7 @@ class App:
             return RC.SUCCESS
         return RC.VIOLATIONS_FOUND
 
-    def report_summary(  # pylint: disable=too-many-locals # noqa: C901
+    def report_summary(  # pylint: disable=too-many-locals # ruff:ignore[complex-structure]
         self,
         summary: SummarizedResults,
         changed_files_count: int,

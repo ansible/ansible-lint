@@ -16,7 +16,7 @@ from ansiblelint.rules import (
 
 if __name__ == "__main__":
     subprocess.run(
-        ["ansible-lint", "--list-rules"],  # noqa: S607
+        ["ansible-lint", "--list-rules"],  # ruff:ignore[start-process-with-partial-path]
         check=True,
         stdout=subprocess.DEVNULL,
     )

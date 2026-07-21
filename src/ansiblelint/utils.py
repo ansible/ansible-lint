@@ -108,7 +108,7 @@ if TYPE_CHECKING:
     from ansiblelint.app import App
     from ansiblelint.rules import RulesCollection
 # Fallback vault password used when no vault configuration is found.
-DEFAULT_VAULT_PASSWORD = "x"  # noqa: S105
+DEFAULT_VAULT_PASSWORD = "x"  # ruff:ignore[hardcoded-password-string]
 
 PLAYBOOK_DIR = os.environ.get("ANSIBLE_PLAYBOOK_DIR", None)
 LINE_COLUMN_REGEX = re.compile(r"line (?P<line>\d+), column (?P<column>\d+)")
@@ -226,7 +226,7 @@ def ansible_templar(basedir: Path, templatevars: Any) -> Templar:
     return templar
 
 
-def mock_filter(left: Any, *args: Any, **kwargs: Any) -> Any:  # noqa: ARG001
+def mock_filter(left: Any, *args: Any, **kwargs: Any) -> Any:  # ruff:ignore[unused-function-argument]
     """Mock a filter that can take any combination of args and kwargs.
 
     This will return x when x | filter(y,z) is called
@@ -337,7 +337,7 @@ def ansible_template(
                 v = templar.environment.filters
                 if not hasattr(v, "_delegatee"):  # pragma: no cover
                     raise
-                v._delegatee[missing_filter] = mock_filter  # fmt: skip # noqa: SLF001 # pyright: ignore[reportAttributeAccessIssue]
+                v._delegatee[missing_filter] = mock_filter  # fmt: skip # ruff:ignore[private-member-access] # pyright: ignore[reportAttributeAccessIssue]
                 # Record the mocked filter so we can warn the user
                 if missing_filter not in options.mock_filters:
                     _logger.debug("Mocking missing filter %s", missing_filter)
@@ -424,7 +424,7 @@ def template(
             variables,
             **dict(kwargs, fail_on_undefined=fail_on_undefined),
         )
-        # Hack to skip the following exception when using to_json filter on a variable. # noqa: FIX004
+        # Hack to skip the following exception when using to_json filter on a variable. # ruff:ignore[line-contains-hack]
         # I guess the filter doesn't like empty vars...
     except (AnsibleError, ValueError, RepresenterError, ImportError):
         # templating failed, so just keep value as is.
@@ -1275,7 +1275,7 @@ def parse_yaml_linenumbers(  # type: ignore[no-any-unimported]
     # signature of AnsibleConstructor.construct_mapping
     def construct_mapping(  # type: ignore[no-any-unimported]
         node: yaml.MappingNode,
-        deep: bool = False,  # noqa: FBT002
+        deep: bool = False,  # ruff:ignore[boolean-default-value-positional-argument]
     ) -> AnsibleMapping:
         # pyright: ignore[reportArgumentType]
         mapping: AnsibleMapping = AnsibleConstructor.construct_mapping(  # type: ignore[no-any-unimported]
@@ -1285,11 +1285,11 @@ def parse_yaml_linenumbers(  # type: ignore[no-any-unimported]
             mapping[LINE_NUMBER_KEY] = getattr(node, LINE_NUMBER_KEY)
         else:
             if hasattr(mapping, "_line_number"):
-                mapping[LINE_NUMBER_KEY] = mapping._line_number  # noqa: SLF001
+                mapping[LINE_NUMBER_KEY] = mapping._line_number  # ruff:ignore[private-member-access]
         mapping[FILENAME_KEY] = lintable.path
         return mapping
 
-    try:  # noqa: PLW0717
+    try:  # ruff:ignore[too-many-statements-in-try-clause]
         kwargs = {}
         if "vault_password" in inspect.getfullargspec(AnsibleLoader.__init__).args:
             kwargs["vault_password"] = DEFAULT_VAULT_PASSWORD
@@ -1381,7 +1381,7 @@ def is_playbook(filename: str) -> bool:
 
     try:
         f = parse_yaml_from_file(filename)
-    except Exception as exc:  # pylint: disable=broad-except # noqa: BLE001
+    except Exception as exc:  # pylint: disable=broad-except # ruff:ignore[blind-except]
         _logger.warning(
             "Failed to load %s with %s, assuming is not a playbook.",
             filename,
