@@ -36,7 +36,7 @@ class _SystemExitModule(ModuleType):
 def test_vault_secrets_loaded(monkeypatch: pytest.MonkeyPatch) -> None:
     """Vault secrets are loaded from ansible configuration."""
     monkeypatch.setattr(utils, "_vault_secrets", None)
-    secrets = utils._get_vault_secrets()  # noqa: SLF001
+    secrets = utils._get_vault_secrets()  # ruff:ignore[private-member-access]
     assert len(secrets) >= 1
     _vault_id, secret = secrets[0]
     # Should be the real password from .vault_pass, not the dummy
@@ -47,7 +47,7 @@ def test_vault_secrets_fallback(monkeypatch: pytest.MonkeyPatch) -> None:
     """Dummy password is returned when no vault configuration exists."""
     monkeypatch.setattr(utils, "_vault_secrets", None)
     monkeypatch.setattr(ansible_constants, "DEFAULT_VAULT_PASSWORD_FILE", None)
-    secrets = utils._get_vault_secrets()  # noqa: SLF001
+    secrets = utils._get_vault_secrets()  # ruff:ignore[private-member-access]
     assert len(secrets) == 1
     _vault_id, secret = secrets[0]
     assert secret.bytes == b"x"
@@ -61,7 +61,7 @@ def test_vault_secrets_bad_file(monkeypatch: pytest.MonkeyPatch) -> None:
         "DEFAULT_VAULT_PASSWORD_FILE",
         "/nonexistent/vault_pass",
     )
-    secrets = utils._get_vault_secrets()  # noqa: SLF001
+    secrets = utils._get_vault_secrets()  # ruff:ignore[private-member-access]
     assert len(secrets) == 1
     _vault_id, secret = secrets[0]
     assert secret.bytes == b"x"
@@ -71,7 +71,7 @@ def test_vault_secrets_import_failure(monkeypatch: pytest.MonkeyPatch) -> None:
     """Dummy password is used when importing ansible.cli raises SystemExit."""
     monkeypatch.setattr(utils, "_vault_secrets", None)
     monkeypatch.setitem(sys.modules, "ansible.cli", _SystemExitModule("ansible.cli"))
-    secrets = utils._get_vault_secrets()  # noqa: SLF001
+    secrets = utils._get_vault_secrets()  # ruff:ignore[private-member-access]
     assert len(secrets) == 1
     _vault_id, secret = secrets[0]
     assert secret.bytes == b"x"
@@ -99,8 +99,8 @@ def test_vault_secrets_without_initialize_context(
         return fake_secrets
 
     monkeypatch.setattr(CLI, "setup_vault_secrets", fake_setup_vault_secrets)
-    assert utils._get_vault_secrets() is fake_secrets  # noqa: SLF001
-    assert utils._get_vault_secrets() is fake_secrets  # noqa: SLF001
+    assert utils._get_vault_secrets() is fake_secrets  # ruff:ignore[private-member-access]
+    assert utils._get_vault_secrets() is fake_secrets  # ruff:ignore[private-member-access]
     # A strict signature above also proves initialize_context was not passed.
     assert captured["calls"] == 1  # second call is served from the cache
     assert captured["ask_vault_pass"] is False
@@ -116,7 +116,7 @@ def test_make_dataloader_without_set_vault_secrets(
         """DataLoader variant without vault secret support."""
 
     monkeypatch.setattr(utils, "DataLoader", _PlainLoader)
-    loader = utils._make_dataloader()  # noqa: SLF001
+    loader = utils._make_dataloader()  # ruff:ignore[private-member-access]
     assert isinstance(loader, _PlainLoader)
 
 

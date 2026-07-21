@@ -54,8 +54,8 @@ def test_get_rule_skips_from_line(line: str, expected: str | list[str]) -> None:
     v = get_rule_skips_from_line(line, lintable=Lintable(""))
     if expected == []:
         assert v == []
-        assert skip_utils._noqa_comment_line_re.fullmatch(line)  # noqa: SLF001
-        assert skip_utils._noqa_comment_re.match(line)  # noqa: SLF001
+        assert skip_utils._noqa_comment_line_re.fullmatch(line)  # ruff:ignore[private-member-access]
+        assert skip_utils._noqa_comment_re.match(line)  # ruff:ignore[private-member-access]
     else:
         assert v == [expected]
 

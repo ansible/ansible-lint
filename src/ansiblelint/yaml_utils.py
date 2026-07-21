@@ -665,7 +665,7 @@ class FormattedEmitter(Emitter):
         """Select how to quote scalars if needed."""
         style = super().choose_scalar_style()
         if (
-            style == ""  # noqa: PLC1901
+            style == ""  # ruff:ignore[compare-to-empty-string]
             and self.event.value.startswith("0")
             and len(self.event.value) > 1
         ):
@@ -701,9 +701,9 @@ class FormattedEmitter(Emitter):
 
     def increase_indent(
         self,
-        flow: bool = False,  # noqa: FBT002
+        flow: bool = False,  # ruff:ignore[boolean-default-value-positional-argument]
         sequence: bool | None = None,
-        indentless: bool = False,  # noqa: FBT002
+        indentless: bool = False,  # ruff:ignore[boolean-default-value-positional-argument]
     ) -> None:
         super().increase_indent(flow, sequence, indentless)
         # If our previous node was a sequence and we are still trying to indent, don't
@@ -717,8 +717,8 @@ class FormattedEmitter(Emitter):
         self,
         indicator: str,  # ruamel.yaml typehint is wrong. This is a string.
         need_whitespace: bool,
-        whitespace: bool = False,  # noqa: FBT002
-        indention: bool = False,  # (sic) ruamel.yaml has this typo in their API # noqa: FBT002
+        whitespace: bool = False,  # ruff:ignore[boolean-default-value-positional-argument]
+        indention: bool = False,  # (sic) ruamel.yaml has this typo in their API # ruff:ignore[boolean-default-value-positional-argument]
     ) -> None:
         """Make sure that flow maps get whitespace by the curly braces."""
         # We try to go with one whitespace by the curly braces and adjust accordingly
@@ -799,7 +799,7 @@ class FormattedEmitter(Emitter):
     def write_comment(
         self,
         comment: CommentToken,
-        pre: bool = False,  # noqa: FBT002
+        pre: bool = False,  # ruff:ignore[boolean-default-value-positional-argument]
     ) -> None:
         """Clean up extra new lines and spaces in comments.
 
@@ -1086,7 +1086,7 @@ class FormattedYAML(YAML):
             data = self.load_all(stream=text)
         except ParserError:
             data = None
-            _logger.error(  # noqa: TRY400
+            _logger.error(  # ruff:ignore[error-instead-of-exception]
                 "Invalid yaml, verify the file contents and try again.",
             )
         if preamble_comment is not None and isinstance(

@@ -43,7 +43,7 @@ def pytest_configure(config: pytest.Config) -> None:
                 text=True,
             )
         except subprocess.CalledProcessError as exc:
-            print(f"{exc}\n{exc.stderr}\n{exc.stdout}", file=sys.stderr)  # noqa: T201
+            print(f"{exc}\n{exc.stderr}\n{exc.stdout}", file=sys.stderr)  # ruff:ignore[print]
             sys.exit(1)
 
 
@@ -57,7 +57,7 @@ def is_master(config: pytest.Config) -> bool:
     return not hasattr(config, "workerinput")
 
 
-# ruff: noqa: E402
+# ruff:file-ignore[module-import-not-at-top-of-file]
 from ansible.module_utils.common.yaml import (  # pylint: disable=wrong-import-position
     HAS_LIBYAML,
 )
