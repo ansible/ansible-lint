@@ -348,7 +348,7 @@ class Runner:
         # avoid resource leak warning, https://github.com/python/cpython/issues/90549
         # pylint: disable=unused-variable
         with contextlib.suppress(OSError):
-            global_resource = multiprocessing.Semaphore()  # ruff:ignore[unused-variable]
+            _global_resource = multiprocessing.Semaphore()
 
         return_list = self._map_syntax_check_workers(worker, files)
         for data in return_list:
