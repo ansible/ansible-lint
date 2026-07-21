@@ -344,7 +344,7 @@ class Markdown(UserString):
                 _logger.info(msg)
 
         if md_cmd:
-            subprocess.run(  # noqa: S603
+            subprocess.run(  # ruff:ignore[subprocess-without-shell-equals-true]
                 md_renderers[md_cmd],
                 input=self.data,
                 text=True,

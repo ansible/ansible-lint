@@ -55,7 +55,7 @@ def test_expand_path_vars(monkeypatch: MonkeyPatch) -> None:
     """Ensure that tilde and env vars are expanded in paths."""
     test_path = "/test/path"
     monkeypatch.setenv("TEST_PATH", test_path)
-    assert expand_path_vars("~") == os.path.expanduser("~")  # noqa: PTH111
+    assert expand_path_vars("~") == os.path.expanduser("~")  # ruff:ignore[os-path-expanduser]
     assert expand_path_vars("$TEST_PATH") == test_path
 
 
@@ -65,7 +65,7 @@ def test_expand_path_vars(monkeypatch: MonkeyPatch) -> None:
         pytest.param(Path("$TEST_PATH"), "/test/path", id="pathlib.Path"),
         pytest.param("$TEST_PATH", "/test/path", id="str"),
         pytest.param("  $TEST_PATH  ", "/test/path", id="stripped-str"),
-        pytest.param("~", os.path.expanduser("~"), id="home"),  # noqa: PTH111
+        pytest.param("~", os.path.expanduser("~"), id="home"),  # ruff:ignore[os-path-expanduser]
     ),
 )
 def test_expand_paths_vars(
@@ -513,7 +513,7 @@ def test_lintable_content_deleter(
     (
         pytest.param("foo", "foo", id="rel"),
         pytest.param(
-            os.path.expanduser("~/xxx"),  # noqa: PTH111
+            os.path.expanduser("~/xxx"),  # ruff:ignore[os-path-expanduser]
             "~/xxx",
             id="rel-to-home",
         ),
@@ -612,11 +612,11 @@ def test_get_project_root_for_dir_is_cached(tmp_path: Path) -> None:
     nested = project / "roles" / "demo"
     nested.mkdir(parents=True)
 
-    file_utils._get_project_root_for_dir.cache_clear()  # noqa: SLF001
-    first = file_utils._get_project_root_for_dir(str(nested.resolve()))  # noqa: SLF001
-    second = file_utils._get_project_root_for_dir(str(nested.resolve()))  # noqa: SLF001
+    file_utils._get_project_root_for_dir.cache_clear()  # ruff:ignore[private-member-access]
+    first = file_utils._get_project_root_for_dir(str(nested.resolve()))  # ruff:ignore[private-member-access]
+    second = file_utils._get_project_root_for_dir(str(nested.resolve()))  # ruff:ignore[private-member-access]
     assert first == second == project.resolve()
-    assert file_utils._get_project_root_for_dir.cache_info().hits >= 1  # noqa: SLF001
+    assert file_utils._get_project_root_for_dir.cache_info().hits >= 1  # ruff:ignore[private-member-access]
 
 
 def test_find_role_dir_namespace_subdir(tmp_path: Path) -> None:

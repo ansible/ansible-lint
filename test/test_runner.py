@@ -327,24 +327,24 @@ def test_build_load_failure_match_empty_args(
     cause = ScannerError("while scanning", None, "problem", None)
     lintable.exc.__cause__ = cause
 
-    match = runner._build_load_failure_match(lintable)  # noqa: SLF001
+    match = runner._build_load_failure_match(lintable)  # ruff:ignore[private-member-access]
     assert match.rule.id == "load-failure"
     assert match.tag.startswith("load-failure[")
     assert match.message == "boom"
 
     lintable.exc = None
     with pytest.raises(RuntimeError, match=r"Expected lintable\.exc"):
-        runner._build_load_failure_match(lintable)  # noqa: SLF001
+        runner._build_load_failure_match(lintable)  # ruff:ignore[private-member-access]
 
     lintable.state = States.LOAD_FAILED
     lintable.exc = Exception("still broken")
     matches: list[Any] = []
-    assert runner._process_load_error_lintable(lintable, matches) is False  # noqa: SLF001
+    assert runner._process_load_error_lintable(lintable, matches) is False  # ruff:ignore[private-member-access]
     assert len(matches) == 1
     assert lintable.stop_processing is True
 
     assert (
-        runner._is_lintable_excluded_by_paths(  # noqa: SLF001
+        runner._is_lintable_excluded_by_paths(  # ruff:ignore[private-member-access]
             Lintable("examples/playbooks/become.yml"),
         )
         is False
@@ -369,5 +369,5 @@ def test_map_syntax_check_workers_threadpool_fallback(
 
     monkeypatch.setattr(multiprocessing.pool, "ThreadPool", boom)
     files = [Lintable("examples/playbooks/become.yml")]
-    results = runner._map_syntax_check_workers(lambda _f: [], files)  # noqa: SLF001
+    results = runner._map_syntax_check_workers(lambda _f: [], files)  # ruff:ignore[private-member-access]
     assert results == [[]]

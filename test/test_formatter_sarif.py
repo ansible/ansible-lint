@@ -11,7 +11,7 @@ from tempfile import NamedTemporaryFile
 
 import pytest
 
-from ansiblelint.app import App  # noqa: TC001
+from ansiblelint.app import App  # ruff:ignore[typing-only-first-party-import]
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.formatters import SarifFormatter
@@ -225,7 +225,7 @@ def test_sarif_file(file: str, return_code: int) -> None:
         ]
         result = subprocess.run([*cmd, file], check=False, capture_output=True)
         assert result.returncode == return_code
-        assert os.path.exists(output_file.name)  # noqa: PTH110
+        assert os.path.exists(output_file.name)  # ruff:ignore[os-path-exists]
         assert pathlib.Path(output_file.name).stat().st_size > 0
 
 
@@ -245,6 +245,6 @@ def test_sarif_file_creates_it_if_none_exists(file: str, return_code: int) -> No
     ]
     result = subprocess.run([*cmd, file], check=False, capture_output=True)
     assert result.returncode == return_code
-    assert os.path.exists(sarif_file_name)  # noqa: PTH110
+    assert os.path.exists(sarif_file_name)  # ruff:ignore[os-path-exists]
     assert pathlib.Path(sarif_file_name).stat().st_size > 0
     pathlib.Path.unlink(pathlib.Path(sarif_file_name))

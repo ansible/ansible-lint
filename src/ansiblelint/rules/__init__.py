@@ -435,7 +435,7 @@ class RulesCollection:
             ],
         )
         for rule in self.rules:
-            rule._collection = self  # noqa: SLF001
+            rule._collection = self  # ruff:ignore[private-member-access]
         for rule in load_plugins(rulesdirs_str):
             self.register(rule, conditional=conditional)
         self.rules = sorted(self.rules)
@@ -451,7 +451,7 @@ class RulesCollection:
         """Register a rule."""
         # We skip opt-in rules which were not manually enabled.
         # But we do include opt-in rules when listing all rules or tags
-        obj._collection = self  # pylint: disable=protected-access # noqa: SLF001
+        obj._collection = self  # pylint: disable=protected-access # ruff:ignore[private-member-access]
         if any(
             [
                 not conditional,
