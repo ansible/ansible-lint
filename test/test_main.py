@@ -186,6 +186,31 @@ def test_fetch_latest_release_writes_cache(
     assert config._fetch_latest_release(str(tmp_path / "fail.json")) == {}  # ruff:ignore[private-member-access]
 
 
+def test_fetch_latest_release_timeout(
+    tmp_path: Path,
+    mocker: MockerFixture,
+) -> None:
+    """Urlopen must be called with a timeout, and a stall must not hang/crash.
+
+    Regression test for a stalled connection to api.github.com blocking the
+    whole ansible-lint run indefinitely, same bug class as #2869.
+    """
+    from io import BytesIO
+
+    from ansiblelint import config
+
+    payload = b'{"html_url": "https://example.invalid", "tag_name": "v2.0.0"}'
+    urlopen_mock = mocker.patch(
+        "ansiblelint.config.urllib.request.urlopen",
+        return_value=BytesIO(payload),
+    )
+    config._fetch_latest_release(str(tmp_path / "latest.json"))  # ruff:ignore[private-member-access]
+    assert urlopen_mock.call_args.kwargs.get("timeout")
+
+    urlopen_mock.side_effect = TimeoutError
+    assert config._fetch_latest_release(str(tmp_path / "fail.json")) == {}  # ruff:ignore[private-member-access]
+
+
 @pytest.mark.parametrize(
     ("offline", "cache_created"),
     (
