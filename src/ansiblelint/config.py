@@ -333,7 +333,7 @@ def get_version_warning() -> str:
             msg = "release_url must start with https://"
             raise ValueError(msg)
         try:
-            with urllib.request.urlopen(release_url) as url:
+            with urllib.request.urlopen(release_url, timeout=5) as url:
                 data = json.load(url)
                 with open(cache_file, "w", encoding="utf-8") as f:
                     json.dump(data, f)
