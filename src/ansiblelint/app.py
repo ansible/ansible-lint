@@ -416,6 +416,19 @@ def _add_module_path_if_needed(
             module_paths.insert(0, str(mock_path))
 
 
+def _update_path_env(
+    env: dict[str, str],
+    varname: str,
+    paths: list[str],
+) -> None:
+    """Prepend path entries to an environment variable without duplicates."""
+    if not paths:
+        return
+    current = env.get(varname, "")
+    values = [*paths, *(current.split(os.pathsep) if current else [])]
+    env[varname] = os.pathsep.join(dict.fromkeys(values))
+
+
 def get_app(*, offline: bool | None = None, cached: bool = False) -> App:
     """Return the application instance, caching the return value."""
     # Avoids ever running the app initialization twice if cached argument
@@ -458,7 +471,11 @@ def get_app(*, offline: bool | None = None, cached: bool = False) -> App:
 
     # https://github.com/ansible/ansible-lint/issues/4973
     _add_collections_path_if_needed(app.options, app.runtime.config.collections_paths)
-    _add_module_path_if_needed(app.options, app.runtime.config.default_module_path)
+    default_module_paths = app.runtime.config.default_module_path
+    module_paths = default_module_paths.copy()
+    _add_module_path_if_needed(app.options, module_paths)
+    if module_paths != default_module_paths:
+        _update_path_env(app.runtime.environ, "ANSIBLE_LIBRARY", module_paths)
 
     app.runtime.prepare_environment(
         install_local=(not offline),
