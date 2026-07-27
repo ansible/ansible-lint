@@ -37,7 +37,7 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__name__)
 
 ignored_re = re.compile(
-    "|".join(  # noqa: FLY002
+    "|".join(  # ruff:ignore[static-join-to-f-string]
         [
             r"^parameters are mutually exclusive:",
             # https://github.com/ansible/ansible-lint/issues/3128 as strings can be jinja
@@ -208,7 +208,7 @@ class ArgsRule(AnsibleLintRule):
                 else:
                     sys.modules[spec.name] = previous_module
 
-            try:  # noqa: PLW0717
+            try:  # ruff:ignore[too-many-statements-in-try-clause]
                 if not hasattr(module, "main"):
                     # skip validation for module options that are implemented as action plugin
                     # as the option values can be changed in action plugin and are not passed
@@ -232,7 +232,7 @@ class ArgsRule(AnsibleLintRule):
                     # as what happens may be very hard to debug.
                     with contextlib.redirect_stdout(fio):
                         # pylint: disable=protected-access
-                        basic._ANSIBLE_ARGS = None  # noqa: SLF001
+                        basic._ANSIBLE_ARGS = None  # ruff:ignore[private-member-access]
                         try:
                             module.main()
                         except SystemExit:
@@ -323,9 +323,12 @@ class ArgsRule(AnsibleLintRule):
 
 # testing code to be loaded only with pytest or when executed the rule file
 if "pytest" in sys.modules:
-    import pytest  # noqa: TC002
+    from typing import cast
+
+    import pytest  # ruff:ignore[typing-only-third-party-import]
 
     from ansiblelint.runner import Runner  # pylint: disable=ungrouped-imports
+    from ansiblelint.utils import Task
 
     def test_args_module_fail(default_rules_collection: RulesCollection) -> None:
         """Test rule invalid module options."""
@@ -389,13 +392,13 @@ if "pytest" in sys.modules:
                 return getattr(self, key)
 
         rule = ArgsRule()
-        task = MockTask()
+        task = cast("Task", MockTask())
         failed_msg = '{"msg": "value of default must be one of: allow, deny, reject"}'
 
         # pylint: disable=protected-access
-        results = rule._parse_failed_msg(  # noqa: SLF001
+        results = rule._parse_failed_msg(  # ruff:ignore[private-member-access]
             failed_msg,
-            task,  # type: ignore[arg-type]
+            task,
             "ufw",
         )
 

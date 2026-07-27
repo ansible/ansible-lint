@@ -12,12 +12,12 @@ description:
 """
 
 
-def filter_with_importerror(data: Any) -> dict[str, str]:  # noqa: ARG001
+def filter_with_importerror(data: Any) -> dict[str, str]:  # ruff:ignore[unused-function-argument]
     """Sample filter.
 
     :return: dict
     """
-    import a_module_that_does_not_exist  # type: ignore[reportMissingImports] # noqa: F401
+    import a_module_that_does_not_exist  # type: ignore[reportMissingImports] # ruff:ignore[unused-import]
 
     return {}
 

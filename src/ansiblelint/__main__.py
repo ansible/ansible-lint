@@ -41,9 +41,9 @@ from ansiblelint.constants import RC, SKIP_SCHEMA_UPDATE
 # safety check for broken ansible core, needs to happen first
 try:
     # pylint: disable=unused-import
-    from ansible.parsing.dataloader import DataLoader  # noqa: F401
+    from ansible.parsing.dataloader import DataLoader  # ruff:ignore[unused-import]
 
-except Exception as _exc:  # pylint: disable=broad-exception-caught # noqa: BLE001
+except Exception as _exc:  # pylint: disable=broad-exception-caught # ruff:ignore[blind-except]
     logging.fatal(_exc)
     sys.exit(RC.INVALID_CONFIG)
 # pylint: disable=ungrouped-imports
@@ -54,6 +54,7 @@ from ansiblelint.config import (
     Options,
     get_deps_versions,
     get_version_warning,
+    has_custom_ansible_env,
     log_entries,
     options,
 )
@@ -91,7 +92,7 @@ class LintLogHandler(logging.Handler):
             console_stderr.print(f"[dim]{msg}[/]")
         except RecursionError:  # See issue 36272
             raise
-        except Exception:  # pylint: disable=broad-exception-caught # noqa: BLE001
+        except Exception:  # pylint: disable=broad-exception-caught # ruff:ignore[blind-except]
             self.handleError(record)
 
 
@@ -145,26 +146,28 @@ def initialize_options(arguments: list[str] | None = None) -> BaseFileLock | Non
         or options.list_rules
         or options.list_tags
     ):
-        options.cache_dir = get_cache_dir(pathlib.Path(options.project_dir))
+        options.cache_dir = get_cache_dir(
+            pathlib.Path(options.project_dir),
+            isolated=not options.offline and not has_custom_ansible_env(),
+        )
 
     options.project_dir = Path(options.project_dir).resolve().as_posix()
 
     # add a lock file so we do not have two instances running inside at the same time
-    if options.cache_dir:
+    if options.cache_dir and not options.offline:
         options.cache_dir.mkdir(parents=True, exist_ok=True)
 
         # lock file can only be used if cache_dir is set and writable
-        if not options.offline:  # pragma: no cover
-            cache_dir_lock = FileLock(
-                f"{options.cache_dir}/.lock",
+        cache_dir_lock = FileLock(
+            f"{options.cache_dir}/.lock",
+        )
+        try:
+            cache_dir_lock.acquire(timeout=180)
+        except Timeout:  # pragma: no cover
+            _logger.error(  # ruff:ignore[error-instead-of-exception]
+                "Timeout waiting for another instance of ansible-lint to release the lock.",
             )
-            try:
-                cache_dir_lock.acquire(timeout=180)
-            except Timeout:  # pragma: no cover
-                _logger.error(  # noqa: TRY400
-                    "Timeout waiting for another instance of ansible-lint to release the lock.",
-                )
-                sys.exit(RC.LOCK_TIMEOUT)
+            sys.exit(RC.LOCK_TIMEOUT)
 
     # Avoid extra output noise from Ansible about using devel versions
     if "ANSIBLE_DEVEL_WARNING" not in os.environ:  # pragma: no branch
@@ -224,15 +227,27 @@ def _handle_warn_list_rerun(
     new_results: LintResult,
     result: LintResult,
     warn_list: list[str],
+    claimed: set[tuple[str, str | None, int]],
 ) -> bool:
-    """Refresh warn_list matches after rerun. Returns True if handled."""
+    """Refresh warn_list matches after rerun. Returns True if handled.
+
+    Correlates repeated same-tag violations in one file one-to-one with rerun
+    results, preferring the closest lineno and consuming each new match once.
+    """
     if not _is_warn_list_match(match, warn_list):
         return False
-    for new_match in new_results.matches:
-        if new_match.tag == match.tag and new_match.filename == match.filename:
-            result.matches[idx] = new_match
-            _logger.debug("Still warned: %s", new_match)
-            break
+    candidates = [
+        new_match
+        for new_match in new_results.matches
+        if new_match.tag == match.tag
+        and new_match.filename == match.filename
+        and (new_match.tag, new_match.filename, new_match.lineno) not in claimed
+    ]
+    if candidates:
+        best = min(candidates, key=lambda item: abs(item.lineno - match.lineno))
+        claimed.add((best.tag, best.filename, best.lineno))
+        result.matches[idx] = best
+        _logger.debug("Still warned: %s", best)
     else:
         _logger.debug("Warn_list match retained: %s", match)
     return True
@@ -268,36 +283,55 @@ def _process_fix_rerun_matches(
     """Rerun yaml rule matches and update the result list after transforms."""
     rerun = ["yaml"]
     resolved: list[tuple[str, str]] = []
-    for idx, match in reversed(list(enumerate(result.matches))):
-        _logger.debug("Fixing: (%s of %s) %s", match_count - idx, match_count, match)
-        if match.fixed:
-            _logger.debug("Fixed, removed: %s", match)
-            result.matches.pop(idx)
-            continue
-        if match.rule.id not in rerun:
-            _logger.debug("Not rerun eligible: %s", match)
-            continue
+    claimed_warn_matches: set[tuple[str, str | None, int]] = set()
+    original_tags = runtime_options.tags
+    original_lintables = runtime_options.lintables
+    original_skip_check = (
+        runtime_options._skip_ansible_syntax_check  # ruff:ignore[private-member-access]
+    )
+    try:
+        for idx, match in reversed(list(enumerate(result.matches))):
+            _logger.debug(
+                "Fixing: (%s of %s) %s",
+                match_count - idx,
+                match_count,
+                match,
+            )
+            if match.fixed:
+                _logger.debug("Fixed, removed: %s", match)
+                result.matches.pop(idx)
+                continue
+            if match.rule.id not in rerun:
+                _logger.debug("Not rerun eligible: %s", match)
+                continue
 
-        uid = (match.rule.id, match.filename)
-        if uid in resolved:
-            _logger.debug("Previously resolved: %s", match)
-            result.matches.pop(idx)
-            continue
+            uid = (match.rule.id, match.filename)
+            if uid in resolved:
+                _logger.debug("Previously resolved: %s", match)
+                result.matches.pop(idx)
+                continue
 
-        _logger.debug("Rerunning: %s", match)
-        runtime_options.tags = [match.rule.id]
-        runtime_options.lintables = [match.filename]
-        runtime_options._skip_ansible_syntax_check = True  # noqa: SLF001
-        new_results = get_matches(rules, runtime_options)
-        if _handle_warn_list_rerun(
-            idx,
-            match,
-            new_results,
-            result,
-            runtime_options.warn_list,
-        ):
-            continue
-        _apply_rerun_outcome(idx, match, new_results, result, resolved)
+            _logger.debug("Rerunning: %s", match)
+            runtime_options.tags = [match.rule.id]
+            runtime_options.lintables = [match.filename]
+            runtime_options._skip_ansible_syntax_check = True  # ruff:ignore[private-member-access]
+            new_results = get_matches(rules, runtime_options)
+            if _handle_warn_list_rerun(
+                idx,
+                match,
+                new_results,
+                result,
+                runtime_options.warn_list,
+                claimed_warn_matches,
+            ):
+                continue
+            _apply_rerun_outcome(idx, match, new_results, result, resolved)
+    finally:
+        runtime_options.tags = original_tags
+        runtime_options.lintables = original_lintables
+        runtime_options._skip_ansible_syntax_check = (  # ruff:ignore[private-member-access]
+            original_skip_check
+        )
 
 
 def fix(runtime_options: Options, result: LintResult, rules: RulesCollection) -> None:
@@ -532,7 +566,7 @@ def path_inject(own_location: str = "") -> None:
             paths[idx] = str(Path(path).expanduser())
             expanded = True
     if expanded:  # pragma: no cover
-        print(  # noqa: T201
+        print(  # ruff:ignore[print]
             "WARNING: PATH altered to expand ~ in it. Read https://stackoverflow.com/a/44704799/99834 and correct your system configuration.",
             file=sys.stderr,
         )
@@ -568,7 +602,7 @@ def path_inject(own_location: str = "") -> None:
             all("pipx" in p for p in inject_paths),
             all("uv/tools" in p for p in inject_paths),
         )):
-            print(  # noqa: T201
+            print(  # ruff:ignore[print]
                 f"WARNING: PATH altered to include {', '.join(inject_paths)} :: This is usually a sign of broken local setup, which can cause unexpected behaviors.",
                 file=sys.stderr,
             )

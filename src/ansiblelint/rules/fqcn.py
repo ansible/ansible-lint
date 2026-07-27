@@ -172,7 +172,7 @@ class FQCNBuiltinsRule(AnsibleLintRule, TransformMixin):
                         tag="fqcn[action]",
                     ),
                 )
-            # TODO(ssbarnea): Remove the c.g. and c.n. exceptions from here once # noqa: FIX002
+            # TODO(ssbarnea): Remove the c.g. and c.n. exceptions from here once # ruff:ignore[line-contains-todo]
             # community team is flattening these.
             # https://github.com/ansible-community/community-topics/issues/147
             elif not module.startswith("community.general.") or module.startswith(

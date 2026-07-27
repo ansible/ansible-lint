@@ -40,7 +40,7 @@ from collections.abc import (
     Sequence,
 )
 from dataclasses import MISSING, dataclass, field
-from functools import cache, lru_cache
+from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -55,6 +55,7 @@ except ImportError:  # pragma: no branch
         to_bytes,
     )
 
+from ansible import constants as ansible_constants
 from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.mod_args import ModuleArgsParser
@@ -71,7 +72,7 @@ from ansible.plugins.loader import (
 from ansible.template import Templar
 from ansible.utils.collection_loader import AnsibleCollectionConfig
 from jinja2 import Environment, nodes
-from jinja2.exceptions import TemplateError, TemplateSyntaxError
+from jinja2.exceptions import TemplateError
 from packaging.version import Version
 from yaml.composer import Composer
 from yaml.parser import ParserError
@@ -106,15 +107,11 @@ from ansiblelint.types import (
 if TYPE_CHECKING:
     from ansiblelint.app import App
     from ansiblelint.rules import RulesCollection
-# ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
-# string as the password to enable such yaml files to be opened and parsed
-# successfully.
-DEFAULT_VAULT_PASSWORD = "x"  # noqa: S105
+# Fallback vault password used when no vault configuration is found.
+DEFAULT_VAULT_PASSWORD = "x"  # ruff:ignore[hardcoded-password-string]
 
 PLAYBOOK_DIR = os.environ.get("ANSIBLE_PLAYBOOK_DIR", None)
-LINE_COLUMN_REGEX = re.compile(
-    r".*line (?P<line>\d+), column (?P<column>\d+).*", flags=re.MULTILINE
-)
+LINE_COLUMN_REGEX = re.compile(r"line (?P<line>\d+), column (?P<column>\d+)")
 
 # cspell: ignore yamllinter
 # Taken from ansible-core's test/lib/ansible_test/_util/controller/sanity/yamllint/yamllinter.py
@@ -123,14 +120,79 @@ FMT_RE = re.compile(r"^# fmt:\s+(\S+)")
 
 _logger = logging.getLogger(__name__)
 
+# Vault secrets are resolved on first use and cached for the process lifetime.
+_vault_secrets: list[tuple[str, Any]] | None = None
+
+
+def _configured_vault_secrets() -> list[tuple[str, Any]] | None:
+    """Load vault secrets from Ansible configuration, or None when unavailable."""
+    try:
+        # Deferred import: importing ansible.cli initializes the locale and
+        # raises SystemExit on systems without a UTF-8 locale.
+        from ansible.cli import CLI
+    except SystemExit:  # NOSONAR
+        # Deliberately not re-raised: when ansible.cli refuses to load, vault
+        # support degrades to the fallback password instead of terminating
+        # the calling process.
+        _logger.debug("Unable to import ansible.cli", exc_info=True)
+        return None
+
+    loader = DataLoader()  # type: ignore[no-untyped-call,unused-ignore]
+
+    vault_ids = list(
+        getattr(ansible_constants, "DEFAULT_VAULT_IDENTITY_LIST", None) or []
+    )
+
+    kwargs: dict[str, Any] = {
+        "ask_vault_pass": False,
+        "auto_prompt": False,
+    }
+    # initialize_context was added in ansible-core 2.19
+    if "initialize_context" in inspect.getfullargspec(CLI.setup_vault_secrets).args:
+        kwargs["initialize_context"] = False
+
+    try:
+        secrets: list[tuple[str, Any]] = CLI.setup_vault_secrets(  # type: ignore[no-untyped-call]
+            loader,
+            vault_ids=vault_ids,
+            **kwargs,
+        )
+    except (AnsibleError, RuntimeError, Warning):
+        _logger.debug(
+            "Failed to load vault secrets from configuration",
+            exc_info=True,
+        )
+        return None
+    return secrets or None
+
+
+def _get_vault_secrets() -> list[tuple[str, Any]]:
+    """Return vault secrets from Ansible configuration, falling back to a dummy password."""
+    # pylint: disable=global-statement
+    global _vault_secrets
+    if _vault_secrets is None:
+        # Fall back to the dummy password for backward compatibility when no
+        # vault configuration is available.
+        _vault_secrets = _configured_vault_secrets() or [
+            (
+                "default",
+                PromptVaultSecret(_bytes=to_bytes(DEFAULT_VAULT_PASSWORD)),  # type: ignore[no-untyped-call]
+            ),
+        ]
+    return _vault_secrets
+
+
+def _make_dataloader() -> DataLoader:
+    """Create a DataLoader with vault secrets from Ansible configuration."""
+    loader = DataLoader()  # type: ignore[no-untyped-call,unused-ignore]
+    if hasattr(loader, "set_vault_secrets"):
+        loader.set_vault_secrets(_get_vault_secrets())
+    return loader
+
 
 def parse_yaml_from_file(filepath: str) -> AnsibleJSON:
     """Extract a decrypted YAML object from file."""
-    dataloader = DataLoader()  # type: ignore[no-untyped-call,unused-ignore]
-    if hasattr(dataloader, "set_vault_secrets"):
-        dataloader.set_vault_secrets([
-            ("default", PromptVaultSecret(_bytes=to_bytes(DEFAULT_VAULT_PASSWORD)))  # type: ignore[no-untyped-call]
-        ])
+    dataloader = _make_dataloader()
     result: object = dataloader.load_from_file(filepath)
     if result is None:
         return result
@@ -143,7 +205,7 @@ def parse_yaml_from_file(filepath: str) -> AnsibleJSON:
 
 def path_dwim(basedir: str, given: str) -> str:
     """Convert a given path do-what-I-mean style."""
-    dataloader = DataLoader()  # type: ignore[no-untyped-call,unused-ignore]
+    dataloader = _make_dataloader()
     dataloader.set_basedir(basedir)
     return str(dataloader.path_dwim(given))
 
@@ -158,13 +220,13 @@ def ansible_templar(basedir: Path, templatevars: Any) -> Templar:
     if basedir.name == "tasks":
         basedir = basedir.parent
 
-    dataloader = DataLoader()  # type: ignore[no-untyped-call,unused-ignore]
+    dataloader = _make_dataloader()
     dataloader.set_basedir(str(basedir))
     templar = Templar(dataloader, variables=templatevars)
     return templar
 
 
-def mock_filter(left: Any, *args: Any, **kwargs: Any) -> Any:  # noqa: ARG001
+def mock_filter(left: Any, *args: Any, **kwargs: Any) -> Any:  # ruff:ignore[unused-function-argument]
     """Mock a filter that can take any combination of args and kwargs.
 
     This will return x when x | filter(y,z) is called
@@ -197,7 +259,7 @@ def has_lookup_function_calls(varname: str) -> bool:
         for node in ast_tree.find_all(nodes.Call):
             if isinstance(node.node, nodes.Name) and node.node.name in lookup_names:
                 return True
-    except (TemplateSyntaxError, TemplateError, AttributeError):
+    except (TemplateError, AttributeError):
         # Fallback to regex for edge cases where Jinja2 parsing fails
         fallback_pattern = re.compile(r"\(?(lookup|query|q)\)?\s*\(")
         return bool(fallback_pattern.search(varname))
@@ -275,7 +337,7 @@ def ansible_template(
                 v = templar.environment.filters
                 if not hasattr(v, "_delegatee"):  # pragma: no cover
                     raise
-                v._delegatee[missing_filter] = mock_filter  # fmt: skip # noqa: SLF001 # pyright: ignore[reportAttributeAccessIssue]
+                v._delegatee[missing_filter] = mock_filter  # fmt: skip # ruff:ignore[private-member-access] # pyright: ignore[reportAttributeAccessIssue]
                 # Record the mocked filter so we can warn the user
                 if missing_filter not in options.mock_filters:
                     _logger.debug("Mocking missing filter %s", missing_filter)
@@ -362,7 +424,7 @@ def template(
             variables,
             **dict(kwargs, fail_on_undefined=fail_on_undefined),
         )
-        # Hack to skip the following exception when using to_json filter on a variable. # noqa: FIX004
+        # Hack to skip the following exception when using to_json filter on a variable. # ruff:ignore[line-contains-hack]
         # I guess the filter doesn't like empty vars...
     except (AnsibleError, ValueError, RepresenterError, ImportError):
         # templating failed, so just keep value as is.
@@ -542,7 +604,7 @@ class HandleChildren:
     def import_playbook_children(
         self,
         lintable: Lintable,
-        k: str,  # pylint: disable=unused-argument
+        _k: str,
         v: Any,
         parent_type: FileType,
     ) -> list[Lintable]:
@@ -724,6 +786,36 @@ def _get_task_handler_children_for_tasks_or_playbooks(
     raise LookupError(msg)
 
 
+_TASK_INTERNAL_KEYS = (SKIPPED_RULES_KEY, FILENAME_KEY, LINE_NUMBER_KEY)
+
+
+def _strip_internal_keys_from_mapping(obj: MutableMapping[str, Any]) -> None:
+    """Remove ansible-lint internal keys from a mapping and nested values."""
+    for key in _TASK_INTERNAL_KEYS:
+        obj.pop(key, None)
+    for value in obj.values():
+        _strip_internal_keys_from_value(value)
+
+
+def _strip_internal_keys_from_value(value: Any) -> None:
+    """Recurse into nested mappings/lists while stripping internal keys."""
+    if isinstance(value, MutableMapping):
+        _strip_internal_keys_from_mapping(value)
+    elif isinstance(value, list):
+        for item in value:
+            if isinstance(item, MutableMapping):
+                _strip_internal_keys_from_mapping(item)
+
+
+def _remove_task_internal_keys(
+    obj: MutableMapping[str, Any],
+) -> MutableMapping[str, Any]:
+    """Recursively remove internally used keys from a nested dictionary."""
+    if isinstance(obj, MutableMapping):
+        _strip_internal_keys_from_mapping(obj)
+    return obj
+
+
 def _sanitize_task(task: MutableMapping[str, Any]) -> MutableMapping[str, Any]:
     """Return a stripped-off task structure compatible with new Ansible.
 
@@ -733,25 +825,7 @@ def _sanitize_task(task: MutableMapping[str, Any]) -> MutableMapping[str, Any]:
     result = copy.deepcopy(task)
     # task is an AnsibleMapping which inherits from OrderedDict, so we need
     # to use `del` to remove unwanted keys.
-
-    def remove_keys(obj: MutableMapping[str, Any]) -> MutableMapping[str, Any]:
-        """Recursively removes specified keys from a nested dictionary or list.
-
-        :param obj: The input dictionary or list to process.
-        :param forbidden_keys: List of keys to remove from dictionaries.
-        :return: A new object with forbidden keys removed.
-        """
-        if isinstance(obj, MutableMapping):
-            for key in [SKIPPED_RULES_KEY, FILENAME_KEY, LINE_NUMBER_KEY]:
-                if key in obj:
-                    del obj[key]
-            for value in obj.values():
-                if isinstance(value, MutableMapping):
-                    remove_keys(value)
-
-        return obj  # Base case: return non-dict, non-list values unchanged
-
-    return remove_keys(result)
+    return _remove_task_internal_keys(result)
 
 
 def _extract_ansible_parsed_keys_from_task(
@@ -760,7 +834,7 @@ def _extract_ansible_parsed_keys_from_task(
     keys: tuple[str, ...],
 ) -> MutableMapping[str, Any]:
     """Return a dict with existing key in task."""
-    for k, v in list(task.items()):
+    for k, v in task.items():
         if k in keys:
             # we don't want to re-assign these values, which were
             # determined by the ModuleArgsParser() above
@@ -769,21 +843,82 @@ def _extract_ansible_parsed_keys_from_task(
     return result
 
 
+def _parser_error_line_column(
+    exc: AnsibleParserError,
+    raw_task: MutableMapping[str, Any],
+) -> tuple[int, int | None]:
+    if "get_line_column" not in globals():
+        from ansiblelint.yaml_utils import get_line_column
+    line, column = get_line_column(raw_task, 0)  # pylint: disable=possibly-used-before-assignment
+    if line:
+        return line, column
+    regex = LINE_COLUMN_REGEX.search(exc.message)
+    if regex:
+        return int(regex.group("line")), int(regex.group("column"))
+    return 0, 0
+
+
+def _handle_parser_error(
+    exc: AnsibleParserError,
+    raw_task: MutableMapping[str, Any],
+    sanitized_task: MutableMapping[str, Any],
+    task: Task,
+) -> tuple[str, MutableMapping[str, Any]]:
+    line, column = _parser_error_line_column(exc, raw_task)
+    if not exc.message.startswith(
+        "Complex args containing variables cannot use bare variables"
+    ):
+        raise MatchError(
+            rule=AnsibleParserErrorRule(),
+            message=exc.message,
+            lintable=Lintable(task.filename or ""),
+            lineno=line or 1,
+            column=column or None,
+        ) from exc
+    result = sanitized_task
+    if "action" not in result:
+        msg = "Unable to normalize task"
+        raise NotImplementedError(msg) from exc
+    return result["action"], result
+
+
+def _set_normalized_action(
+    result: MutableMapping[str, Any],
+    action: str,
+    arguments: MutableMapping[str, Any],
+    task: Task,
+) -> None:
+    if not isinstance(action, str):
+        msg = f"Task actions can only be strings, got {action}"
+        raise TypeError(msg)
+    action_unnormalized = action
+    action = removeprefix(action, "ansible.builtin.")
+    result["action"] = {
+        "__ansible_module__": action,
+        "__ansible_module_original__": action_unnormalized,
+    }
+    if (
+        action_unnormalized in task.raw_task
+        and isinstance(task.raw_task[action_unnormalized], Mapping)
+        and "__line__" in task.raw_task[action_unnormalized]
+    ):
+        result["action"]["__line__"] = task.raw_task[action_unnormalized]["__line__"]
+    result["action"].update(arguments)
+
+
 def normalize_task_v2(task: Task) -> MutableMapping[str, Any]:
     """Ensure tasks have a normalized action key and strings are converted to python objects."""
     raw_task = task.raw_task
     result: MutableMapping[str, Any] = {}
     ansible_parsed_keys = ("action", "local_action", "args", "delegate_to")
-    arguments = {}
+    arguments: MutableMapping[str, Any] = {}
 
     if is_nested_task(raw_task):
         _extract_ansible_parsed_keys_from_task(result, raw_task, ansible_parsed_keys)
-        # Add dummy action for block/always/rescue statements
         result["action"] = {
             "__ansible_module__": "block/always/rescue",
             "__ansible_module_original__": "block/always/rescue",
         }
-
         return result
 
     sanitized_task = _sanitize_task(raw_task)
@@ -794,34 +929,8 @@ def normalize_task_v2(task: Task) -> MutableMapping[str, Any]:
             skip_action_validation=options.skip_action_validation,
         )
     except AnsibleParserError as exc:  # pragma: no cover
-        if "get_line_column" not in globals():
-            from ansiblelint.yaml_utils import get_line_column
-        # pylint: disable=possibly-used-before-assignment
-        line, column = get_line_column(raw_task, 0)
-        if not line:
-            line = 0
-            column = 0
-            regex = LINE_COLUMN_REGEX.search(exc.message)
-            if regex:
-                line = int(regex.group("line"))
-                column = int(regex.group("column"))
-        if not exc.message.startswith(
-            "Complex args containing variables cannot use bare variables"
-        ):
-            raise MatchError(
-                rule=AnsibleParserErrorRule(),
-                message=exc.message,
-                lintable=Lintable(task.filename or ""),
-                lineno=line or 1,
-                column=column or None,
-            ) from exc
-        result = sanitized_task
-        if "action" not in result:
-            msg = "Unable to normalize task"
-            raise NotImplementedError(msg) from exc
-        action = result["action"]
+        action, result = _handle_parser_error(exc, raw_task, sanitized_task, task)
 
-    # denormalize shell -> command conversion
     if "_uses_shell" in arguments:
         action = "shell"
         del arguments["_uses_shell"]
@@ -831,29 +940,7 @@ def normalize_task_v2(task: Task) -> MutableMapping[str, Any]:
         raw_task,
         (*ansible_parsed_keys, action),
     )
-
-    if not isinstance(action, str):
-        msg = f"Task actions can only be strings, got {action}"
-        raise TypeError(msg)
-    action_unnormalized = action
-    # convert builtin fqn calls to short forms because most rules know only
-    # about short calls but in the future we may switch the normalization to do
-    # the opposite. Mainly we currently consider normalized the module listing
-    # used by `ansible-doc -t module -l 2>/dev/null`
-    action = removeprefix(action, "ansible.builtin.")
-    result["action"] = {
-        "__ansible_module__": action,
-        "__ansible_module_original__": action_unnormalized,
-    }
-    # Inject back original line number information into the task
-    if (
-        action_unnormalized in task.raw_task
-        and isinstance(task.raw_task[action_unnormalized], Mapping)
-        and "__line__" in task.raw_task[action_unnormalized]
-    ):
-        result["action"]["__line__"] = task.raw_task[action_unnormalized]["__line__"]
-
-    result["action"].update(arguments)
+    _set_normalized_action(result, action, arguments, task)
     return result
 
 
@@ -1048,7 +1135,7 @@ class Task(Mapping[str, Any]):
 
     def __iter__(self) -> Iterator[str]:
         """Provide support for 'key in task'."""
-        yield from (f for f in self.normalized_task)
+        yield from self.normalized_task
 
     @property
     def line(self) -> int:
@@ -1162,7 +1249,7 @@ def add_action_type(  # type: ignore[no-any-unimported]
     return results
 
 
-@cache
+@lru_cache(maxsize=256)
 def _parse_yaml_linenumbers_cached(  # type: ignore[no-any-unimported]
     abspath: str,
     content: str,
@@ -1187,7 +1274,7 @@ def _parse_yaml_linenumbers_cached(  # type: ignore[no-any-unimported]
     # signature of AnsibleConstructor.construct_mapping
     def construct_mapping(  # type: ignore[no-any-unimported]
         node: yaml.MappingNode,
-        deep: bool = False,  # noqa: FBT002
+        deep: bool = False,  # ruff:ignore[boolean-default-value-positional-argument]
     ) -> AnsibleMapping:
         # pyright: ignore[reportArgumentType]
         mapping: AnsibleMapping = AnsibleConstructor.construct_mapping(  # type: ignore[no-any-unimported]
@@ -1197,11 +1284,11 @@ def _parse_yaml_linenumbers_cached(  # type: ignore[no-any-unimported]
             mapping[LINE_NUMBER_KEY] = getattr(node, LINE_NUMBER_KEY)
         else:
             if hasattr(mapping, "_line_number"):
-                mapping[LINE_NUMBER_KEY] = mapping._line_number  # noqa: SLF001
+                mapping[LINE_NUMBER_KEY] = mapping._line_number  # ruff:ignore[private-member-access]
         mapping[FILENAME_KEY] = filename
         return mapping
 
-    try:  # noqa: PLW0717
+    try:  # ruff:ignore[too-many-statements-in-try-clause]
         kwargs = {}
         if "vault_password" in inspect.getfullargspec(AnsibleLoader.__init__).args:
             kwargs["vault_password"] = DEFAULT_VAULT_PASSWORD
@@ -1245,8 +1332,14 @@ def parse_yaml_linenumbers(  # type: ignore[no-any-unimported]
     """Parse yaml as ansible.utils.parse_yaml but with linenumbers.
 
     The line numbers are stored in each node's LINE_NUMBER_KEY key.
+
+    Returns a deep copy of the cached parse so callers (e.g. skip metadata
+    mutation) cannot pollute the shared cache entry.
     """
-    return _parse_yaml_linenumbers_cached(str(lintable.abspath), lintable.content)
+    data = _parse_yaml_linenumbers_cached(str(lintable.abspath), lintable.content)
+    if data is None:
+        return None
+    return copy.deepcopy(data)
 
 
 def get_cmd_args(task: Mapping[str, Any]) -> str:
@@ -1303,7 +1396,7 @@ def is_playbook(filename: str) -> bool:
 
     try:
         f = parse_yaml_from_file(filename)
-    except Exception as exc:  # pylint: disable=broad-except # noqa: BLE001
+    except Exception as exc:  # pylint: disable=broad-except # ruff:ignore[blind-except]
         _logger.warning(
             "Failed to load %s with %s, assuming is not a playbook.",
             filename,

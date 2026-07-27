@@ -22,6 +22,11 @@ if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
     from ansiblelint.utils import Task
 
+_TAG_RAW = "no-free-form[raw]"
+_MODULE_COMMAND = "ansible.builtin.command"
+_MODULE_SHELL = "ansible.builtin.shell"
+_MODULE_DNF = "ansible.builtin.dnf"
+
 
 class NoFreeFormRule(AnsibleLintRule, TransformMixin):
     """Rule for detecting discouraged free-form syntax for action modules."""
@@ -36,7 +41,7 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
         r"(chdir|creates|executable|removes|stdin|stdin_add_newline|warn)=",
     )
     _ids = {
-        "no-free-form[raw]": "Avoid embedding `executable=` inside raw calls, use explicit args dictionary instead.",
+        _TAG_RAW: "Avoid embedding `executable=` inside raw calls, use explicit args dictionary instead.",
         "no-free-form[raw-non-string]": "Passing a non string value to `raw` module is neither documented or supported.",
     }
 
@@ -143,8 +148,8 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
         elif isinstance(action_value, str) and "=" in action_value:
             fail = False
             if task["action"].get("__ansible_module__") in (
-                "ansible.builtin.command",
-                "ansible.builtin.shell",
+                _MODULE_COMMAND,
+                _MODULE_SHELL,
                 "ansible.windows.win_command",
                 "ansible.windows.win_shell",
                 "command",
@@ -189,7 +194,7 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
                         task[k] = v
 
                 match.fixed = True
-            elif match.tag == "no-free-form[raw]":
+            elif match.tag == _TAG_RAW:
                 for _ in range(len(task)):
                     k, v = task.popitem(False)
                     if isinstance(v, str) and "executable" in v:
@@ -206,8 +211,12 @@ if "pytest" in sys.modules:
     import pytest
 
     # pylint: disable=ungrouped-imports
+    from ansiblelint.errors import MatchError
+    from ansiblelint.file_utils import Lintable
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
+
+    _LINTABLE = Lintable(name="test.yml")
 
     @pytest.mark.parametrize(
         ("file", "expected"),
@@ -234,69 +243,61 @@ if "pytest" in sys.modules:
         """Test that transform handles malformed quoted strings."""
         from ruamel.yaml.comments import CommentedMap
 
-        from ansiblelint.errors import MatchError
-
         rule = NoFreeFormRule()
-        task = CommentedMap({"ansible.builtin.shell": 'chdir=" /tmp echo foo'})
+        task = CommentedMap({_MODULE_SHELL: 'chdir=" /tmp echo foo'})
         match = MatchError(
             message="test",
             rule=rule,
-            details="ansible.builtin.shell",
+            details=_MODULE_SHELL,
             tag="no-free-form",
         )
 
-        rule.transform(match, None, task)  # type: ignore[arg-type]
-        assert task["ansible.builtin.shell"] == {"cmd": 'chdir=" /tmp echo foo'}
+        rule.transform(match, _LINTABLE, task)
+        assert task[_MODULE_SHELL] == {"cmd": 'chdir=" /tmp echo foo'}
 
     def test_no_free_form_transform_jinja_with_spaces() -> None:
         """Test that Jinja expressions with spaces are preserved."""
         from ruamel.yaml.comments import CommentedMap
 
-        from ansiblelint.errors import MatchError
-
         rule = NoFreeFormRule()
         task = CommentedMap(
-            {"ansible.builtin.dnf": "name={{ item }} state=latest"},
+            {_MODULE_DNF: "name={{ item }} state=latest"},
         )
         match = MatchError(
             message="test",
             rule=rule,
-            details="ansible.builtin.dnf",
+            details=_MODULE_DNF,
             tag="no-free-form",
         )
 
-        rule.transform(match, None, task)  # type: ignore[arg-type]
-        assert task["ansible.builtin.dnf"]["name"] == "{{ item }}"
-        assert task["ansible.builtin.dnf"]["state"] == "latest"
-        assert "cmd" not in task["ansible.builtin.dnf"]
+        rule.transform(match, _LINTABLE, task)
+        assert task[_MODULE_DNF]["name"] == "{{ item }}"
+        assert task[_MODULE_DNF]["state"] == "latest"
+        assert "cmd" not in task[_MODULE_DNF]
 
     def test_no_free_form_transform_unmatched_quote_value() -> None:
         """Test that malformed quoted values fall back to cmd."""
         from ruamel.yaml.comments import CommentedMap
 
-        from ansiblelint.errors import MatchError
-
         rule = NoFreeFormRule()
         task = CommentedMap(
-            {"ansible.builtin.command": 'name="foo"bar chdir=/tmp'},
+            {_MODULE_COMMAND: 'name="foo"bar chdir=/tmp'},
         )
         match = MatchError(
             message="test",
             rule=rule,
-            details="ansible.builtin.command",
+            details=_MODULE_COMMAND,
             tag="no-free-form",
         )
 
-        rule.transform(match, None, task)  # type: ignore[arg-type]
-        assert task["ansible.builtin.command"] == {
+        rule.transform(match, _LINTABLE, task)
+        assert task[_MODULE_COMMAND] == {
             "cmd": 'name="foo"bar chdir=/tmp',
         }
 
     def test_no_free_form_transform_raw_unbalanced_executable() -> None:
         """Test raw transform fallback when executable value is unbalanced."""
         from ruamel.yaml.comments import CommentedMap
-
-        from ansiblelint.errors import MatchError
 
         rule = NoFreeFormRule()
         task = CommentedMap(
@@ -305,9 +306,9 @@ if "pytest" in sys.modules:
         match = MatchError(
             message="test",
             rule=rule,
-            tag="no-free-form[raw]",
+            tag=_TAG_RAW,
         )
 
-        rule.transform(match, None, task)  # type: ignore[arg-type]
+        rule.transform(match, _LINTABLE, task)
         assert task["ansible.builtin.raw"] == 'executable="/bin/bash echo foo'
         assert "args" not in task

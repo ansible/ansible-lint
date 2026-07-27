@@ -57,8 +57,8 @@ if TYPE_CHECKING:
 
 _logger = logging.getLogger(__name__)
 _found_deprecated_tags: set[str] = set()
-_noqa_comment_re = re.compile(r"^\s*# noqa(\s|:)", flags=re.MULTILINE)
-_noqa_comment_line_re = re.compile(r"^\s*# noqa(\s|:).*$")
+_noqa_comment_re = re.compile(r"^\s*# noqa(?:[\s:]|$)", flags=re.MULTILINE)
+_noqa_comment_line_re = re.compile(r"^\s*# noqa(?:[\s:].*)?$")
 
 # playbook: Sequence currently expects only instances of one of the two
 # classes below but we should consider avoiding this chimera.
@@ -145,6 +145,68 @@ def load_data(file_text: str) -> Any:
         return yaml.load_all(file_text)
 
 
+def _apply_skipped_rules_to_metadata(  # type: ignore[no-any-unimported]
+    pyyaml_data: AnsibleBaseYAMLObject,
+    skipped_rules: Sequence[Any],
+    _lintable: Lintable,
+) -> AnsibleBaseYAMLObject:
+    if isinstance(pyyaml_data, MutableMapping):
+        pyyaml_data[SKIPPED_RULES_KEY] = skipped_rules
+    elif (
+        not isinstance(pyyaml_data, str)
+        and isinstance(pyyaml_data, collections.abc.Sequence)
+        and skipped_rules
+    ):
+        pyyaml_data[0][SKIPPED_RULES_KEY] = skipped_rules
+    return pyyaml_data
+
+
+def _get_task_blocks_pair(  # type: ignore[no-any-unimported]
+    pyyaml_data: AnsibleBaseYAMLObject,
+    ruamel_data: Any,
+    lintable: Lintable,
+) -> tuple[Sequence[Any], Sequence[Any]] | None:
+    if not isinstance(pyyaml_data, Sequence):
+        return None
+    if lintable.kind in ("tasks", "handlers"):
+        return pyyaml_data, ruamel_data
+    try:
+        return (
+            _get_task_blocks_from_playbook(pyyaml_data),
+            _get_task_blocks_from_playbook(ruamel_data),
+        )
+    except (AttributeError, TypeError):
+        return None
+
+
+def _append_skipped_rules_to_tasks(  # type: ignore[no-any-unimported]
+    pyyaml_data: AnsibleBaseYAMLObject,
+    ruamel_data: Any,
+    lintable: Lintable,
+) -> None:
+    """Mutate ``pyyaml_data`` in place by attaching skipped rules to tasks."""
+    blocks_pair = _get_task_blocks_pair(pyyaml_data, ruamel_data, lintable)
+    if blocks_pair is None:
+        return
+
+    pyyaml_task_blocks, ruamel_task_blocks = blocks_pair
+    pyyaml_tasks = _get_tasks_from_blocks(pyyaml_task_blocks)
+    ruamel_tasks = _get_tasks_from_blocks(ruamel_task_blocks)
+
+    for ruamel_task, pyyaml_task in zip(ruamel_tasks, pyyaml_tasks, strict=False):
+        if not pyyaml_task and not ruamel_task:
+            continue
+        if isinstance(pyyaml_task, str):
+            continue
+        if pyyaml_task.get("name") != ruamel_task.get("name"):  # pragma: no cover
+            msg = "Error in matching skip comment to a task"
+            raise RuntimeError(msg)
+        pyyaml_task[SKIPPED_RULES_KEY] = _get_rule_skips_from_yaml(
+            ruamel_task,
+            lintable,
+        )
+
+
 def _append_skipped_rules(  # type: ignore[no-any-unimported]
     pyyaml_data: AnsibleBaseYAMLObject,
     lintable: Lintable,
@@ -171,60 +233,14 @@ def _append_skipped_rules(  # type: ignore[no-any-unimported]
         "test-meta",
         "galaxy",
     ]:
-        # AnsibleMapping, dict
-        if isinstance(pyyaml_data, MutableMapping):
-            pyyaml_data[SKIPPED_RULES_KEY] = skipped_rules
-        # AnsibleSequence, list
-        elif (
-            not isinstance(pyyaml_data, str)
-            and isinstance(pyyaml_data, collections.abc.Sequence)
-            and skipped_rules
-        ):
-            pyyaml_data[0][SKIPPED_RULES_KEY] = skipped_rules
+        return _apply_skipped_rules_to_metadata(pyyaml_data, skipped_rules, lintable)
 
+    if lintable.kind in ("tasks", "handlers", "playbook"):
+        _append_skipped_rules_to_tasks(pyyaml_data, ruamel_data, lintable)
         return pyyaml_data
 
-    # create list of blocks of tasks or nested tasks
-    pyyaml_task_blocks: Sequence[Any]
-    if lintable.kind in ("tasks", "handlers", "playbook"):
-        if not isinstance(pyyaml_data, Sequence):
-            return pyyaml_data
-        if lintable.kind in ("tasks", "handlers"):
-            ruamel_task_blocks = ruamel_data
-            pyyaml_task_blocks = pyyaml_data
-        else:
-            try:
-                pyyaml_task_blocks = _get_task_blocks_from_playbook(pyyaml_data)
-                ruamel_task_blocks = _get_task_blocks_from_playbook(ruamel_data)
-            except (AttributeError, TypeError):
-                return pyyaml_data
-    else:
-        # For unsupported file types, we return empty skip lists
-        return None
-
-    # get tasks from blocks of tasks
-    pyyaml_tasks = _get_tasks_from_blocks(pyyaml_task_blocks)
-    ruamel_tasks = _get_tasks_from_blocks(ruamel_task_blocks)
-
-    # append skipped_rules for each task
-    for ruamel_task, pyyaml_task in zip(ruamel_tasks, pyyaml_tasks, strict=False):
-        # ignore empty tasks
-        if not pyyaml_task and not ruamel_task:
-            continue
-
-        # AnsibleUnicode or str
-        if isinstance(pyyaml_task, str):
-            continue
-
-        if pyyaml_task.get("name") != ruamel_task.get("name"):  # pragma: no cover
-            msg = "Error in matching skip comment to a task"
-            raise RuntimeError(msg)
-        pyyaml_task[SKIPPED_RULES_KEY] = _get_rule_skips_from_yaml(
-            ruamel_task,
-            lintable,
-        )
-
-    return pyyaml_data
+    # For unsupported file types, we return empty skip lists
+    return None
 
 
 def _get_task_blocks_from_playbook(playbook: Sequence[Any]) -> list[Any]:
@@ -266,7 +282,7 @@ def _continue_skip_next_lines(
     """When a line only contains a noqa comment (and possibly indentation), add the skip also to the next non-empty line."""
     # If line starts with _noqa_comment_line_re, add next non-empty line to same lintable.line_skips
     line_content = lintable.content.splitlines()
-    for line_no in list(lintable.line_skips.keys()):
+    for line_no in tuple(lintable.line_skips):
         if _noqa_comment_line_re.fullmatch(line_content[line_no - 1]):
             # Find next non-empty line
             next_line_no = line_no

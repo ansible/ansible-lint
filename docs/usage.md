@@ -287,10 +287,27 @@ follows:
 
 ## Vaults
 
-As ansible-lint executes ansible, it also needs access to encrypted secrets. If
-you do not give access to them or you are concerned about security implications,
-you should consider refactoring your code to allow it to be linted without
-access to real secrets:
+Ansible-lint honors the same vault configuration sources that `ansible-playbook`
+uses, so it can decrypt vault-encrypted files during linting:
+
+- `ANSIBLE_VAULT_PASSWORD_FILE` environment variable
+- `vault_password_file` in `ansible.cfg`
+- `ANSIBLE_VAULT_IDENTITY_LIST` / `vault_identity_list`
+
+Interactive prompts (`--ask-vault-pass`) are not supported.
+
+!!! warning "Trusted content only"
+
+    Ansible reads `ansible.cfg` from the current working directory, and a
+    `vault_password_file` can point to an executable that Ansible runs to
+    obtain the password. Linting untrusted content, such as a fork pull
+    request in CI, can therefore execute code from that content, just as
+    running `ansible-playbook` on it would. Lint untrusted content only in
+    an isolated environment, or point `ANSIBLE_CONFIG` and the vault
+    environment variables at configuration that you control.
+
+If you do not give access to vault secrets or you are concerned about security
+implications, you can lint without access to real secrets:
 
 - Configure dummy fallback values that are used during linting, so Ansible will
   not complain about undefined variables.

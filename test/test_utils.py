@@ -125,11 +125,11 @@ def test_normalize(
 ) -> None:
     """Test that tasks specified differently are normalized same way."""
     task = utils.Task(reference_form, filename="tasks.yml")
-    normal_form = task._normalize_task()  # noqa: SLF001
+    normal_form = task._normalize_task()  # ruff:ignore[private-member-access]
 
     for form in alternate_forms:
         task2 = utils.Task(form, filename="tasks.yml")
-        assert normal_form == task2._normalize_task()  # noqa: SLF001
+        assert normal_form == task2._normalize_task()  # ruff:ignore[private-member-access]
 
 
 def test_normalize_complex_command() -> None:
@@ -153,9 +153,9 @@ def test_normalize_complex_command() -> None:
         {"name": "hello", "action": "pip name=df editable=false"},
         filename="tasks.yml",
     )
-    assert task1._normalize_task() == task2._normalize_task()  # noqa: SLF001
-    assert task2._normalize_task() == task3._normalize_task()  # noqa: SLF001
-    assert task3._normalize_task() == task4._normalize_task()  # noqa: SLF001
+    assert task1._normalize_task() == task2._normalize_task()  # ruff:ignore[private-member-access]
+    assert task2._normalize_task() == task3._normalize_task()  # ruff:ignore[private-member-access]
+    assert task3._normalize_task() == task4._normalize_task()  # ruff:ignore[private-member-access]
 
 
 @pytest.mark.parametrize(
@@ -693,7 +693,7 @@ def test_get_task_handler_children_climbing(tmp_path: Path) -> None:
     task_handler = {"import_tasks": "imported_task.yml"}
 
     with cwd(project):
-        child = utils._get_task_handler_children_for_tasks_or_playbooks(  # noqa: SLF001
+        child = utils._get_task_handler_children_for_tasks_or_playbooks(  # ruff:ignore[private-member-access]
             task_handler=task_handler,
             basedir=str(project),
             k="import_tasks",
@@ -716,6 +716,22 @@ def test_parse_yaml_linenumbers_rereads_changed_content(tmp_path: Path) -> None:
     second = utils.parse_yaml_linenumbers(lintable)
 
     assert second[0]["name"] == "Uppercase task"  # type: ignore[index]
+
+
+def test_parse_yaml_linenumbers_returns_independent_copies(tmp_path: Path) -> None:
+    """Cached YAML parses must not share mutations across callers."""
+    from ansiblelint.constants import SKIPPED_RULES_KEY
+
+    task_file = tmp_path / "tasks.yml"
+    task_file.write_text("- name: Task one\n  debug: msg=hi\n", encoding="utf-8")
+    lintable = Lintable(task_file)
+
+    first = utils.parse_yaml_linenumbers(lintable)
+    second = utils.parse_yaml_linenumbers(lintable)
+
+    assert first is not second
+    first[0][SKIPPED_RULES_KEY] = ["yaml"]  # type: ignore[index]
+    assert SKIPPED_RULES_KEY not in second[0]  # type: ignore[operator]
 
 
 def test_warn_list_preserves_line_length_after_name_fix(tmp_path: Path) -> None:
@@ -798,3 +814,127 @@ def test_warn_list_preserves_line_length_repro5030_content(tmp_path: Path) -> No
     ]
     assert len(shell_lines) == 1
     assert len(shell_lines[0]) > 160
+
+
+def test_remove_task_internal_keys_nested_lists() -> None:
+    """Internal keys nested inside lists must be stripped during sanitization."""
+    task = {
+        "name": "nested",
+        "block": [
+            {
+                "name": "inner",
+                "__line__": 2,
+                "__file__": "tasks.yml",
+                "__skipped_rules__": ["fqcn"],
+                "ansible.builtin.debug": {"msg": "hi", "__line__": 3},
+            },
+            "not-a-mapping",
+        ],
+        "__line__": 1,
+        "__file__": "tasks.yml",
+    }
+
+    cleaned = utils._sanitize_task(task)  # ruff:ignore[private-member-access]
+
+    assert "__line__" not in cleaned
+    assert "__file__" not in cleaned
+    inner = cleaned["block"][0]
+    assert "__line__" not in inner
+    assert "__file__" not in inner
+    assert "__skipped_rules__" not in inner
+    assert "__line__" not in inner["ansible.builtin.debug"]
+    assert cleaned["block"][1] == "not-a-mapping"
+
+    # Call the extracted helpers directly so coverage maps to the new symbols.
+    nested = {
+        "block": [{"__line__": 1, "debug": {"msg": "x"}}],
+        "__file__": "x.yml",
+    }
+    utils._strip_internal_keys_from_mapping(nested)  # ruff:ignore[private-member-access]
+    assert "__file__" not in nested
+    assert "__line__" not in nested["block"][0]
+    utils._strip_internal_keys_from_value([{"__line__": 2}, "skip"])  # ruff:ignore[private-member-access]
+    assert utils._remove_task_internal_keys({"__line__": 3}) == {}  # ruff:ignore[private-member-access]
+
+
+def test_set_normalized_action_copies_line() -> None:
+    """Normalized action should preserve __line__ from the raw task module map."""
+    task = utils.Task(
+        {
+            "name": "copy line",
+            "ansible.builtin.debug": {"msg": "x", "__line__": 9},
+        },
+        filename="tasks.yml",
+    )
+    result: dict[str, Any] = {}
+    utils._set_normalized_action(  # ruff:ignore[private-member-access]
+        result,
+        "ansible.builtin.debug",
+        {"msg": "x"},
+        task,
+    )
+    assert result["action"]["__ansible_module__"] == "debug"
+    assert result["action"]["__line__"] == 9
+
+    with pytest.raises(TypeError, match="Task actions can only be strings"):
+        utils._set_normalized_action(result, 123, {}, task)  # type: ignore[arg-type]  # ruff:ignore[private-member-access]
+
+
+def test_parser_error_helpers_cover_extracted_branches(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Cover parser-error helpers extracted for Sonar complexity limits."""
+    from ansible.errors import AnsibleParserError
+
+    from ansiblelint.errors import MatchError
+
+    raw_with_line = {"name": "x", "__line__": 7}
+    exc_with_coords = AnsibleParserError("failed at line 9, column 4")
+    assert utils._parser_error_line_column(exc_with_coords, raw_with_line) == (  # ruff:ignore[private-member-access]
+        7,
+        None,
+    )
+
+    # Avoid ansible Origin tagging quirks on plain dicts; force the regex/fallback paths.
+    from ansiblelint import yaml_utils
+
+    monkeypatch.setattr(yaml_utils, "get_line_column", lambda *_a, **_k: (0, None))
+    exc_regex_only = AnsibleParserError("failed at line 9, column 4")
+    assert utils._parser_error_line_column(exc_regex_only, {"name": "x"}) == (  # ruff:ignore[private-member-access]
+        9,
+        4,
+    )
+    assert utils._parser_error_line_column(  # ruff:ignore[private-member-access]
+        AnsibleParserError("no coordinates"),
+        {"name": "x"},
+    ) == (0, 0)
+
+    task = utils.Task({"name": "broken"}, filename="tasks.yml")
+    unexpected_exc = AnsibleParserError("unexpected parse failure")
+    with pytest.raises(MatchError, match="unexpected parse failure"):
+        utils._handle_parser_error(  # ruff:ignore[private-member-access]
+            unexpected_exc,
+            task.raw_task,
+            {"name": "broken"},
+            task,
+        )
+
+    bare_var_exc = AnsibleParserError(
+        "Complex args containing variables cannot use bare variables: foo",
+    )
+    action, result = utils._handle_parser_error(  # ruff:ignore[private-member-access]
+        bare_var_exc,
+        task.raw_task,
+        {"action": "debug", "name": "broken"},
+        task,
+    )
+    assert action == "debug"
+    assert result["action"] == "debug"
+
+    with pytest.raises(NotImplementedError, match="Unable to normalize task"):
+        utils._handle_parser_error(  # ruff:ignore[private-member-access]
+            bare_var_exc,
+            task.raw_task,
+            {"name": "broken"},
+            task,
+        )

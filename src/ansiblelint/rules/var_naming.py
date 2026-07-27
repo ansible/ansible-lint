@@ -177,8 +177,12 @@ class VariableNamingRule(AnsibleLintRule):
                 data=ident,
             )
 
+        # Variables in the ansible_ namespace are owned by Ansible itself
+        # (connection variables like ansible_ssh_common_args, ansible_port, ...)
+        # and cannot be renamed to carry a role prefix.
         if (
             prefix
+            and not ident.lstrip("_").startswith("ansible_")
             and not ident.lstrip("_").startswith(f"{prefix.value}_")
             and not has_jinja(prefix.value)
             and is_fqcn_or_name(prefix.value)
@@ -210,7 +214,7 @@ class VariableNamingRule(AnsibleLintRule):
                 continue
             role_fqcn = role.get("role", role.get("name"))
             prefix = self._parse_prefix(role_fqcn)
-            for key in list(role.keys()):
+            for key in role:
                 if key not in PLAYBOOK_ROLE_KEYWORDS:
                     match_error = self.get_var_naming_matcherror(
                         key, prefix=prefix, file=file
@@ -293,15 +297,23 @@ class VariableNamingRule(AnsibleLintRule):
         # If the task registers a variable
         registered_var = task.get("register", None)
         if registered_var:
-            match_error = self.get_var_naming_matcherror(
-                registered_var,
-                prefix=role_prefix,
-                file=file or Lintable(""),
+            registered_vars = (
+                registered_var.keys()
+                if isinstance(registered_var, dict)
+                else (registered_var,)
             )
-            if match_error:
-                match_error.message += f" (register: {registered_var})"
-                match_error.lineno = task.line
-                results.append(match_error)
+            for key in registered_vars:
+                if isinstance(key, str) and key.startswith("__"):
+                    continue
+                match_error = self.get_var_naming_matcherror(
+                    key,
+                    prefix=role_prefix,
+                    file=file or Lintable(""),
+                )
+                if match_error:
+                    match_error.message += f" (register: {key})"
+                    match_error.lineno = task.line
+                    results.append(match_error)
 
         return results
 
@@ -455,6 +467,20 @@ if "pytest" in sys.modules:
             assert result.tag == expected_errors[idx][0]
             assert result.lineno == expected_errors[idx][1]
 
+    def test_var_naming_connection_vars_in_role() -> None:
+        """Connection variables must not require a role prefix."""
+        rule = VariableNamingRule()
+        file = Lintable("examples/roles/var_naming_no_role_prefix/tasks/main.yml")
+        prefix = Prefix("var_naming_no_role_prefix")
+        for ident in (
+            "ansible_ssh_common_args",
+            "ansible_ssh_extra_args",
+            "ansible_port",
+        ):
+            assert (
+                rule.get_var_naming_matcherror(ident, prefix=prefix, file=file) is None
+            )
+
     def test_var_naming_with_pattern() -> None:
         """Test rule matches."""
         role_path = "examples/roles/var_naming_pattern/tasks/main.yml"
@@ -490,6 +516,19 @@ if "pytest" in sys.modules:
         result = run_ansible_lint(role_path)
         assert result.returncode == RC.SUCCESS
         assert "var-naming" not in result.stdout
+
+    def test_var_naming_with_register_projection(
+        config_options: Options,
+        app: App,
+    ) -> None:
+        """Test register projection variable names."""
+        rules = RulesCollection(app=app, options=config_options)
+        rules.register(VariableNamingRule())
+        results = Runner(
+            Lintable("test/schemas/test/playbooks/register_projection.yml"),
+            rules=rules,
+        ).run()
+        assert not results
 
     def test_var_naming_with_include_role_import_role() -> None:
         """Test with include role and import role."""

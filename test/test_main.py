@@ -7,6 +7,7 @@ import sys
 import tempfile
 import time
 from collections.abc import Mapping
+from copy import deepcopy
 from http.client import RemoteDisconnected
 from os.path import abspath
 from pathlib import Path
@@ -104,16 +105,13 @@ def test_get_version_warning(
 def test_get_version_warning_no_pip(mocker: MockerFixture) -> None:
     """Test that we do not display any message if install method is not pip."""
     mocker.patch("ansiblelint.config.guess_install_method", return_value="")
-    assert get_version_warning() == ""  # noqa: PLC1901
+    assert get_version_warning() == ""  # ruff:ignore[compare-to-empty-string]
 
 
 def test_get_version_warning_remote_disconnect(mocker: MockerFixture) -> None:
     """Test that we can handle remote disconnect when fetching release url."""
     mocker.patch("urllib.request.urlopen", side_effect=RemoteDisconnected)
-    try:
-        get_version_warning()
-    except RemoteDisconnected:
-        pytest.fail("Failed to handle a remote disconnect")
+    get_version_warning()
 
 
 def test_get_version_warning_offline(mocker: MockerFixture) -> None:
@@ -122,7 +120,159 @@ def test_get_version_warning_offline(mocker: MockerFixture) -> None:
         # ensures a real cache_file is not loaded
         mocker.patch("ansiblelint.config.CACHE_DIR", Path(temporary_directory))
         options.offline = True
-        assert get_version_warning() == ""  # noqa: PLC1901
+        assert get_version_warning() == ""  # ruff:ignore[compare-to-empty-string]
+
+
+def test_version_cache_helpers(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Exercise version-cache helper branches used by get_version_warning."""
+    from packaging.version import Version
+
+    from ansiblelint import config
+
+    missing = str(tmp_path / "missing.json")
+    assert config._version_cache_needs_refresh(missing) is True  # ruff:ignore[private-member-access]
+
+    cache_file = tmp_path / "latest.json"
+    cache_file.write_text(
+        '{"html_url": "https://example.invalid", "tag_name": "v9.9.9"}',
+        encoding="utf-8",
+    )
+    assert config._version_cache_needs_refresh(str(cache_file)) is False  # ruff:ignore[private-member-access]
+
+    monkeypatch.setattr(os.path, "getmtime", lambda _path: time.time() - 25 * 60 * 60)
+    assert config._version_cache_needs_refresh(str(cache_file)) is True  # ruff:ignore[private-member-access]
+
+    data = config._load_version_cache(str(cache_file))  # ruff:ignore[private-member-access]
+    assert data["tag_name"] == "v9.9.9"
+
+    assert not config._format_version_upgrade_message(Version("1.0.0"), {}, "pip")  # ruff:ignore[private-member-access]
+    assert "pre-release" in config._format_version_upgrade_message(  # ruff:ignore[private-member-access]
+        Version("99.0.0"),
+        data,
+        "pip",
+    )
+    assert "new release" in config._format_version_upgrade_message(  # ruff:ignore[private-member-access]
+        Version("1.0.0"),
+        data,
+        "pip",
+    )
+    assert not config._format_version_upgrade_message(  # ruff:ignore[private-member-access]
+        Version("9.9.9"),
+        data,
+        "pip",
+    )
+
+
+def test_fetch_latest_release_writes_cache(
+    tmp_path: Path,
+    mocker: MockerFixture,
+) -> None:
+    """Successful GitHub release fetch should persist JSON cache."""
+    from io import BytesIO
+    from urllib.error import URLError
+
+    from ansiblelint import config
+
+    payload = b'{"html_url": "https://example.invalid", "tag_name": "v2.0.0"}'
+    mocker.patch(
+        "ansiblelint.config.urllib.request.urlopen",
+        return_value=BytesIO(payload),
+    )
+    cache_file = tmp_path / "latest.json"
+    data = config._fetch_latest_release(str(cache_file))  # ruff:ignore[private-member-access]
+    assert data["tag_name"] == "v2.0.0"
+    assert cache_file.is_file()
+
+    mocker.patch(
+        "ansiblelint.config.urllib.request.urlopen",
+        side_effect=URLError("offline"),
+    )
+    assert config._fetch_latest_release(str(tmp_path / "fail.json")) == {}  # ruff:ignore[private-member-access]
+
+
+class _StallingResponse:
+    """A urlopen() response double whose body read stalls out."""
+
+    def __enter__(self) -> "_StallingResponse":  # ruff:ignore[non-self-return-type]
+        return self
+
+    def __exit__(self, *_exc_info: object) -> None:
+        return None
+
+    def read(self, *_args: object) -> bytes:
+        raise TimeoutError
+
+
+def test_fetch_latest_release_timeout(
+    tmp_path: Path,
+    mocker: MockerFixture,
+) -> None:
+    """Urlopen must be called with a timeout, and a stall must not hang/crash.
+
+    Regression test for a stalled connection to api.github.com blocking the
+    whole ansible-lint run indefinitely, same bug class as #2869.
+    """
+    from io import BytesIO
+
+    from ansiblelint import config
+
+    payload = b'{"html_url": "https://example.invalid", "tag_name": "v2.0.0"}'
+    urlopen_mock = mocker.patch(
+        "ansiblelint.config.urllib.request.urlopen",
+        return_value=BytesIO(payload),
+    )
+    config._fetch_latest_release(str(tmp_path / "latest.json"))  # ruff:ignore[private-member-access]
+    assert urlopen_mock.call_args.kwargs.get("timeout") == 10
+
+    # A timeout while establishing the connection.
+    urlopen_mock.side_effect = TimeoutError
+    assert config._fetch_latest_release(str(tmp_path / "fail.json")) == {}  # ruff:ignore[private-member-access]
+
+    # A timeout while reading the response body, which raises TimeoutError
+    # from json.load(url) rather than from urlopen() itself.
+    urlopen_mock.side_effect = lambda *_args, **_kwargs: _StallingResponse()
+    assert config._fetch_latest_release(str(tmp_path / "stall.json")) == {}  # ruff:ignore[private-member-access]
+
+
+@pytest.mark.parametrize(
+    ("offline", "cache_created"),
+    (
+        pytest.param(True, False, id="offline"),
+        pytest.param(False, True, id="online"),
+    ),
+)
+def test_initialize_options_cache_dir_creation(
+    tmp_path: Path,
+    offline: bool,
+    cache_created: bool,
+) -> None:
+    """Check that offline mode does not create an isolated cache directory."""
+    from ansiblelint.__main__ import initialize_options
+
+    old_options = deepcopy(options)
+    project_dir = tmp_path / "project"
+    project_dir.mkdir()
+    cache_dir = project_dir / ".ansible"
+
+    arguments = ["--config-file", "/dev/null", "--project-dir", str(project_dir)]
+    if offline:
+        arguments.append("--offline")
+
+    cache_dir_lock = initialize_options(arguments)
+    try:
+        expected_cache_dir = (
+            Path(os.environ.get("ANSIBLE_HOME", "~/.ansible")).expanduser()
+            if offline
+            else cache_dir
+        )
+        assert options.cache_dir == expected_cache_dir
+        assert cache_dir.exists() is cache_created
+    finally:
+        if cache_dir_lock:
+            cache_dir_lock.release()
+            Path(cache_dir_lock.lock_file).unlink(missing_ok=True)
+        options.__dict__.clear()
+        options.__dict__.update(old_options.__dict__)
 
 
 @pytest.mark.parametrize(
@@ -201,7 +351,7 @@ def test_ro_venv(tmp_path: Path) -> None:
         # running with a ro venv and default cwd
         f"{venv_path}/bin/ansible-lint --version",
         # running from a read-only cwd:
-        f"cd / && {abspath(venv_path)}/bin/ansible-lint --version",  # noqa: PTH100
+        f"cd / && {abspath(venv_path)}/bin/ansible-lint --version",  # ruff:ignore[os-path-abspath]
         # running with a ro venv and a custom project path in forced non-online mode, so it will need to install requirements
         f"{venv_path}/bin/ansible-lint -vv --nocolor --no-offline --project-dir {tmp_path.as_posix()} ./examples/reqs_v2/",
     ]
@@ -254,10 +404,26 @@ def test_handle_warn_list_rerun() -> None:
         rule=match.rule,
     )
     new_results = LintResult([refreshed], set())
+    claimed: set[tuple[str, str | None, int]] = set()
 
-    assert _handle_warn_list_rerun(0, match, new_results, result, ["yaml[line-length]"])
+    assert _handle_warn_list_rerun(
+        0,
+        match,
+        new_results,
+        result,
+        ["yaml[line-length]"],
+        claimed,
+    )
     assert result.matches[0].lineno == 6
-    assert not _handle_warn_list_rerun(0, match, new_results, result, ["name"])
+    assert claimed == {("yaml[line-length]", match.filename, 6)}
+    assert not _handle_warn_list_rerun(
+        0,
+        match,
+        new_results,
+        result,
+        ["name"],
+        claimed,
+    )
 
 
 def test_apply_rerun_outcome() -> None:
@@ -308,8 +474,64 @@ def test_handle_warn_list_rerun_retains_when_no_refresh_match() -> None:
         LintResult([other], set()),
         result,
         ["yaml[line-length]"],
+        set(),
     )
     assert result.matches[0] is match
+
+
+def test_handle_warn_list_rerun_correlates_multiple_matches() -> None:
+    """Repeated same-tag warnings in one file must refresh one-to-one."""
+    from ansiblelint.__main__ import _handle_warn_list_rerun
+
+    first = _yaml_line_length_match()
+    first.lineno = 5
+    second = _yaml_line_length_match()
+    second.lineno = 14
+    result = LintResult([first, second], set())
+
+    refreshed_near_second = MatchError(
+        message=first.message,
+        lintable=first.lintable,
+        tag="yaml[line-length]",
+        lineno=15,
+        rule=first.rule,
+    )
+    refreshed_near_first = MatchError(
+        message=first.message,
+        lintable=first.lintable,
+        tag="yaml[line-length]",
+        lineno=6,
+        rule=first.rule,
+    )
+    new_results = LintResult(
+        [refreshed_near_second, refreshed_near_first],
+        set(),
+    )
+    claimed: set[tuple[str, str | None, int]] = set()
+
+    assert _handle_warn_list_rerun(
+        0,
+        first,
+        new_results,
+        result,
+        ["yaml[line-length]"],
+        claimed,
+    )
+    assert result.matches[0].lineno == 6
+
+    assert _handle_warn_list_rerun(
+        1,
+        second,
+        new_results,
+        result,
+        ["yaml[line-length]"],
+        claimed,
+    )
+    assert result.matches[1].lineno == 15
+    assert claimed == {
+        ("yaml[line-length]", first.filename, 6),
+        ("yaml[line-length]", first.filename, 15),
+    }
 
 
 def test_process_fix_rerun_matches(
@@ -335,6 +557,9 @@ def test_process_fix_rerun_matches(
     )
 
     config_options.warn_list = ["yaml[line-length]"]
+    config_options.tags = ["all"]
+    config_options.lintables = ["roles/demo"]
+    config_options._skip_ansible_syntax_check = False  # ruff:ignore[private-member-access]
     refreshed = MatchError(
         message=yaml_match.message,
         lintable=yaml_match.lintable,
@@ -365,6 +590,9 @@ def test_process_fix_rerun_matches(
     yaml_matches = [m for m in result.matches if m.tag == "yaml[line-length]"]
     assert len(yaml_matches) == 1
     assert yaml_matches[0].lineno == 8
+    assert config_options.tags == ["all"]
+    assert config_options.lintables == ["roles/demo"]
+    assert config_options._skip_ansible_syntax_check is False  # ruff:ignore[private-member-access]
 
 
 def test_process_fix_rerun_matches_drops_previously_resolved(
@@ -392,3 +620,34 @@ def test_process_fix_rerun_matches_drops_previously_resolved(
     )
 
     assert result.matches == []
+
+
+def test_process_fix_rerun_matches_restores_options_on_error(
+    mocker: MockerFixture,
+    config_options: Options,
+    default_rules_collection: RulesCollection,
+) -> None:
+    """Rerun must restore Options even when get_matches raises."""
+    from ansiblelint.__main__ import _process_fix_rerun_matches
+
+    yaml_match = _yaml_line_length_match()
+    config_options.warn_list = []
+    config_options.tags = ["original"]
+    config_options.lintables = ["original.yml"]
+    config_options._skip_ansible_syntax_check = False  # ruff:ignore[private-member-access]
+    mocker.patch(
+        "ansiblelint.__main__.get_matches",
+        side_effect=RuntimeError("boom"),
+    )
+
+    with pytest.raises(RuntimeError, match="boom"):
+        _process_fix_rerun_matches(
+            config_options,
+            LintResult([yaml_match], set()),
+            default_rules_collection,
+            1,
+        )
+
+    assert config_options.tags == ["original"]
+    assert config_options.lintables == ["original.yml"]
+    assert config_options._skip_ansible_syntax_check is False  # ruff:ignore[private-member-access]

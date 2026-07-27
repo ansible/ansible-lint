@@ -1,6 +1,6 @@
 """Console support: coloring and terminal code."""
 
-# cspell: ignore mdcat, mdless, bbcode, noteset
+# cspell: ignore mdcat, mdless, bbcode
 
 from __future__ import annotations
 
@@ -135,23 +135,23 @@ def should_do_markup(stream: TextIO = sys.stdout) -> bool:  # pragma: no cover
 class PlainStyle:
     """Theme."""
 
-    failed = ""
-    success = ""
-    normal = ""
-    dim = ""
-    bold = ""
+    failed: str = ""
+    success: str = ""
+    normal: str = ""
+    dim: str = ""
+    bold: str = ""
     # logging
-    notset = ""
-    debug = ""
-    info = ""
-    warning = ""
-    error = ""
-    critical = ""
+    notset: str = ""
+    debug: str = ""
+    info: str = ""
+    warning: str = ""
+    error: str = ""
+    critical: str = ""
 
     # data types
-    number = ""
-    path = ""
-    link = ""
+    number: str = ""
+    path: str = ""
+    link: str = ""
 
     @classmethod
     def render_link(cls, uri: str, label: str | None = None) -> str:
@@ -189,22 +189,22 @@ class AnsiStyle(PlainStyle):
         DIM = "\033[2m"
         BOLD_CYAN = "\033[1;36m"
 
-    warning = "\033[33m"  # yellow
-    error = ANSI.RED  # "\033[31m"  # red
-    info = ANSI.BLUE
-    debug = ANSI.BLUE
-    notset = ANSI.BLUE
+    warning: str = "\033[33m"  # yellow
+    error: str = ANSI.RED  # "\033[31m"  # red
+    info: str = ANSI.BLUE
+    debug: str = ANSI.BLUE
+    notset: str = ANSI.BLUE
 
-    failed = ANSI.RED
-    success = ANSI.GREEN
+    failed: str = ANSI.RED
+    success: str = ANSI.GREEN
 
-    normal = ANSI.END
-    dim = ANSI.DIM
-    bold = ANSI.BOLD
+    normal: str = ANSI.END
+    dim: str = ANSI.DIM
+    bold: str = ANSI.BOLD
     # data types
-    number = ANSI.BOLD_CYAN
-    path = ANSI.MAGENTA  # do not use same color as link
-    link = ANSI.BLUE
+    number: str = ANSI.BOLD_CYAN
+    path: str = ANSI.MAGENTA  # do not use same color as link
+    link: str = ANSI.BLUE
 
     @classmethod
     def render_link(cls, uri: str, label: str | None = None) -> str:
@@ -217,6 +217,111 @@ class AnsiStyle(PlainStyle):
         escape_mask = "\033]8;{};{}\033\\{}\033]8;;\033\\"
 
         return cls.link + escape_mask.format(parameters, uri, label) + cls.normal
+
+
+def _bbcode_to_ansi_mappings(style: type[PlainStyle]) -> dict[str, tuple[str, str]]:
+    return {
+        "bold": (style.bold, style.normal),
+        "dim": (style.dim, style.normal),
+        "warning": (style.warning, style.normal),
+        "error": (style.error, style.normal),
+        "info": (style.info, style.normal),
+        "debug": (style.debug, style.normal),
+        "notset": (style.notset, style.normal),
+        "repr.path": (style.path, style.normal),
+        "repr.number": (style.number, style.normal),
+        "repr.link": (style.link, style.normal),
+        "failed": (style.failed, style.normal),
+        "success": (style.success, style.normal),
+    }
+
+
+def _replace_bb_links(text: str, style: type[PlainStyle]) -> str:
+    def replacement(match: re.Match[str]) -> str:
+        url = match.group(1)
+        title = match.group(2)
+        return style.render_link(url, title)
+
+    return RE_BB_LINK_PATTERN.sub(replacement, text)
+
+
+def _append_bb_open_tag(
+    tag: str,
+    param: str | None,
+    raw: str,
+    stack: list[tuple[str, str | None]],
+    result: list[str],
+    bbcode_to_ansi: dict[str, tuple[str, str]],
+) -> None:
+    if tag not in bbcode_to_ansi:
+        result.append(raw)
+        # Link tags are closed by [/link] (handled later); do not push onto the
+        # generic [/] stack or nested tag closing will become misaligned.
+        if tag != "link":
+            stack.append(("unknown", None))
+        return
+    stack.append((tag, param))
+    opening, _ = bbcode_to_ansi[tag]
+    if param:
+        opening = opening.replace("{param}", param)
+    result.append(opening)
+
+
+def _append_bb_close_tag(
+    stack: list[tuple[str, str | None]],
+    result: list[str],
+    bbcode_to_ansi: dict[str, tuple[str, str]],
+) -> None:
+    if not stack:
+        result.append("[/]")
+        return
+    open_tag, _ = stack.pop()
+    if open_tag in bbcode_to_ansi:
+        _, closing = bbcode_to_ansi[open_tag]
+        result.append(closing)
+    else:
+        result.append("[/]")
+
+
+def _flush_bb_stack(
+    stack: list[tuple[str, str | None]],
+    result: list[str],
+    bbcode_to_ansi: dict[str, tuple[str, str]],
+) -> None:
+    while stack:
+        open_tag, _ = stack.pop()
+        if open_tag != "unknown":
+            _, closing = bbcode_to_ansi[open_tag]
+            result.append(closing)
+
+
+def _replace_bb_tags(
+    text: str,
+    tag_pattern: re.Pattern[str],
+    bbcode_to_ansi: dict[str, tuple[str, str]],
+) -> str:
+    stack: list[tuple[str, str | None]] = []
+    result: list[str] = []
+    pos = 0
+
+    for match in tag_pattern.finditer(text):
+        start, end = match.span()
+        tag = match.group(1)
+        param = match.group(2)
+
+        result.append(text[pos:start])
+        pos = end
+
+        if tag:
+            _append_bb_open_tag(
+                tag, param, match.group(0), stack, result, bbcode_to_ansi
+            )
+        else:
+            _append_bb_close_tag(stack, result, bbcode_to_ansi)
+
+    result.append(text[pos:])
+    _flush_bb_stack(stack, result, bbcode_to_ansi)
+    return "".join(result)
 
 
 class Markdown(UserString):
@@ -239,7 +344,7 @@ class Markdown(UserString):
                 _logger.info(msg)
 
         if md_cmd:
-            subprocess.run(  # noqa: S603
+            subprocess.run(  # ruff:ignore[subprocess-without-shell-equals-true]
                 md_renderers[md_cmd],
                 input=self.data,
                 text=True,
@@ -286,98 +391,11 @@ class Console:
     def render(self, text: str) -> str:
         """Parses a string containing nested BBCode with a generic block terminator ([/])."""
         style: type[PlainStyle] = AnsiStyle if self.colored else PlainStyle
-        # Define bbcode-to-ansi mappings
-        bbcode_to_ansi = {
-            "bold": (style.bold, style.normal),
-            "dim": (style.dim, style.normal),
-            # logging
-            "warning": (style.warning, style.normal),
-            "error": (style.error, style.normal),
-            "info": (style.info, style.normal),
-            "debug": (style.debug, style.normal),
-            "noteset": (style.notset, style.normal),
-            # data types
-            "repr.path": (style.path, style.normal),
-            "repr.number": (style.number, style.normal),
-            "repr.link": (style.link, style.normal),
-            "failed": (style.failed, style.normal),
-            "success": (style.success, style.normal),
-        }
-
-        def replace_bb_links(text: str) -> str:
-            """Replaces BBCode-style links ([link=url]title[/link]) with HTML <a> tags.
-
-            Args:
-                text (str): The input text containing BBCode links.
-
-            Returns:
-                str: The text with BBCode links replaced by HTML <a> tags.
-            """
-            # Replace matches with HTML <a> tags
-
-            def replacement(match: re.Match[str]) -> str:
-                url = match.group(1)  # The URL part from [link=url]
-                title = match.group(2)
-                return style.render_link(url, title)
-
-            result = RE_BB_LINK_PATTERN.sub(replacement, text)
-            return result
-
-        def replace_bb_tags(text: str) -> str:
-            """Processes the text with a stack-based approach to handle nested tags."""
-            # Incomplete implementation as it does not track full ANSI behavior
-            # and only remembers to reset the style when tags ends.
-            stack = []  # Stack to keep track of open tags
-            result = []  # Result list to build the output HTML
-            pos = 0  # Current position in the text
-
-            for match in self.tag_pattern.finditer(text):
-                start, end = match.span()
-                tag = match.group(1)
-                param = match.group(2)
-
-                # Add plain text before this tag
-                result.append(text[pos:start])
-                pos = end
-
-                if tag:  # Opening tag
-                    if tag in bbcode_to_ansi:
-                        # Push tag and param onto the stack
-                        stack.append((tag, param))
-                        opening, _ = bbcode_to_ansi[tag]
-                        if param:
-                            opening = opening.replace("{param}", param)
-                        result.append(opening)
-                    else:
-                        # Preserve unknown tags as-is
-                        result.append(match.group(0))
-                        stack.append(("unknown", None))  # Track unknown tags
-                else:  # Closing tag ([/])
-                    if stack:
-                        open_tag, _ = stack.pop()
-                        if open_tag in bbcode_to_ansi:
-                            _, closing = bbcode_to_ansi[open_tag]
-                            result.append(closing)
-                        else:
-                            # Preserve unmatched closing tag for unknown tags
-                            result.append("[/]")
-                    else:
-                        # Preserve unmatched closing tags
-                        result.append("[/]")
-
-            # Add remaining plain text after the last tag
-            result.append(text[pos:])
-
-            # Close any unclosed tags
-            while stack:
-                open_tag, _ = stack.pop()
-                if open_tag != "unknown":
-                    _, closing = bbcode_to_ansi[open_tag]
-                    result.append(closing)
-
-            return "".join(result)
-
-        return replace_bb_links(replace_bb_tags(text))
+        bbcode_to_ansi = _bbcode_to_ansi_mappings(style)
+        return _replace_bb_links(
+            _replace_bb_tags(text, self.tag_pattern, bbcode_to_ansi),
+            style,
+        )
 
 
 console = Console()
