@@ -640,10 +640,11 @@ def test_process_fix_rerun_matches_restores_options_on_error(
         side_effect=RuntimeError("boom"),
     )
 
+    result = LintResult([yaml_match], set())
     with pytest.raises(RuntimeError, match="boom"):
         _process_fix_rerun_matches(
             config_options,
-            LintResult([yaml_match], set()),
+            result,
             default_rules_collection,
             1,
         )
