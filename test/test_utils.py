@@ -729,9 +729,11 @@ def test_parse_yaml_linenumbers_returns_independent_copies(tmp_path: Path) -> No
     first = utils.parse_yaml_linenumbers(lintable)
     second = utils.parse_yaml_linenumbers(lintable)
 
+    assert first is not None
+    assert second is not None
     assert first is not second
-    first[0][SKIPPED_RULES_KEY] = ["yaml"]  # type: ignore[index]
-    assert SKIPPED_RULES_KEY not in second[0]  # type: ignore[operator]
+    first[0][SKIPPED_RULES_KEY] = ["yaml"]
+    assert SKIPPED_RULES_KEY not in second[0]
 
 
 def test_warn_list_preserves_line_length_after_name_fix(tmp_path: Path) -> None:
