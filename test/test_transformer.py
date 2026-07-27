@@ -347,7 +347,7 @@ def test_should_preserve_long_lines(
     config_options.write_list = write_list
     config_options.warn_list = warn_list
     transformer = Transformer(LintResult([], set()), config_options)
-    assert transformer._should_preserve_long_lines() is expected  # noqa: SLF001
+    assert transformer._should_preserve_long_lines() is expected  # ruff:ignore[private-member-access]
 
 
 @mock.patch.dict(os.environ, {"ANSIBLE_LINT_WRITE_TMP": "1"}, clear=True)
