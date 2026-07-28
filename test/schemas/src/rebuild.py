@@ -77,7 +77,7 @@ if __name__ == "__main__":
     invalid_var_names = sorted(list(keyword.kwlist) + play_keywords)
     if "__peg_parser__" in invalid_var_names:
         invalid_var_names.remove("__peg_parser__")
-    print("Updating invalid var names")  # noqa: T201
+    print("Updating invalid var names")  # ruff:ignore[print]
 
     with Path("f/vars.json").open("r+", encoding="utf-8") as f:
         vars_schema = json.load(f)
@@ -89,7 +89,7 @@ if __name__ == "__main__":
         f.write("\n")
         f.truncate()
 
-    print("Compiling subschemas...")  # noqa: T201
+    print("Compiling subschemas...")  # ruff:ignore[print]
     with Path("f/ansible.json").open(encoding="utf-8") as f:
         combined_json = json.load(f)
 
@@ -112,7 +112,7 @@ if __name__ == "__main__":
                 del sub_json[key]
         for key in sub_json:
             if key not in ["$schema", "$defs"]:
-                print(  # noqa: T201
+                print(  # ruff:ignore[print]
                     f"Unexpected key found at combined schema root: ${key}",
                 )
                 sys.exit(2)
@@ -128,7 +128,7 @@ if __name__ == "__main__":
         while True:
             spare = [k for k in sub_json["$defs"] if not is_ref_used(sub_json, k)]
             for k in spare:
-                print(f"{subschema}: deleting unused '{k}' definition")  # noqa: T201
+                print(f"{subschema}: deleting unused '{k}' definition")  # ruff:ignore[print]
                 del sub_json["$defs"][k]
             if not spare:
                 break

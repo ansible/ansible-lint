@@ -176,9 +176,9 @@ class Transformer:
             try:
                 match.rule.transform(match, file, data)
             except Exception as exc:  # pylint: disable=broad-except
-                _logger.error("%s %s", self.FIX_FAILED_MSG, match_id)  # noqa: TRY400
-                _logger.exception(exc)  # noqa: TRY401
-                _logger.error(self.FIX_ISSUE_MSG)  # noqa: TRY400
+                _logger.error("%s %s", self.FIX_FAILED_MSG, match_id)  # ruff:ignore[error-instead-of-exception]
+                _logger.exception(exc)  # ruff:ignore[verbose-log-message]
+                _logger.error(self.FIX_ISSUE_MSG)  # ruff:ignore[error-instead-of-exception]
                 continue
             if match.fixed:
                 _logger.debug("%s %s", self.FIX_APPLIED_MSG, match_id)

@@ -56,7 +56,7 @@ should not be preserved when transferring files between them.
             return False
 
         archive = action.get("archive", True)
-        if action.get("owner", archive) or action.get("group", archive):  # noqa: SIM103
+        if action.get("owner", archive) or action.get("group", archive):  # ruff:ignore[needless-bool]
             return True
         return False
 

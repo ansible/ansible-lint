@@ -53,6 +53,14 @@ RE_JINJA_STATEMENT = re.compile(r"{%.+?%}", re.DOTALL)
 RE_JINJA_COMMENT = re.compile(r"{#.+?#}", re.DOTALL)
 
 
+def _should_skip_play(play: Any, rule_id: str) -> bool:
+    if play is None or not hasattr(play, "get"):
+        return True
+    if rule_id in play.get(SKIPPED_RULES_KEY, ()):
+        return True
+    return "skip_ansible_lint" in play.get("tags", [])
+
+
 class AnsibleLintRule(BaseRule):
     """AnsibleLintRule should be used as base for writing new rules."""
 
@@ -123,6 +131,22 @@ class AnsibleLintRule(BaseRule):
             match.details = "Task/Handler: " + str(task)
 
         match.lineno = max(match.lineno, task.line)
+
+    def _yaml_string_load_failure(self, file: Lintable) -> list[MatchError] | None:
+        yaml = file.data
+        if not isinstance(yaml, str):
+            return None
+        if yaml.startswith("$ANSIBLE_VAULT"):
+            return []
+        if self._collection is None:  # pragma: no cover
+            msg = f"Rule {self.id} was not added to a collection."
+            raise RuntimeError(msg)
+        return [
+            MatchError(
+                lintable=file,
+                rule=self._collection["load-failure"],
+            ),
+        ]
 
     def matchlines(self, file: Lintable) -> list[MatchError]:
         matches: list[MatchError] = []
@@ -229,23 +253,11 @@ class AnsibleLintRule(BaseRule):
         if str(file.base_kind) != "text/yaml":
             return matches
 
+        load_failure = self._yaml_string_load_failure(file)
+        if load_failure is not None:
+            return load_failure
+
         yaml = file.data
-        # yaml returned can be an AnsibleUnicode (a string) when the yaml
-        # file contains a single string. YAML spec allows this but we consider
-        # this an fatal error.
-        if isinstance(yaml, str):
-            if yaml.startswith("$ANSIBLE_VAULT"):
-                return []
-            if self._collection is None:  # pragma: no cover
-                msg = f"Rule {self.id} was not added to a collection."
-                raise RuntimeError(msg)
-            return [
-                # pylint: disable=E1136
-                MatchError(
-                    lintable=file,
-                    rule=self._collection["load-failure"],
-                ),
-            ]
         if not yaml:
             return matches
 
@@ -253,16 +265,8 @@ class AnsibleLintRule(BaseRule):
             yaml = [yaml]
 
         for play in yaml:
-            # Bug #849 and #4492
-            if play is None or not hasattr(play, "get"):
+            if _should_skip_play(play, self.id):
                 continue
-
-            if self.id in play.get(SKIPPED_RULES_KEY, ()):
-                continue
-
-            if "skip_ansible_lint" in play.get("tags", []):
-                continue
-
             matches.extend(self.matchplay(file, play))
 
         return matches
@@ -431,7 +435,7 @@ class RulesCollection:
             ],
         )
         for rule in self.rules:
-            rule._collection = self  # noqa: SLF001
+            rule._collection = self  # ruff:ignore[private-member-access]
         for rule in load_plugins(rulesdirs_str):
             self.register(rule, conditional=conditional)
         self.rules = sorted(self.rules)
@@ -447,7 +451,7 @@ class RulesCollection:
         """Register a rule."""
         # We skip opt-in rules which were not manually enabled.
         # But we do include opt-in rules when listing all rules or tags
-        obj._collection = self  # pylint: disable=protected-access # noqa: SLF001
+        obj._collection = self  # pylint: disable=protected-access # ruff:ignore[private-member-access]
         if any(
             [
                 not conditional,

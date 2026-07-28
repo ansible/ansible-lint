@@ -34,3 +34,8 @@ __all__ = [
     "UnsetVariableMatcherRule",
     "UseHandlerRatherThanWhenChangedRule",
 ]
+
+
+def test_vulture_reachable_imports() -> None:
+    """Ensure vulture-reachable rule imports stay importable."""
+    assert ArgsRule.id == "args"

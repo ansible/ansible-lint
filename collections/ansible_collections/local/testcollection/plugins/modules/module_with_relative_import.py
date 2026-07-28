@@ -1,9 +1,12 @@
 """module_with_relative_import module."""
+# ruff:file-ignore[relative-imports]
 
 from ansible.module_utils.basic import AnsibleModule
 
 # pylint: disable=E0402
-from ..module_utils import MY_STRING  # noqa: TID252 # type: ignore[import-untyped]
+from ..module_utils import (
+    MY_STRING,  # type: ignore[import-untyped]
+)
 
 DOCUMENTATION = r"""
 options:

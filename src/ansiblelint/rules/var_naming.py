@@ -210,7 +210,7 @@ class VariableNamingRule(AnsibleLintRule):
                 continue
             role_fqcn = role.get("role", role.get("name"))
             prefix = self._parse_prefix(role_fqcn)
-            for key in list(role.keys()):
+            for key in role:
                 if key not in PLAYBOOK_ROLE_KEYWORDS:
                     match_error = self.get_var_naming_matcherror(
                         key, prefix=prefix, file=file

@@ -177,7 +177,7 @@ class BaseRule:
             rule_config = self.options.rules.get(self.id, {})
         if not isinstance(rule_config, dict):  # pragma: no cover
             msg = f"Invalid rule config for {self.id}: {rule_config}"
-            raise RuntimeError(msg)  # noqa: TRY004
+            raise RuntimeError(msg)  # ruff:ignore[type-check-without-type-error]
         return rule_config
 
     @property
