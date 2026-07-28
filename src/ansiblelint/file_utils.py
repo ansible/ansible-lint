@@ -299,7 +299,7 @@ class Lintable:
 
         if str(self.path) in ["/dev/stdin", "-"]:
             # pylint: disable=consider-using-with
-            self.file = NamedTemporaryFile(  # noqa: SIM115
+            self.file = NamedTemporaryFile(  # ruff:ignore[open-file-with-context-handler]
                 mode="w+",
                 suffix="playbook.yml",
                 encoding="utf-8",

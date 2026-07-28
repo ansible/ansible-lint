@@ -348,7 +348,7 @@ class Runner:
         # avoid resource leak warning, https://github.com/python/cpython/issues/90549
         # pylint: disable=unused-variable
         with contextlib.suppress(OSError):
-            global_resource = multiprocessing.Semaphore()  # noqa: F841
+            _global_resource = multiprocessing.Semaphore()
 
         return_list = self._map_syntax_check_workers(worker, files)
         for data in return_list:
@@ -441,7 +441,7 @@ class Runner:
     - ansible.builtin.import_role:
         name: {lintable.path.expanduser()!s}
 """
-                fh = tempfile.NamedTemporaryFile(  # noqa: SIM115
+                fh = tempfile.NamedTemporaryFile(  # ruff:ignore[open-file-with-context-handler]
                     mode="w",
                     suffix=".yml",
                     prefix="play",
@@ -475,7 +475,7 @@ class Runner:
             # https://github.com/ansible/ansible-lint/issues/3650
             env["ANSIBLE_INVENTORY_ANY_UNPARSED_IS_FAILED"] = "False"
 
-            run = subprocess.run(  # noqa: S603
+            run = subprocess.run(  # ruff:ignore[subprocess-without-shell-equals-true]
                 cmd,
                 stdin=subprocess.PIPE,
                 capture_output=True,
@@ -714,7 +714,7 @@ class Runner:
         examples.line_offset = offset
 
         # pylint: disable=consider-using-with
-        examples.file = NamedTemporaryFile(  # noqa: SIM115
+        examples.file = NamedTemporaryFile(  # ruff:ignore[open-file-with-context-handler]
             mode="w+",
             suffix=f"_{lintable.path.name}.yaml",
             encoding="utf-8",
@@ -801,7 +801,7 @@ def get_matches(rules: RulesCollection, options: Options) -> LintResult:
         verbosity=options.verbosity,
         checked_files=checked_files,
         project_dir=options.project_dir,
-        _skip_ansible_syntax_check=options._skip_ansible_syntax_check,  # noqa: SLF001
+        _skip_ansible_syntax_check=options._skip_ansible_syntax_check,  # ruff:ignore[private-member-access]
     )
     matches.extend(runner.run())
 

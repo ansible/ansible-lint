@@ -35,7 +35,7 @@ def test_base_formatter_when_base_dir(
     base_formatter = BaseFormatter(base_dir, relative_path)  # type: ignore[var-annotated]
 
     # When
-    output_path = base_formatter._format_path(  # noqa: SLF001
+    output_path = base_formatter._format_path(  # ruff:ignore[private-member-access]
         path,
     )
 
@@ -71,7 +71,7 @@ def test_base_formatter_when_base_dir_is_given_and_relative_is_true(
     base_formatter = BaseFormatter(base_dir, True)  # type: ignore[var-annotated]
 
     # When
-    output_path = base_formatter._format_path(path)  # noqa: SLF001
+    output_path = base_formatter._format_path(path)  # ruff:ignore[private-member-access]
 
     # Then
     assert isinstance(output_path, str | Path)
