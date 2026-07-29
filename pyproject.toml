@@ -34,7 +34,7 @@ classifiers = [
 ]
 dependencies = [
   "ansible-compat>=26.3.0",
-  "ansible-core>=2.16.14",
+  "ansible-core>=2.16.19,!=2.17.*",
   "black>=24.3.0",
   "cffi>=1.15.1",  # indirect dependency of ruamel-yaml
   "cryptography>=37",
@@ -300,46 +300,46 @@ target-version = "py310"
 
 [tool.ruff.lint]
 ignore = [
-  "COM812",  # conflicts with ISC001 on format
-  "CPY001",  # missing-copyright-notice
-  "D203",  # incompatible with D211
-  "D213",  # incompatible with D212
-  "E501",  # we use black
-  "ERA001",  # auto-removal of commented out code affects development and vscode integration
-  "INP001",  # "is part of an implicit namespace package", all false positives
-  "ISC001",  # conflicts with COM812 on format
-  "PLW2901",  # PLW2901: Redefined loop variable
-  "RET504",  # Unnecessary variable assignment before `return` statement
+  "missing-trailing-comma",  # conflicts with ISC001 on format
+  "missing-copyright-notice",  # missing-copyright-notice
+  "incorrect-blank-line-before-class",  # incompatible with D211
+  "multi-line-summary-second-line",  # incompatible with D212
+  "line-too-long",  # we use black
+  "commented-out-code",  # auto-removal of commented out code affects development and vscode integration
+  "implicit-namespace-package",  # "is part of an implicit namespace package", all false positives
+  "single-line-implicit-string-concatenation",  # conflicts with COM812 on format
+  "redefined-loop-name",  # PLW2901: Redefined loop variable
+  "unnecessary-assign",  # Unnecessary variable assignment before `return` statement
   # temporary disabled until we fix them:
   "ANN",
-  "ARG002",  # Unused method argument (currently in too many places)
-  "D102",  # Missing docstring in public method (currently in too many places)
-  "FBT001",
-  "FBT003",
-  "FURB189",  # Subclassing `dict` can be error prone, use `collections.UserDict` instead
-  "PD011",  # We are not using pandas, any .values attributes are unrelated
-  "PERF203",
+  "unused-method-argument",  # Unused method argument (currently in too many places)
+  "undocumented-public-method",  # Missing docstring in public method (currently in too many places)
+  "boolean-type-hint-positional-argument",
+  "boolean-positional-value-in-call",
+  "subclass-builtin",  # Subclassing `dict` can be error prone, use `collections.UserDict` instead
+  "pandas-use-of-dot-values",  # We are not using pandas, any .values attributes are unrelated
+  "try-except-in-loop",
   "PLR",
-  "PLW0603",  # global lock file in cache dir
-  "RUF012",  # Mutable class attributes should be annotated with `typing.ClassVar`
-  "RUF045",  # Assignment without annotation found in dataclass body
+  "global-statement",  # global lock file in cache dir
+  "mutable-class-default",  # Mutable class attributes should be annotated with `typing.ClassVar`
+  "implicit-class-var-in-dataclass",  # Assignment without annotation found in dataclass body
   # part of preview rules:
-  "B909",  # raise-missing-from
-  "DOC201",  # docstring-missing-returns
-  "DOC402",  # docstring-missing-summary
-  "DOC501",  # docstring-missing-exception
-  "FURB101",
-  "FURB103",
-  "FURB110",
-  "FURB113",
-  "FURB118",
-  "PLC0207",  # maxsplit with [-1] preview rule
-  "D421",  # property-docstring-starts-with-verb (preview, too many existing violations)
-  "PLC0415",
-  "PLC2701",
-  "PLW1641",
-  "RUF067",
-  "S404",
+  "loop-iterator-mutation",  # raise-missing-from
+  "docstring-missing-returns",  # docstring-missing-returns
+  "docstring-missing-yields",  # docstring-missing-summary
+  "docstring-missing-exception",  # docstring-missing-exception
+  "read-whole-file",
+  "write-whole-file",
+  "if-exp-instead-of-or-operator",
+  "repeated-append",
+  "reimplemented-operator",
+  "missing-maxsplit-arg",  # maxsplit with [-1] preview rule
+  "property-docstring-starts-with-verb",  # property-docstring-starts-with-verb (preview, too many existing violations)
+  "import-outside-top-level",
+  "import-private-name",
+  "eq-without-hash",
+  "non-empty-init-module",
+  "suspicious-subprocess-import",
 ]
 select = ["ALL"]
 
@@ -360,7 +360,12 @@ max-complexity = 20
 "src/ansiblelint/{utils,file_utils,runner,loaders,constants,config,cli,_mockings}.py" = [
   "PTH",
 ]
-"test/**/*.py" = ["DOC201", "DOC501", "PLC2701", "S"]
+"test/**/*.py" = [
+  "docstring-missing-returns",
+  "docstring-missing-exception",
+  "import-private-name",
+  "S"
+]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"

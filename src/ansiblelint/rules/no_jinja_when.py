@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from ansiblelint.utils import Task
 
 RE_JINJA = re.compile(r"{{ (.*?) }}")
+_WHEN_KEYS = ("when", "changed_when", "failed_when")
 
 
 class NoFormattingInWhenRule(AnsibleLintRule, TransformMixin):
@@ -78,31 +79,44 @@ class NoFormattingInWhenRule(AnsibleLintRule, TransformMixin):
         lintable: Lintable,
         data: CommentedMap | CommentedSeq | str,
     ) -> None:
-        if match.tag == self.id:
-            task = self.seek(match.yaml_path, data)
-            key_to_check = ("when", "changed_when", "failed_when")
-            for _ in range(len(task)):
-                if isinstance(task, MutableMapping):
-                    for k, v in task.items():
-                        if k == "roles" and isinstance(v, list):
-                            transform_for_roles(v, key_to_check=key_to_check)
-                        elif k in key_to_check:
-                            v = RE_JINJA.sub(r"\1", v)
-                            task[k] = v
-            match.fixed = True
+        if match.tag != self.id:
+            return
+        task = self.seek(match.yaml_path, data)
+        if isinstance(task, MutableMapping):
+            _transform_when_keys(task, _WHEN_KEYS)
+        match.fixed = True
+
+
+def _transform_when_value(value: Any) -> Any:
+    if isinstance(value, list):
+        return [
+            RE_JINJA.sub(r"\1", item) if isinstance(item, str) else item
+            for item in value
+        ]
+    if isinstance(value, str):
+        return RE_JINJA.sub(r"\1", value)
+    return value
+
+
+def _transform_when_keys(
+    task: MutableMapping[str, Any],
+    key_to_check: tuple[str, ...],
+) -> None:
+    for key, value in task.items():
+        if key == "roles" and isinstance(value, list):
+            transform_for_roles(value, key_to_check=key_to_check)
+        elif key in key_to_check:
+            task[key] = _transform_when_value(value)
 
 
 def transform_for_roles(v: list[Any], key_to_check: tuple[str, ...]) -> None:
     """Additional transform logic in case of roles."""
-    for idx, new_dict in enumerate(v):
-        for new_key, new_value in new_dict.items():
-            if new_key in key_to_check:
-                if isinstance(new_value, list):
-                    for index, nested_value in enumerate(new_value):
-                        new_value[index] = RE_JINJA.sub(r"\1", nested_value)
-                    v[idx][new_key] = new_value
-                if isinstance(new_value, str):
-                    v[idx][new_key] = RE_JINJA.sub(r"\1", new_value)
+    for role in v:
+        if not isinstance(role, MutableMapping):
+            continue
+        for key, value in role.items():
+            if key in key_to_check:
+                role[key] = _transform_when_value(value)
 
 
 if "pytest" in sys.modules:
@@ -124,3 +138,18 @@ if "pytest" in sys.modules:
         bad_runner = Runner(failure, rules=empty_rule_collection)
         errs = bad_runner.run()
         assert len(errs) == 3
+
+    def test_transform_when_value_preserves_non_strings() -> None:
+        """Autofix must leave non-string when list items untouched."""
+        assert _transform_when_value([True, "{{ foo }}", 1]) == [True, "foo", 1]
+        assert _transform_when_value(True) is True
+
+    def test_transform_for_roles_skips_shorthand_strings() -> None:
+        """Shorthand role strings must not break transform iteration."""
+        roles: list[Any] = [
+            "geerlingguy.nginx",
+            {"role": "demo", "when": "{{ bar }}"},
+        ]
+        transform_for_roles(roles, key_to_check=_WHEN_KEYS)
+        assert roles[0] == "geerlingguy.nginx"
+        assert roles[1]["when"] == "bar"

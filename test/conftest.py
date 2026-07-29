@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 # pylint: disable=wildcard-import,unused-wildcard-import
-from ansiblelint.testing.fixtures import *  # noqa: F403
+from ansiblelint.testing.fixtures import *  # ruff:ignore[undefined-local-with-import-star]
 from ansiblelint.yaml_utils import FormattedYAML
 
 if TYPE_CHECKING:
