@@ -186,6 +186,19 @@ def test_fetch_latest_release_writes_cache(
     assert config._fetch_latest_release(str(tmp_path / "fail.json")) == {}  # ruff:ignore[private-member-access]
 
 
+class _StallingResponse:
+    """A urlopen() response double whose body read stalls out."""
+
+    def __enter__(self) -> "_StallingResponse":  # ruff:ignore[non-self-return-type]
+        return self
+
+    def __exit__(self, *_exc_info: object) -> None:
+        return None
+
+    def read(self, *_args: object) -> bytes:
+        raise TimeoutError
+
+
 def test_fetch_latest_release_timeout(
     tmp_path: Path,
     mocker: MockerFixture,
@@ -205,10 +218,16 @@ def test_fetch_latest_release_timeout(
         return_value=BytesIO(payload),
     )
     config._fetch_latest_release(str(tmp_path / "latest.json"))  # ruff:ignore[private-member-access]
-    assert urlopen_mock.call_args.kwargs.get("timeout")
+    assert urlopen_mock.call_args.kwargs.get("timeout") == 10
 
+    # A timeout while establishing the connection.
     urlopen_mock.side_effect = TimeoutError
     assert config._fetch_latest_release(str(tmp_path / "fail.json")) == {}  # ruff:ignore[private-member-access]
+
+    # A timeout while reading the response body, which raises TimeoutError
+    # from json.load(url) rather than from urlopen() itself.
+    urlopen_mock.side_effect = lambda *_args, **_kwargs: _StallingResponse()
+    assert config._fetch_latest_release(str(tmp_path / "stall.json")) == {}  # ruff:ignore[private-member-access]
 
 
 @pytest.mark.parametrize(
