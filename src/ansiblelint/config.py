@@ -315,11 +315,11 @@ def _fetch_latest_release(cache_file: str) -> dict[str, Any]:
         msg = "release_url must start with https://"
         raise ValueError(msg)
     try:
-        with urllib.request.urlopen(release_url) as url:
+        with urllib.request.urlopen(release_url, timeout=10) as url:
             data = json.load(url)
             with open(cache_file, "w", encoding="utf-8") as f:
                 json.dump(data, f)
-    except (URLError, HTTPException) as exc:  # pragma: no cover
+    except (URLError, HTTPException, TimeoutError) as exc:  # pragma: no cover
         _logger.debug(
             "Unable to fetch latest version from %s due to: %s",
             release_url,
