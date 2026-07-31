@@ -1,0 +1,28 @@
+id: openapi-drift
+title: "OpenAPI spec drift \u2014 route missing from spec"
+trigger_type: ci_failure
+log_pattern: Routes in code but MISSING from
+cause: A new route was added to the backend router but the corresponding endpoint
+  definition was not added to api/openapi.yaml.
+fix_description: Add the missing endpoint definition (path, method, operationId, response
+  schema) to api/openapi.yaml and register any new tags in the global tags section.
+fix_steps:
+- Identify the missing route from the CI log output
+- Open api/openapi.yaml
+- Add the endpoint definition under the paths section
+- If using a new tag, add it to the global tags list
+- Run 'yarn openapi:check-drift' locally to verify the fix
+auto_fixable: false
+auto_fix_command: ''
+tags:
+- openapi
+- api-spec
+- drift
+- ci
+contexts:
+- ansible-backstage-plugins
+created_by: tgeetika
+created_at: '2026-06-12T00:00:00+00:00'
+match_count: 2
+last_matched: '2026-07-31T22:52:58.107504+00:00'
+estimated_tokens_per_diagnosis: 1500

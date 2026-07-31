@@ -1,0 +1,63 @@
+name: FlowForge CI Watch
+
+on:
+  workflow_run:
+    workflows: ["tox"]
+    types: [completed]
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  analyze-failure:
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install FlowForge
+        run: pip install git+https://github.com/tanwigeetika1618/FlowForge.git@rewrite/pattern-memory
+
+      - name: Fetch failed CI logs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RUN_ID="${{ github.event.workflow_run.id }}"
+          gh run view "${RUN_ID}" --log-failed > ci_failure.log 2>&1 || \
+            echo "Could not fetch logs for run ${RUN_ID}" > ci_failure.log
+          echo "--- Log size: $(wc -c < ci_failure.log) bytes ---"
+
+      - name: Diagnose with FlowForge
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          FLOWFORGE_PATTERNS_DIR: ./patterns
+          FLOWFORGE_METRICS_FILE: ./flowforge_metrics.yaml
+        run: |
+          flowforge diagnose \
+            --file ci_failure.log \
+            --repo "${{ github.repository }}" \
+            --ci github-actions \
+            --save
+
+      - name: Commit learned patterns
+        run: |
+          git config user.name "FlowForge Bot"
+          git config user.email "flowforge[bot]@users.noreply.github.com"
+          git add patterns/ flowforge_metrics.yaml
+          if ! git diff --cached --quiet; then
+            git commit -m "flowforge: learn from CI failure (run #${{ github.event.workflow_run.id }})"
+            git push
+          else
+            echo "No new patterns to commit."
+          fi

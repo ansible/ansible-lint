@@ -1,0 +1,27 @@
+id: unused-imports
+title: ESLint no-unused-vars on imports
+trigger_type: lint_error
+log_pattern: no-unused-vars
+cause: An import statement was added but the imported symbol is not used in the file,
+  or a variable was declared but never referenced.
+fix_description: Remove the unused import/variable, or prefix it with an underscore
+  if it's intentionally unused (e.g., _unusedParam).
+fix_steps:
+- Check the lint output for the file and line number
+- Remove the unused import or variable
+- If the variable is intentionally unused (e.g., a function parameter), prefix with
+  underscore
+- Run 'yarn lint' to verify the fix
+auto_fixable: true
+auto_fix_command: yarn fix
+tags:
+- eslint
+- lint
+- imports
+- typescript
+contexts: []
+created_by: tgeetika
+created_at: '2026-08-01T00:00:00+00:00'
+match_count: 0
+last_matched: ''
+estimated_tokens_per_diagnosis: 1500
