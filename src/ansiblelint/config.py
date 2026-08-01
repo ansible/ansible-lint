@@ -14,7 +14,7 @@ from http.client import HTTPException
 from importlib.metadata import PackageNotFoundError, distribution, version
 from pathlib import Path
 from typing import Any
-from urllib.error import HTTPError, URLError
+from urllib.error import URLError
 
 from packaging.version import Version
 
@@ -254,7 +254,7 @@ def guess_install_method() -> str:
 
     # By default we assume pip is not safe to be used
     use_pip = False
-    try:  # noqa: PLW0717
+    try:  # ruff:ignore[too-many-statements-in-try-clause]
         # Use pip to detect if is safe to use it to upgrade the package.
         # We do imports here to for performance and reasons, and also in order
         # to avoid errors if pip internals change. Also we want to avoid having
@@ -297,6 +297,57 @@ def get_deps_versions() -> dict[str, Version | None]:
     return result
 
 
+def _version_cache_needs_refresh(cache_file: str) -> bool:
+    if not os.path.exists(cache_file):
+        return True
+    age = time.time() - os.path.getmtime(cache_file)
+    return age >= 24 * 60 * 60
+
+
+def _load_version_cache(cache_file: str) -> dict[str, Any]:
+    with open(cache_file, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _fetch_latest_release(cache_file: str) -> dict[str, Any]:
+    release_url = "https://api.github.com/repos/ansible/ansible-lint/releases/latest"
+    if not release_url.startswith("https://"):  # pragma: no cover (ruff compatibility)
+        msg = "release_url must start with https://"
+        raise ValueError(msg)
+    try:
+        with urllib.request.urlopen(release_url, timeout=10) as url:
+            data = json.load(url)
+            with open(cache_file, "w", encoding="utf-8") as f:
+                json.dump(data, f)
+    except (URLError, HTTPException, TimeoutError) as exc:  # pragma: no cover
+        _logger.debug(
+            "Unable to fetch latest version from %s due to: %s",
+            release_url,
+            exc,
+        )
+        return {}
+    else:
+        return data
+
+
+def _format_version_upgrade_message(
+    current_version: Version,
+    data: dict[str, Any],
+    pip: str,
+) -> str:
+    if not data:
+        return ""
+    html_url = data["html_url"]
+    new_version = Version(data["tag_name"][1:])  # removing v prefix from tag
+
+    if current_version > new_version:
+        return "[dim]You are using a pre-release version of ansible-lint.[/]"
+    if current_version < new_version:
+        msg = f"""[warning]A new release of ansible-lint is available: [warning]{current_version}[/] → [success][link={html_url}]{new_version}[/link][/][/]"""
+        return f"{msg} Upgrade by running: [info]{pip}[/]"
+    return ""
+
+
 def get_version_warning() -> str:
     """Display warning if current version is outdated."""
     # 0.1dev1 is special fallback version
@@ -308,51 +359,20 @@ def get_version_warning() -> str:
     if not pip:
         return ""
 
-    msg = ""
-    data = {}
     current_version = Version(__version__)
 
     if not os.path.exists(CACHE_DIR):  # pragma: no cover
         os.makedirs(CACHE_DIR)
     cache_file = f"{CACHE_DIR}/latest.json"
-    refresh = True
+    refresh = _version_cache_needs_refresh(cache_file)
+    data: dict[str, Any] = {}
     if os.path.exists(cache_file):
-        age = time.time() - os.path.getmtime(cache_file)
-        if age < 24 * 60 * 60:
-            refresh = False
-        with open(cache_file, encoding="utf-8") as f:
-            data = json.load(f)
+        data = _load_version_cache(cache_file)
 
     if not options.offline and (refresh or not data):
-        release_url = (
-            "https://api.github.com/repos/ansible/ansible-lint/releases/latest"
-        )
-        if not release_url.startswith(
-            "https://"
-        ):  # pragma: no cover (ruff compatibility)
-            msg = "release_url must start with https://"
-            raise ValueError(msg)
-        try:
-            with urllib.request.urlopen(release_url) as url:
-                data = json.load(url)
-                with open(cache_file, "w", encoding="utf-8") as f:
-                    json.dump(data, f)
-        except (URLError, HTTPError, HTTPException) as exc:  # pragma: no cover
-            _logger.debug(
-                "Unable to fetch latest version from %s due to: %s",
-                release_url,
-                exc,
-            )
+        fetched = _fetch_latest_release(cache_file)
+        if not fetched:
             return ""
+        data = fetched
 
-    if data:
-        html_url = data["html_url"]
-        new_version = Version(data["tag_name"][1:])  # removing v prefix from tag
-
-        if current_version > new_version:
-            msg = "[dim]You are using a pre-release version of ansible-lint.[/]"
-        elif current_version < new_version:
-            msg = f"""[warning]A new release of ansible-lint is available: [warning]{current_version}[/] → [success][link={html_url}]{new_version}[/link][/][/]"""
-            msg += f" Upgrade by running: [info]{pip}[/]"
-
-    return msg
+    return _format_version_upgrade_message(current_version, data, pip)

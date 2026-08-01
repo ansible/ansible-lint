@@ -86,7 +86,7 @@ runs:
 
     - name: Set up uv
       if: inputs.setup_python == 'true'
-      uses: astral-sh/setup-uv@v8.2.0
+      uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
       with:
         enable-cache: true
         python-version: ${{ inputs.python_version }}
@@ -101,7 +101,8 @@ runs:
       # SETUPTOOLS_SCM_PRETEND_VERSION=${{ github.action_ref || 'main' }}
       run: |
         if [[ "${{ inputs.setup_python }}" == "true" ]]; then
-          uv tool install --python ${{ inputs.python_version }} "ansible-lint[lock] @ git+https://github.com/ansible/ansible-lint@$GH_ACTION_REF"
+          # --with-executables-from requires uv >= 0.8.5 (provided by setup-uv latest above)
+          uv tool install --python ${{ inputs.python_version }} --with-executables-from ansible-core "ansible-lint[lock] @ git+https://github.com/ansible/ansible-lint@$GH_ACTION_REF"
         else
           echo "setup_python is false, using pip"
           pip install "ansible-lint[lock] @ git+https://github.com/ansible/ansible-lint@$GH_ACTION_REF"

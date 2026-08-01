@@ -14,6 +14,8 @@ if TYPE_CHECKING:
     from ansiblelint.file_utils import Lintable
     from ansiblelint.utils import Task
 
+_RULES_COLLECTION_REQUIRED_MSG = "Rules cannot be run outside a rule collection."
+
 
 class ComplexityRule(AnsibleLintRule):
     """Sets maximum complexity to avoid complex plays."""
@@ -38,8 +40,7 @@ class ComplexityRule(AnsibleLintRule):
             return []
         tasks = data.get("tasks", [])
         if not isinstance(self._collection, RulesCollection):  # pragma: no cover
-            msg = "Rules cannot be run outside a rule collection."
-            raise TypeError(msg)
+            raise TypeError(_RULES_COLLECTION_REQUIRED_MSG)
         if len(tasks) > self._collection.options.max_tasks:
             results.append(
                 self.create_matcherror(
@@ -56,8 +57,7 @@ class ComplexityRule(AnsibleLintRule):
         results: list[MatchError] = []
 
         if not isinstance(self._collection, RulesCollection):  # pragma: no cover
-            msg = "Rules cannot be run outside a rule collection."
-            raise TypeError(msg)
+            raise TypeError(_RULES_COLLECTION_REQUIRED_MSG)
 
         if task.action == "block/always/rescue":
             block_depth = self.calculate_block_depth(task)
@@ -77,8 +77,7 @@ class ComplexityRule(AnsibleLintRule):
         matches: list[MatchError] = []
 
         if not isinstance(self._collection, RulesCollection):  # pragma: no cover
-            msg = "Rules cannot be run outside a rule collection."
-            raise TypeError(msg)
+            raise TypeError(_RULES_COLLECTION_REQUIRED_MSG)
 
         # Call parent's matchtasks to get all individual task violations
         matches = super().matchtasks(file)

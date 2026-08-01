@@ -16,5 +16,5 @@ if not TYPE_CHECKING:
             import pkg_resources  # pylint: disable=import-error
 
             __version__ = pkg_resources.get_distribution("ansible-lint").version
-        except Exception:  # pylint: disable=broad-except  # noqa: BLE001, S110
+        except Exception:  # pylint: disable=broad-except  # ruff:ignore[blind-except, try-except-pass]
             pass

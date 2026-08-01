@@ -418,5 +418,5 @@ if "pytest" in sys.modules:
     def test_when_no_lintable() -> None:
         """Test when lintable is None."""
         name_rule = NameRule()
-        result = name_rule._prefix_check("Foo", None, 1)  # noqa: SLF001
+        result = name_rule._prefix_check("Foo", None, 1)  # ruff:ignore[private-member-access]
         assert len(result) == 0

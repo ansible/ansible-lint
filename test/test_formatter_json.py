@@ -7,7 +7,7 @@ import pathlib
 
 import pytest
 
-from ansiblelint.app import App  # noqa: TC001
+from ansiblelint.app import App  # ruff:ignore[typing-only-first-party-import]
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.formatters import CodeclimateJSONFormatter
@@ -38,7 +38,7 @@ def json_formatter_collection(
 
 @pytest.fixture
 def json_formatter_matches(
-    json_formatter_collection: RulesCollection,  # noqa: ARG001
+    json_formatter_collection: RulesCollection,  # ruff:ignore[unused-function-argument]
     json_formatter_rule: AnsibleLintRule,
 ) -> list[MatchError]:
     """Create test match errors for JSON formatter tests."""
@@ -145,7 +145,7 @@ def test_validate_codeclimate_schema(
 
 def test_validate_codeclimate_schema_with_positions(
     json_formatter: CodeclimateJSONFormatter,
-    json_formatter_collection: RulesCollection,  # noqa: ARG001
+    json_formatter_collection: RulesCollection,  # ruff:ignore[unused-function-argument]
     json_formatter_rule: AnsibleLintRule,
 ) -> None:
     """Test if the returned JSON is a valid codeclimate report (containing 'positions' instead of 'lines')."""

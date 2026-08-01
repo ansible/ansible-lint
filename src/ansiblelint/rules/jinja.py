@@ -53,7 +53,7 @@ class Token(NamedTuple):
 
 
 ignored_re = re.compile(
-    "|".join(  # noqa: FLY002
+    "|".join(  # ruff:ignore[static-join-to-f-string]
         [
             r"^Object of type method is not JSON serializable",
             r"^Unexpected templating type error occurred on",
@@ -233,7 +233,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
         file: Lintable | None = None,
     ) -> list[MatchError]:
         result = []
-        try:  # noqa: PLW0717
+        try:  # ruff:ignore[too-many-statements-in-try-clause]
             for key, v, path in nested_items_path(
                 task,
                 ignored_keys=("block", "ansible.builtin.block", "ansible.legacy.block"),
@@ -562,7 +562,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                         obj = obj[pth]
                     except (KeyError, TypeError) as exc:
                         err = f"Unable to transform {match.transform_meta}: {exc}"
-                        _logger.error(err)  # noqa: TRY400
+                        _logger.error(err)  # ruff:ignore[error-instead-of-exception]
                         return
                 try:
                     obj[path[-1]][key] = match.transform_meta.fixed
@@ -570,7 +570,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
 
                 except (KeyError, TypeError) as exc:
                     err = f"Unable to transform {match.transform_meta}: {exc}"
-                    _logger.error(err)  # noqa: TRY400
+                    _logger.error(err)  # ruff:ignore[error-instead-of-exception]
                 return
 
 
@@ -604,11 +604,6 @@ if "pytest" in sys.modules:
         for index, result in enumerate(results):
             assert result.tag == "jinja[spacing]"
             assert result.lineno == lineno_list[index]
-
-        # error_lines_difference = list(
-        #     set(error_expected_lines).symmetric_difference(set(lint_error_lines)),
-        # )
-        # assert len(error_lines_difference) == 0
 
     def test_jinja_spacing_vars(empty_rule_collection: RulesCollection) -> None:
         """Ensure that expected error details are matching found linting error details."""

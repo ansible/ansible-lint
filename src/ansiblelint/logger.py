@@ -17,4 +17,4 @@ def timed_info(msg: Any, *args: Any) -> Iterator[None]:
         yield
     finally:
         elapsed = time.time() - start
-        _logger.info(msg + " (%.2fs)", *(*args, elapsed))  # noqa: G003
+        _logger.info(msg + " (%.2fs)", *(*args, elapsed))  # ruff:ignore[logging-string-concat]
