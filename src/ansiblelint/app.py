@@ -46,10 +46,18 @@ class App:
         formatter_factory = choose_formatter_factory(options)
         self.formatter = formatter_factory(options.cwd, options.display_relative_path)
 
-        # Without require_module, our _set_collections_basedir may fail
+        ansible_env_vars = (
+            "ANSIBLE_HOME",
+            "ANSIBLE_LIBRARY",
+            "ANSIBLE_ROLES_PATH",
+            "ANSIBLE_COLLECTIONS_PATH",
+        )
+        has_custom_ansible_env = any(var in os.environ for var in ansible_env_vars)
+        is_isolated = not options.offline and not has_custom_ansible_env
+
         self.runtime = Runtime(
             project_dir=Path(options.project_dir),
-            isolated=not options.offline,
+            isolated=is_isolated,
             require_module=True,
             verbosity=options.verbosity,
         )
