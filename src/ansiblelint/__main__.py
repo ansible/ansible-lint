@@ -54,6 +54,7 @@ from ansiblelint.config import (
     Options,
     get_deps_versions,
     get_version_warning,
+    has_custom_ansible_env,
     log_entries,
     options,
 )
@@ -143,19 +144,9 @@ def initialize_options(arguments: list[str] | None = None) -> BaseFileLock | Non
         or options.list_rules
         or options.list_tags
     ):
-        # respecting user's env vars
-        ansible_env_vars = (
-            "ANSIBLE_HOME",
-            "ANSIBLE_LIBRARY",
-            "ANSIBLE_ROLES_PATH",
-            "ANSIBLE_COLLECTIONS_PATH",
-        )
-        has_custom_ansible_env = any(var in os.environ for var in ansible_env_vars)
-        is_isolated = not options.offline and not has_custom_ansible_env
-
         options.cache_dir = get_cache_dir(
             pathlib.Path(options.project_dir),
-            isolated=is_isolated,
+            isolated=not options.offline and not has_custom_ansible_env(),
         )
 
     options.project_dir = Path(options.project_dir).resolve().as_posix()
