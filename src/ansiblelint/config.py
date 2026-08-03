@@ -120,6 +120,19 @@ ANSIBLE_OWNED_KINDS = {
 
 PROFILES = yaml_from_file(Path(__file__).parent / "data" / "profiles.yml")
 
+ANSIBLE_ENV_VARS = (
+    "ANSIBLE_HOME",
+    "ANSIBLE_LIBRARY",
+    "ANSIBLE_ROLES_PATH",
+    "ANSIBLE_COLLECTIONS_PATH",
+)
+
+
+def has_custom_ansible_env() -> bool:
+    """Return True when any ANSIBLE_* path env var is set by the user."""
+    return any(var in os.environ for var in ANSIBLE_ENV_VARS)
+
+
 LOOP_VAR_PREFIX = "^(__|{role}_)"
 
 
