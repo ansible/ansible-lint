@@ -6,6 +6,7 @@ FQCNs
 Fimport
 LIBYAML
 LINEINFILE
+LINTABLE
 Lineinfile
 Lintable
 MYSQLD
@@ -28,7 +29,6 @@ Tsukinowa
 WSLENV
 addoption
 addopts
-alertmanager
 ansiblelint
 apport
 argparsing
@@ -92,12 +92,10 @@ languageservice
 libyaml
 licensedb
 lineinfile
-linenums
 lintable
 lintables
 localectl
 machinectl
-magiclink
 matchdir
 matcherror
 matchlines
@@ -129,7 +127,6 @@ posargs
 prek
 prerun
 pyargs
-pymdownx
 redirections
 reformatter
 releasenotes

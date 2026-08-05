@@ -308,3 +308,66 @@ def test_with_full_path(default_rules_collection: RulesCollection) -> None:
     result = runner.run()
     assert len(result) == 1
     assert result[0].tag == "name[casing]"
+
+
+def test_build_load_failure_match_empty_args(
+    default_rules_collection: RulesCollection,
+) -> None:
+    """Empty exception args and missing exc must be handled safely."""
+    from yaml.scanner import ScannerError
+
+    from ansiblelint.constants import States
+
+    runner = Runner(
+        "examples/playbooks/become.yml",
+        rules=default_rules_collection,
+    )
+    lintable = Lintable("broken.yml", content=":")
+    lintable.exc = Exception("boom")
+    cause = ScannerError("while scanning", None, "problem", None)
+    lintable.exc.__cause__ = cause
+
+    match = runner._build_load_failure_match(lintable)  # ruff:ignore[private-member-access]
+    assert match.rule.id == "load-failure"
+    assert match.tag.startswith("load-failure[")
+    assert match.message == "boom"
+
+    lintable.exc = None
+    with pytest.raises(RuntimeError, match=r"Expected lintable\.exc"):
+        runner._build_load_failure_match(lintable)  # ruff:ignore[private-member-access]
+
+    lintable.state = States.LOAD_FAILED
+    lintable.exc = Exception("still broken")
+    matches: list[Any] = []
+    assert runner._process_load_error_lintable(lintable, matches) is False  # ruff:ignore[private-member-access]
+    assert len(matches) == 1
+    assert lintable.stop_processing is True
+
+    assert (
+        runner._is_lintable_excluded_by_paths(  # ruff:ignore[private-member-access]
+            Lintable("examples/playbooks/become.yml"),
+        )
+        is False
+    )
+
+
+def test_map_syntax_check_workers_threadpool_fallback(
+    default_rules_collection: RulesCollection,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """OSError during ThreadPool creation must fall back to ThreadPoolExecutor."""
+    import multiprocessing.pool
+
+    runner = Runner(
+        "examples/playbooks/become.yml",
+        rules=default_rules_collection,
+    )
+
+    def boom(*_args: Any, **_kwargs: Any) -> Any:
+        msg = "No space left on device"
+        raise OSError(msg)
+
+    monkeypatch.setattr(multiprocessing.pool, "ThreadPool", boom)
+    files = [Lintable("examples/playbooks/become.yml")]
+    results = runner._map_syntax_check_workers(lambda _f: [], files)  # ruff:ignore[private-member-access]
+    assert results == [[]]

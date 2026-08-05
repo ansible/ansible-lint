@@ -53,7 +53,7 @@ def _fetch_and_store_schema(
     schema: dict[str, Any],
 ) -> int:
     """Fetch a schema from URL and save it to disk. Returns 1 if changed, 0 otherwise."""
-    with urllib.request.urlopen(request, timeout=10) as response:  # noqa: S310
+    with urllib.request.urlopen(request, timeout=10) as response:  # ruff:ignore[suspicious-url-open-usage]
         if response.status == 200:  # pragma: no cover
             content = response.read().decode("utf-8").rstrip()
             etag = response.headers["etag"].strip('"')
@@ -109,7 +109,7 @@ def refresh_schemas(min_age_seconds: int = 3600 * 24) -> int:
         if not url.startswith(("http:", "https:")):  # pragma: no cover
             msg = f"Unexpected url schema: {url}"
             raise ValueError(msg)
-        request = Request(url)  # noqa: S310
+        request = Request(url)  # ruff:ignore[suspicious-url-open-usage]
         etag = data.get("etag", "")
         if not path.exists():
             etag = ""
@@ -143,7 +143,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     if refresh_schemas(0 if args.force else 60 * 10):  # pragma: no cover
-        print("Schemas were updated.")  # noqa: T201
+        print("Schemas were updated.")  # ruff:ignore[print]
         sys.exit(1)
     else:  # pragma: no cover
-        print("Schemas not updated", 0)  # noqa: T201
+        print("Schemas not updated", 0)  # ruff:ignore[print]

@@ -41,9 +41,9 @@ from ansiblelint.constants import RC, SKIP_SCHEMA_UPDATE
 # safety check for broken ansible core, needs to happen first
 try:
     # pylint: disable=unused-import
-    from ansible.parsing.dataloader import DataLoader  # noqa: F401
+    from ansible.parsing.dataloader import DataLoader  # ruff:ignore[unused-import]
 
-except Exception as _exc:  # pylint: disable=broad-exception-caught # noqa: BLE001
+except Exception as _exc:  # pylint: disable=broad-exception-caught # ruff:ignore[blind-except]
     logging.fatal(_exc)
     sys.exit(RC.INVALID_CONFIG)
 # pylint: disable=ungrouped-imports
@@ -54,6 +54,7 @@ from ansiblelint.config import (
     Options,
     get_deps_versions,
     get_version_warning,
+    has_custom_ansible_env,
     log_entries,
     options,
 )
@@ -89,7 +90,7 @@ class LintLogHandler(logging.Handler):
             console_stderr.print(f"[dim]{msg}[/]")
         except RecursionError:  # See issue 36272
             raise
-        except Exception:  # pylint: disable=broad-exception-caught # noqa: BLE001
+        except Exception:  # pylint: disable=broad-exception-caught # ruff:ignore[blind-except]
             self.handleError(record)
 
 
@@ -145,7 +146,7 @@ def initialize_options(arguments: list[str] | None = None) -> BaseFileLock | Non
     ):
         options.cache_dir = get_cache_dir(
             pathlib.Path(options.project_dir),
-            isolated=not options.offline,
+            isolated=not options.offline and not has_custom_ansible_env(),
         )
 
     options.project_dir = Path(options.project_dir).resolve().as_posix()
@@ -161,7 +162,7 @@ def initialize_options(arguments: list[str] | None = None) -> BaseFileLock | Non
         try:
             cache_dir_lock.acquire(timeout=180)
         except Timeout:  # pragma: no cover
-            _logger.error(  # noqa: TRY400
+            _logger.error(  # ruff:ignore[error-instead-of-exception]
                 "Timeout waiting for another instance of ansible-lint to release the lock.",
             )
             sys.exit(RC.LOCK_TIMEOUT)
@@ -270,7 +271,7 @@ def fix(runtime_options: Options, result: LintResult, rules: RulesCollection) ->
         _logger.debug("Rerunning: %s", match)
         runtime_options.tags = [match.rule.id]
         runtime_options.lintables = [match.filename]
-        runtime_options._skip_ansible_syntax_check = True  # noqa: SLF001
+        runtime_options._skip_ansible_syntax_check = True  # ruff:ignore[private-member-access]
         new_results = get_matches(rules, runtime_options)
         if not new_results.matches:
             _logger.debug("Newly resolved: %s", match)
@@ -478,7 +479,7 @@ def path_inject(own_location: str = "") -> None:
             paths[idx] = str(Path(path).expanduser())
             expanded = True
     if expanded:  # pragma: no cover
-        print(  # noqa: T201
+        print(  # ruff:ignore[print]
             "WARNING: PATH altered to expand ~ in it. Read https://stackoverflow.com/a/44704799/99834 and correct your system configuration.",
             file=sys.stderr,
         )
@@ -514,7 +515,7 @@ def path_inject(own_location: str = "") -> None:
             all("pipx" in p for p in inject_paths),
             all("uv/tools" in p for p in inject_paths),
         )):
-            print(  # noqa: T201
+            print(  # ruff:ignore[print]
                 f"WARNING: PATH altered to include {', '.join(inject_paths)} :: This is usually a sign of broken local setup, which can cause unexpected behaviors.",
                 file=sys.stderr,
             )

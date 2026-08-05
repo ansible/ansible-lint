@@ -386,7 +386,7 @@ def test_write_exclude_list(
         Options(write_list=write_list, write_exclude_list=write_exclude_list),
     )
     # noinspection PyTypeChecker
-    Transformer._do_transforms(transformer, Mock(), "", False, matches)  # noqa: SLF001
+    Transformer._do_transforms(transformer, Mock(), "", False, matches)  # ruff:ignore[private-member-access]
 
     for match in matches:
         if match.rule.transform_expected:  # type: ignore[attr-defined]
@@ -513,7 +513,7 @@ def fixture_test_result(
         :param _kwargs: Keyword arguments
         """
 
-    setattr(match.lintable, "write", write)  # noqa: B010
+    setattr(match.lintable, "write", write)  # ruff:ignore[set-attr-with-constant]
 
     assert match.rule.id == TransformTests.ID
     assert match.filename == TransformTests.FILE_NAME
@@ -591,7 +591,7 @@ def test_transform_no_tb(
         raise RuntimeError(exception_msg)
 
     if isinstance(result.matches[0].rule, TransformMixin):
-        setattr(result.matches[0].rule, "transform", transform)  # noqa: B010
+        setattr(result.matches[0].rule, "transform", transform)  # ruff:ignore[set-attr-with-constant]
     else:
         err = "Rule is not a TransformMixin"
         raise TypeError(err)
@@ -715,7 +715,7 @@ def test_transform_not_applied(
         match.fixed = False
 
     if isinstance(result.matches[0].rule, TransformMixin):
-        setattr(result.matches[0].rule, "transform", transform)  # noqa: B010
+        setattr(result.matches[0].rule, "transform", transform)  # ruff:ignore[set-attr-with-constant]
     else:
         err = "Rule is not a TransformMixin"
         raise TypeError(err)
