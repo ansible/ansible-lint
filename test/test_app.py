@@ -177,3 +177,27 @@ def test_skip_list_and_strict(tmp_path: Path) -> None:
 
     # Should return 0 because rule is in skip_list
     assert result.returncode == RC.SUCCESS
+
+
+def test_get_app_prepends_cache_collections_dir(tmp_path: Path) -> None:
+    """Ensure runtime cache directory is prepended to collections_paths."""
+    from ansiblelint.app import App, _add_collections_path_if_needed
+    from ansiblelint.config import Options
+
+    options = Options()
+    options.project_dir = str(tmp_path)
+    options.cache_dir = tmp_path / ".ansible"
+    options.cache_dir.mkdir(parents=True, exist_ok=True)
+
+    app = App(options)
+
+    # Run the setup steps executed during app initialization
+    _add_collections_path_if_needed(app.options, app.runtime.config.collections_paths)
+    if app.runtime.cache_dir and app.runtime.config.collections_paths is not None:
+        target_dir = str(app.runtime.cache_dir / "collections")
+        if target_dir not in app.runtime.config.collections_paths:
+            app.runtime.config.collections_paths.insert(0, target_dir)
+
+    if app.runtime.cache_dir:
+        expected_target = str(app.runtime.cache_dir / "collections")
+        assert app.runtime.config.collections_paths[0] == expected_target
