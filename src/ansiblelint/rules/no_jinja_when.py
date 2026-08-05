@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from ansiblelint.utils import Task
 
 RE_JINJA = re.compile(r"{{ (.*?) }}")
-RE_QUOTED_STRING = re.compile(r'"[^"]*"|\'[^\']*\'')
+RE_QUOTED_STRING = re.compile(r'"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'')
 _WHEN_KEYS = ("when", "changed_when", "failed_when")
 
 
@@ -193,4 +193,12 @@ if "pytest" in sys.modules:
         assert (
             _strip_redundant_jinja('not "version={{ v }}" in stdout')
             == 'not "version={{ v }}" in stdout'
+        )
+
+    def test_strip_redundant_jinja_handles_escaped_quotes() -> None:
+        """An escaped quote must not be mistaken for the closing delimiter."""
+        escaped = r"'it\'s {{ v }}' == x"
+        assert _strip_redundant_jinja(escaped) == escaped
+        assert _strip_redundant_jinja('{{ ansible_facts["os_family"] }}') == (
+            'ansible_facts["os_family"]'
         )
