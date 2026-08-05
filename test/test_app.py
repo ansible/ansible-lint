@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+import pytest
+
 from ansiblelint.__main__ import _rule_is_skipped
 from ansiblelint.constants import RC
 from ansiblelint.file_utils import Lintable
@@ -179,25 +181,25 @@ def test_skip_list_and_strict(tmp_path: Path) -> None:
     assert result.returncode == RC.SUCCESS
 
 
-def test_get_app_prepends_cache_collections_dir(tmp_path: Path) -> None:
-    """Ensure runtime cache directory is prepended to collections_paths."""
-    from ansiblelint.app import App, _add_collections_path_if_needed
-    from ansiblelint.config import Options
+def test_get_app_prepends_cache_collections_dir(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Ensure runtime cache directory is prepended to collections_paths when external paths exist."""
+    from unittest.mock import patch
 
-    options = Options()
-    options.project_dir = str(tmp_path)
-    options.cache_dir = tmp_path / ".ansible"
-    options.cache_dir.mkdir(parents=True, exist_ok=True)
+    from ansiblelint.app import get_app
+    from ansiblelint.config import options as default_options
 
-    app = App(options)
+    # 1. Seed external collections path and cache dir on default_options BEFORE get_app runs
+    external_path = "/usr/share/ansible/collections"
+    monkeypatch.setattr(default_options, "cache_dir", tmp_path / ".ansible")
+    monkeypatch.setenv("ANSIBLE_COLLECTIONS_PATH", external_path)
 
-    # Run the setup steps executed during app initialization
-    _add_collections_path_if_needed(app.options, app.runtime.config.collections_paths)
-    if app.runtime.cache_dir and app.runtime.config.collections_paths is not None:
-        target_dir = str(app.runtime.cache_dir / "collections")
-        if target_dir not in app.runtime.config.collections_paths:
-            app.runtime.config.collections_paths.insert(0, target_dir)
+    # 2. Mock network/environment prep so get_app() runs fast without side-effects
+    with patch("ansible_compat.runtime.Runtime.prepare_environment"):
+        app = get_app(offline=True)
 
-    if app.runtime.cache_dir:
-        expected_target = str(app.runtime.cache_dir / "collections")
-        assert app.runtime.config.collections_paths[0] == expected_target
+    # 3. Verify production logic inside get_app prepended target_dir and preserved external_path
+    expected_cache_target = str(app.runtime.cache_dir / "collections")
+    assert app.runtime.config.collections_paths[0] == expected_cache_target
+    assert external_path in app.runtime.config.collections_paths
