@@ -54,6 +54,7 @@ from ansiblelint.config import (
     Options,
     get_deps_versions,
     get_version_warning,
+    has_custom_ansible_env,
     log_entries,
     options,
 )
@@ -145,7 +146,7 @@ def initialize_options(arguments: list[str] | None = None) -> BaseFileLock | Non
     ):
         options.cache_dir = get_cache_dir(
             pathlib.Path(options.project_dir),
-            isolated=not options.offline,
+            isolated=not options.offline and not has_custom_ansible_env(),
         )
 
     options.project_dir = Path(options.project_dir).resolve().as_posix()
