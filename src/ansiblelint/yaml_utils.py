@@ -624,6 +624,49 @@ class FormattedEmitter(Emitter):
 
     _in_empty_flow_map = False
 
+    _flow_collection_styles: tuple[bool, ...] = ()
+    _previous_event_ended_flow_collection = False
+    _pending_flow_collection_separator = False
+
+    def emit(self, event: Any) -> None:
+        """Track whether a flow collection needs a separating blank line.
+
+        A blank line between elements should survive when the previous real
+        element ended a flow collection, even if one or more comment lines and
+        intervening container-close events sit in between. A single one-step
+        look-behind is insufficient because closing an enclosing block
+        collection (or emitting comments) happens between the flow collection
+        end and the next element. So instead of resetting the state on the very
+        next event, keep it "sticky" until the next real element (scalar or
+        collection start) is emitted and can consume it.
+        """
+        ended_flow_collection = False
+        if isinstance(event, ruamel.yaml.events.CollectionStartEvent):
+            self._flow_collection_styles += (bool(event.flow_style),)
+        elif isinstance(event, ruamel.yaml.events.CollectionEndEvent):
+            ended_flow_collection = self._flow_collection_styles[-1]
+            self._flow_collection_styles = self._flow_collection_styles[:-1]
+
+        if ended_flow_collection:
+            # A flow collection just closed. Remember that a separating blank
+            # line should be preserved before the next element, surviving any
+            # intervening comment lines and container-close events.
+            self._pending_flow_collection_separator = True
+        elif isinstance(
+            event,
+            ruamel.yaml.events.ScalarEvent
+            | ruamel.yaml.events.CollectionStartEvent,
+        ):
+            # A new real element begins. Expose the pending separator to the
+            # comment writer for this element, then clear it so subsequent
+            # elements do not inherit it.
+            self._previous_event_ended_flow_collection = (
+                self._pending_flow_collection_separator
+            )
+            self._pending_flow_collection_separator = False
+
+        super().emit(event)
+
     @property
     def _is_root_level_sequence(self) -> bool:
         """Return True if this is a sequence at the root level of the yaml document."""
@@ -818,9 +861,9 @@ class FormattedEmitter(Emitter):
                 | ruamel.yaml.events.MappingStartEvent,
             )
         ):
-            # drop pure whitespace pre comments
-            # does not apply to End events since they consume one of the newlines.
-            value = ""
+            # Preserve a separating blank line after a flow collection. Pure
+            # whitespace comments elsewhere remain removed by the formatter.
+            value = "\n" if self._previous_event_ended_flow_collection else ""
         elif (
             pre
             and not value.strip()
@@ -828,9 +871,9 @@ class FormattedEmitter(Emitter):
         ):
             value = self._re_repeat_blank_lines.sub("", value)
         elif pre:
-            # preserve content in pre comment with at least one newline,
-            # but no extra blank lines.
-            value = self._re_repeat_blank_lines.sub("\n", value)
+            # preserve content in pre comment, collapsing runs of blank lines
+            # down to a single blank line.
+            value = self._re_repeat_blank_lines.sub("\n\n", value)
         else:
             # single blank lines in post comments
             value = self._re_repeat_blank_lines.sub("\n\n", value)
