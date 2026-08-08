@@ -45,6 +45,11 @@ You can also run Ansible-lint on your source code with the
 [Ansible-lint GitHub action](https://github.com/marketplace/actions/run-ansible-lint)
 instead of installing it directly.
 
+Another way to run Ansible-lint in CI without installing it is through
+[MegaLinter](https://megalinter.io/), an open-source linters aggregator that
+[runs Ansible-lint out of the box](https://megalinter.io/latest/descriptors/ansible_ansible_lint/)
+alongside linters for other languages and formats.
+
 ## Installing the latest version
 
 {{ install_from_adt("ansible-lint") }}
