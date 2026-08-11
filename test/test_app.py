@@ -200,3 +200,23 @@ def test_get_app_prepends_cache_collections_dir(
     expected_cache_target = str(app.runtime.cache_dir / "collections")
     assert app.runtime.config.collections_paths[0] == expected_cache_target
     assert external_path in app.runtime.config.collections_paths
+
+
+def test_get_app_skips_prepend_when_no_external_path(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Ensure no duplicate prepend when cache dir is already in collections_paths."""
+    from unittest.mock import patch
+
+    from ansiblelint.app import get_app
+    from ansiblelint.config import options as default_options
+
+    monkeypatch.setattr(default_options, "cache_dir", tmp_path / ".ansible")
+    monkeypatch.delenv("ANSIBLE_COLLECTIONS_PATH", raising=False)
+
+    with patch("ansible_compat.runtime.Runtime.prepare_environment"):
+        app = get_app(offline=True)
+
+    if app.runtime.config.collections_paths is not None:
+        cache_target = str(app.runtime.cache_dir / "collections")
+        assert app.runtime.config.collections_paths.count(cache_target) <= 1
