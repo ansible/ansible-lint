@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+import pytest
+
 from ansiblelint.__main__ import _rule_is_skipped
 from ansiblelint.constants import RC
 from ansiblelint.file_utils import Lintable
@@ -177,3 +179,24 @@ def test_skip_list_and_strict(tmp_path: Path) -> None:
 
     # Should return 0 because rule is in skip_list
     assert result.returncode == RC.SUCCESS
+
+
+def test_get_app_prepends_cache_collections_dir(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Ensure runtime cache directory is prepended to collections_paths when external paths exist."""
+    from unittest.mock import patch
+
+    from ansiblelint.app import get_app
+    from ansiblelint.config import options as default_options
+
+    external_path = "/usr/share/ansible/collections"
+    monkeypatch.setattr(default_options, "cache_dir", tmp_path / ".ansible")
+    monkeypatch.setenv("ANSIBLE_COLLECTIONS_PATH", external_path)
+
+    with patch("ansible_compat.runtime.Runtime.prepare_environment"):
+        app = get_app(offline=True)
+
+    expected_cache_target = str(app.runtime.cache_dir / "collections")
+    assert app.runtime.config.collections_paths[0] == expected_cache_target
+    assert external_path in app.runtime.config.collections_paths
