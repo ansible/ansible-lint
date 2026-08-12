@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+import pytest
+
 from ansiblelint.__main__ import _rule_is_skipped
 from ansiblelint.constants import RC
 from ansiblelint.file_utils import Lintable
@@ -177,3 +179,81 @@ def test_skip_list_and_strict(tmp_path: Path) -> None:
 
     # Should return 0 because rule is in skip_list
     assert result.returncode == RC.SUCCESS
+
+
+def test_ensure_cache_collections_first_noop_without_cache_dir() -> None:
+    """Ensure helper is a no-op when cache_dir is not set."""
+    from unittest.mock import MagicMock
+
+    from ansiblelint.app import _ensure_cache_collections_first
+
+    app = MagicMock()
+    app.runtime.cache_dir = None
+    app.runtime.config.collections_paths = ["/some/path"]
+
+    _ensure_cache_collections_first(app)
+
+    assert app.runtime.config.collections_paths == ["/some/path"]
+
+
+def test_get_app_prepends_cache_collections_dir(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Ensure runtime cache directory is prepended to collections_paths when external paths exist."""
+    from unittest.mock import patch
+
+    from ansiblelint.app import get_app
+    from ansiblelint.config import options as default_options
+
+    external_path = "/usr/share/ansible/collections"
+    monkeypatch.setattr(default_options, "cache_dir", tmp_path / ".ansible")
+    monkeypatch.setenv("ANSIBLE_COLLECTIONS_PATH", external_path)
+
+    with patch("ansible_compat.runtime.Runtime.prepare_environment"):
+        app = get_app(offline=True)
+
+    expected_cache_target = str(app.runtime.cache_dir / "collections")
+    assert app.runtime.config.collections_paths[0] == expected_cache_target
+    assert external_path in app.runtime.config.collections_paths
+
+
+def test_get_app_prepends_cache_dir_without_external_path(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Ensure cache dir is prepended exactly once even without external collections path."""
+    from unittest.mock import patch
+
+    from ansiblelint.app import get_app
+    from ansiblelint.config import options as default_options
+
+    monkeypatch.setattr(default_options, "cache_dir", tmp_path / ".ansible")
+    monkeypatch.delenv("ANSIBLE_COLLECTIONS_PATH", raising=False)
+
+    with patch("ansible_compat.runtime.Runtime.prepare_environment"):
+        app = get_app(offline=True)
+
+    assert app.runtime.config.collections_paths is not None
+    cache_target = str(app.runtime.cache_dir / "collections")
+    assert app.runtime.config.collections_paths[0] == cache_target
+    assert app.runtime.config.collections_paths.count(cache_target) == 1
+
+
+def test_get_app_moves_existing_cache_dir_to_front(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Ensure cache dir is moved to index 0 when it already exists at a later position."""
+    from unittest.mock import patch
+
+    from ansiblelint.app import get_app
+    from ansiblelint.config import options as default_options
+
+    external_path = "/usr/share/ansible/collections"
+    monkeypatch.setattr(default_options, "cache_dir", tmp_path / ".ansible")
+    monkeypatch.setenv("ANSIBLE_COLLECTIONS_PATH", external_path)
+
+    with patch("ansible_compat.runtime.Runtime.prepare_environment"):
+        app = get_app(offline=True)
+
+    cache_target = str(app.runtime.cache_dir / "collections")
+    assert app.runtime.config.collections_paths[0] == cache_target
+    assert app.runtime.config.collections_paths.count(cache_target) == 1

@@ -177,8 +177,12 @@ class VariableNamingRule(AnsibleLintRule):
                 data=ident,
             )
 
+        # Variables in the ansible_ namespace are owned by Ansible itself
+        # (connection variables like ansible_ssh_common_args, ansible_port, ...)
+        # and cannot be renamed to carry a role prefix.
         if (
             prefix
+            and not ident.lstrip("_").startswith("ansible_")
             and not ident.lstrip("_").startswith(f"{prefix.value}_")
             and not has_jinja(prefix.value)
             and is_fqcn_or_name(prefix.value)
@@ -462,6 +466,20 @@ if "pytest" in sys.modules:
         for idx, result in enumerate(results):
             assert result.tag == expected_errors[idx][0]
             assert result.lineno == expected_errors[idx][1]
+
+    def test_var_naming_connection_vars_in_role() -> None:
+        """Connection variables must not require a role prefix."""
+        rule = VariableNamingRule()
+        file = Lintable("examples/roles/var_naming_no_role_prefix/tasks/main.yml")
+        prefix = Prefix("var_naming_no_role_prefix")
+        for ident in (
+            "ansible_ssh_common_args",
+            "ansible_ssh_extra_args",
+            "ansible_port",
+        ):
+            assert (
+                rule.get_var_naming_matcherror(ident, prefix=prefix, file=file) is None
+            )
 
     def test_var_naming_with_pattern() -> None:
         """Test rule matches."""

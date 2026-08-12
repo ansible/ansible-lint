@@ -420,6 +420,16 @@ def _add_module_path_if_needed(
             module_paths.insert(0, str(mock_path))
 
 
+def _ensure_cache_collections_first(app: App) -> None:
+    """Ensure the runtime cache collections directory is first in collections_paths."""
+    if not app.runtime.cache_dir or app.runtime.config.collections_paths is None:
+        return
+    target_dir = str(app.runtime.cache_dir / "collections")
+    if target_dir in app.runtime.config.collections_paths:
+        app.runtime.config.collections_paths.remove(target_dir)
+    app.runtime.config.collections_paths.insert(0, target_dir)
+
+
 def get_app(*, offline: bool | None = None, cached: bool = False) -> App:
     """Return the application instance, caching the return value."""
     # Avoids ever running the app initialization twice if cached argument
@@ -463,6 +473,8 @@ def get_app(*, offline: bool | None = None, cached: bool = False) -> App:
     # https://github.com/ansible/ansible-lint/issues/4973
     _add_collections_path_if_needed(app.options, app.runtime.config.collections_paths)
     _add_module_path_if_needed(app.options, app.runtime.config.default_module_path)
+
+    _ensure_cache_collections_first(app)
 
     app.runtime.prepare_environment(
         install_local=(not offline),
