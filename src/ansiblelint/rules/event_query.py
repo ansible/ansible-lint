@@ -152,8 +152,9 @@ class EventQueryRule(AnsibleLintRule):
             )
 
             # Check for device_type inside the facts block, not at top level
+            # Use \b anchor so "facts:" doesn't match inside "canonical_facts:"
             facts_match = re.search(
-                r"facts\s*:\s*\{([^}]*)\}",
+                r"\bfacts\s*:\s*\{([^}]*)\}",
                 query,
                 re.DOTALL,
             )
@@ -241,6 +242,14 @@ class EventQueryRule(AnsibleLintRule):
                                 filename=file,
                             ),
                         )
+                elif re.search(r"canonical_facts\s*:", query):
+                    results.append(
+                        self.create_matcherror(
+                            message=f"Module '{module_key}' canonical_facts must be an object with at least one unique identifier field.",
+                            tag="event-query[canonical-facts-empty]",
+                            filename=file,
+                        ),
+                    )
 
         return results
 
@@ -291,6 +300,11 @@ if "pytest" in sys.modules:
                     "event-query[device-type-missing]",
                 ],
                 id="null-canonical-facts",
+            ),
+            pytest.param(
+                "examples/event_query/fail_scalar_canonical_facts/extensions/audit/event_query.yml",
+                ["event-query[canonical-facts-empty]"],
+                id="scalar-canonical-facts",
             ),
         ),
     )
