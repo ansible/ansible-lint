@@ -181,6 +181,21 @@ def test_skip_list_and_strict(tmp_path: Path) -> None:
     assert result.returncode == RC.SUCCESS
 
 
+def test_ensure_cache_collections_first_noop_without_cache_dir() -> None:
+    """Ensure helper is a no-op when cache_dir is not set."""
+    from unittest.mock import MagicMock
+
+    from ansiblelint.app import _ensure_cache_collections_first
+
+    app = MagicMock()
+    app.runtime.cache_dir = None
+    app.runtime.config.collections_paths = ["/some/path"]
+
+    _ensure_cache_collections_first(app)
+
+    assert app.runtime.config.collections_paths == ["/some/path"]
+
+
 def test_get_app_prepends_cache_collections_dir(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
