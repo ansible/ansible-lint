@@ -202,10 +202,10 @@ def test_get_app_prepends_cache_collections_dir(
     assert external_path in app.runtime.config.collections_paths
 
 
-def test_get_app_skips_prepend_when_no_external_path(
+def test_get_app_prepends_cache_dir_without_external_path(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Ensure no duplicate prepend when cache dir is already in collections_paths."""
+    """Ensure cache dir is prepended exactly once even without external collections path."""
     from unittest.mock import patch
 
     from ansiblelint.app import get_app
@@ -217,6 +217,28 @@ def test_get_app_skips_prepend_when_no_external_path(
     with patch("ansible_compat.runtime.Runtime.prepare_environment"):
         app = get_app(offline=True)
 
-    if app.runtime.config.collections_paths is not None:
-        cache_target = str(app.runtime.cache_dir / "collections")
-        assert app.runtime.config.collections_paths.count(cache_target) <= 1
+    assert app.runtime.config.collections_paths is not None
+    cache_target = str(app.runtime.cache_dir / "collections")
+    assert app.runtime.config.collections_paths[0] == cache_target
+    assert app.runtime.config.collections_paths.count(cache_target) == 1
+
+
+def test_get_app_moves_existing_cache_dir_to_front(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Ensure cache dir is moved to index 0 when it already exists at a later position."""
+    from unittest.mock import patch
+
+    from ansiblelint.app import get_app
+    from ansiblelint.config import options as default_options
+
+    external_path = "/usr/share/ansible/collections"
+    monkeypatch.setattr(default_options, "cache_dir", tmp_path / ".ansible")
+    monkeypatch.setenv("ANSIBLE_COLLECTIONS_PATH", external_path)
+
+    with patch("ansible_compat.runtime.Runtime.prepare_environment"):
+        app = get_app(offline=True)
+
+    cache_target = str(app.runtime.cache_dir / "collections")
+    assert app.runtime.config.collections_paths[0] == cache_target
+    assert app.runtime.config.collections_paths.count(cache_target) == 1

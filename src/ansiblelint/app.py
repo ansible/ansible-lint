@@ -466,8 +466,9 @@ def get_app(*, offline: bool | None = None, cached: bool = False) -> App:
 
     if app.runtime.cache_dir and app.runtime.config.collections_paths is not None:
         target_dir = str(app.runtime.cache_dir / "collections")
-        if target_dir not in app.runtime.config.collections_paths:
-            app.runtime.config.collections_paths.insert(0, target_dir)
+        if target_dir in app.runtime.config.collections_paths:
+            app.runtime.config.collections_paths.remove(target_dir)
+        app.runtime.config.collections_paths.insert(0, target_dir)
 
     app.runtime.prepare_environment(
         install_local=(not offline),
