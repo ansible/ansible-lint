@@ -100,6 +100,15 @@ class EventQueryRule(AnsibleLintRule):
             return results
 
         for module_key, entry in data.items():
+            if not isinstance(module_key, str):
+                results.append(
+                    self.create_matcherror(
+                        message=f"Module key '{module_key}' is not a valid FQCN. Expected format: namespace.collection.module_name",
+                        tag="event-query[module-key-format]",
+                        filename=file,
+                    ),
+                )
+                continue
             if module_key.startswith("__"):
                 continue
 
@@ -142,8 +151,46 @@ class EventQueryRule(AnsibleLintRule):
                 if not re.search(rf"\b{field}\s*:", query)
             )
 
-            # Check for device_type in facts section
-            if "device_type" not in query:
+            # Check for device_type inside the facts block, not at top level
+            facts_match = re.search(
+                r"facts\s*:\s*\{([^}]*)\}",
+                query,
+                re.DOTALL,
+            )
+            if facts_match:
+                facts_content = facts_match.group(1)
+                if "device_type" not in facts_content:
+                    results.append(
+                        self.create_matcherror(
+                            message=f"Module '{module_key}' query output should include 'device_type' in the facts section.",
+                            tag="event-query[device-type-missing]",
+                            filename=file,
+                        ),
+                    )
+                else:
+                    dt_match = re.search(
+                        r'device_type\s*:\s*["\']([^"\']+)["\']',
+                        facts_content,
+                    )
+                    if dt_match:
+                        device_type = dt_match.group(1)
+                        normalized = device_type.lower().replace(" ", "_")
+                        if normalized not in VALID_DEVICE_TYPES:
+                            results.append(
+                                self.create_matcherror(
+                                    message=(
+                                        f"Module '{module_key}' uses device_type '{device_type}' "
+                                        f"which is not in the normalized taxonomy. "
+                                        f"Valid types include: virtual_machine, bare_metal, container, "
+                                        f"switch, router, firewall, cloud_instance, esxi_host, "
+                                        f"vcenter_appliance, cluster, resource, endpoint. "
+                                        f"See event_query.md for the full list."
+                                    ),
+                                    tag="event-query[device-type]",
+                                    filename=file,
+                                ),
+                            )
+            elif "device_type" not in query:
                 results.append(
                     self.create_matcherror(
                         message=f"Module '{module_key}' query output should include 'device_type' in the facts section.",
@@ -152,46 +199,48 @@ class EventQueryRule(AnsibleLintRule):
                     ),
                 )
             else:
-                # Extract device_type value and validate against taxonomy
-                dt_match = re.search(r'device_type\s*:\s*["\']([^"\']+)["\']', query)
-                if dt_match:
-                    device_type = dt_match.group(1)
-                    normalized = device_type.lower().replace(" ", "_")
-                    if normalized not in VALID_DEVICE_TYPES:
+                results.append(
+                    self.create_matcherror(
+                        message=f"Module '{module_key}' query output should include 'device_type' in the facts section.",
+                        tag="event-query[device-type-missing]",
+                        filename=file,
+                    ),
+                )
+
+            # Check canonical_facts is not null and has at least one identifier
+            cf_null_match = re.search(
+                r"canonical_facts\s*:\s*null\b",
+                query,
+            )
+            if cf_null_match:
+                results.append(
+                    self.create_matcherror(
+                        message=f"Module '{module_key}' canonical_facts must define at least one non-null unique identifier.",
+                        tag="event-query[canonical-facts-empty]",
+                        filename=file,
+                    ),
+                )
+            else:
+                cf_match = re.search(
+                    r"canonical_facts\s*:\s*\{([^}]*)\}",
+                    query,
+                    re.DOTALL,
+                )
+                if cf_match:
+                    cf_content = cf_match.group(1).strip()
+                    non_null_fields = [
+                        line.strip()
+                        for line in cf_content.split(",")
+                        if line.strip() and "null" not in line.split(":")[-1]
+                    ]
+                    if not non_null_fields:
                         results.append(
                             self.create_matcherror(
-                                message=(
-                                    f"Module '{module_key}' uses device_type '{device_type}' "
-                                    f"which is not in the normalized taxonomy. "
-                                    f"Valid types include: virtual_machine, bare_metal, container, "
-                                    f"switch, router, firewall, cloud_instance, esxi_host, "
-                                    f"vcenter_appliance, cluster, resource, endpoint. "
-                                    f"See event_query.md for the full list."
-                                ),
-                                tag="event-query[device-type]",
+                                message=f"Module '{module_key}' canonical_facts must define at least one non-null unique identifier.",
+                                tag="event-query[canonical-facts-empty]",
                                 filename=file,
                             ),
                         )
-
-            # Check canonical_facts has at least one identifier
-            # Look for key-value patterns inside canonical_facts block
-            cf_match = re.search(r"canonical_facts\s*:\s*\{([^}]*)\}", query, re.DOTALL)
-            if cf_match:
-                cf_content = cf_match.group(1).strip()
-                # Filter out only null assignments and empty content
-                non_null_fields = [
-                    line.strip()
-                    for line in cf_content.split(",")
-                    if line.strip() and "null" not in line.split(":")[-1]
-                ]
-                if not non_null_fields:
-                    results.append(
-                        self.create_matcherror(
-                            message=f"Module '{module_key}' canonical_facts must define at least one non-null unique identifier.",
-                            tag="event-query[canonical-facts-empty]",
-                            filename=file,
-                        ),
-                    )
 
         return results
 
@@ -229,6 +278,19 @@ if "pytest" in sys.modules:
                 "examples/event_query/fail_bad_device_type/extensions/audit/event_query.yml",
                 ["event-query[device-type]"],
                 id="bad-device-type",
+            ),
+            pytest.param(
+                "examples/event_query/fail_non_string_key/extensions/audit/event_query.yml",
+                ["event-query[module-key-format]"],
+                id="non-string-key",
+            ),
+            pytest.param(
+                "examples/event_query/fail_null_canonical_facts/extensions/audit/event_query.yml",
+                [
+                    "event-query[canonical-facts-empty]",
+                    "event-query[device-type-missing]",
+                ],
+                id="null-canonical-facts",
             ),
         ),
     )
