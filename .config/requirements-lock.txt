@@ -10,7 +10,7 @@ black==26.5.1
     # via ansible-lint
 bracex==3.0.1
     # via wcmatch
-cffi==2.1.1
+cffi==2.1.0
     # via
     #   ansible-lint
     #   cryptography
