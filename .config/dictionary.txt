@@ -54,6 +54,7 @@ cpuset
 createfile
 dbservers
 deannotate
+delenv
 dellemc
 direnv
 doas
