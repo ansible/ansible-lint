@@ -832,8 +832,6 @@ def test_import_playbook_children_extra_vars_success(
     monkeypatch: MonkeyPatch,
 ) -> None:
     """Verify import_playbook_children re-checks with extra_vars on initial failure."""
-    from unittest.mock import MagicMock
-
     from ansiblelint.app import App
     from ansiblelint.config import Options
     from ansiblelint.rules import RulesCollection
@@ -852,10 +850,12 @@ def test_import_playbook_children_extra_vars_success(
 
     # Mock has_playbook to return False (initial check fails)
     monkeypatch.setattr(app.runtime, "has_playbook", lambda _: False)
-    # Mock run to return success (re-check with extra_vars passes)
-    mock_result = MagicMock()
-    mock_result.returncode = 0
-    monkeypatch.setattr(app.runtime, "run", lambda _: mock_result)
+    # Mock _recheck_playbook_with_extra_vars at class level to return True
+    monkeypatch.setattr(
+        utils.HandleChildren,
+        "_recheck_playbook_with_extra_vars",
+        lambda self, _: True,
+    )
 
     lintable = Lintable(outer)
     children = handler.import_playbook_children(
@@ -872,8 +872,6 @@ def test_import_playbook_children_extra_vars_recheck_fails(
     caplog: LogCaptureFixture,
 ) -> None:
     """Verify import_playbook_children logs error when re-check also fails."""
-    from unittest.mock import MagicMock
-
     from ansiblelint.app import App
     from ansiblelint.config import Options
     from ansiblelint.rules import RulesCollection
@@ -890,10 +888,12 @@ def test_import_playbook_children_extra_vars_recheck_fails(
     handler = utils.HandleChildren(rules=rules, app=app)
 
     monkeypatch.setattr(app.runtime, "has_playbook", lambda _: False)
-    # Re-check also fails
-    mock_result = MagicMock()
-    mock_result.returncode = 1
-    monkeypatch.setattr(app.runtime, "run", lambda _: mock_result)
+    # Mock _recheck_playbook_with_extra_vars at class level to return False
+    monkeypatch.setattr(
+        utils.HandleChildren,
+        "_recheck_playbook_with_extra_vars",
+        lambda self, _: False,
+    )
 
     lintable = Lintable(outer)
     with caplog.at_level(logging.ERROR):
@@ -927,9 +927,18 @@ def test_import_playbook_children_no_extra_vars(
     handler = utils.HandleChildren(rules=rules, app=app)
 
     monkeypatch.setattr(app.runtime, "has_playbook", lambda _: False)
-    # run() should NOT be called since extra_vars is empty
-    run_called = []
-    monkeypatch.setattr(app.runtime, "run", lambda _: run_called.append(True))
+    # _recheck_playbook_with_extra_vars returns False when no extra_vars
+    recheck_called = []
+
+    def mock_recheck(self: Any, _: Path) -> bool:
+        recheck_called.append(True)
+        return False
+
+    monkeypatch.setattr(
+        utils.HandleChildren,
+        "_recheck_playbook_with_extra_vars",
+        mock_recheck,
+    )
 
     lintable = Lintable(outer)
     with caplog.at_level(logging.ERROR):
@@ -939,4 +948,5 @@ def test_import_playbook_children_no_extra_vars(
 
     assert children == []
     assert "Failed to load" in caplog.text
-    assert not run_called  # run() was never called
+    # recheck is called but returns False due to empty extra_vars
+    assert recheck_called
