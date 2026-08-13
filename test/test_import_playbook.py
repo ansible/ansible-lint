@@ -89,12 +89,12 @@ def test_import_playbook_no_extra_vars(tmp_path: Path) -> None:
 
 
 def test_import_playbook_extra_vars_still_fails(tmp_path: Path) -> None:
-    """Verify genuinely broken playbooks still fail even with extra_vars."""
+    """Verify playbooks needing different vars still fail even with extra_vars."""
+    # extra_vars has my_host but the inner playbook needs undefined_var
     (tmp_path / ".ansible-lint").write_text("extra_vars:\n  my_host: localhost\n")
-    # This playbook has a genuine syntax error (invalid YAML indentation)
     (tmp_path / "inner.yml").write_text(
-        "---\n- name: Inner play\n  hosts: localhost\n  gather_facts: false\n"
-        "  tasks:\n  - name: Broken\n      ansible.builtin.debug:\n        msg: hi\n",
+        '---\n- name: Inner play\n  hosts: "{{ undefined_var }}"\n  gather_facts: false\n'
+        "  tasks:\n    - name: Noop\n      ansible.builtin.debug:\n        msg: hi\n",
     )
     (tmp_path / "outer.yml").write_text(
         "---\n- name: Import inner\n  ansible.builtin.import_playbook: inner.yml\n",
@@ -102,5 +102,5 @@ def test_import_playbook_extra_vars_still_fails(tmp_path: Path) -> None:
 
     result = run_ansible_lint("outer.yml", cwd=tmp_path)
 
-    # Even with extra_vars, genuinely broken playbooks should still fail.
+    # The re-check with extra_vars still fails because undefined_var is not defined.
     assert "Failed to load" in result.stderr
