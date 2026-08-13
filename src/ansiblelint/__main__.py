@@ -221,6 +221,28 @@ def fix(runtime_options: Options, result: LintResult, rules: RulesCollection) ->
     :param options: Options object
     :param result: LintResult object
     """
+    # pylint: disable=import-outside-toplevel
+    from ansiblelint.transformer import Transformer
+
+    acceptable_tags = {"all", "none", *rules.known_transform_tags()}
+    unknown_tags = set(options.write_list).difference(acceptable_tags)
+
+    if unknown_tags:  # pragma: no cover
+        _logger.error(
+            "Found invalid value(s) (%s) for --fix arguments, must be one of: %s. Valid values are limited by the configured profile.",
+            ", ".join(unknown_tags),
+            ", ".join(acceptable_tags),
+        )
+        sys.exit(RC.INVALID_CONFIG)
+
+    if Transformer.effective_write_set(runtime_options.write_list) == {"none"}:
+        # --fix=none disables fixing entirely. Without this early return the
+        # transformer still reformats YAML files on disk and the rerun loop
+        # below drops resolved matches after --strict has already decided the
+        # outcome, producing "Failed: 0 failure(s), 0 warning(s)" with a
+        # non-zero exit code. https://github.com/ansible/ansible-lint/issues/5147
+        return
+
     match_count = len(result.matches)
     _logger.debug("Begin fixing: %s matches", match_count)
     ruamel_safe_version = "0.17.26"
@@ -239,16 +261,6 @@ def fix(runtime_options: Options, result: LintResult, rules: RulesCollection) ->
             ruamel_yaml_version_str,
             ruamel_safe_version,
         )
-    acceptable_tags = {"all", "none", *rules.known_transform_tags()}
-    unknown_tags = set(options.write_list).difference(acceptable_tags)
-
-    if unknown_tags:  # pragma: no cover
-        _logger.error(
-            "Found invalid value(s) (%s) for --fix arguments, must be one of: %s. Valid values are limited by the configured profile.",
-            ", ".join(unknown_tags),
-            ", ".join(acceptable_tags),
-        )
-        sys.exit(RC.INVALID_CONFIG)
     _do_transform(result, options)
 
     rerun = ["yaml"]

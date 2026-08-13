@@ -257,3 +257,106 @@ def test_get_app_moves_existing_cache_dir_to_front(
     cache_target = str(app.runtime.cache_dir / "collections")
     assert app.runtime.config.collections_paths[0] == cache_target
     assert app.runtime.config.collections_paths.count(cache_target) == 1
+
+
+def test_fix_none_does_not_modify_files_or_hide_violations(tmp_path: Path) -> None:
+    """Test that --fix=none behaves exactly like plain linting.
+
+    Regression test for https://github.com/ansible/ansible-lint/issues/5147:
+    with --fix=none the fixer still ran, silently reformatting YAML files on
+    disk and dropping the resolved matches from the results after --strict had
+    already decided the outcome. This produced a contradictory "Failed: 0
+    failure(s), 0 warning(s) ... and it passed." summary with a non-zero exit
+    code, and modified files the user asked not to touch.
+    """
+    lintable = Lintable(tmp_path / "playbook.yml")
+    lintable.content = (
+        "---\n"
+        "- name: Test play\n"
+        "  hosts: localhost\n"
+        "  tasks:\n"
+        "    - name: Print something\n"
+        "      ansible.builtin.debug:\n"
+        "        msg: hello\n"
+        "\n"
+        "\n"
+    )
+    lintable.write(force=True)
+    content_before = (tmp_path / "playbook.yml").read_text(encoding="utf-8")
+
+    result = run_ansible_lint(
+        "--fix=none",
+        "--strict",
+        "--profile=production",
+        lintable.filename,
+        cwd=tmp_path,
+    )
+
+    # --fix=none must not modify files on disk
+    assert (tmp_path / "playbook.yml").read_text(encoding="utf-8") == content_before
+    # The yaml[empty-lines] violation must be reported, not silently resolved
+    assert "empty-lines" in result.stdout
+    assert result.returncode == RC.VIOLATIONS_FOUND
+
+
+def test_fix_with_none_write_list_is_a_no_op() -> None:
+    """Directly test the fix() early return for --fix=none to get coverage.
+
+    fix() must leave matches untouched when the effective write set is
+    {"none"}; see test_fix_none_does_not_modify_files_or_hide_violations for
+    the end-to-end behavior.
+    """
+    from unittest.mock import Mock
+
+    from ansiblelint.__main__ import fix
+    from ansiblelint.config import Options
+    from ansiblelint.runner import LintResult
+
+    options = Options(write_list=["none"])
+    matches = [Mock()]
+    result = LintResult(matches=list(matches), files=set())
+    rules = Mock()
+    rules.known_transform_tags.return_value = []
+
+    # noinspection PyTypeChecker
+    fix(runtime_options=options, result=result, rules=rules)
+
+    assert result.matches == matches
+
+
+def test_fix_none_wins_over_config_write_list(tmp_path: Path) -> None:
+    """Test that CLI --fix=none overrides write_list from the config file.
+
+    Regression test for the second half of
+    https://github.com/ansible/ansible-lint/issues/5147: merge_fix_list_config
+    gave the config file precedence over the CLI (contradicting its own
+    docstring), so a project with write_list in .ansible-lint kept fixing (and
+    modifying files) despite an explicit --fix=none.
+    """
+    lintable = Lintable(tmp_path / "playbook.yml")
+    lintable.content = (
+        "---\n"
+        "- name: Test play\n"
+        "  hosts: localhost\n"
+        "  tasks:\n"
+        "    - name: Print something\n"
+        "      ansible.builtin.debug:\n"
+        "        msg: hello\n"
+        "\n"
+        "\n"
+    )
+    lintable.write(force=True)
+    (tmp_path / ".ansible-lint").write_text("write_list:\n  - all\n")
+    content_before = (tmp_path / "playbook.yml").read_text(encoding="utf-8")
+
+    result = run_ansible_lint(
+        "--fix=none",
+        "--strict",
+        "--profile=production",
+        lintable.filename,
+        cwd=tmp_path,
+    )
+
+    assert (tmp_path / "playbook.yml").read_text(encoding="utf-8") == content_before
+    assert "empty-lines" in result.stdout
+    assert result.returncode == RC.VIOLATIONS_FOUND
