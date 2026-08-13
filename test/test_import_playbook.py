@@ -67,3 +67,40 @@ def test_import_playbook_extra_vars(tmp_path: Path) -> None:
     assert result.returncode == 0, result.stderr
     assert "2 files processed" in result.stderr
     assert "Failed to load" not in result.stderr
+
+
+def test_import_playbook_no_extra_vars(tmp_path: Path) -> None:
+    """Verify imported playbook needing vars is dropped when no extra_vars configured."""
+    # No .ansible-lint config, so no extra_vars
+    (tmp_path / "inner.yml").write_text(
+        '---\n- name: Inner play\n  hosts: "{{ my_host }}"\n  gather_facts: false\n'
+        "  tasks:\n    - name: Noop\n      ansible.builtin.debug:\n        msg: hi\n",
+    )
+    (tmp_path / "outer.yml").write_text(
+        "---\n- name: Import inner\n  ansible.builtin.import_playbook: inner.yml\n",
+    )
+
+    result = run_ansible_lint("outer.yml", cwd=tmp_path)
+
+    # Without extra_vars, the imported playbook fails syntax check and is dropped.
+    # Only outer.yml is processed.
+    assert "1 file" in result.stderr
+    assert "Failed to load" in result.stderr
+
+
+def test_import_playbook_extra_vars_still_fails(tmp_path: Path) -> None:
+    """Verify genuinely broken playbooks still fail even with extra_vars."""
+    (tmp_path / ".ansible-lint").write_text("extra_vars:\n  my_host: localhost\n")
+    # This playbook has a genuine syntax error (invalid YAML indentation)
+    (tmp_path / "inner.yml").write_text(
+        "---\n- name: Inner play\n  hosts: localhost\n  gather_facts: false\n"
+        "  tasks:\n  - name: Broken\n      ansible.builtin.debug:\n        msg: hi\n",
+    )
+    (tmp_path / "outer.yml").write_text(
+        "---\n- name: Import inner\n  ansible.builtin.import_playbook: inner.yml\n",
+    )
+
+    result = run_ansible_lint("outer.yml", cwd=tmp_path)
+
+    # Even with extra_vars, genuinely broken playbooks should still fail.
+    assert "Failed to load" in result.stderr
