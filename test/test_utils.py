@@ -825,3 +825,118 @@ def test_parser_error_helpers_cover_extracted_branches(
             {"name": "broken"},
             task,
         )
+
+
+def test_import_playbook_children_extra_vars_success(
+    tmp_path: Path,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Verify import_playbook_children re-checks with extra_vars on initial failure."""
+    from unittest.mock import MagicMock
+
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
+
+    # Create a playbook file
+    inner = tmp_path / "inner.yml"
+    inner.write_text("---\n- hosts: localhost\n  tasks: []\n")
+    outer = tmp_path / "outer.yml"
+    outer.write_text("---\n- import_playbook: inner.yml\n")
+
+    options = Options()
+    options.extra_vars = {"my_host": "localhost"}
+    app = App(options=options)
+    rules = RulesCollection(app=app)
+    handler = utils.HandleChildren(rules=rules, app=app)
+
+    # Mock has_playbook to return False (initial check fails)
+    monkeypatch.setattr(app.runtime, "has_playbook", lambda _: False)
+    # Mock run to return success (re-check with extra_vars passes)
+    mock_result = MagicMock()
+    mock_result.returncode = 0
+    monkeypatch.setattr(app.runtime, "run", lambda _: mock_result)
+
+    lintable = Lintable(outer)
+    children = handler.import_playbook_children(
+        lintable, "import_playbook", "inner.yml", "playbook"
+    )
+
+    assert len(children) == 1
+    assert children[0].path.name == "inner.yml"
+
+
+def test_import_playbook_children_extra_vars_recheck_fails(
+    tmp_path: Path,
+    monkeypatch: MonkeyPatch,
+    caplog: LogCaptureFixture,
+) -> None:
+    """Verify import_playbook_children logs error when re-check also fails."""
+    from unittest.mock import MagicMock
+
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
+
+    inner = tmp_path / "inner.yml"
+    inner.write_text("---\n- hosts: localhost\n  tasks: []\n")
+    outer = tmp_path / "outer.yml"
+    outer.write_text("---\n- import_playbook: inner.yml\n")
+
+    options = Options()
+    options.extra_vars = {"my_host": "localhost"}
+    app = App(options=options)
+    rules = RulesCollection(app=app)
+    handler = utils.HandleChildren(rules=rules, app=app)
+
+    monkeypatch.setattr(app.runtime, "has_playbook", lambda _: False)
+    # Re-check also fails
+    mock_result = MagicMock()
+    mock_result.returncode = 1
+    monkeypatch.setattr(app.runtime, "run", lambda _: mock_result)
+
+    lintable = Lintable(outer)
+    with caplog.at_level(logging.ERROR):
+        children = handler.import_playbook_children(
+            lintable, "import_playbook", "inner.yml", "playbook"
+        )
+
+    assert children == []
+    assert "Failed to load" in caplog.text
+
+
+def test_import_playbook_children_no_extra_vars(
+    tmp_path: Path,
+    monkeypatch: MonkeyPatch,
+    caplog: LogCaptureFixture,
+) -> None:
+    """Verify import_playbook_children skips re-check when no extra_vars."""
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
+
+    inner = tmp_path / "inner.yml"
+    inner.write_text("---\n- hosts: localhost\n  tasks: []\n")
+    outer = tmp_path / "outer.yml"
+    outer.write_text("---\n- import_playbook: inner.yml\n")
+
+    options = Options()
+    options.extra_vars = {}  # No extra_vars
+    app = App(options=options)
+    rules = RulesCollection(app=app)
+    handler = utils.HandleChildren(rules=rules, app=app)
+
+    monkeypatch.setattr(app.runtime, "has_playbook", lambda _: False)
+    # run() should NOT be called since extra_vars is empty
+    run_called = []
+    monkeypatch.setattr(app.runtime, "run", lambda _: run_called.append(True))
+
+    lintable = Lintable(outer)
+    with caplog.at_level(logging.ERROR):
+        children = handler.import_playbook_children(
+            lintable, "import_playbook", "inner.yml", "playbook"
+        )
+
+    assert children == []
+    assert "Failed to load" in caplog.text
+    assert not run_called  # run() was never called
