@@ -687,25 +687,23 @@ class HandleChildren:
         if not (namespace_name and collection_name):
             return [lintable.path.parent / v]
 
-        paths: list[Path] = []
-        for loc in self.app.runtime.config.collections_paths:
-            for ext in (".yml", ".yaml"):
-                paths.append(
-                    Path(
-                        path_dwim(
-                            os.path.expanduser(loc),
-                            os.path.join(
-                                "ansible_collections",
-                                namespace_name,
-                                collection_name,
-                                "playbooks",
-                                *playbook_path[:-1],
-                                f"{playbook_path[-1]}{ext}",
-                            ),
-                        ),
+        return [
+            Path(
+                path_dwim(
+                    os.path.expanduser(loc),
+                    os.path.join(
+                        "ansible_collections",
+                        namespace_name,
+                        collection_name,
+                        "playbooks",
+                        *playbook_path[:-1],
+                        f"{playbook_path[-1]}{ext}",
                     ),
-                )
-        return paths
+                ),
+            )
+            for loc in self.app.runtime.config.collections_paths
+            for ext in (".yml", ".yaml")
+        ]
 
     def _look_for_role_files(self, basedir: str, role: str) -> list[Lintable]:
         role_path = self._rolepath(basedir, role)

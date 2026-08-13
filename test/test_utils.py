@@ -854,7 +854,7 @@ def test_import_playbook_children_extra_vars_success(
     monkeypatch.setattr(
         utils.HandleChildren,
         "_recheck_playbook_with_extra_vars",
-        lambda self, _: True,
+        lambda _self, _path: True,
     )
 
     lintable = Lintable(outer)
@@ -892,7 +892,7 @@ def test_import_playbook_children_extra_vars_recheck_fails(
     monkeypatch.setattr(
         utils.HandleChildren,
         "_recheck_playbook_with_extra_vars",
-        lambda self, _: False,
+        lambda _self, _path: False,
     )
 
     lintable = Lintable(outer)
@@ -930,7 +930,7 @@ def test_import_playbook_children_no_extra_vars(
     # _recheck_playbook_with_extra_vars returns False when no extra_vars
     recheck_called = []
 
-    def mock_recheck(self: Any, _: Path) -> bool:
+    def mock_recheck(_self: Any, _path: Path) -> bool:
         recheck_called.append(True)
         return False
 
