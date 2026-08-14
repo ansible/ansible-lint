@@ -991,7 +991,8 @@ def test_resolve_playbook_path_not_exists(
 
     missing = tmp_path / "missing.yml"
     result = handler._resolve_playbook_path(missing, False, "playbook", "missing.yml")  # ruff:ignore[private-member-access]
-    assert result == "Failed to find missing.yml playbook."
+    assert isinstance(result, tuple)
+    assert result == ("not_found", "Failed to find missing.yml playbook.")
 
 
 def test_resolve_playbook_path_collection_success(

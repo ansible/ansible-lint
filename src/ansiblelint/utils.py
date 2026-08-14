@@ -121,6 +121,8 @@ FMT_RE = re.compile(r"^# fmt:\s+(\S+)")
 
 _logger = logging.getLogger(__name__)
 
+_SYNTAX_CHECK_FAILED = "syntax_check_failed"
+
 # Vault secrets are resolved on first use and cached for the process lifetime.
 _vault_secrets: list[tuple[str, Any]] | None = None
 
@@ -631,16 +633,19 @@ class HandleChildren:
         is_collection: bool,
         parent_type: FileType,
         name: str,
-    ) -> list[Lintable] | str:
-        """Check a single playbook path and return Lintable or error message."""
+    ) -> list[Lintable] | tuple[str, str]:
+        """Check a single playbook path and return Lintable list or (tag, message) on failure."""
         if not possible_path.exists():
-            return f"Failed to find {name} playbook."
+            return ("not_found", f"Failed to find {name} playbook.")
         if not self.app.runtime.has_playbook(str(possible_path)):
             if not is_collection and self._recheck_playbook_with_extra_vars(
                 possible_path
             ):
                 return [Lintable(possible_path, kind=parent_type)]
-            return f"Failed to load {name} playbook due to failing syntax check."
+            return (
+                _SYNTAX_CHECK_FAILED,
+                f"Failed to load {name} playbook due to failing syntax check.",
+            )
         if is_collection:
             return []  # don't lint foreign playbook
         return [Lintable(possible_path, kind=parent_type)]
@@ -668,8 +673,9 @@ class HandleChildren:
             )
             if isinstance(result, list):
                 return result
-            if "syntax check" in result:
-                _logger.error(result)
+            tag, message = result
+            if tag == _SYNTAX_CHECK_FAILED:
+                _logger.error(message)
                 return []
 
         _logger.error("Failed to find %s playbook.", v)
@@ -683,7 +689,7 @@ class HandleChildren:
         collection_name: str,
         playbook_path: list[str],
     ) -> list[Path]:
-        """Build list of possible playbook paths to check."""
+        """Build list of possible playbook paths to check for an import_playbook reference."""
         if not (namespace_name and collection_name):
             return [lintable.path.parent / v]
 
