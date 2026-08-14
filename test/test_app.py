@@ -111,6 +111,47 @@ def test_add_module_path_skips_collection_only_mocks(tmp_path: Path) -> None:
     assert module_paths == ["/usr/share/ansible/plugins/modules"]
 
 
+def test_update_path_env_prepends_without_duplicates() -> None:
+    """Verify _update_path_env prepends paths and removes duplicates."""
+    import os
+
+    from ansiblelint.app import _update_path_env
+
+    env: dict[str, str] = {"ANSIBLE_LIBRARY": "/existing/path"}
+    paths = ["/new/path", "/existing/path"]
+
+    _update_path_env(env, "ANSIBLE_LIBRARY", paths)
+
+    # Should prepend new paths and deduplicate
+    expected = os.pathsep.join(["/new/path", "/existing/path"])
+    assert env["ANSIBLE_LIBRARY"] == expected
+
+
+def test_update_path_env_empty_paths() -> None:
+    """Verify _update_path_env does nothing when paths is empty."""
+    from ansiblelint.app import _update_path_env
+
+    env: dict[str, str] = {"ANSIBLE_LIBRARY": "/existing/path"}
+    _update_path_env(env, "ANSIBLE_LIBRARY", [])
+
+    assert env["ANSIBLE_LIBRARY"] == "/existing/path"
+
+
+def test_update_path_env_no_existing_var() -> None:
+    """Verify _update_path_env works when env var doesn't exist."""
+    import os
+
+    from ansiblelint.app import _update_path_env
+
+    env: dict[str, str] = {}
+    paths = ["/new/path1", "/new/path2"]
+
+    _update_path_env(env, "ANSIBLE_LIBRARY", paths)
+
+    expected = os.pathsep.join(["/new/path1", "/new/path2"])
+    assert env["ANSIBLE_LIBRARY"] == expected
+
+
 def test_ignore_file_with_skip_and_strict(tmp_path: Path) -> None:
     """Test that .ansible-lint-ignore with skip qualifier returns exit code 0 with --strict.
 
