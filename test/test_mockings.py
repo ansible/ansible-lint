@@ -79,3 +79,19 @@ def test_mock_modules_stub_is_lintable(tmp_path: Path) -> None:
     )
     result = run_ansible_lint("playbook.yml", cwd=tmp_path)
     assert result.returncode == 0, result.stdout
+
+
+def test_short_mock_modules_stub_is_lintable(tmp_path: Path) -> None:
+    """Ensure short-name mock modules are resolved during syntax-check."""
+    (tmp_path / ".ansible-lint.yml").write_text("mock_modules:\n  - custom_module\n")
+    (tmp_path / "playbook.yml").write_text(
+        "---\n"
+        "- name: Test mocked short module\n"
+        "  hosts: localhost\n"
+        "  gather_facts: false\n"
+        "  tasks:\n"
+        "    - name: Run mocked short module\n"
+        "      custom_module:\n"
+    )
+    result = run_ansible_lint("playbook.yml", cwd=tmp_path)
+    assert result.returncode == 0, result.stdout
