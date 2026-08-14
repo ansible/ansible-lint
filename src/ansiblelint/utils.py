@@ -574,17 +574,7 @@ class HandleChildren:
         v: Sequence[Any],
         parent_type: FileType,
     ) -> list[Lintable]:
-        """Discover lintable files for roles declared in a playbook or role.
-        
-        Parameters:
-        	lintable (Lintable): File containing the role declarations.
-        	k (str): Key identifying the role declaration section.
-        	v (Sequence[Any]): Role declarations to resolve.
-        	parent_type (FileType): Type of the containing file.
-        
-        Returns:
-        	list[Lintable]: Files found for the declared roles.
-        """
+        """Roles children."""
         # pylint: disable=unused-argument # parent_type)
         basedir = str(lintable.path.parent)
         results: list[Lintable] = []
@@ -613,15 +603,11 @@ class HandleChildren:
         return results
 
     def _recheck_playbook_with_extra_vars(self, possible_path: Path) -> bool:
-        """
-        Re-check a playbook's syntax using the configured extra variables.
-        
-        Parameters:
-            possible_path (Path): Path to the playbook to validate.
-        
-        Returns:
-            bool: `True` if the syntax check succeeds with the configured extra
-            variables, `False` if no extra variables are configured or the check fails.
+        """Re-check playbook syntax with configured extra_vars.
+
+        has_playbook() runs its syntax check without our configured extra_vars,
+        so it wrongly fails on a local playbook that only loads once those vars
+        are defined. Re-check with them before giving up.
         """
         extra_vars = self.app.options.extra_vars
         if not extra_vars:
@@ -646,18 +632,7 @@ class HandleChildren:
         parent_type: FileType,
         name: str,
     ) -> list[Lintable] | str:
-        """
-        Validate a candidate playbook path and return its lintable representation or an error message.
-        
-        Parameters:
-            possible_path (Path): Candidate playbook path.
-            is_collection (bool): Whether the playbook belongs to a foreign collection.
-            parent_type (FileType): File type assigned to the resulting lintable.
-            name (str): Playbook name used in error messages.
-        
-        Returns:
-            list[Lintable] | str: A list containing the lintable playbook, an empty list for foreign collection playbooks, or an error message.
-        """
+        """Check a single playbook path and return Lintable or error message."""
         if not possible_path.exists():
             return f"Failed to find {name} playbook."
         if not self.app.runtime.has_playbook(str(possible_path)):
@@ -677,16 +652,7 @@ class HandleChildren:
         v: Any,
         parent_type: FileType,
     ) -> list[Lintable]:
-        """
-        Resolve an imported playbook and return its lintable child files.
-        
-        Parameters:
-            v (Any): A local or fully qualified playbook name.
-            parent_type (FileType): The file type of the importing parent.
-        
-        Returns:
-            list[Lintable]: Lintable files discovered from the playbook, or an empty list when the playbook cannot be resolved.
-        """
+        """Include import_playbook children."""
         if not isinstance(v, str):
             return []
 
@@ -740,15 +706,6 @@ class HandleChildren:
         ]
 
     def _look_for_role_files(self, basedir: str, role: str) -> list[Lintable]:
-        """Recursively collect YAML files from the task, metadata, handler, variable, and default directories of a role.
-        
-        Parameters:
-            basedir (str): Base directory used to resolve the role.
-            role (str): Role name or path to search.
-        
-        Returns:
-            list[Lintable]: Lintable objects for the role's discovered YAML files.
-        """
         role_path = self._rolepath(basedir, role)
         if not role_path:  # pragma: no branch
             return []
