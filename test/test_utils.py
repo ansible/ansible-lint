@@ -950,3 +950,162 @@ def test_import_playbook_children_no_extra_vars(
     assert "Failed to load" in caplog.text
     # recheck is called but returns False due to empty extra_vars
     assert recheck_called
+
+
+def test_recheck_playbook_with_extra_vars_no_vars(
+    tmp_path: Path,
+) -> None:
+    """Verify _recheck_playbook_with_extra_vars returns False when no extra_vars."""
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
+
+    playbook = tmp_path / "test.yml"
+    playbook.write_text("---\n- hosts: localhost\n  tasks: []\n")
+
+    options = Options()
+    options.extra_vars = {}
+    app = App(options=options)
+    rules = RulesCollection(app=app)
+    handler = utils.HandleChildren(rules=rules, app=app)
+
+    result = handler._recheck_playbook_with_extra_vars(playbook)  # ruff:ignore[private-member-access]
+    assert result is False
+
+
+def test_resolve_playbook_path_not_exists(
+    tmp_path: Path,
+) -> None:
+    """Verify _resolve_playbook_path returns error when path doesn't exist."""
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
+
+    outer = tmp_path / "outer.yml"
+    outer.write_text("---\n- import_playbook: missing.yml\n")
+
+    options = Options()
+    app = App(options=options)
+    rules = RulesCollection(app=app)
+    handler = utils.HandleChildren(rules=rules, app=app)
+
+    missing = tmp_path / "missing.yml"
+    result = handler._resolve_playbook_path(missing, False, "playbook", "missing.yml")  # ruff:ignore[private-member-access]
+    assert result == "Failed to find missing.yml playbook."
+
+
+def test_resolve_playbook_path_collection_success(
+    tmp_path: Path,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Verify _resolve_playbook_path returns empty list for valid collection playbook."""
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
+
+    playbook = tmp_path / "test.yml"
+    playbook.write_text("---\n- hosts: localhost\n  tasks: []\n")
+
+    options = Options()
+    app = App(options=options)
+    rules = RulesCollection(app=app)
+    handler = utils.HandleChildren(rules=rules, app=app)
+
+    monkeypatch.setattr(app.runtime, "has_playbook", lambda _: True)
+
+    result = handler._resolve_playbook_path(playbook, True, "playbook", "test.yml")  # ruff:ignore[private-member-access]
+    assert result == []
+
+
+def test_resolve_playbook_path_local_success(
+    tmp_path: Path,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Verify _resolve_playbook_path returns Lintable for valid local playbook."""
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
+
+    playbook = tmp_path / "test.yml"
+    playbook.write_text("---\n- hosts: localhost\n  tasks: []\n")
+
+    options = Options()
+    app = App(options=options)
+    rules = RulesCollection(app=app)
+    handler = utils.HandleChildren(rules=rules, app=app)
+
+    monkeypatch.setattr(app.runtime, "has_playbook", lambda _: True)
+
+    result = handler._resolve_playbook_path(playbook, False, "playbook", "test.yml")  # ruff:ignore[private-member-access]
+    assert isinstance(result, list)
+    assert len(result) == 1
+    assert result[0].path == playbook
+
+
+def test_get_playbook_paths_local(tmp_path: Path) -> None:
+    """Verify _get_playbook_paths returns local path for non-collection."""
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
+
+    outer = tmp_path / "outer.yml"
+    outer.write_text("---\n- import_playbook: inner.yml\n")
+
+    options = Options()
+    app = App(options=options)
+    rules = RulesCollection(app=app)
+    handler = utils.HandleChildren(rules=rules, app=app)
+
+    lintable = Lintable(outer)
+    paths = handler._get_playbook_paths(lintable, "inner.yml", "", "", [])  # ruff:ignore[private-member-access]
+    assert len(paths) == 1
+    assert paths[0] == tmp_path / "inner.yml"
+
+
+def test_import_playbook_children_non_string(tmp_path: Path) -> None:
+    """Verify import_playbook_children returns empty for non-string v."""
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
+
+    outer = tmp_path / "outer.yml"
+    outer.write_text("---\n- import_playbook: inner.yml\n")
+
+    options = Options()
+    app = App(options=options)
+    rules = RulesCollection(app=app)
+    handler = utils.HandleChildren(rules=rules, app=app)
+
+    lintable = Lintable(outer)
+    # Pass a dict instead of string
+    result = handler.import_playbook_children(
+        lintable, "import_playbook", {"name": "invalid"}, "playbook"
+    )
+    assert result == []
+
+
+def test_import_playbook_children_missing_playbook(
+    tmp_path: Path,
+    caplog: LogCaptureFixture,
+) -> None:
+    """Verify import_playbook_children logs error for missing playbook."""
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
+
+    outer = tmp_path / "outer.yml"
+    outer.write_text("---\n- import_playbook: missing.yml\n")
+
+    options = Options()
+    app = App(options=options)
+    rules = RulesCollection(app=app)
+    handler = utils.HandleChildren(rules=rules, app=app)
+
+    lintable = Lintable(outer)
+    with caplog.at_level(logging.ERROR):
+        result = handler.import_playbook_children(
+            lintable, "import_playbook", "missing.yml", "playbook"
+        )
+
+    assert result == []
+    assert "Failed to find missing.yml playbook" in caplog.text
