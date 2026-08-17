@@ -316,7 +316,7 @@ def test_fix_with_none_write_list_is_a_no_op() -> None:
     matches = [Mock()]
     result = LintResult(matches=list(matches), files=set())
     rules = Mock()
-    rules.known_transform_tags.return_value = []
+    rules.known_transform_tags = Mock(return_value=[])
 
     # noinspection PyTypeChecker
     fix(runtime_options=options, result=result, rules=rules)
