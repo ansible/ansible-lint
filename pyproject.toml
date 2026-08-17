@@ -360,12 +360,7 @@ max-complexity = 20
 "src/ansiblelint/{utils,file_utils,runner,loaders,constants,config,cli,_mockings}.py" = [
   "PTH",
 ]
-"test/**/*.py" = [
-  "docstring-missing-returns",
-  "docstring-missing-exception",
-  "import-private-name",
-  "S"
-]
+"test/**/*.py" = ["docstring-missing-returns", "docstring-missing-exception", "import-private-name", "S"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
@@ -604,30 +599,7 @@ allowlist_externals = [
   "{tox_root}/tools/test-hook.sh",
   "{work_dir}/.pipx/bin/ansible-lint",
 ]
-commands = [
-  [
-    "python",
-    "-c",
-    "import pathlib; pathlib.Path(\"{env_site_packages_dir}/cov.pth\").write_text(\"import coverage; coverage.process_startup()\")"
-  ],
-  [
-    "coverage",
-    "run",
-    "-m",
-    "pytest",
-    { default = [
-      "-ra",
-      "--showlocals",
-      "--doctest-modules",
-      "--durations=10",
-      "--junitxml=./junit.xml"
-    ], extend = true, replace = "posargs" }
-  ],
-  ["coverage", "combine", "-q"],
-  ["coverage", "xml", "-o", "{env_dir}/coverage.xml", "--fail-under=0"],
-  ["coverage", "lcov", "-q", "--fail-under=0"],
-  ["coverage", "report"]
-]
+commands = [["python", "-c", "import pathlib; pathlib.Path(\"{env_site_packages_dir}/cov.pth\").write_text(\"import coverage; coverage.process_startup()\")"], ["coverage", "run", "-m", "pytest", { default = ["-ra", "--showlocals", "--doctest-modules", "--durations=10", "--junitxml=./junit.xml"], extend = true, replace = "posargs" }], ["coverage", "combine", "-q"], ["coverage", "xml", "-o", "{env_dir}/coverage.xml", "--fail-under=0"], ["coverage", "lcov", "-q", "--fail-under=0"], ["coverage", "report"]]
 commands_pre = [
   ["coverage", "erase"],
   ["bash", "./tools/install-reqs.sh"],
