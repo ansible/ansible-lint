@@ -81,16 +81,14 @@ def _safe_path_under_root(root: Path, *parts: str) -> Path | None:
     return candidate
 
 
-def _mock_role_path(
-    role_name: str,
-    mock_root: Path,
-    mock_collections_path: Path,
-) -> Path | None:
+def _mock_role_path(role_name: str, mock_root: Path) -> Path | None:
     """Return the filesystem path for a mocked role, or None if invalid."""
     if re.match(r"^\w+\.\w+\.\w+$", role_name):
         namespace, collection, role_dir = role_name.split(".")
+        # Always anchor on mock_root so a symlinked collections/ cannot escape.
         return _safe_path_under_root(
-            mock_collections_path,
+            mock_root,
+            "collections",
             "ansible_collections",
             namespace,
             collection,
@@ -103,40 +101,45 @@ def _mock_role_path(
     return _safe_path_under_root(mock_root, "roles", role_name)
 
 
+def _mock_module_path(module_name: str, mock_root: Path) -> Path | None:
+    """Return the filesystem path for a mocked module, or None if invalid."""
+    if not re.match(r"^(\w+|\w+\.\w+\.[\.\w]+)$", module_name):
+        return None
+    parts = module_name.split(".")
+    if len(parts) < 3:
+        return _safe_path_under_root(mock_root, "modules", f"{module_name}.py")
+    relpath = _collection_module_relpath(module_name)
+    if relpath is None:  # pragma: no cover
+        return None
+    # Always anchor on mock_root so a symlinked collections/ cannot escape.
+    return _safe_path_under_root(mock_root, "collections", *relpath.parts)
+
+
 def _make_module_stub(module_name: str, options: Options) -> None:
     mock_root = options.mock_root
-    mock_collections_path = options.mock_collections_path
-    mock_modules_path = options.mock_modules_path
-    if not mock_root or not mock_collections_path or not mock_modules_path:
+    if not mock_root:
         msg = "Cache directory not set"
         raise RuntimeError(msg)
-    # a.b.c is treated a collection
-    if re.match(r"^(\w+|\w+\.\w+\.[\.\w]+)$", module_name):
-        parts = module_name.split(".")
-        if len(parts) < 3:
-            path = mock_modules_path
-            module_file = path / f"{module_name}.py"
-            namespace = None
-            collection = None
-        else:
-            namespace = parts[0]
-            collection = parts[1]
-            relpath = _collection_module_relpath(module_name)
-            if relpath is None:  # pragma: no cover
-                msg = f"Invalid module name: {module_name}"
-                raise RuntimeError(msg)
-            module_file = mock_collections_path / relpath
-            path = module_file.parent
-        path.mkdir(exist_ok=True, parents=True)
-        _write_module_stub(
-            filename=module_file,
-            name=module_name,
-            namespace=namespace,
-            collection=collection,
-        )
-    else:
+    module_file = _mock_module_path(module_name, mock_root)
+    if module_file is None:
         _logger.error("Config error: %s is not a valid module name.", module_name)
         sys.exit(RC.INVALID_CONFIG)
+
+    parts = module_name.split(".")
+    if len(parts) < 3:
+        namespace = None
+        collection = None
+    else:
+        namespace = parts[0]
+        collection = parts[1]
+
+    module_file.parent.mkdir(exist_ok=True, parents=True)
+    _write_module_stub(
+        filename=module_file,
+        name=module_name,
+        namespace=namespace,
+        collection=collection,
+    )
 
 
 def _write_module_stub(
@@ -166,12 +169,11 @@ def _write_module_stub(
 def _perform_mockings(options: Options) -> None:
     """Mock modules and roles."""
     mock_root = options.mock_root
-    mock_collections_path = options.mock_collections_path
-    if not mock_root or not mock_collections_path:  # pragma: no cover
+    if not mock_root:  # pragma: no cover
         msg = "Cache directory not set"
         raise RuntimeError(msg)
     for role_name in options.mock_roles:
-        path = _mock_role_path(role_name, mock_root, mock_collections_path)
+        path = _mock_role_path(role_name, mock_root)
         if path is None:
             _logger.error("Config error: %s is not a valid role name.", role_name)
             sys.exit(RC.INVALID_CONFIG)
@@ -191,34 +193,19 @@ def _perform_mockings(options: Options) -> None:
 def _perform_mockings_cleanup(options: Options) -> None:
     """Clean up mocked modules and roles."""
     mock_root = options.mock_root
-    mock_collections_path = options.mock_collections_path
-    mock_modules_path = options.mock_modules_path
-    if not mock_root or not mock_collections_path or not mock_modules_path:
+    if not mock_root:
         msg = "Cache directory not set"
         raise RuntimeError(msg)
 
     for role_name in options.mock_roles:
-        path = _mock_role_path(role_name, mock_root, mock_collections_path)
+        path = _mock_role_path(role_name, mock_root)
         if path is None:
             continue
         with contextlib.suppress(OSError):
             path.rmdir()
 
     for module_name in options.mock_modules:
-        parts = module_name.split(".")
-        if len(parts) < 3:
-            module_file = _safe_path_under_root(
-                mock_modules_path,
-                f"{module_name}.py",
-            )
-        else:
-            relpath = _collection_module_relpath(module_name)
-            if relpath is None:  # pragma: no cover
-                continue
-            module_file = _safe_path_under_root(
-                mock_collections_path,
-                *relpath.parts,
-            )
+        module_file = _mock_module_path(module_name, mock_root)
         if module_file is not None and is_lint_mock_module(module_file):
             with contextlib.suppress(OSError):
                 module_file.unlink()

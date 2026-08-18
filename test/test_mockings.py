@@ -316,7 +316,9 @@ def test_safe_path_under_root_rejects_invalid_parts(tmp_path: Path) -> None:
 
     assert _safe_path_under_root(root, "roles", "valid_role") is not None
     assert _safe_path_under_root(root, "roles", "..", "outside") is None
+    assert _safe_path_under_root(root, "roles", ".", "outside") is None
     assert _safe_path_under_root(root, "roles", "nested/role") is None
+    assert _safe_path_under_root(root, "roles", r"nested\role") is None
     assert _safe_path_under_root(root, "roles", "") is None
 
 
@@ -331,6 +333,35 @@ def test_safe_path_under_root_rejects_symlink_escape(tmp_path: Path) -> None:
     (root / "roles").symlink_to(outside)
 
     assert _safe_path_under_root(root, "roles", "escaped") is None
+
+
+def test_mock_paths_reject_symlinked_collections_escape(
+    config_options: Options,
+    tmp_path: Path,
+) -> None:
+    """FQCN mocks must not follow a collections/ symlink outside mock_root."""
+    from ansiblelint._mockings import _perform_mockings
+    from ansiblelint.constants import RC
+
+    config_options.cache_dir = tmp_path
+    mock_root = tmp_path / "ansible-lint-mocks"
+    mock_root.mkdir()
+    outside = tmp_path / "outside_collections"
+    outside.mkdir()
+    (mock_root / "collections").symlink_to(outside)
+
+    config_options.mock_modules = ["ns.coll.sample"]
+    with pytest.raises(SystemExit) as exc:
+        _perform_mockings(options=config_options)
+    assert exc.value.code == RC.INVALID_CONFIG
+    assert not list(outside.rglob("sample.py"))
+
+    config_options.mock_modules = []
+    config_options.mock_roles = ["ns.coll.role"]
+    with pytest.raises(SystemExit) as exc:
+        _perform_mockings(options=config_options)
+    assert exc.value.code == RC.INVALID_CONFIG
+    assert not list(outside.rglob("role"))
 
 
 def test_is_lint_mock_module_handles_missing_file_and_oserror(
