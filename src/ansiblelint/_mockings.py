@@ -7,7 +7,7 @@ import logging
 import re
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NoReturn
 
 from ansiblelint.constants import ANSIBLE_MOCKED_MODULE, MOCK_MODULE_MARKER, RC
 
@@ -51,7 +51,7 @@ def _collection_module_relpath(module_name: str) -> Path | None:
 
 
 def _warn_if_mock_clobbered_real_collections(options: Options) -> None:
-    """Warn when previously written stubs still sit under real collections."""
+    """Remove legacy mock stubs still sitting under real collections."""
     if not options.cache_dir or not options.mock_modules:
         return
     real_collections = options.cache_dir / "collections"
@@ -61,13 +61,15 @@ def _warn_if_mock_clobbered_real_collections(options: Options) -> None:
             continue
         candidate = real_collections / relpath
         if is_lint_mock_module(candidate):
+            with contextlib.suppress(OSError):
+                candidate.unlink()
             _logger.warning(
-                "Found ansible-lint mock stub at %s under the real collections "
-                "path. Reinstall affected collections "
+                "Removed legacy ansible-lint mock stub at %s under the real "
+                "collections path so installed modules can resolve correctly. "
+                "If problems persist, reinstall affected collections "
                 "(ansible-galaxy collection install ... --force).",
                 candidate,
             )
-            return
 
 
 def _safe_path_under_root(root: Path, *parts: str) -> Path | None:
@@ -81,8 +83,22 @@ def _safe_path_under_root(root: Path, *parts: str) -> Path | None:
     return candidate
 
 
+def _is_valid_module_name(module_name: str) -> bool:
+    """Return True if module_name matches the allowed mock_modules patterns."""
+    return bool(re.match(r"^(\w+|\w+\.\w+\.[\.\w]+)$", module_name))
+
+
+def _is_valid_role_name(role_name: str) -> bool:
+    """Return True if role_name matches the allowed mock_roles patterns."""
+    if re.match(r"^\w+\.\w+\.\w+$", role_name):
+        return True
+    return bool(re.match(r"^[\w][\w.-]*$", role_name) and ".." not in role_name)
+
+
 def _mock_role_path(role_name: str, mock_root: Path) -> Path | None:
-    """Return the filesystem path for a mocked role, or None if invalid."""
+    """Return the filesystem path for a mocked role, or None if invalid/unsafe."""
+    if not _is_valid_role_name(role_name):
+        return None
     if re.match(r"^\w+\.\w+\.\w+$", role_name):
         namespace, collection, role_dir = role_name.split(".")
         # Always anchor on mock_root so a symlinked collections/ cannot escape.
@@ -95,15 +111,12 @@ def _mock_role_path(role_name: str, mock_root: Path) -> Path | None:
             "roles",
             role_dir,
         )
-    # Standalone role names (including author.role_name) must stay under roles/.
-    if not re.match(r"^[\w][\w.-]*$", role_name) or ".." in role_name:
-        return None
     return _safe_path_under_root(mock_root, "roles", role_name)
 
 
 def _mock_module_path(module_name: str, mock_root: Path) -> Path | None:
-    """Return the filesystem path for a mocked module, or None if invalid."""
-    if not re.match(r"^(\w+|\w+\.\w+\.[\.\w]+)$", module_name):
+    """Return the filesystem path for a mocked module, or None if invalid/unsafe."""
+    if not _is_valid_module_name(module_name):
         return None
     parts = module_name.split(".")
     if len(parts) < 3:
@@ -115,6 +128,21 @@ def _mock_module_path(module_name: str, mock_root: Path) -> Path | None:
     return _safe_path_under_root(mock_root, "collections", *relpath.parts)
 
 
+def _exit_invalid_mock_name(kind: str, name: str, mock_root: Path) -> NoReturn:
+    """Exit with a specific error for invalid names vs unsafe mock paths."""
+    validator = _is_valid_module_name if kind == "module" else _is_valid_role_name
+    if not validator(name):
+        _logger.error("Config error: %s is not a valid %s name.", name, kind)
+    else:
+        _logger.error(
+            "Config error: refused unsafe mock %s path for %s outside %s.",
+            kind,
+            name,
+            mock_root,
+        )
+    sys.exit(RC.INVALID_CONFIG)
+
+
 def _make_module_stub(module_name: str, options: Options) -> None:
     mock_root = options.mock_root
     if not mock_root:
@@ -122,8 +150,7 @@ def _make_module_stub(module_name: str, options: Options) -> None:
         raise RuntimeError(msg)
     module_file = _mock_module_path(module_name, mock_root)
     if module_file is None:
-        _logger.error("Config error: %s is not a valid module name.", module_name)
-        sys.exit(RC.INVALID_CONFIG)
+        _exit_invalid_mock_name("module", module_name, mock_root)
 
     parts = module_name.split(".")
     if len(parts) < 3:
@@ -175,8 +202,7 @@ def _perform_mockings(options: Options) -> None:
     for role_name in options.mock_roles:
         path = _mock_role_path(role_name, mock_root)
         if path is None:
-            _logger.error("Config error: %s is not a valid role name.", role_name)
-            sys.exit(RC.INVALID_CONFIG)
+            _exit_invalid_mock_name("role", role_name, mock_root)
         # Avoid error from makedirs if destination is a broken symlink
         if path.is_symlink() and not path.exists():  # pragma: no cover
             _logger.warning("Removed broken symlink from %s", path)

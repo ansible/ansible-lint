@@ -233,11 +233,22 @@ class Options:  # pylint: disable=too-many-instance-attributes
             return None
         return self.mock_root / "modules"
 
+    @property
+    def mock_roles_path(self) -> Path | None:
+        """Return the plain mock roles path if cache_dir is set."""
+        if self.mock_root is None:
+            return None
+        return self.mock_root / "roles"
+
     def has_collection_mocks(self) -> bool:
         """Check if any mock roles or modules use collection format (ns.coll.name)."""
         return any(len(r.split(".")) >= 3 for r in self.mock_roles) or any(
             len(m.split(".")) >= 3 for m in self.mock_modules
         )
+
+    def has_plain_role_mocks(self) -> bool:
+        """Check if any mock roles are standalone (non-collection) names."""
+        return any(len(r.split(".")) < 3 for r in self.mock_roles)
 
 
 options = Options()

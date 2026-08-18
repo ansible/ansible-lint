@@ -426,6 +426,17 @@ def _add_module_path_if_needed(
             module_paths.append(mock_path)
 
 
+def _add_roles_path_if_needed(
+    options: Options,
+    role_paths: list[str],
+) -> None:
+    """Append plain mock roles path as a fallback when standalone role mocks exist."""
+    if options.mock_roles_path and options.has_plain_role_mocks():
+        mock_path = str(options.mock_roles_path)
+        if mock_path not in role_paths:
+            role_paths.append(mock_path)
+
+
 def _update_path_env(
     env: dict[str, str],
     varname: str,
@@ -496,6 +507,12 @@ def get_app(*, offline: bool | None = None, cached: bool = False) -> App:
     _add_module_path_if_needed(app.options, module_paths)
     if module_paths != default_module_paths:
         _update_path_env(app.runtime.environ, "ANSIBLE_LIBRARY", module_paths)
+
+    default_role_paths = list(app.runtime.config.default_roles_path)
+    role_paths = default_role_paths.copy()
+    _add_roles_path_if_needed(app.options, role_paths)
+    if role_paths != default_role_paths:
+        _update_path_env(app.runtime.environ, "ANSIBLE_ROLES_PATH", role_paths)
 
     _ensure_cache_collections_first(app)
 

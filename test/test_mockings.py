@@ -32,6 +32,17 @@ def test_mock_roles_with_collection_name(tmp_path: Path) -> None:
     assert "was not found" not in result.stdout
 
 
+def test_plain_mock_roles_resolve(tmp_path: Path) -> None:
+    """Standalone mock_roles must resolve via ansible-lint-mocks/roles."""
+    (tmp_path / ".ansible-lint.yml").write_text("mock_roles:\n  - plain_mock_role\n")
+    (tmp_path / "playbook.yml").write_text(
+        "---\n- name: Test\n  hosts: localhost\n  roles:\n    - plain_mock_role\n"
+    )
+    result = run_ansible_lint("playbook.yml", cwd=tmp_path)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "was not found" not in result.stdout
+
+
 def test_add_collections_path_if_needed(tmp_path: Path) -> None:
     """Test _add_collections_path_if_needed helper."""
     from ansiblelint.app import _add_collections_path_if_needed
@@ -303,8 +314,9 @@ def test_warn_if_mock_clobbered_real_collections(
     with caplog.at_level("WARNING"):
         _perform_mockings(options=config_options)
 
-    assert "Found ansible-lint mock stub at" in caplog.text
-    assert "Reinstall affected collections" in caplog.text
+    assert "Removed legacy ansible-lint mock stub at" in caplog.text
+    assert "reinstall affected collections" in caplog.text
+    assert not legacy_stub.exists()
 
 
 def test_safe_path_under_root_rejects_invalid_parts(tmp_path: Path) -> None:
