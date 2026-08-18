@@ -425,4 +425,4 @@ def test_warn_if_mock_clobbered_skips_short_module_names(
     with caplog.at_level("WARNING"):
         _warn_if_mock_clobbered_real_collections(config_options)
 
-    assert caplog.text == ""
+    assert not caplog.text
