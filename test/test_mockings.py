@@ -318,3 +318,111 @@ def test_safe_path_under_root_rejects_invalid_parts(tmp_path: Path) -> None:
     assert _safe_path_under_root(root, "roles", "..", "outside") is None
     assert _safe_path_under_root(root, "roles", "nested/role") is None
     assert _safe_path_under_root(root, "roles", "") is None
+
+
+def test_safe_path_under_root_rejects_symlink_escape(tmp_path: Path) -> None:
+    """Resolved paths outside the mocks root are rejected."""
+    from ansiblelint._mockings import _safe_path_under_root
+
+    root = tmp_path / "ansible-lint-mocks"
+    outside = tmp_path / "outside"
+    root.mkdir()
+    outside.mkdir()
+    (root / "roles").symlink_to(outside)
+
+    assert _safe_path_under_root(root, "roles", "escaped") is None
+
+
+def test_is_lint_mock_module_handles_missing_file_and_oserror(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Non-files and unreadable paths are not treated as lint mocks."""
+    from ansiblelint._mockings import is_lint_mock_module
+
+    assert is_lint_mock_module(tmp_path) is False
+
+    module_path = tmp_path / "module.py"
+    module_path.write_text("# stub\n", encoding="utf-8")
+
+    def raise_oserror(*_args: object, **_kwargs: object) -> None:
+        msg = "permission denied"
+        raise OSError(msg)
+
+    monkeypatch.setattr(Path, "open", raise_oserror)
+    assert is_lint_mock_module(module_path) is False
+
+
+def test_make_module_stub_requires_cache_dir(config_options: Options) -> None:
+    """Module stub creation fails fast when cache_dir is unset."""
+    config_options.cache_dir = None
+    with pytest.raises(RuntimeError, match="Cache directory not set"):
+        _make_module_stub(module_name="ns.coll.mod", options=config_options)
+
+
+def test_mock_roles_reject_invalid_names(
+    config_options: Options,
+    tmp_path: Path,
+) -> None:
+    """Invalid mock_roles names are rejected before touching disk."""
+    from ansiblelint._mockings import _perform_mockings
+    from ansiblelint.constants import RC
+
+    config_options.cache_dir = tmp_path
+    config_options.mock_roles = ["bad/role"]
+    with pytest.raises(SystemExit) as exc:
+        _perform_mockings(options=config_options)
+    assert exc.value.code == RC.INVALID_CONFIG
+
+
+def test_perform_mockings_cleanup_removes_collection_roles(
+    config_options: Options,
+    tmp_path: Path,
+) -> None:
+    """Cleanup removes collection role directories under the mocks root."""
+    from ansiblelint._mockings import _perform_mockings, _perform_mockings_cleanup
+
+    config_options.cache_dir = tmp_path
+    config_options.mock_roles = ["ns.coll.role"]
+    _perform_mockings(options=config_options)
+
+    role_path = (
+        tmp_path
+        / "ansible-lint-mocks"
+        / "collections"
+        / "ansible_collections"
+        / "ns"
+        / "coll"
+        / "roles"
+        / "role"
+    )
+    assert role_path.is_dir()
+
+    _perform_mockings_cleanup(config_options)
+    assert not role_path.exists()
+
+
+def test_perform_mockings_cleanup_requires_cache_dir(config_options: Options) -> None:
+    """Cleanup fails fast when cache_dir is unset."""
+    from ansiblelint._mockings import _perform_mockings_cleanup
+
+    config_options.cache_dir = None
+    with pytest.raises(RuntimeError, match="Cache directory not set"):
+        _perform_mockings_cleanup(config_options)
+
+
+def test_warn_if_mock_clobbered_skips_short_module_names(
+    config_options: Options,
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Legacy-clobber warning only applies to collection module paths."""
+    from ansiblelint._mockings import _warn_if_mock_clobbered_real_collections
+
+    config_options.cache_dir = tmp_path
+    config_options.mock_modules = ["plain_module"]
+
+    with caplog.at_level("WARNING"):
+        _warn_if_mock_clobbered_real_collections(config_options)
+
+    assert caplog.text == ""
