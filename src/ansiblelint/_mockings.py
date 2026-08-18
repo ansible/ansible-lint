@@ -70,6 +70,39 @@ def _warn_if_mock_clobbered_real_collections(options: Options) -> None:
             return
 
 
+def _safe_path_under_root(root: Path, *parts: str) -> Path | None:
+    """Join path parts under root, or return None if they would escape root."""
+    if any(part in ("", ".", "..") or "/" in part or "\\" in part for part in parts):
+        return None
+    candidate = root.joinpath(*parts)
+    # Resolve only after join so we detect .. via Path semantics if present.
+    if not candidate.resolve().is_relative_to(root.resolve()):
+        return None
+    return candidate
+
+
+def _mock_role_path(
+    role_name: str,
+    mock_root: Path,
+    mock_collections_path: Path,
+) -> Path | None:
+    """Return the filesystem path for a mocked role, or None if invalid."""
+    if re.match(r"^\w+\.\w+\.\w+$", role_name):
+        namespace, collection, role_dir = role_name.split(".")
+        return _safe_path_under_root(
+            mock_collections_path,
+            "ansible_collections",
+            namespace,
+            collection,
+            "roles",
+            role_dir,
+        )
+    # Standalone role names (including author.role_name) must stay under roles/.
+    if not re.match(r"^[\w][\w.-]*$", role_name) or ".." in role_name:
+        return None
+    return _safe_path_under_root(mock_root, "roles", role_name)
+
+
 def _make_module_stub(module_name: str, options: Options) -> None:
     mock_root = options.mock_root
     mock_collections_path = options.mock_collections_path
@@ -138,18 +171,10 @@ def _perform_mockings(options: Options) -> None:
         msg = "Cache directory not set"
         raise RuntimeError(msg)
     for role_name in options.mock_roles:
-        if re.match(r"\w+\.\w+\.\w+$", role_name):
-            namespace, collection, role_dir = role_name.split(".")
-            path = (
-                mock_collections_path
-                / "ansible_collections"
-                / namespace
-                / collection
-                / "roles"
-                / role_dir
-            )
-        else:
-            path = mock_root / "roles" / role_name
+        path = _mock_role_path(role_name, mock_root, mock_collections_path)
+        if path is None:
+            _logger.error("Config error: %s is not a valid role name.", role_name)
+            sys.exit(RC.INVALID_CONFIG)
         # Avoid error from makedirs if destination is a broken symlink
         if path.is_symlink() and not path.exists():  # pragma: no cover
             _logger.warning("Removed broken symlink from %s", path)
@@ -173,30 +198,27 @@ def _perform_mockings_cleanup(options: Options) -> None:
         raise RuntimeError(msg)
 
     for role_name in options.mock_roles:
-        if re.match(r"\w+\.\w+\.\w+$", role_name):
-            namespace, collection, role_dir = role_name.split(".")
-            path = (
-                mock_collections_path
-                / "ansible_collections"
-                / namespace
-                / collection
-                / "roles"
-                / role_dir
-            )
-        else:
-            path = mock_root / "roles" / role_name
+        path = _mock_role_path(role_name, mock_root, mock_collections_path)
+        if path is None:
+            continue
         with contextlib.suppress(OSError):
             path.rmdir()
 
     for module_name in options.mock_modules:
         parts = module_name.split(".")
         if len(parts) < 3:
-            module_file = mock_modules_path / f"{module_name}.py"
+            module_file = _safe_path_under_root(
+                mock_modules_path,
+                f"{module_name}.py",
+            )
         else:
             relpath = _collection_module_relpath(module_name)
             if relpath is None:  # pragma: no cover
                 continue
-            module_file = mock_collections_path / relpath
-        if is_lint_mock_module(module_file):
+            module_file = _safe_path_under_root(
+                mock_collections_path,
+                *relpath.parts,
+            )
+        if module_file is not None and is_lint_mock_module(module_file):
             with contextlib.suppress(OSError):
                 module_file.unlink()

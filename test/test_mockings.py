@@ -255,3 +255,19 @@ def test_perform_mockings_cleanup_removes_module_stubs(
     _perform_mockings_cleanup(config_options)
     assert not fqcn_stub.exists()
     assert not short_stub.exists()
+
+
+def test_mock_roles_reject_path_escape(
+    config_options: Options,
+    tmp_path: Path,
+) -> None:
+    """Simple mock_roles values must not escape the mocks root."""
+    from ansiblelint._mockings import _perform_mockings
+    from ansiblelint.constants import RC
+
+    config_options.cache_dir = tmp_path
+    config_options.mock_roles = ["../../outside"]
+    with pytest.raises(SystemExit) as exc:
+        _perform_mockings(options=config_options)
+    assert exc.value.code == RC.INVALID_CONFIG
+    assert not (tmp_path / "outside").exists()
