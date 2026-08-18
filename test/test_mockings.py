@@ -124,7 +124,7 @@ def test_mock_modules_do_not_overwrite_installed_module(
         / "coll"
         / "plugins"
         / "modules"
-        / "realmod.py"
+        / "installed.py"
     )
     real_module.parent.mkdir(parents=True)
     original = (
@@ -132,7 +132,7 @@ def test_mock_modules_do_not_overwrite_installed_module(
     )
     real_module.write_text(original, encoding="utf-8")
 
-    _make_module_stub(module_name="ns.coll.realmod", options=config_options)
+    _make_module_stub(module_name="ns.coll.installed", options=config_options)
 
     assert real_module.read_text(encoding="utf-8") == original
     assert MOCK_MODULE_MARKER not in original
@@ -155,13 +155,13 @@ def test_mock_modules_do_not_touch_real_collections_tree(
         / "coll"
         / "plugins"
         / "modules"
-        / "mymod.py"
+        / "sample.py"
     )
     real_module.parent.mkdir(parents=True)
     original = "#!/usr/bin/python\n# installed collection module\n"
     real_module.write_text(original, encoding="utf-8")
 
-    _make_module_stub(module_name="ns.coll.mymod", options=config_options)
+    _make_module_stub(module_name="ns.coll.sample", options=config_options)
 
     assert real_module.read_text(encoding="utf-8") == original
     stub = (
@@ -173,7 +173,7 @@ def test_mock_modules_do_not_touch_real_collections_tree(
         / "coll"
         / "plugins"
         / "modules"
-        / "mymod.py"
+        / "sample.py"
     )
     assert stub.is_file()
     assert is_lint_mock_module(stub)
@@ -233,9 +233,9 @@ def test_perform_mockings_cleanup_removes_module_stubs(
     from ansiblelint._mockings import _make_module_stub, _perform_mockings_cleanup
 
     config_options.cache_dir = tmp_path
-    config_options.mock_modules = ["ns.coll.mymod", "shortmod"]
-    _make_module_stub(module_name="ns.coll.mymod", options=config_options)
-    _make_module_stub(module_name="shortmod", options=config_options)
+    config_options.mock_modules = ["ns.coll.sample", "custom_sample"]
+    _make_module_stub(module_name="ns.coll.sample", options=config_options)
+    _make_module_stub(module_name="custom_sample", options=config_options)
 
     fqcn_stub = (
         tmp_path
@@ -246,9 +246,9 @@ def test_perform_mockings_cleanup_removes_module_stubs(
         / "coll"
         / "plugins"
         / "modules"
-        / "mymod.py"
+        / "sample.py"
     )
-    short_stub = tmp_path / "ansible-lint-mocks" / "modules" / "shortmod.py"
+    short_stub = tmp_path / "ansible-lint-mocks" / "modules" / "custom_sample.py"
     assert fqcn_stub.is_file()
     assert short_stub.is_file()
 

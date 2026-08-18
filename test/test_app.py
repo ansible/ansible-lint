@@ -115,6 +115,7 @@ def test_add_module_path_for_plain_mock_modules(tmp_path: Path) -> None:
         str(options.cache_dir / "ansible-lint-mocks" / "modules"),
     ]
 
+
 def test_add_module_path_skips_collection_only_mocks(tmp_path: Path) -> None:
     """Collection module mocks are exposed through collection paths instead."""
     from ansiblelint.app import _add_module_path_if_needed
