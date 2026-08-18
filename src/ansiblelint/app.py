@@ -402,24 +402,28 @@ def _add_collections_path_if_needed(
     options: Options,
     collections_paths: list[str],
 ) -> None:
-    """Add mock collections path to collections_paths if collection mocks exist."""
+    """Append mock collections path as a fallback when collection mocks exist.
+
+    Mocks are appended (not prepended) so installed collections take precedence
+    over empty ansible-lint stubs during plugin resolution and args validation.
+    """
     if options.has_collection_mocks():
         mock_path = options.mock_collections_path
         if mock_path and str(mock_path) not in collections_paths:
-            collections_paths.insert(0, str(mock_path))
+            collections_paths.append(str(mock_path))
 
 
 def _add_module_path_if_needed(
     options: Options,
     module_paths: list[str],
 ) -> None:
-    """Add plain mock modules path to module_paths if module mocks exist."""
-    if options.cache_dir and any(
+    """Append plain mock modules path as a fallback when module mocks exist."""
+    if options.mock_modules_path and any(
         len(module_name.split(".")) < 3 for module_name in options.mock_modules
     ):
-        mock_path = options.cache_dir / "modules"
-        if str(mock_path) not in module_paths:
-            module_paths.insert(0, str(mock_path))
+        mock_path = str(options.mock_modules_path)
+        if mock_path not in module_paths:
+            module_paths.append(mock_path)
 
 
 def _update_path_env(

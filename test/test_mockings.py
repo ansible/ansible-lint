@@ -39,13 +39,14 @@ def test_add_collections_path_if_needed(tmp_path: Path) -> None:
     options = Options()
     options.cache_dir = tmp_path
     options.mock_roles = ["ns.coll.role"]
-    paths: list[str] = []
+    paths: list[str] = ["/existing/collections"]
 
     _add_collections_path_if_needed(options, paths)
-    assert str(tmp_path / "collections") in paths
+    mock_path = str(tmp_path / "ansible-lint-mocks" / "collections")
+    assert paths == ["/existing/collections", mock_path]
 
     _add_collections_path_if_needed(options, paths)
-    assert paths.count(str(tmp_path / "collections")) == 1
+    assert paths.count(mock_path) == 1
 
     options.mock_roles = ["simple"]
     paths2: list[str] = []
@@ -54,13 +55,21 @@ def test_add_collections_path_if_needed(tmp_path: Path) -> None:
 
 
 def test_options_collection_mocks() -> None:
-    """Test Options.has_collection_mocks and mock_collections_path."""
+    """Test Options.has_collection_mocks and mock path helpers."""
     opts = Options()
     opts.cache_dir = None
+    assert opts.mock_root is None
     assert opts.mock_collections_path is None
+    assert opts.mock_modules_path is None
 
+    opts.cache_dir = Path("/tmp/cache")
     opts.mock_modules = ["ns.coll.mod"]
     assert opts.has_collection_mocks() is True
+    assert opts.mock_root == Path("/tmp/cache/ansible-lint-mocks")
+    assert opts.mock_collections_path == Path(
+        "/tmp/cache/ansible-lint-mocks/collections",
+    )
+    assert opts.mock_modules_path == Path("/tmp/cache/ansible-lint-mocks/modules")
 
 
 def test_mock_modules_stub_is_lintable(tmp_path: Path) -> None:
@@ -95,3 +104,154 @@ def test_short_mock_modules_stub_is_lintable(tmp_path: Path) -> None:
     )
     result = run_ansible_lint("playbook.yml", cwd=tmp_path)
     assert result.returncode == 0, result.stdout
+
+
+def test_mock_modules_do_not_overwrite_installed_module(
+    config_options: Options,
+    tmp_path: Path,
+) -> None:
+    """Mock stubs must not overwrite a real installed module file."""
+    from ansiblelint._mockings import _make_module_stub
+    from ansiblelint.constants import MOCK_MODULE_MARKER
+
+    config_options.cache_dir = tmp_path
+    real_module = (
+        tmp_path
+        / "ansible-lint-mocks"
+        / "collections"
+        / "ansible_collections"
+        / "ns"
+        / "coll"
+        / "plugins"
+        / "modules"
+        / "realmod.py"
+    )
+    real_module.parent.mkdir(parents=True)
+    original = (
+        "#!/usr/bin/python\n# real module\nARGUMENT_SPEC = {'name': {'type': 'str'}}\n"
+    )
+    real_module.write_text(original, encoding="utf-8")
+
+    _make_module_stub(module_name="ns.coll.realmod", options=config_options)
+
+    assert real_module.read_text(encoding="utf-8") == original
+    assert MOCK_MODULE_MARKER not in original
+
+
+def test_mock_modules_do_not_touch_real_collections_tree(
+    config_options: Options,
+    tmp_path: Path,
+) -> None:
+    """Offline-style mocks must write under ansible-lint-mocks, not collections/."""
+    from ansiblelint._mockings import _make_module_stub, is_lint_mock_module
+    from ansiblelint.constants import MOCK_MODULE_MARKER
+
+    config_options.cache_dir = tmp_path
+    real_module = (
+        tmp_path
+        / "collections"
+        / "ansible_collections"
+        / "ns"
+        / "coll"
+        / "plugins"
+        / "modules"
+        / "mymod.py"
+    )
+    real_module.parent.mkdir(parents=True)
+    original = "#!/usr/bin/python\n# installed collection module\n"
+    real_module.write_text(original, encoding="utf-8")
+
+    _make_module_stub(module_name="ns.coll.mymod", options=config_options)
+
+    assert real_module.read_text(encoding="utf-8") == original
+    stub = (
+        tmp_path
+        / "ansible-lint-mocks"
+        / "collections"
+        / "ansible_collections"
+        / "ns"
+        / "coll"
+        / "plugins"
+        / "modules"
+        / "mymod.py"
+    )
+    assert stub.is_file()
+    assert is_lint_mock_module(stub)
+    assert stub.read_text(encoding="utf-8").startswith(MOCK_MODULE_MARKER)
+
+
+def test_args_rule_skips_lint_mock_modules(tmp_path: Path) -> None:
+    """ArgsRule must not validate empty mock_modules stubs."""
+    (tmp_path / ".ansible-lint.yml").write_text(
+        "---\n"
+        "mock_modules:\n"
+        "  - fake_ns.fake_coll.fake_module\n"
+        "enable_list:\n"
+        "  - args\n"
+        "skip_list:\n"
+        "  - name[missing]\n"
+    )
+    (tmp_path / "playbook.yml").write_text(
+        "---\n"
+        "- name: Test mocked module args\n"
+        "  hosts: localhost\n"
+        "  gather_facts: false\n"
+        "  tasks:\n"
+        "    - name: Call mocked module with args\n"
+        "      fake_ns.fake_coll.fake_module:\n"
+        "        foo: bar\n"
+        "        baz: 1\n"
+    )
+    result = run_ansible_lint("playbook.yml", cwd=tmp_path)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "args[module]" not in result.stdout
+    assert "Unsupported parameters" not in result.stdout
+
+
+def test_is_lint_mock_module_detects_marker(tmp_path: Path) -> None:
+    """Marker-based detection covers legacy stubs outside ansible-lint-mocks."""
+    from ansiblelint._mockings import is_lint_mock_module
+    from ansiblelint.constants import MOCK_MODULE_MARKER
+
+    stub = tmp_path / "ad_hoc_command.py"
+    stub.write_text(
+        f"{MOCK_MODULE_MARKER}\nfrom ansible.module_utils.basic import AnsibleModule\n",
+    )
+    real = tmp_path / "real.py"
+    real.write_text("#!/usr/bin/python\n# real\n")
+
+    assert is_lint_mock_module(stub) is True
+    assert is_lint_mock_module(real) is False
+    assert is_lint_mock_module(None) is False
+
+
+def test_perform_mockings_cleanup_removes_module_stubs(
+    config_options: Options,
+    tmp_path: Path,
+) -> None:
+    """Cleanup removes lint-generated module stubs under the mocks root."""
+    from ansiblelint._mockings import _make_module_stub, _perform_mockings_cleanup
+
+    config_options.cache_dir = tmp_path
+    config_options.mock_modules = ["ns.coll.mymod", "shortmod"]
+    _make_module_stub(module_name="ns.coll.mymod", options=config_options)
+    _make_module_stub(module_name="shortmod", options=config_options)
+
+    fqcn_stub = (
+        tmp_path
+        / "ansible-lint-mocks"
+        / "collections"
+        / "ansible_collections"
+        / "ns"
+        / "coll"
+        / "plugins"
+        / "modules"
+        / "mymod.py"
+    )
+    short_stub = tmp_path / "ansible-lint-mocks" / "modules" / "shortmod.py"
+    assert fqcn_stub.is_file()
+    assert short_stub.is_file()
+
+    _perform_mockings_cleanup(config_options)
+    assert not fqcn_stub.exists()
+    assert not short_stub.exists()

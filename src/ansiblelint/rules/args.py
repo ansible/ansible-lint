@@ -22,6 +22,7 @@ from unittest.mock import patch
 import ansible.module_utils.basic as mock_ansible_module
 from ansible.module_utils import basic
 
+from ansiblelint._mockings import is_lint_mock_module
 from ansiblelint.rules import AnsibleLintRule, RulesCollection
 from ansiblelint.text import has_jinja
 from ansiblelint.utils import load_plugin
@@ -134,6 +135,11 @@ class ArgsRule(AnsibleLintRule):
             loaded_module.plugin_resolved_path,
             str,
         ) and loaded_module.plugin_resolved_path.endswith(".ps1"):
+            return []
+
+        # mock_modules stubs use an empty argument_spec and would otherwise
+        # report every real parameter as unsupported (args[module] / basic.py).
+        if is_lint_mock_module(loaded_module.plugin_resolved_path):
             return []
 
         module_args = {

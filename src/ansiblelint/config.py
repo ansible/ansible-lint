@@ -213,11 +213,25 @@ class Options:  # pylint: disable=too-many-instance-attributes
         return sorted([*self._default_supported, *self.supported_ansible_also])
 
     @property
-    def mock_collections_path(self) -> Path | None:
-        """Return the mock collections path if cache_dir is set."""
+    def mock_root(self) -> Path | None:
+        """Return isolated root for ansible-lint mocks if cache_dir is set."""
         if self.cache_dir is None:
             return None
-        return self.cache_dir / "collections"
+        return self.cache_dir / "ansible-lint-mocks"
+
+    @property
+    def mock_collections_path(self) -> Path | None:
+        """Return the mock collections path if cache_dir is set."""
+        if self.mock_root is None:
+            return None
+        return self.mock_root / "collections"
+
+    @property
+    def mock_modules_path(self) -> Path | None:
+        """Return the plain mock modules path if cache_dir is set."""
+        if self.mock_root is None:
+            return None
+        return self.mock_root / "modules"
 
     def has_collection_mocks(self) -> bool:
         """Check if any mock roles or modules use collection format (ns.coll.name)."""
