@@ -271,3 +271,50 @@ def test_mock_roles_reject_path_escape(
         _perform_mockings(options=config_options)
     assert exc.value.code == RC.INVALID_CONFIG
     assert not (tmp_path / "outside").exists()
+
+
+def test_warn_if_mock_clobbered_real_collections(
+    config_options: Options,
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Warn when legacy mock stubs remain under the real collections tree."""
+    from ansiblelint._mockings import _perform_mockings
+    from ansiblelint.constants import MOCK_MODULE_MARKER
+
+    config_options.cache_dir = tmp_path
+    config_options.mock_modules = ["ns.coll.sample"]
+    legacy_stub = (
+        tmp_path
+        / "collections"
+        / "ansible_collections"
+        / "ns"
+        / "coll"
+        / "plugins"
+        / "modules"
+        / "sample.py"
+    )
+    legacy_stub.parent.mkdir(parents=True)
+    legacy_stub.write_text(
+        f"{MOCK_MODULE_MARKER}\nfrom ansible.module_utils.basic import AnsibleModule\n",
+        encoding="utf-8",
+    )
+
+    with caplog.at_level("WARNING"):
+        _perform_mockings(options=config_options)
+
+    assert "Found ansible-lint mock stub at" in caplog.text
+    assert "Reinstall affected collections" in caplog.text
+
+
+def test_safe_path_under_root_rejects_invalid_parts(tmp_path: Path) -> None:
+    """Path helper rejects traversal and separator injection."""
+    from ansiblelint._mockings import _safe_path_under_root
+
+    root = tmp_path / "ansible-lint-mocks"
+    root.mkdir()
+
+    assert _safe_path_under_root(root, "roles", "valid_role") is not None
+    assert _safe_path_under_root(root, "roles", "..", "outside") is None
+    assert _safe_path_under_root(root, "roles", "nested/role") is None
+    assert _safe_path_under_root(root, "roles", "") is None
