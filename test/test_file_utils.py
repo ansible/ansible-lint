@@ -684,7 +684,7 @@ def test_expand_dirs_in_lintables_warns_on_expansion(
     lintables: set[Lintable] = {Lintable(".")}
     options.lintables = ["."]
     options.exclude_paths = []
-    with caplog.at_level(logging.WARNING, logger="ansiblelint.file_utils"):
+    with caplog.at_level(logging.WARNING):
         expand_dirs_in_lintables(lintables)
     assert "Directory expansion discovered" in caplog.text
     assert "exclude_paths" in caplog.text
