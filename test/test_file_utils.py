@@ -671,6 +671,7 @@ def test_expand_dirs_in_lintables_relative_paths(tmp_path: Path) -> None:
 def test_expand_dirs_in_lintables_warns_on_expansion(
     tmp_path: Path,
     caplog: pytest.LogCaptureFixture,
+    monkeypatch: MonkeyPatch,
 ) -> None:
     """Directory expansion emits a warning when new files are discovered."""
     project_dir = tmp_path / "project"
@@ -679,15 +680,11 @@ def test_expand_dirs_in_lintables_warns_on_expansion(
     task_file = role_dir / "tasks" / "main.yml"
     task_file.write_text("---\n- debug: msg=hi\n", encoding="utf-8")
 
-    original_cwd = Path.cwd()
-    try:
-        os.chdir(project_dir)
-        lintables: set[Lintable] = {Lintable(".")}
-        options.lintables = ["."]
-        options.exclude_paths = []
-        with caplog.at_level(logging.WARNING, logger="ansiblelint.file_utils"):
-            expand_dirs_in_lintables(lintables)
-        assert "Directory expansion discovered" in caplog.text
-        assert "exclude_paths" in caplog.text
-    finally:
-        os.chdir(original_cwd)
+    monkeypatch.chdir(project_dir)
+    lintables: set[Lintable] = {Lintable(".")}
+    options.lintables = ["."]
+    options.exclude_paths = []
+    with caplog.at_level(logging.WARNING, logger="ansiblelint.file_utils"):
+        expand_dirs_in_lintables(lintables)
+    assert "Directory expansion discovered" in caplog.text
+    assert "exclude_paths" in caplog.text
