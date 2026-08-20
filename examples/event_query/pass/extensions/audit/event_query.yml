@@ -13,6 +13,19 @@ vmware.vmware.cluster_info:
       }
     }
 
+example.nested.braces_module:
+  query: >-
+    .data | {
+      name: .hostname,
+      canonical_facts: {
+        guid: .guid
+      },
+      facts: {
+        device_type: "virtual_machine",
+        metadata: { platform: "aws", region: .region }
+      }
+    }
+
 microsoft.ad.computer:
   query: >-
     if ($data.object_guid // null) != null

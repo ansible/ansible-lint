@@ -61,6 +61,24 @@ _FQCN_PATTERN = re.compile(r"^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_
 _REQUIRED_OUTPUT_KEYS = {"name", "canonical_facts", "facts"}
 
 
+def _extract_braced_block(text: str, keyword: str) -> str | None:
+    """Extract content between braces after 'keyword: {', handling nesting."""
+    pattern = re.compile(rf"\b{keyword}\s*:\s*\{{")
+    m = pattern.search(text)
+    if not m:
+        return None
+    depth = 1
+    start = m.end()
+    for i in range(start, len(text)):
+        if text[i] == "{":
+            depth += 1
+        elif text[i] == "}":
+            depth -= 1
+            if depth == 0:
+                return text[start:i]
+    return None
+
+
 class EventQueryRule(AnsibleLintRule):
     """Validate indirect node counting event_query.yml files."""
 
@@ -73,7 +91,7 @@ class EventQueryRule(AnsibleLintRule):
     )
     severity = "HIGH"
     tags = ["metadata", "aap"]
-    version_changed = "25.0.0"
+    version_changed = "26.9.0"
     _ids = {
         "event-query[module-key-format]": "Module key must be a fully qualified collection name (namespace.collection.module).",
         "event-query[missing-query]": "Each module entry must have a 'query' field.",
@@ -88,9 +106,12 @@ class EventQueryRule(AnsibleLintRule):
         if file.path.name != "event_query.yml":
             return []
 
-        # Only match files under extensions/audit/
         parts = file.path.parts
-        if "extensions" not in parts or "audit" not in parts:
+        try:
+            ext_idx = parts.index("extensions")
+            if parts[ext_idx + 1] != "audit":
+                return []
+        except (ValueError, IndexError):
             return []
 
         results: list[MatchError] = []
@@ -151,15 +172,8 @@ class EventQueryRule(AnsibleLintRule):
                 if not re.search(rf"\b{field}\s*:", query)
             )
 
-            # Check for device_type inside the facts block, not at top level
-            # Use \b anchor so "facts:" doesn't match inside "canonical_facts:"
-            facts_match = re.search(
-                r"\bfacts\s*:\s*\{([^}]*)\}",
-                query,
-                re.DOTALL,
-            )
-            if facts_match:
-                facts_content = facts_match.group(1)
+            facts_content = _extract_braced_block(query, "facts")
+            if facts_content is not None:
                 if "device_type" not in facts_content:
                     results.append(
                         self.create_matcherror(
@@ -175,8 +189,7 @@ class EventQueryRule(AnsibleLintRule):
                     )
                     if dt_match:
                         device_type = dt_match.group(1)
-                        normalized = device_type.lower().replace(" ", "_")
-                        if normalized not in VALID_DEVICE_TYPES:
+                        if device_type not in VALID_DEVICE_TYPES:
                             results.append(
                                 self.create_matcherror(
                                     message=(
@@ -191,14 +204,6 @@ class EventQueryRule(AnsibleLintRule):
                                     filename=file,
                                 ),
                             )
-            elif "device_type" not in query:
-                results.append(
-                    self.create_matcherror(
-                        message=f"Module '{module_key}' query output should include 'device_type' in the facts section.",
-                        tag="event-query[device-type-missing]",
-                        filename=file,
-                    ),
-                )
             else:
                 results.append(
                     self.create_matcherror(
@@ -208,12 +213,7 @@ class EventQueryRule(AnsibleLintRule):
                     ),
                 )
 
-            # Check canonical_facts is not null and has at least one identifier
-            cf_null_match = re.search(
-                r"canonical_facts\s*:\s*null\b",
-                query,
-            )
-            if cf_null_match:
+            if re.search(r"canonical_facts\s*:\s*null\b", query):
                 results.append(
                     self.create_matcherror(
                         message=f"Module '{module_key}' canonical_facts must define at least one non-null unique identifier.",
@@ -222,13 +222,8 @@ class EventQueryRule(AnsibleLintRule):
                     ),
                 )
             else:
-                cf_match = re.search(
-                    r"canonical_facts\s*:\s*\{([^}]*)\}",
-                    query,
-                    re.DOTALL,
-                )
-                if cf_match:
-                    cf_content = cf_match.group(1).strip()
+                cf_content = _extract_braced_block(query, "canonical_facts")
+                if cf_content is not None:
                     non_null_fields = [
                         line.strip()
                         for line in cf_content.split(",")
@@ -296,8 +291,8 @@ if "pytest" in sys.modules:
             pytest.param(
                 "examples/event_query/fail_null_canonical_facts/extensions/audit/event_query.yml",
                 [
-                    "event-query[canonical-facts-empty]",
                     "event-query[device-type-missing]",
+                    "event-query[canonical-facts-empty]",
                 ],
                 id="null-canonical-facts",
             ),

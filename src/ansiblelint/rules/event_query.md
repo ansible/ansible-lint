@@ -26,7 +26,8 @@ field with a jq expression that produces an object with these required fields:
 | `canonical_facts` | An object with at least one non-null unique identifier (e.g., GUID, MOID, ARN) |
 | `facts` | An object containing `device_type` and other classification metadata |
 
-The `device_type` field in `facts` must use a value from the normalized taxonomy:
+The `device_type` field in `facts` must use an exact value from the normalized
+taxonomy (case-sensitive, no spaces — use snake_case):
 
 | Category | Valid Values |
 |---|---|
