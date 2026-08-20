@@ -10,15 +10,17 @@ instances, network devices, virtual machines, etc.) should include an
 
 ## Required file location
 
-```
+```text
 <collection_root>/extensions/audit/event_query.yml
 ```
 
 ## Schema
 
 Each top-level key must be a fully qualified collection name (FQCN) for the
-module whose return data the query processes. The value must contain a `query`
-field with a jq expression that produces an object with these required fields:
+module whose return data the query processes. Keys beginning with `__` (double
+underscore) are reserved for metadata and are exempt from FQCN validation.
+The value must contain a `query` field with a jq expression that produces an
+object with these required fields:
 
 | Field | Description |
 |---|---|

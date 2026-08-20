@@ -291,8 +291,8 @@ if "pytest" in sys.modules:
             pytest.param(
                 "examples/event_query/fail_null_canonical_facts/extensions/audit/event_query.yml",
                 [
-                    "event-query[device-type-missing]",
                     "event-query[canonical-facts-empty]",
+                    "event-query[device-type-missing]",
                 ],
                 id="null-canonical-facts",
             ),
