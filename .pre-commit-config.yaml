@@ -67,7 +67,7 @@ repos:
           - "-o"
           - ".config/requirements-lock.txt"
   - repo: https://github.com/biomejs/pre-commit
-    rev: "v2.5.9"
+    rev: "v2.5.10"
     hooks:
       - id: biome-check
         name: biome
