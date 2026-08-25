@@ -28,6 +28,7 @@ import collections.abc
 import contextlib
 import copy
 import inspect
+import json
 import logging
 import os
 import re
@@ -120,6 +121,8 @@ FMT_RE = re.compile(r"^# fmt:\s+(\S+)")
 
 _logger = logging.getLogger(__name__)
 
+_SYNTAX_CHECK_FAILED = "syntax_check_failed"
+
 # Vault secrets are resolved on first use and cached for the process lifetime.
 _vault_secrets: list[tuple[str, Any]] | None = None
 
@@ -208,6 +211,54 @@ def path_dwim(basedir: str, given: str) -> str:
     dataloader = _make_dataloader()
     dataloader.set_basedir(basedir)
     return str(dataloader.path_dwim(given))
+
+
+def _include_search_basedirs(lintable: Lintable | None, basedir: str) -> list[str]:
+    """Return basedirs to use while resolving nested task includes."""
+    basedirs = [basedir]
+    parent = lintable.parent if lintable else None
+    while parent:
+        if parent.path.is_absolute():
+            parent_basedir = str(parent.path.parent)
+            if parent_basedir not in basedirs:
+                basedirs.append(parent_basedir)
+        parent = parent.parent
+    return basedirs
+
+
+def _resolve_include_path(
+    lintable: Lintable | None,
+    basedir: str,
+    file_name: str,
+) -> str:
+    """Resolve a task include path, accounting for nested include context."""
+    search_basedirs = _include_search_basedirs(lintable, basedir)
+
+    for search_basedir in search_basedirs:
+        for candidate in (
+            path_dwim(search_basedir, file_name),
+            path_dwim(os.path.join(search_basedir, "tasks"), file_name),
+        ):
+            if os.path.exists(candidate):
+                return candidate
+
+    # Keep the historical upward search as a fallback for role layouts and
+    # task files that rely on project-root-relative include paths. When no
+    # candidate exists, return the same final path the old climbing logic used
+    # so missing external-ish includes are not pulled back into the current role.
+    result = path_dwim(basedir, file_name)
+    search_basedir = basedir
+    while True:
+        if os.path.exists(result):
+            return result
+        tasks_result = path_dwim(os.path.join(search_basedir, "tasks"), file_name)
+        if os.path.exists(tasks_result):
+            return tasks_result
+        new_basedir = os.path.dirname(search_basedir)
+        if new_basedir == search_basedir:
+            return result
+        search_basedir = new_basedir
+        result = path_dwim(search_basedir, file_name)
 
 
 def ansible_templar(basedir: Path, templatevars: Any) -> Templar:
@@ -468,21 +519,11 @@ class HandleChildren:
         else:
             return []
 
-        result = path_dwim(basedir, file)
-        while True:
-            if os.path.exists(result):
-                break
-            tasks_result = path_dwim(os.path.join(basedir, "tasks"), file)
-            if os.path.exists(tasks_result):
-                result = tasks_result
-                break
-            new_basedir = os.path.dirname(basedir)
-            if new_basedir == basedir:
-                break
-            basedir = new_basedir
-            result = path_dwim(basedir, file)
+        result = _resolve_include_path(lintable, basedir, file)
+        child = Lintable(result, kind=parent_type)
+        child.parent = lintable
 
-        return [Lintable(result, kind=parent_type)]
+        return [child]
 
     def taskshandlers_children(
         self,
@@ -511,6 +552,7 @@ class HandleChildren:
                     basedir,
                     k,
                     parent_type,
+                    lintable=lintable,
                 )
                 results.append(children)
                 continue
@@ -601,6 +643,52 @@ class HandleChildren:
                 results.extend(self._look_for_role_files(basedir, role))
         return results
 
+    def _recheck_playbook_with_extra_vars(self, possible_path: Path) -> bool:
+        """Re-check playbook syntax with configured extra_vars.
+
+        has_playbook() runs its syntax check without our configured extra_vars,
+        so it wrongly fails on a local playbook that only loads once those vars
+        are defined. Re-check with them before giving up.
+        """
+        extra_vars = self.app.options.extra_vars
+        if not extra_vars:
+            return False
+        return (
+            self.app.runtime.run(
+                [
+                    "ansible-playbook",
+                    "--syntax-check",
+                    str(possible_path),
+                    "--extra-vars",
+                    json.dumps(extra_vars),
+                ],
+            ).returncode
+            == 0
+        )
+
+    def _resolve_playbook_path(
+        self,
+        possible_path: Path,
+        is_collection: bool,
+        parent_type: FileType,
+        name: str,
+    ) -> list[Lintable] | tuple[str, str]:
+        """Check a single playbook path and return Lintable list or (tag, message) on failure."""
+        if not possible_path.exists():
+            return ("not_found", f"Failed to find {name} playbook.")
+        if not self.app.runtime.has_playbook(str(possible_path)):
+            if not is_collection and self._recheck_playbook_with_extra_vars(
+                possible_path
+            ):
+                return [Lintable(possible_path, kind=parent_type)]
+            return (
+                _SYNTAX_CHECK_FAILED,
+                f"Failed to load {name} playbook due to failing syntax check.",
+            )
+        if is_collection:
+            return []  # don't lint foreign playbook
+        return [Lintable(possible_path, kind=parent_type)]
+
     def import_playbook_children(
         self,
         lintable: Lintable,
@@ -609,58 +697,58 @@ class HandleChildren:
         parent_type: FileType,
     ) -> list[Lintable]:
         """Include import_playbook children."""
-
-        def append_playbook_path(loc: str, playbook_path: list[str]) -> None:
-            possible_paths.append(
-                Path(
-                    path_dwim(
-                        os.path.expanduser(loc),
-                        os.path.join(
-                            "ansible_collections",
-                            namespace_name,
-                            collection_name,
-                            "playbooks",
-                            *playbook_path,
-                        ),
-                    ),
-                ),
-            )
-
-        # import_playbook only accepts a string as argument (no dict syntax)
         if not isinstance(v, str):
             return []
 
-        possible_paths = []
         namespace_name, collection_name, *playbook_path = parse_fqcn(v)
-        if namespace_name and collection_name:
-            for loc in self.app.runtime.config.collections_paths:
-                append_playbook_path(
-                    loc,
-                    [*playbook_path[:-1], f"{playbook_path[-1]}.yml"],
-                )
-                append_playbook_path(
-                    loc,
-                    [*playbook_path[:-1], f"{playbook_path[-1]}.yaml"],
-                )
-        else:
-            possible_paths.append(lintable.path.parent / v)
+        is_collection = bool(namespace_name and collection_name)
+        possible_paths = self._get_playbook_paths(
+            lintable, v, namespace_name, collection_name, playbook_path
+        )
 
         for possible_path in possible_paths:
-            if not possible_path.exists():
-                msg = f"Failed to find {v} playbook."
-            elif not self.app.runtime.has_playbook(
-                str(possible_path),
-            ):
-                msg = f"Failed to load {v} playbook due to failing syntax check."
-                break
-            elif namespace_name and collection_name:
-                # don't lint foreign playbook
+            result = self._resolve_playbook_path(
+                possible_path, is_collection, parent_type, v
+            )
+            if isinstance(result, list):
+                return result
+            tag, message = result
+            if tag == _SYNTAX_CHECK_FAILED:
+                _logger.error(message)
                 return []
-            else:
-                return [Lintable(possible_path, kind=parent_type)]
 
-        _logger.error(msg)
+        _logger.error("Failed to find %s playbook.", v)
         return []
+
+    def _get_playbook_paths(
+        self,
+        lintable: Lintable,
+        v: str,
+        namespace_name: str,
+        collection_name: str,
+        playbook_path: list[str],
+    ) -> list[Path]:
+        """Build list of possible playbook paths to check for an import_playbook reference."""
+        if not (namespace_name and collection_name):
+            return [lintable.path.parent / v]
+
+        return [
+            Path(
+                path_dwim(
+                    os.path.expanduser(loc),
+                    os.path.join(
+                        "ansible_collections",
+                        namespace_name,
+                        collection_name,
+                        "playbooks",
+                        *playbook_path[:-1],
+                        f"{playbook_path[-1]}{ext}",
+                    ),
+                ),
+            )
+            for loc in self.app.runtime.config.collections_paths
+            for ext in (".yml", ".yaml")
+        ]
 
     def _look_for_role_files(self, basedir: str, role: str) -> list[Lintable]:
         role_path = self._rolepath(basedir, role)
@@ -739,6 +827,7 @@ def _get_task_handler_children_for_tasks_or_playbooks(
     basedir: str,
     k: Any,
     parent_type: FileType,
+    lintable: Lintable | None = None,
 ) -> Lintable:
     """Try to get children of taskhandler for include/import tasks/playbooks."""
     child_type = k if parent_type == "playbook" else parent_type
@@ -768,20 +857,11 @@ def _get_task_handler_children_for_tasks_or_playbooks(
             if not file_name:
                 # ignore invalid data (syntax check will outside the scope)
                 continue
-            f = path_dwim(basedir, file_name)
-            while True:
-                if os.path.exists(f):
-                    break
-                tasks_f = path_dwim(os.path.join(basedir, "tasks"), file_name)
-                if os.path.exists(tasks_f):
-                    f = tasks_f
-                    break
-                new_basedir = os.path.dirname(basedir)
-                if new_basedir == basedir:
-                    break
-                basedir = new_basedir
-                f = path_dwim(basedir, file_name)
-            return Lintable(f, kind=child_type)
+            f = _resolve_include_path(lintable, basedir, file_name)
+            child = Lintable(f, kind=child_type)
+            if lintable:
+                child.parent = lintable
+            return child
     msg = f"The node contains none of: {', '.join(sorted(INCLUSION_ACTION_NAMES))}"
     raise LookupError(msg)
 

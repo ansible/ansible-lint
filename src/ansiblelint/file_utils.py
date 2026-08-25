@@ -614,12 +614,23 @@ def expand_dirs_in_lintables(lintables: set[Lintable]) -> None:
     if should_expand:
         # this relies on git and we do not want to call unless needed
         all_files = discover_lintables(options)
+        initial_count = len(lintables)
 
         for item in copy.copy(lintables):
             if item.path.is_dir():
                 for filename in all_files:
                     if path_is_inside(Path(filename), item.path):
                         lintables.add(Lintable(filename))
+
+        expanded_count = len(lintables) - initial_count
+        if expanded_count > 0:
+            _logger.warning(
+                "Directory expansion discovered %d file(s). "
+                "If this is more than expected, use 'exclude_paths' in your "
+                "ansible-lint configuration to narrow the scope. "
+                "See: https://docs.ansible.com/projects/lint/configuring/",
+                expanded_count,
+            )
 
 
 def _guess_parent(lintable: Lintable) -> Lintable | None:
