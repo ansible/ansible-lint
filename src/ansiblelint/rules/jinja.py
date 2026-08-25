@@ -105,6 +105,17 @@ class JinjaRuleTMetaSpacing(RuleMatchTransformMeta):
         return f"{self.key}={self.value} at {self.path} fixed to {self.fixed}"
 
 
+# Indentation immediately before a Jinja block tag. Lex/unlex cannot restore
+# whitespace eaten by ``{%-`` / ``-%}`` trim markers, so that indent is not a
+# real spacing problem.
+_BLOCK_TAG_INDENT = re.compile(r"(?m)^[ \t]+(?=\{%)")
+
+
+def _is_block_indent_only_change(original: str, reformatted: str) -> bool:
+    """Return True when texts differ only by indentation of Jinja block tags."""
+    return _BLOCK_TAG_INDENT.sub("", original) == _BLOCK_TAG_INDENT.sub("", reformatted)
+
+
 def _is_broken_rewrite(
     env: jinja2.Environment, original: str, reformatted: str
 ) -> bool:
@@ -503,6 +514,12 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
         if failed and _is_broken_rewrite(self.env, text, reformatted):
             return _uncook(text, implicit=implicit), "", "spacing"
 
+        # Nested {%- if -%} / {%- else -%} blocks lose their indent on
+        # lex/unlex because the '-' trim eats following whitespace. That is
+        # not a spacing improvement; --fix would make the template worse.
+        if failed and _is_block_indent_only_change(text, reformatted):
+            return _uncook(text, implicit=implicit), "", "spacing"
+
         reformatted = _uncook(reformatted, implicit=implicit)
         details = (
             f"Jinja2 template rewrite recommendation: `{reformatted}`."
@@ -843,6 +860,37 @@ if "pytest" in sys.modules:
                 "'{ {{- item.limits -}} }'",
                 "spacing",
                 id="47",
+            ),
+            # https://github.com/ansible/ansible-lint/issues/5146
+            pytest.param(
+                (
+                    "{%- if existing_service_name in "
+                    "services_stop_existing.ansible_facts.services -%}\n"
+                    "  {%- if services_stop_existing.ansible_facts.services"
+                    "[existing_service_name]['status'] == 'masked' -%}\n"
+                    "    true\n"
+                    "  {%- else -%}\n"
+                    "    false\n"
+                    "  {%- endif -%}\n"
+                    "{%- else -%}\n"
+                    "  false\n"
+                    "{%- endif -%}"
+                ),
+                (
+                    "{%- if existing_service_name in "
+                    "services_stop_existing.ansible_facts.services -%}\n"
+                    "  {%- if services_stop_existing.ansible_facts.services"
+                    "[existing_service_name]['status'] == 'masked' -%}\n"
+                    "    true\n"
+                    "  {%- else -%}\n"
+                    "    false\n"
+                    "  {%- endif -%}\n"
+                    "{%- else -%}\n"
+                    "  false\n"
+                    "{%- endif -%}"
+                ),
+                "spacing",
+                id="48",
             ),
         ),
     )
