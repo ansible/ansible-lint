@@ -43,6 +43,8 @@ class App:
 
     def __init__(self, options: Options):
         """Construct app run based on already loaded configuration."""
+        if options.profile:
+            options.skip_list.extend(PROFILES[options.profile].get("skip_list", []))
         options.skip_list = _sanitize_list_options(options.skip_list)
         options.warn_list = _sanitize_list_options(options.warn_list)
 
