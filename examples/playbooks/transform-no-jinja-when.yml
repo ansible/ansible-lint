@@ -19,3 +19,21 @@
     - role: hello
       when:
         - "{{ '1' = '1' }}"
+
+# Jinja is embedded inside a larger quoted string; stripping {{ }} would change the meaning, so skip.
+- name: Four
+  hosts: all
+  tasks:
+    - name: Test when with jinja2 embedded in quoted string # noqa: jinja[spacing]
+      ansible.builtin.debug:
+        msg: text
+      when: not "version={{ expected_version }}" in stdout
+
+# The quoted string is exactly a jinja block, but stripping it still changes meaning, so skip too.
+- name: Five
+  hosts: all
+  tasks:
+    - name: Test when with a whole jinja2 block quoted # noqa: jinja[spacing]
+      ansible.builtin.debug:
+        msg: text
+      when: "'{{ v }}' == '8'"
