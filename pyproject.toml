@@ -239,6 +239,8 @@ doctest_optionflags = ["ALLOW_UNICODE", "ELLIPSIS"]
 filterwarnings = [
   # We raise one non critical warning from our own conftest.py:
   "always::pytest.PytestWarning",
+  # coverage thread tracing can race with daemon thread startup under pytest 9.x
+  "ignore:Exception ignored in thread.*trace function:pytest.PytestUnraisableExceptionWarning",
   "error",
   # py312 ansible-core
   # https://github.com/ansible/ansible/issues/81906
