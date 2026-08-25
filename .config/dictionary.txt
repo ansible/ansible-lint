@@ -26,6 +26,7 @@ Sorin
 Taskfile
 Taskfiles
 Tsukinowa
+Unraisable
 WSLENV
 addoption
 addopts

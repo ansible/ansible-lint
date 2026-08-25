@@ -239,14 +239,14 @@ doctest_optionflags = ["ALLOW_UNICODE", "ELLIPSIS"]
 filterwarnings = [
   # We raise one non critical warning from our own conftest.py:
   "always::pytest.PytestWarning",
-  # coverage thread tracing can race with daemon thread startup under pytest 9.x
-  "ignore:Exception ignored in thread.*trace function:pytest.PytestUnraisableExceptionWarning",
   "error",
   # py312 ansible-core
   # https://github.com/ansible/ansible/issues/81906
   "ignore:'importlib.abc.TraversableResources' is deprecated and slated for removal in Python 3.14:DeprecationWarning",
   # https://github.com/ansible/ansible/pull/80968
   "ignore:Attribute s is deprecated and will be removed in Python 3.14; use value instead:DeprecationWarning",
+  # coverage thread tracing can race with daemon thread startup under pytest 9.x
+  "ignore:Exception ignored in thread.*trace function:pytest.PytestUnraisableExceptionWarning",
 ]
 junit_family = "xunit2"
 markers = ["libyaml: tests that will pass only with pyyaml libyaml is present."]
