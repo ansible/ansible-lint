@@ -303,10 +303,9 @@ def test_guess_install_method_pip_error(
         assert not result
 
 
-@patch("ansiblelint.config.in_venv", return_value=False)
 @patch("ansiblelint.config.distribution")
 def test_guess_install_method_no_uninstall_paths(
-    mock_dist: MagicMock, mock_in_venv: MagicMock
+    mock_dist: MagicMock,
 ) -> None:
     """Test guess_install_method when no uninstall paths found."""
     mock_dist_obj = MagicMock()
