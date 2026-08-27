@@ -35,7 +35,8 @@ classifiers = [
 dependencies = [
   "ansible-compat>=26.3.0",
   "ansible-core>=2.16.19,!=2.17.*",
-  "black>=24.3.0",
+  "black>=25.2.0",
+  "cffi>=1.15.1",  # indirect dependency of ruamel-yaml
   "cryptography>=37",
   "distro>=1.9.0",
   "filelock>=3.8.2",
@@ -65,7 +66,7 @@ ansible-lint = "ansiblelint.__main__:_run_cli_entrypoint"
 [dependency-groups]
 dev = [
   "ansible-creator>=25.8.0",  # indirect dependency of ipython
-  "black>=25.1.0",  # indirect dependency of ipython
+  "black>=25.2.0",  # indirect dependency of ipython
   "coverage-enable-subprocess>=1.0",  # indirect dependency
   "coverage[toml]>=7.2.0",
   "decorator>=5.1.1",
