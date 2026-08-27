@@ -36,7 +36,7 @@ dependencies = [
   "ansible-compat>=26.3.0",
   "ansible-core>=2.16.19,!=2.17.*",
   "black>=25.2.0",
-  "cffi>=1.15.1",  # indirect dependency of ruamel-yaml
+  "cffi>=2.0.0",  # indirect dependency of cryptography
   "cryptography>=37",
   "distro>=1.9.0",
   "filelock>=3.8.2",
@@ -46,8 +46,7 @@ dependencies = [
   "pyyaml>=6.0.1 ; python_version < '3.14'",
   "pyyaml>=6.0.1 ; python_version >= '3.14'",  # py314 support
   "referencing>=0.36.2",
-  "ruamel-yaml>=0.18.11",
-  "ruamel-yaml-clib>=0.2.12 ; python_version < '3.14'",
+  "ruamel-yaml>=0.19.1",
   "subprocess-tee>=0.4.1",
   "wcmatch>=8.1.2 ; python_version < '3.12'",
   "wcmatch>=8.5.0 ; python_version >= '3.12'",
@@ -87,8 +86,7 @@ dev = [
   "pytest-mock>=3.15.0",
   "pytest-xdist[psutil]>=2.1.0",  # do not add setproctitle here due to build issues
   "pyyaml>=6.0.1",
-  "ruamel-yaml>=0.18.11",
-  "ruamel-yaml-clib>=0.2.12 ; python_full_version < '3.14'",
+  "ruamel-yaml>=0.19.1",
   "tombi>=0.7.26",
   "tox>=4.24.2",
   "tox-extra>=2.1",
