@@ -6,6 +6,7 @@ from __future__ import annotations
 import builtins
 import os
 import shutil
+import sys
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 from unittest import mock
@@ -397,7 +398,7 @@ def test_transformer_sets_wide_yaml_dump_for_warn_line_length(
     transformer.run()
 
     assert yaml_instances
-    assert yaml_instances[-1].width == 4096
+    assert yaml_instances[-1].width == sys.maxsize
 
 
 @pytest.mark.parametrize(

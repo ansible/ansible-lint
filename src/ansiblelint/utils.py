@@ -883,8 +883,7 @@ def _strip_internal_keys_from_value(value: Any) -> None:
         _strip_internal_keys_from_mapping(value)
     elif isinstance(value, list):
         for item in value:
-            if isinstance(item, MutableMapping):
-                _strip_internal_keys_from_mapping(item)
+            _strip_internal_keys_from_value(item)
 
 
 def _remove_task_internal_keys(

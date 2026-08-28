@@ -856,6 +856,9 @@ def test_remove_task_internal_keys_nested_lists() -> None:
     assert "__file__" not in nested
     assert "__line__" not in nested["block"][0]
     utils._strip_internal_keys_from_value([{"__line__": 2}, "skip"])  # ruff:ignore[private-member-access]
+    double_nested = [[{"__line__": 3}]]
+    utils._strip_internal_keys_from_value(double_nested)  # ruff:ignore[private-member-access]
+    assert "__line__" not in double_nested[0][0]
     assert utils._remove_task_internal_keys({"__line__": 3}) == {}  # ruff:ignore[private-member-access]
 
 

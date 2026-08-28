@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import logging
+import sys
 from typing import TYPE_CHECKING, cast
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
@@ -137,7 +138,7 @@ class Transformer:
 
                 if self._should_preserve_long_lines():
                     # Avoid folding long scalars when line-length is warn-only (#5030).
-                    yaml.width = 4096
+                    yaml.width = sys.maxsize
 
                 _logger.debug("%s %s, version=%s", self.DUMP_MSG, file, yaml.version)
                 # noinspection PyUnboundLocalVariable
