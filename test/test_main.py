@@ -638,7 +638,7 @@ def test_process_fix_rerun_matches_previously_resolved_keeps_warn_list(
     from ansiblelint.__main__ import _process_fix_rerun_matches
 
     warn_match = _yaml_line_length_match()
-    nonwarn_match = MatchError(
+    non_warn_match = MatchError(
         message="Wrong indentation",
         lintable=warn_match.lintable,
         tag="yaml[indentation]",
@@ -651,10 +651,10 @@ def test_process_fix_rerun_matches_previously_resolved_keeps_warn_list(
         return_value=LintResult([], set()),
     )
 
-    # nonwarn_match is processed first (reverse iteration order), so its
+    # non_warn_match is processed first (reverse iteration order), so its
     # rerun -- which finds nothing -- marks (rule.id, filename) resolved
     # before warn_match is reached.
-    result = LintResult([warn_match, nonwarn_match], set())
+    result = LintResult([warn_match, non_warn_match], set())
     _process_fix_rerun_matches(
         config_options,
         result,
@@ -663,7 +663,7 @@ def test_process_fix_rerun_matches_previously_resolved_keeps_warn_list(
     )
 
     assert warn_match in result.matches
-    assert nonwarn_match not in result.matches
+    assert non_warn_match not in result.matches
 
 
 def test_process_fix_rerun_matches_restores_options_on_error(
