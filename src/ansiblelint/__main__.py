@@ -306,7 +306,9 @@ def _process_fix_rerun_matches(
                 continue
 
             uid = (match.rule.id, match.filename)
-            if uid in resolved:
+            if uid in resolved and not _is_warn_list_match(
+                match, runtime_options.warn_list
+            ):
                 _logger.debug("Previously resolved: %s", match)
                 result.matches.pop(idx)
                 continue

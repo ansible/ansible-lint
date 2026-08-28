@@ -622,6 +622,50 @@ def test_process_fix_rerun_matches_drops_previously_resolved(
     assert result.matches == []
 
 
+def test_process_fix_rerun_matches_previously_resolved_keeps_warn_list(
+    mocker: MockerFixture,
+    config_options: Options,
+    default_rules_collection: RulesCollection,
+) -> None:
+    """The previously-resolved shortcut must not drop a warn_list match.
+
+    Regression test: a non-warn yaml match and a yaml[line-length] warn_list
+    match share the same (rule.id, filename) uid. If the non-warn match is
+    processed first and its rerun finds nothing, the uid gets marked
+    resolved -- that must not cause the warn_list match to be silently
+    popped via the shortcut without going through _handle_warn_list_rerun.
+    """
+    from ansiblelint.__main__ import _process_fix_rerun_matches
+
+    warn_match = _yaml_line_length_match()
+    nonwarn_match = MatchError(
+        message="Wrong indentation",
+        lintable=warn_match.lintable,
+        tag="yaml[indentation]",
+        lineno=1,
+        rule=warn_match.rule,
+    )
+    config_options.warn_list = ["yaml[line-length]"]
+    mocker.patch(
+        "ansiblelint.__main__.get_matches",
+        return_value=LintResult([], set()),
+    )
+
+    # nonwarn_match is processed first (reverse iteration order), so its
+    # rerun -- which finds nothing -- marks (rule.id, filename) resolved
+    # before warn_match is reached.
+    result = LintResult([warn_match, nonwarn_match], set())
+    _process_fix_rerun_matches(
+        config_options,
+        result,
+        default_rules_collection,
+        len(result.matches),
+    )
+
+    assert warn_match in result.matches
+    assert nonwarn_match not in result.matches
+
+
 def test_process_fix_rerun_matches_restores_options_on_error(
     mocker: MockerFixture,
     config_options: Options,
