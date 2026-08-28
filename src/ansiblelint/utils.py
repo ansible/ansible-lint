@@ -41,7 +41,7 @@ from collections.abc import (
     Sequence,
 )
 from dataclasses import MISSING, dataclass, field
-from functools import lru_cache
+from functools import lru_cache, partial
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -1328,6 +1328,42 @@ def add_action_type(  # type: ignore[no-any-unimported]
     return results
 
 
+def _compose_node_with_linenumbers(
+    loader: AnsibleLoader,  # type: ignore[valid-type]
+    parent: yaml.nodes.Node | None,
+    index: int,
+) -> yaml.nodes.Node:
+    """Override for Composer.compose_node that records line numbers."""
+    # the line number where the previous token has ended (plus empty lines)
+    node = Composer.compose_node(loader, parent, index)  # type: ignore[no-untyped-call,arg-type,unused-ignore]
+    if not isinstance(node, yaml.nodes.Node):
+        msg = "Unexpected yaml data."
+        raise TypeError(msg)
+    if hasattr(loader, "line"):  # pragma: no cover
+        line = loader.line  # type: ignore[attr-defined]
+        node.__line__ = line + 1  # type: ignore[attr-defined]
+    return node
+
+
+def _construct_mapping_with_linenumbers(  # type: ignore[no-any-unimported]
+    loader: AnsibleLoader,  # type: ignore[valid-type]
+    filename: Path,
+    node: yaml.MappingNode,
+    deep: bool = False,  # ruff:ignore[boolean-default-value-positional-argument]
+) -> AnsibleMapping:
+    """Override for AnsibleConstructor.construct_mapping that records line numbers."""
+    # pyright: ignore[reportArgumentType]
+    mapping: AnsibleMapping = AnsibleConstructor.construct_mapping(  # type: ignore[no-any-unimported]
+        loader, node, deep=deep
+    )
+    if hasattr(node, LINE_NUMBER_KEY):
+        mapping[LINE_NUMBER_KEY] = getattr(node, LINE_NUMBER_KEY)
+    elif hasattr(mapping, "_line_number"):
+        mapping[LINE_NUMBER_KEY] = mapping._line_number  # ruff:ignore[private-member-access]
+    mapping[FILENAME_KEY] = filename
+    return mapping
+
+
 @lru_cache(maxsize=256)
 def _parse_yaml_linenumbers_cached(  # type: ignore[no-any-unimported]
     abspath: str,
@@ -1338,35 +1374,6 @@ def _parse_yaml_linenumbers_cached(  # type: ignore[no-any-unimported]
     result = AnsibleSequence()
     filename = Path(abspath)
 
-    # signature of Composer.compose_node
-    def compose_node(parent: yaml.nodes.Node | None, index: int) -> yaml.nodes.Node:
-        # the line number where the previous token has ended (plus empty lines)
-        node = Composer.compose_node(loader, parent, index)  # type: ignore[no-untyped-call,arg-type,unused-ignore]
-        if not isinstance(node, yaml.nodes.Node):
-            msg = "Unexpected yaml data."
-            raise TypeError(msg)
-        if hasattr(loader, "line"):  # pragma: no cover
-            line = loader.line  # type: ignore[attr-defined]
-            node.__line__ = line + 1  # type: ignore[attr-defined]
-        return node
-
-    # signature of AnsibleConstructor.construct_mapping
-    def construct_mapping(  # type: ignore[no-any-unimported]
-        node: yaml.MappingNode,
-        deep: bool = False,  # ruff:ignore[boolean-default-value-positional-argument]
-    ) -> AnsibleMapping:
-        # pyright: ignore[reportArgumentType]
-        mapping: AnsibleMapping = AnsibleConstructor.construct_mapping(  # type: ignore[no-any-unimported]
-            loader, node, deep=deep
-        )
-        if hasattr(node, LINE_NUMBER_KEY):
-            mapping[LINE_NUMBER_KEY] = getattr(node, LINE_NUMBER_KEY)
-        else:
-            if hasattr(mapping, "_line_number"):
-                mapping[LINE_NUMBER_KEY] = mapping._line_number  # ruff:ignore[private-member-access]
-        mapping[FILENAME_KEY] = filename
-        return mapping
-
     try:  # ruff:ignore[too-many-statements-in-try-clause]
         kwargs = {}
         if "vault_password" in inspect.getfullargspec(AnsibleLoader.__init__).args:
@@ -1374,10 +1381,12 @@ def _parse_yaml_linenumbers_cached(  # type: ignore[no-any-unimported]
         # WARNING: 'unused-ignore' is needed below in order to allow mypy to
         # be passing with both pre-2.19 and post-2.19 versions of Ansible core.
         loader = AnsibleLoader(content, **kwargs)
-        # redefine Composer.compose_node
-        loader.compose_node = compose_node  # type: ignore[attr-defined,unused-ignore]
-        # redefine AnsibleConstructor.construct_mapping
-        loader.construct_mapping = construct_mapping  # type: ignore[attr-defined]
+        # redefine Composer.compose_node and AnsibleConstructor.construct_mapping
+        # so parsed nodes/mappings carry line-number metadata.
+        loader.compose_node = partial(_compose_node_with_linenumbers, loader)  # type: ignore[attr-defined,unused-ignore]
+        loader.construct_mapping = partial(  # type: ignore[attr-defined]
+            _construct_mapping_with_linenumbers, loader, filename
+        )
         # while Ansible only accepts single documents, we also need to load
         # multi-documents, as we attempt to load any YAML file, not only
         # Ansible managed ones.
