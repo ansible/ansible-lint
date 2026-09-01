@@ -41,7 +41,7 @@ from collections.abc import (
     Sequence,
 )
 from dataclasses import MISSING, dataclass, field
-from functools import cache, lru_cache
+from functools import lru_cache, partial
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -883,8 +883,7 @@ def _strip_internal_keys_from_value(value: Any) -> None:
         _strip_internal_keys_from_mapping(value)
     elif isinstance(value, list):
         for item in value:
-            if isinstance(item, MutableMapping):
-                _strip_internal_keys_from_mapping(item)
+            _strip_internal_keys_from_value(item)
 
 
 def _remove_task_internal_keys(
@@ -1329,45 +1328,51 @@ def add_action_type(  # type: ignore[no-any-unimported]
     return results
 
 
-@cache
-def parse_yaml_linenumbers(  # type: ignore[no-any-unimported]
-    lintable: Lintable,
-) -> AnsibleBaseYAMLObject | None:
-    """Parse yaml as ansible.utils.parse_yaml but with linenumbers.
+def _compose_node_with_linenumbers(
+    loader: AnsibleLoader,  # type: ignore[valid-type]
+    parent: yaml.nodes.Node | None,
+    index: int,
+) -> yaml.nodes.Node:
+    """Override for Composer.compose_node that records line numbers."""
+    # the line number where the previous token has ended (plus empty lines)
+    node = Composer.compose_node(loader, parent, index)  # type: ignore[no-untyped-call,arg-type,unused-ignore]
+    if not isinstance(node, yaml.nodes.Node):
+        msg = "Unexpected yaml data."
+        raise TypeError(msg)
+    if hasattr(loader, "line"):  # pragma: no cover
+        line = loader.line  # type: ignore[attr-defined]
+        node.__line__ = line + 1  # type: ignore[attr-defined]
+    return node
 
-    The line numbers are stored in each node's LINE_NUMBER_KEY key.
-    """
+
+def _construct_mapping_with_linenumbers(  # type: ignore[no-any-unimported]
+    loader: AnsibleLoader,  # type: ignore[valid-type]
+    filename: Path,
+    node: yaml.MappingNode,
+    deep: bool = False,  # ruff:ignore[boolean-default-value-positional-argument]
+) -> AnsibleMapping:
+    """Override for AnsibleConstructor.construct_mapping that records line numbers."""
+    # pyright: ignore[reportArgumentType]
+    mapping: AnsibleMapping = AnsibleConstructor.construct_mapping(  # type: ignore[no-any-unimported]
+        loader, node, deep=deep
+    )
+    if hasattr(node, LINE_NUMBER_KEY):
+        mapping[LINE_NUMBER_KEY] = getattr(node, LINE_NUMBER_KEY)
+    elif hasattr(mapping, "_line_number"):
+        mapping[LINE_NUMBER_KEY] = mapping._line_number  # ruff:ignore[private-member-access]
+    mapping[FILENAME_KEY] = filename
+    return mapping
+
+
+@lru_cache(maxsize=256)
+def _parse_yaml_linenumbers_cached(  # type: ignore[no-any-unimported]
+    abspath: str,
+    content: str,
+) -> AnsibleBaseYAMLObject | None:
+    """Parse yaml content with linenumbers, cached by path and content."""
     loader: AnsibleLoader  # type: ignore[valid-type]
     result = AnsibleSequence()
-
-    # signature of Composer.compose_node
-    def compose_node(parent: yaml.nodes.Node | None, index: int) -> yaml.nodes.Node:
-        # the line number where the previous token has ended (plus empty lines)
-        node = Composer.compose_node(loader, parent, index)  # type: ignore[no-untyped-call,arg-type,unused-ignore]
-        if not isinstance(node, yaml.nodes.Node):
-            msg = "Unexpected yaml data."
-            raise TypeError(msg)
-        if hasattr(loader, "line"):  # pragma: no cover
-            line = loader.line  # type: ignore[attr-defined]
-            node.__line__ = line + 1  # type: ignore[attr-defined]
-        return node
-
-    # signature of AnsibleConstructor.construct_mapping
-    def construct_mapping(  # type: ignore[no-any-unimported]
-        node: yaml.MappingNode,
-        deep: bool = False,  # ruff:ignore[boolean-default-value-positional-argument]
-    ) -> AnsibleMapping:
-        # pyright: ignore[reportArgumentType]
-        mapping: AnsibleMapping = AnsibleConstructor.construct_mapping(  # type: ignore[no-any-unimported]
-            loader, node, deep=deep
-        )
-        if hasattr(node, LINE_NUMBER_KEY):
-            mapping[LINE_NUMBER_KEY] = getattr(node, LINE_NUMBER_KEY)
-        else:
-            if hasattr(mapping, "_line_number"):
-                mapping[LINE_NUMBER_KEY] = mapping._line_number  # ruff:ignore[private-member-access]
-        mapping[FILENAME_KEY] = lintable.path
-        return mapping
+    filename = Path(abspath)
 
     try:  # ruff:ignore[too-many-statements-in-try-clause]
         kwargs = {}
@@ -1375,11 +1380,13 @@ def parse_yaml_linenumbers(  # type: ignore[no-any-unimported]
             kwargs["vault_password"] = DEFAULT_VAULT_PASSWORD
         # WARNING: 'unused-ignore' is needed below in order to allow mypy to
         # be passing with both pre-2.19 and post-2.19 versions of Ansible core.
-        loader = AnsibleLoader(lintable.content, **kwargs)
-        # redefine Composer.compose_node
-        loader.compose_node = compose_node  # type: ignore[attr-defined,unused-ignore]
-        # redefine AnsibleConstructor.construct_mapping
-        loader.construct_mapping = construct_mapping  # type: ignore[attr-defined]
+        loader = AnsibleLoader(content, **kwargs)
+        # redefine Composer.compose_node and AnsibleConstructor.construct_mapping
+        # so parsed nodes/mappings carry line-number metadata.
+        loader.compose_node = partial(_compose_node_with_linenumbers, loader)  # type: ignore[attr-defined,unused-ignore]
+        loader.construct_mapping = partial(  # type: ignore[attr-defined]
+            _construct_mapping_with_linenumbers, loader, filename
+        )
         # while Ansible only accepts single documents, we also need to load
         # multi-documents, as we attempt to load any YAML file, not only
         # Ansible managed ones.
@@ -1395,7 +1402,7 @@ def parse_yaml_linenumbers(  # type: ignore[no-any-unimported]
         ruamel.yaml.parser.ParserError,
     ) as exc:
         msg = "Failed to load YAML file"
-        raise RuntimeError(msg, lintable.path) from exc
+        raise RuntimeError(msg, filename) from exc
 
     if len(result) == 0:
         return None  # empty documents
@@ -1405,6 +1412,22 @@ def parse_yaml_linenumbers(  # type: ignore[no-any-unimported]
             raise TypeError(msg)
         return result[0]
     return result
+
+
+def parse_yaml_linenumbers(  # type: ignore[no-any-unimported]
+    lintable: Lintable,
+) -> AnsibleBaseYAMLObject | None:
+    """Parse yaml as ansible.utils.parse_yaml but with linenumbers.
+
+    The line numbers are stored in each node's LINE_NUMBER_KEY key.
+
+    Returns a deep copy of the cached parse so callers (e.g. skip metadata
+    mutation) cannot pollute the shared cache entry.
+    """
+    data = _parse_yaml_linenumbers_cached(str(lintable.abspath), lintable.content)
+    if data is None:
+        return None
+    return copy.deepcopy(data)
 
 
 def get_cmd_args(task: Mapping[str, Any]) -> str:
