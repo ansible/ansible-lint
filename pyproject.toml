@@ -47,7 +47,6 @@ dependencies = [
   "pyyaml>=6.0.1 ; python_version >= '3.14'",  # py314 support
   "referencing>=0.36.2",
   "ruamel-yaml>=0.18.11",
-  "ruamel-yaml-clib>=0.2.12 ; python_version < '3.14'",
   "subprocess-tee>=0.4.1",
   "wcmatch>=8.1.2 ; python_version < '3.12'",
   "wcmatch>=8.5.0 ; python_version >= '3.12'",
