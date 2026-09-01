@@ -37,8 +37,11 @@ content. That mock tree is added as a **fallback** on the collections/module
 search path: real installed plugins take precedence, and stubs are used only
 when the real plugin is missing (for example offline syntax-check).
 
-Ansible-lint does not automatically clean the cache. If required you can delete
-the cache directory manually; a new cache is created on the next invocation.
+Ansible-lint does not automatically clean the cache. To remove generated mocks,
+delete `{cache_dir}/ansible-lint-mocks/`. For a project-local cache (typically
+`{project}/.ansible`), you can delete the whole directory; a new cache is created
+on the next invocation. Do not delete shared `~/.ansible` or `ANSIBLE_HOME`
+directories when they contain installed roles or collections.
 
 You should add project-local `.ansible` / `.cache` folders to `.gitignore`.
 
