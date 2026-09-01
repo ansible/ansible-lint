@@ -469,3 +469,55 @@ def test_warn_if_mock_clobbered_skips_short_module_names(
         _warn_if_mock_clobbered_real_collections(config_options)
 
     assert not caplog.text
+
+
+def test_mock_role_path_plain_role(tmp_path: Path) -> None:
+    """Standalone mock_roles resolve under ansible-lint-mocks/roles."""
+    from ansiblelint._mockings import _mock_role_path
+
+    mock_root = tmp_path / "ansible-lint-mocks"
+    path = _mock_role_path("plain_role", mock_root)
+
+    assert path == mock_root / "roles" / "plain_role"
+
+
+def test_perform_mockings_cleanup_skips_invalid_paths(
+    config_options: Options,
+    tmp_path: Path,
+) -> None:
+    """Cleanup ignores mock names that do not resolve to safe paths."""
+    from ansiblelint._mockings import _perform_mockings_cleanup
+
+    config_options.cache_dir = tmp_path
+    config_options.mock_roles = ["../../outside"]
+    config_options.mock_modules = ["bad/module"]
+
+    _perform_mockings_cleanup(config_options)
+
+
+def test_perform_mockings_cleanup_skips_non_lint_modules(
+    config_options: Options,
+    tmp_path: Path,
+) -> None:
+    """Cleanup must not delete real modules that happen to share a mock path."""
+    from ansiblelint._mockings import _perform_mockings_cleanup
+
+    config_options.cache_dir = tmp_path
+    config_options.mock_modules = ["ns.coll.installed"]
+    real_module = (
+        tmp_path
+        / "ansible-lint-mocks"
+        / "collections"
+        / "ansible_collections"
+        / "ns"
+        / "coll"
+        / "plugins"
+        / "modules"
+        / "installed.py"
+    )
+    real_module.parent.mkdir(parents=True)
+    real_module.write_text("#!/usr/bin/python\n# real module\n", encoding="utf-8")
+
+    _perform_mockings_cleanup(config_options)
+
+    assert real_module.exists()
