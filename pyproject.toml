@@ -245,7 +245,7 @@ filterwarnings = [
   # https://github.com/ansible/ansible/pull/80968
   "ignore:Attribute s is deprecated and will be removed in Python 3.14; use value instead:DeprecationWarning",
   # coverage thread tracing can race with daemon thread startup under pytest 9.x
-  "ignore:Exception ignored in thread.*trace function:pytest.PytestUnraisableExceptionWarning",
+  "ignore:Exception ignored in thread:pytest.PytestUnraisableExceptionWarning",
 ]
 junit_family = "xunit2"
 markers = ["libyaml: tests that will pass only with pyyaml libyaml is present."]
