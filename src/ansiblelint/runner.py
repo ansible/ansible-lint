@@ -3,12 +3,10 @@
 from __future__ import annotations
 
 import concurrent.futures
-import contextlib
 import json
 import logging
 import math
 import multiprocessing
-import multiprocessing.pool
 import os
 import re
 import subprocess
@@ -312,23 +310,14 @@ class Runner:
         worker: Any,
         files: list[Lintable],
     ) -> list[list[MatchError]]:
-        try:
-            pool = multiprocessing.pool.ThreadPool(processes=threads())
-        except OSError:
-            _logger.info(
-                "ThreadPool creation failed (likely missing /dev/shm), "
-                "falling back to concurrent.futures.ThreadPoolExecutor"
-            )
-            with concurrent.futures.ThreadPoolExecutor(
-                max_workers=threads()
-            ) as executor:
-                return list(executor.map(worker, files))
-
-        try:
-            return pool.map(worker, files, chunksize=1)
-        finally:
-            pool.close()
-            pool.join()
+        # Use ThreadPoolExecutor instead of multiprocessing.pool.ThreadPool.
+        # The latter spawns daemon worker threads that conflict with coverage's
+        # trace hooks under pytest, causing flaky PytestUnraisableExceptionWarning
+        # failures (see scheduled CI on 2026-09-02).
+        with concurrent.futures.ThreadPoolExecutor(
+            max_workers=threads(),
+        ) as executor:
+            return list(executor.map(worker, files))
 
     def _run_syntax_check_phase(
         self,
@@ -344,11 +333,6 @@ class Runner:
             )
 
         files = self._collect_syntax_check_files()
-
-        # avoid resource leak warning, https://github.com/python/cpython/issues/90549
-        # pylint: disable=unused-variable
-        with contextlib.suppress(OSError):
-            _global_resource = multiprocessing.Semaphore()
 
         return_list = self._map_syntax_check_workers(worker, files)
         for data in return_list:
