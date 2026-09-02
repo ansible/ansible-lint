@@ -10,6 +10,7 @@ import time
 import urllib.request
 import warnings
 from dataclasses import dataclass, field
+from functools import cache
 from http.client import HTTPException
 from importlib.metadata import PackageNotFoundError, distribution, version
 from pathlib import Path
@@ -298,8 +299,13 @@ def guess_install_method() -> str:
     return pip if use_pip else ""
 
 
+@cache
 def get_deps_versions() -> dict[str, Version | None]:
-    """Return versions of most important dependencies."""
+    """Return versions of most important dependencies.
+
+    Cached: called per templated string via ansible_template(), and
+    installed versions can't change mid-process.
+    """
     result: dict[str, Version | None] = {}
 
     for name in ["ansible-core", "ansible-compat", "ruamel-yaml"]:
