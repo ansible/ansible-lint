@@ -312,8 +312,7 @@ class Runner:
     ) -> list[list[MatchError]]:
         # Use ThreadPoolExecutor instead of multiprocessing.pool.ThreadPool.
         # The latter spawns daemon worker threads that conflict with coverage's
-        # trace hooks under pytest, causing flaky PytestUnraisableExceptionWarning
-        # failures (see scheduled CI on 2026-09-02).
+        # trace hooks under pytest, causing flaky scheduled CI failures.
         with concurrent.futures.ThreadPoolExecutor(
             max_workers=threads(),
         ) as executor:
