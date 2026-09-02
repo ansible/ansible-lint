@@ -285,11 +285,12 @@
                     "properties": {
                         "container-engine": {
                             "default": "auto",
-                            "description": "Specify the container engine (auto=podman then docker)",
+                            "description": "Specify the container engine (auto=podman then docker then container)",
                             "enum": [
                                 "auto",
                                 "podman",
-                                "docker"
+                                "docker",
+                                "container"
                             ],
                             "type": "string"
                         },
