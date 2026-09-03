@@ -264,6 +264,26 @@
         "elements": {
           "$ref": "#/$defs/datatype"
         },
+        "example": {
+          "description": "Example illustrating how this option is used.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "object"
+            },
+            {
+              "type": "array"
+            }
+          ]
+        },
         "fallback": {
           "default": "None",
           "type": "string"
