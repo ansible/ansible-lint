@@ -636,6 +636,10 @@
           "title": "Remote User",
           "type": "string"
         },
+        "validate_argspec": {
+          "$ref": "#/$defs/templated-boolean",
+          "title": "Validate Argspec"
+        },
         "vars": {
           "title": "Vars",
           "type": "object"
