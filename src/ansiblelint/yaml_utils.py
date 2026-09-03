@@ -752,6 +752,9 @@ class FormattedEmitter(Emitter):
     # "/n/n" results in one blank line (end the previous line, then newline).
     # So, "/n/n/n" or more is too many new lines. Clean it up.
     _re_repeat_blank_lines: Pattern[str] = re.compile(r"\n{3,}")
+    # In whitespace-only pre comments, each "\n" is one blank line (the previous
+    # line's newline was already written), so two or more is too many.
+    _re_repeat_blank_lines_pre: Pattern[str] = re.compile(r"\n{2,}")
     # Insert a space after a leading "#" run when it is missing ("#foo" -> "# foo",
     # "##foo" -> "## foo"); leave "## foo" and bare "##" untouched.
     _re_missing_comment_space: Pattern[str] = re.compile(r"^(#+)(?=[^#\s])")
@@ -810,23 +813,20 @@ class FormattedEmitter(Emitter):
         if (
             pre
             and not value.strip()
-            and not isinstance(
-                self.event,
-                ruamel.yaml.events.CollectionEndEvent
-                | ruamel.yaml.events.DocumentEndEvent
-                | ruamel.yaml.events.StreamEndEvent
-                | ruamel.yaml.events.MappingStartEvent,
-            )
-        ):
-            # drop pure whitespace pre comments
-            # does not apply to End events since they consume one of the newlines.
-            value = ""
-        elif (
-            pre
-            and not value.strip()
             and isinstance(self.event, ruamel.yaml.events.MappingStartEvent)
         ):
             value = self._re_repeat_blank_lines.sub("", value)
+        elif (
+            pre
+            and not value.strip()
+            and isinstance(
+                self.event,
+                ruamel.yaml.events.ScalarEvent | ruamel.yaml.events.SequenceStartEvent,
+            )
+        ):
+            # Blank line(s) before the next sibling node, e.g. after a
+            # flow-style value. Keep at most one blank line.
+            value = self._re_repeat_blank_lines_pre.sub("\n", value)
         elif pre:
             # preserve content in pre comment with at least one newline,
             # but no extra blank lines.
