@@ -1,0 +1,8 @@
+- name: Minimal reproducer
+  hosts: localhost
+  gather_facts: false
+  validate_argspec: true
+  tasks:
+    - name: Test
+      ansible.builtin.debug:
+        msg: Test
