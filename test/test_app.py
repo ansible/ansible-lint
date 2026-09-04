@@ -128,6 +128,41 @@ def test_add_module_path_skips_collection_only_mocks(tmp_path: Path) -> None:
     assert module_paths == ["/usr/share/ansible/plugins/modules"]
 
 
+def test_add_roles_path_for_plain_mock_roles(tmp_path: Path) -> None:
+    """Plain role mocks are exposed through Ansible's roles path.
+
+    Regression test for https://github.com/ansible/ansible-lint/issues/5096: this
+    injection must not depend on Runtime.isolated (which --offline turns off), only
+    on whether _perform_mockings() actually created a plain-name role mock.
+    """
+    from ansiblelint.app import _add_roles_path_if_needed
+    from ansiblelint.config import Options
+
+    options = Options()
+    options.cache_dir = tmp_path / ".ansible"
+    options.mock_roles = ["my_role", "some.collection.role"]
+    roles_paths = ["/usr/share/ansible/roles"]
+
+    _add_roles_path_if_needed(options, roles_paths)
+
+    assert roles_paths[0] == str(options.cache_dir / "roles")
+
+
+def test_add_roles_path_skips_collection_only_mocks(tmp_path: Path) -> None:
+    """Collection-style role mocks are exposed through collection paths instead."""
+    from ansiblelint.app import _add_roles_path_if_needed
+    from ansiblelint.config import Options
+
+    options = Options()
+    options.cache_dir = tmp_path / ".ansible"
+    options.mock_roles = ["some.collection.role"]
+    roles_paths = ["/usr/share/ansible/roles"]
+
+    _add_roles_path_if_needed(options, roles_paths)
+
+    assert roles_paths == ["/usr/share/ansible/roles"]
+
+
 def test_update_path_env_prepends_without_duplicates() -> None:
     """Verify _update_path_env prepends paths and removes duplicates."""
     import os

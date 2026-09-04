@@ -422,6 +422,25 @@ def _add_module_path_if_needed(
             module_paths.insert(0, str(mock_path))
 
 
+def _add_roles_path_if_needed(
+    options: Options,
+    roles_paths: list[str],
+) -> None:
+    """Add plain mock roles path to roles_paths if plain-name role mocks exist.
+
+    Mirrors _add_module_path_if_needed / _add_collections_path_if_needed:
+    injecting the mock roles path into the search path must not depend on the
+    runtime's `isolated` setting (which --offline turns off), only on whether
+    _perform_mockings() actually materialized any plain-name role mocks there.
+    """
+    if options.cache_dir and any(
+        len(role_name.split(".")) < 3 for role_name in options.mock_roles
+    ):
+        mock_path = options.cache_dir / "roles"
+        if str(mock_path) not in roles_paths:
+            roles_paths.insert(0, str(mock_path))
+
+
 def _update_path_env(
     env: dict[str, str],
     varname: str,
@@ -492,6 +511,13 @@ def get_app(*, offline: bool | None = None, cached: bool = False) -> App:
     _add_module_path_if_needed(app.options, module_paths)
     if module_paths != default_module_paths:
         _update_path_env(app.runtime.environ, "ANSIBLE_LIBRARY", module_paths)
+
+    # https://github.com/ansible/ansible-lint/issues/5096
+    default_roles_paths = app.runtime.config.default_roles_path
+    roles_paths = default_roles_paths.copy()
+    _add_roles_path_if_needed(app.options, roles_paths)
+    if roles_paths != default_roles_paths:
+        _update_path_env(app.runtime.environ, "ANSIBLE_ROLES_PATH", roles_paths)
 
     _ensure_cache_collections_first(app)
 
