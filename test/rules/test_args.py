@@ -106,3 +106,47 @@ def test_args_module_import_restores_existing_module(
 
     assert results == []
     assert sys.modules[module_name] is existing_module
+
+
+def test_args_rule_skips_when_resolved_path_is_lint_mock(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """ArgsRule returns no matches for ansible-lint mock stubs."""
+    from ansiblelint.constants import MOCK_MODULE_MARKER
+
+    stub_path = tmp_path / "stub_module.py"
+    stub_path.write_text(
+        f"{MOCK_MODULE_MARKER}\n"
+        "from ansible.module_utils.basic import AnsibleModule\n"
+        "def main():\n"
+        "    AnsibleModule(argument_spec=dict()).exit_json()\n",
+        encoding="utf-8",
+    )
+    module_name = "fake_ns.fake_coll.fake_module"
+
+    monkeypatch.setattr(
+        "ansiblelint.rules.args.load_plugin",
+        lambda _name: SimpleNamespace(
+            plugin_resolved_path=str(stub_path),
+            plugin_resolved_name=module_name,
+            resolved_fqcn=module_name,
+        ),
+    )
+
+    class MockTask:
+        action: dict[str, Any] = {
+            "__ansible_module_original__": module_name,
+            "unsupported_arg": True,
+        }
+        raw_task: dict[str, Any] = {"args": {}}
+        line = 1
+
+        def __getitem__(self, key: str) -> object:
+            return getattr(self, key)
+
+    results = ArgsRule().matchtask(
+        cast("Task", MockTask()),
+        file=Lintable("test.yml", kind="tasks"),
+    )
+    assert results == []

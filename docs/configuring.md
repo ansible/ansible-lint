@@ -49,6 +49,14 @@ counterparts:
 {!../.ansible-lint!}
 ```
 
+!!! note "mock_modules and mock_roles"
+
+    Stubs are written under `{cache_dir}/ansible-lint-mocks/` and registered as
+    a fallback search path. They never overwrite installed collection modules.
+    The `args` rule skips lint-generated stubs; real modules are validated when
+    installed. See [Caching](usage.md#caching) for recovery steps if an older
+    ansible-lint release clobbered `~/.ansible/collections`.
+
 ## Ignoring rules for entire files
 
 Ansible-lint will load ignore rules from an `.ansible-lint-ignore` or

@@ -73,6 +73,7 @@
         "type": "string"
       },
       "title": "Mock Modules",
+      "description": "Module names to stub for offline syntax-check. Stubs live under cache_dir/ansible-lint-mocks and are a fallback behind installed collections. The args rule skips lint-generated stubs.",
       "type": "array"
     },
     "mock_roles": {
@@ -80,6 +81,7 @@
         "type": "string"
       },
       "title": "Mock Roles",
+      "description": "Role names to stub for offline syntax-check. Collection role stubs live under cache_dir/ansible-lint-mocks.",
       "type": "array"
     },
     "offline": {
