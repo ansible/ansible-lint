@@ -6,7 +6,7 @@ import draft7MetaSchema from "ajv/dist/refs/json-schema-draft-07.json" with {
   type: "json",
 };
 import { assert } from "chai";
-import yaml from "js-yaml";
+import { load as yamlLoad } from "js-yaml";
 import { minimatch } from "minimatch";
 import stringify from "safe-stable-stringify";
 
@@ -26,6 +26,25 @@ function stripAnsi(data: string) {
     );
   }
   return data.replace(ansiRegex(), "");
+}
+
+function loadYamlFile(filePath: string): unknown {
+  const content = fs.readFileSync(filePath, "utf8");
+  if (!content.trim()) {
+    return null;
+  }
+  try {
+    return yamlLoad(content);
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message.includes("expected a document")
+    ) {
+      // Comment-only files without a YAML document (e.g. empty role meta)
+      return {};
+    }
+    throw error;
+  }
 }
 
 const ajv = new Ajv2020({
@@ -82,9 +101,7 @@ describe("schemas under f/", () => {
         ({ file: test_file, expect_fail }) => {
           it(`linting ${test_file} using ${schema_file}`, () => {
             var errors_md = "";
-            const result = validator(
-              yaml.load(fs.readFileSync(test_file, "utf8")),
-            );
+            const result = validator(loadYamlFile(test_file));
             if (validator.errors) {
               errors_md += "# ajv errors\n\n```json\n";
               errors_md += stringify(validator.errors, null, 2);
@@ -146,9 +163,7 @@ describe("schemas under f/", () => {
           getTestFiles(schema_json.$defs[definition].examples).forEach(
             ({ file: test_file, expect_fail }) => {
               it(`linting ${test_file} using ${subschema_uri}`, () => {
-                const result = subschema_validator(
-                  yaml.load(fs.readFileSync(test_file, "utf8")),
-                );
+                const result = subschema_validator(loadYamlFile(test_file));
                 assert.equal(
                   result,
                   !expect_fail,

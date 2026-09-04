@@ -127,8 +127,8 @@ repos:
     rev: v2.16
     hooks:
       - id: vulture
-  - repo: https://github.com/ansible/team-devtools
-    rev: v26.4.0
+  - repo: https://github.com/rockygeekz/team-devtools
+    rev: c44381c
     hooks:
       - id: check-platform-constraints
         priority: 1
