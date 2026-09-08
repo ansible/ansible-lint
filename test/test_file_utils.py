@@ -374,6 +374,25 @@ def test_lintable_updated(
     assert lintable.updated is updated
 
 
+def test_lintable_content_change_resets_yaml_state(tmp_path: Path) -> None:
+    """Changing content must invalidate cached YAML parse state."""
+    from ansiblelint.constants import States
+
+    task_file = tmp_path / "tasks.yml"
+    task_file.write_text("- name: first\n  debug: msg=hi\n", encoding="utf-8")
+    lintable = Lintable(task_file)
+
+    first_data = lintable.data
+    assert first_data[0]["name"] == "first"
+    assert lintable.state != States.NOT_LOADED
+
+    lintable.content = "- name: second\n  debug: msg=hi\n"
+    assert lintable.state == States.NOT_LOADED
+
+    second_data = lintable.data
+    assert second_data[0]["name"] == "second"
+
+
 @pytest.mark.parametrize(
     "updated_content",
     ((None,), (b"bytes",)),
@@ -666,3 +685,25 @@ def test_expand_dirs_in_lintables_relative_paths(tmp_path: Path) -> None:
         )
     finally:
         os.chdir(original_cwd)
+
+
+def test_expand_dirs_in_lintables_warns_on_expansion(
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Directory expansion emits a warning when new files are discovered."""
+    project_dir = tmp_path / "project"
+    role_dir = project_dir / "roles" / "my_namespace" / "myRole"
+    (role_dir / "tasks").mkdir(parents=True)
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.write_text("---\n- debug: msg=hi\n", encoding="utf-8")
+
+    monkeypatch.chdir(project_dir)
+    lintables: set[Lintable] = {Lintable(".")}
+    options.lintables = ["."]
+    options.exclude_paths = []
+    with caplog.at_level(logging.WARNING):
+        expand_dirs_in_lintables(lintables)
+    assert "Directory expansion discovered" in caplog.text
+    assert "exclude_paths" in caplog.text
