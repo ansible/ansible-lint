@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+import pytest
+
 from ansiblelint.__main__ import _rule_is_skipped
 from ansiblelint.constants import RC
 from ansiblelint.file_utils import Lintable
@@ -56,6 +58,23 @@ def test_with_inventory_concurrent_syntax_checks(tmp_path: Path) -> None:
         counter += 1
 
 
+def test_app_profile_skip_list_merged(tmp_path: Path) -> None:
+    """Profile skip_list entries are merged into options.skip_list during App init."""
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+
+    options = Options()
+    options.project_dir = str(tmp_path)
+    options.cache_dir = tmp_path / ".cache"
+    options.cache_dir.mkdir()
+    options.profile = "basic"
+
+    App(options)
+
+    assert "name[template]" in options.skip_list
+    assert "name[casing]" in options.skip_list
+
+
 def test_app_fixed_violations_coverage(tmp_path: Path) -> None:
     """Directly test App.report_outcome to get coverage on RC.FIXED_VIOLATIONS."""
     from ansiblelint.app import App
@@ -80,7 +99,7 @@ def test_app_fixed_violations_coverage(tmp_path: Path) -> None:
 
 
 def test_add_module_path_for_plain_mock_modules(tmp_path: Path) -> None:
-    """Plain module mocks are exposed through Ansible's module path."""
+    """Plain module mocks are exposed through Ansible's module path as fallback."""
     from ansiblelint.app import _add_module_path_if_needed
     from ansiblelint.config import Options
 
@@ -91,7 +110,43 @@ def test_add_module_path_for_plain_mock_modules(tmp_path: Path) -> None:
 
     _add_module_path_if_needed(options, module_paths)
 
-    assert module_paths[0] == str(options.cache_dir / "modules")
+    assert module_paths == [
+        "/usr/share/ansible/plugins/modules",
+        str(options.cache_dir / "ansible-lint-mocks" / "modules"),
+    ]
+
+
+def test_add_roles_path_for_plain_mock_roles(tmp_path: Path) -> None:
+    """Standalone role mocks are exposed through Ansible's roles path as fallback."""
+    from ansiblelint.app import _add_roles_path_if_needed
+    from ansiblelint.config import Options
+
+    options = Options()
+    options.cache_dir = tmp_path / ".ansible"
+    options.mock_roles = ["plain_role", "ns.coll.role"]
+    role_paths = ["/usr/share/ansible/roles"]
+
+    _add_roles_path_if_needed(options, role_paths)
+
+    assert role_paths == [
+        "/usr/share/ansible/roles",
+        str(options.cache_dir / "ansible-lint-mocks" / "roles"),
+    ]
+
+
+def test_add_roles_path_skips_collection_only_mocks(tmp_path: Path) -> None:
+    """Collection role mocks are exposed through collection paths instead."""
+    from ansiblelint.app import _add_roles_path_if_needed
+    from ansiblelint.config import Options
+
+    options = Options()
+    options.cache_dir = tmp_path / ".ansible"
+    options.mock_roles = ["ns.coll.role"]
+    role_paths = ["/usr/share/ansible/roles"]
+
+    _add_roles_path_if_needed(options, role_paths)
+
+    assert role_paths == ["/usr/share/ansible/roles"]
 
 
 def test_add_module_path_skips_collection_only_mocks(tmp_path: Path) -> None:
@@ -107,6 +162,47 @@ def test_add_module_path_skips_collection_only_mocks(tmp_path: Path) -> None:
     _add_module_path_if_needed(options, module_paths)
 
     assert module_paths == ["/usr/share/ansible/plugins/modules"]
+
+
+def test_update_path_env_prepends_without_duplicates() -> None:
+    """Verify _update_path_env prepends paths and removes duplicates."""
+    import os
+
+    from ansiblelint.app import _update_path_env
+
+    env: dict[str, str] = {"ANSIBLE_LIBRARY": "/existing/path"}
+    paths = ["/new/path", "/existing/path"]
+
+    _update_path_env(env, "ANSIBLE_LIBRARY", paths)
+
+    # Should prepend new paths and deduplicate
+    expected = os.pathsep.join(["/new/path", "/existing/path"])
+    assert env["ANSIBLE_LIBRARY"] == expected
+
+
+def test_update_path_env_empty_paths() -> None:
+    """Verify _update_path_env does nothing when paths is empty."""
+    from ansiblelint.app import _update_path_env
+
+    env: dict[str, str] = {"ANSIBLE_LIBRARY": "/existing/path"}
+    _update_path_env(env, "ANSIBLE_LIBRARY", [])
+
+    assert env["ANSIBLE_LIBRARY"] == "/existing/path"
+
+
+def test_update_path_env_no_existing_var() -> None:
+    """Verify _update_path_env works when env var doesn't exist."""
+    import os
+
+    from ansiblelint.app import _update_path_env
+
+    env: dict[str, str] = {}
+    paths = ["/new/path1", "/new/path2"]
+
+    _update_path_env(env, "ANSIBLE_LIBRARY", paths)
+
+    expected = os.pathsep.join(["/new/path1", "/new/path2"])
+    assert env["ANSIBLE_LIBRARY"] == expected
 
 
 def test_ignore_file_with_skip_and_strict(tmp_path: Path) -> None:
@@ -177,3 +273,81 @@ def test_skip_list_and_strict(tmp_path: Path) -> None:
 
     # Should return 0 because rule is in skip_list
     assert result.returncode == RC.SUCCESS
+
+
+def test_ensure_cache_collections_first_noop_without_cache_dir() -> None:
+    """Ensure helper is a no-op when cache_dir is not set."""
+    from unittest.mock import MagicMock
+
+    from ansiblelint.app import _ensure_cache_collections_first
+
+    app = MagicMock()
+    app.runtime.cache_dir = None
+    app.runtime.config.collections_paths = ["/some/path"]
+
+    _ensure_cache_collections_first(app)
+
+    assert app.runtime.config.collections_paths == ["/some/path"]
+
+
+def test_get_app_prepends_cache_collections_dir(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Ensure runtime cache directory is prepended to collections_paths when external paths exist."""
+    from unittest.mock import patch
+
+    from ansiblelint.app import get_app
+    from ansiblelint.config import options as default_options
+
+    external_path = "/usr/share/ansible/collections"
+    monkeypatch.setattr(default_options, "cache_dir", tmp_path / ".ansible")
+    monkeypatch.setenv("ANSIBLE_COLLECTIONS_PATH", external_path)
+
+    with patch("ansible_compat.runtime.Runtime.prepare_environment"):
+        app = get_app(offline=True)
+
+    expected_cache_target = str(app.runtime.cache_dir / "collections")
+    assert app.runtime.config.collections_paths[0] == expected_cache_target
+    assert external_path in app.runtime.config.collections_paths
+
+
+def test_get_app_prepends_cache_dir_without_external_path(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Ensure cache dir is prepended exactly once even without external collections path."""
+    from unittest.mock import patch
+
+    from ansiblelint.app import get_app
+    from ansiblelint.config import options as default_options
+
+    monkeypatch.setattr(default_options, "cache_dir", tmp_path / ".ansible")
+    monkeypatch.delenv("ANSIBLE_COLLECTIONS_PATH", raising=False)
+
+    with patch("ansible_compat.runtime.Runtime.prepare_environment"):
+        app = get_app(offline=True)
+
+    assert app.runtime.config.collections_paths is not None
+    cache_target = str(app.runtime.cache_dir / "collections")
+    assert app.runtime.config.collections_paths[0] == cache_target
+    assert app.runtime.config.collections_paths.count(cache_target) == 1
+
+
+def test_get_app_moves_existing_cache_dir_to_front(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Ensure cache dir is moved to index 0 when it already exists at a later position."""
+    from unittest.mock import patch
+
+    from ansiblelint.app import get_app
+    from ansiblelint.config import options as default_options
+
+    external_path = "/usr/share/ansible/collections"
+    monkeypatch.setattr(default_options, "cache_dir", tmp_path / ".ansible")
+    monkeypatch.setenv("ANSIBLE_COLLECTIONS_PATH", external_path)
+
+    with patch("ansible_compat.runtime.Runtime.prepare_environment"):
+        app = get_app(offline=True)
+
+    cache_target = str(app.runtime.cache_dir / "collections")
+    assert app.runtime.config.collections_paths[0] == cache_target
+    assert app.runtime.config.collections_paths.count(cache_target) == 1

@@ -703,6 +703,121 @@ def test_get_task_handler_children_climbing(tmp_path: Path) -> None:
         assert child.path.resolve() == imported_task.resolve()
 
 
+def test_parse_yaml_linenumbers_rereads_changed_content(tmp_path: Path) -> None:
+    """Updated lintable content must not reuse stale cached parse results."""
+    task_file = tmp_path / "tasks.yml"
+    task_file.write_text("- name: lowercase task\n  debug: msg=hi\n", encoding="utf-8")
+    lintable = Lintable(task_file)
+
+    first = utils.parse_yaml_linenumbers(lintable)
+    assert first[0]["name"] == "lowercase task"  # type: ignore[index]
+
+    lintable.content = "- name: Uppercase task\n  debug: msg=hi\n"
+    second = utils.parse_yaml_linenumbers(lintable)
+
+    assert second[0]["name"] == "Uppercase task"  # type: ignore[index]
+
+
+def test_parse_yaml_linenumbers_returns_independent_copies(tmp_path: Path) -> None:
+    """Cached YAML parses must not share mutations across callers."""
+    from ansiblelint.constants import SKIPPED_RULES_KEY
+
+    task_file = tmp_path / "tasks.yml"
+    task_file.write_text("- name: Task one\n  debug: msg=hi\n", encoding="utf-8")
+    lintable = Lintable(task_file)
+
+    first = utils.parse_yaml_linenumbers(lintable)
+    second = utils.parse_yaml_linenumbers(lintable)
+
+    assert first is not None
+    assert second is not None
+    assert first is not second
+    first[0][SKIPPED_RULES_KEY] = ["yaml"]
+    assert SKIPPED_RULES_KEY not in second[0]
+
+
+def test_warn_list_preserves_line_length_after_name_fix(tmp_path: Path) -> None:
+    """warn_list rules must not be auto-fixed after another rule rewrites the file (#5030)."""
+    (tmp_path / ".ansible-lint").write_text(
+        "write_list:\n  - name\nwarn_list:\n  - yaml[line-length]\n",
+        encoding="utf-8",
+    )
+    tasks_dir = tmp_path / "roles" / "demo" / "tasks"
+    tasks_dir.mkdir(parents=True)
+    long_expr = "".join(f" | regex_replace('k{i}', 'v{i}')" for i in range(12))
+    shell_line = f"  ansible.builtin.shell: \"{{{{ lookup('template', 'long.j2'){long_expr} }}}}\""
+    assert len(shell_line) > 160
+    (tasks_dir / "main.yml").write_text(
+        "---\n"
+        "- name: check service status\n"
+        "  ansible.builtin.command: systemctl status nginx\n\n"
+        "- name: run complex command\n"
+        f"{shell_line}\n",
+        encoding="utf-8",
+    )
+
+    result = run_ansible_lint(
+        "--fix",
+        "roles/demo/",
+        cwd=tmp_path,
+        env={"ANSIBLE_LINT_NODEPS": "1"},
+    )
+    output = result.stdout + result.stderr
+    assert "Error trying to append skipped rules" not in output
+    assert "yaml[line-length]" in output
+
+    text = (tasks_dir / "main.yml").read_text(encoding="utf-8")
+    assert "Check service status" in text
+    assert "Run complex command" in text
+    shell_lines = [
+        line for line in text.splitlines() if "ansible.builtin.shell" in line
+    ]
+    assert len(shell_lines) == 1
+    assert len(shell_lines[0]) > 160
+
+
+def test_warn_list_preserves_line_length_repro5030_content(tmp_path: Path) -> None:
+    """warn_list must keep long lines intact for typical repro5030 shell tasks (#5030)."""
+    (tmp_path / ".ansible-lint").write_text(
+        "write_list:\n  - name\nwarn_list:\n  - yaml[line-length]\n",
+        encoding="utf-8",
+    )
+    tasks_dir = tmp_path / "roles" / "demo" / "tasks"
+    tasks_dir.mkdir(parents=True)
+    shell_line = (
+        "  ansible.builtin.shell: \"{{ lookup('template', 'long.j2') | join(' ')"
+        " | regex_replace('foo', 'bar') | regex_replace('baz', 'qux')"
+        " | regex_replace('alpha', 'beta') | regex_replace('gamma', 'delta')"
+        " | regex_replace('epsilon', 'zeta') | regex_replace('eta', 'theta') }}\""
+    )
+    assert len(shell_line) > 160
+    (tasks_dir / "main.yml").write_text(
+        "---\n"
+        "- name: check service status\n"
+        "  ansible.builtin.command: systemctl status nginx\n"
+        "- name: run complex command\n"
+        f"{shell_line}\n",
+        encoding="utf-8",
+    )
+
+    result = run_ansible_lint(
+        "--fix",
+        "roles/demo/",
+        cwd=tmp_path,
+        env={"ANSIBLE_LINT_NODEPS": "1"},
+    )
+    output = result.stdout + result.stderr
+    assert "Error trying to append skipped rules" not in output
+    assert "yaml[line-length]" in output
+
+    text = (tasks_dir / "main.yml").read_text(encoding="utf-8")
+    shell_lines = [
+        line for line in text.splitlines() if "ansible.builtin.shell" in line
+    ]
+    assert len(shell_lines) == 1
+    assert len(shell_lines[0]) > 160
+
+
 def test_remove_task_internal_keys_nested_lists() -> None:
     """Internal keys nested inside lists must be stripped during sanitization."""
     task = {
@@ -741,6 +856,9 @@ def test_remove_task_internal_keys_nested_lists() -> None:
     assert "__file__" not in nested
     assert "__line__" not in nested["block"][0]
     utils._strip_internal_keys_from_value([{"__line__": 2}, "skip"])  # ruff:ignore[private-member-access]
+    double_nested = [[{"__line__": 3}]]
+    utils._strip_internal_keys_from_value(double_nested)  # ruff:ignore[private-member-access]
+    assert "__line__" not in double_nested[0][0]
     assert utils._remove_task_internal_keys({"__line__": 3}) == {}  # ruff:ignore[private-member-access]
 
 
@@ -825,3 +943,288 @@ def test_parser_error_helpers_cover_extracted_branches(
             {"name": "broken"},
             task,
         )
+
+
+def test_import_playbook_children_extra_vars_success(
+    tmp_path: Path,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Verify import_playbook_children re-checks with extra_vars on initial failure."""
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
+
+    # Create a playbook file
+    inner = tmp_path / "inner.yml"
+    inner.write_text("---\n- hosts: localhost\n  tasks: []\n")
+    outer = tmp_path / "outer.yml"
+    outer.write_text("---\n- import_playbook: inner.yml\n")
+
+    options = Options()
+    options.extra_vars = {"my_host": "localhost"}
+    app = App(options=options)
+    rules = RulesCollection(app=app)
+    handler = utils.HandleChildren(rules=rules, app=app)
+
+    # Mock has_playbook to return False (initial check fails)
+    monkeypatch.setattr(app.runtime, "has_playbook", lambda _: False)
+    # Mock _recheck_playbook_with_extra_vars at class level to return True
+    monkeypatch.setattr(
+        utils.HandleChildren,
+        "_recheck_playbook_with_extra_vars",
+        lambda _self, _path: True,
+    )
+
+    lintable = Lintable(outer)
+    children = handler.import_playbook_children(
+        lintable, "import_playbook", "inner.yml", "playbook"
+    )
+
+    assert len(children) == 1
+    assert children[0].path.name == "inner.yml"
+
+
+def test_import_playbook_children_extra_vars_recheck_fails(
+    tmp_path: Path,
+    monkeypatch: MonkeyPatch,
+    caplog: LogCaptureFixture,
+) -> None:
+    """Verify import_playbook_children logs error when re-check also fails."""
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
+
+    inner = tmp_path / "inner.yml"
+    inner.write_text("---\n- hosts: localhost\n  tasks: []\n")
+    outer = tmp_path / "outer.yml"
+    outer.write_text("---\n- import_playbook: inner.yml\n")
+
+    options = Options()
+    options.extra_vars = {"my_host": "localhost"}
+    app = App(options=options)
+    rules = RulesCollection(app=app)
+    handler = utils.HandleChildren(rules=rules, app=app)
+
+    monkeypatch.setattr(app.runtime, "has_playbook", lambda _: False)
+    # Mock _recheck_playbook_with_extra_vars at class level to return False
+    monkeypatch.setattr(
+        utils.HandleChildren,
+        "_recheck_playbook_with_extra_vars",
+        lambda _self, _path: False,
+    )
+
+    lintable = Lintable(outer)
+    with caplog.at_level(logging.ERROR):
+        children = handler.import_playbook_children(
+            lintable, "import_playbook", "inner.yml", "playbook"
+        )
+
+    assert children == []
+    assert "Failed to load" in caplog.text
+
+
+def test_import_playbook_children_no_extra_vars(
+    tmp_path: Path,
+    monkeypatch: MonkeyPatch,
+    caplog: LogCaptureFixture,
+) -> None:
+    """Verify import_playbook_children skips re-check when no extra_vars."""
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
+
+    inner = tmp_path / "inner.yml"
+    inner.write_text("---\n- hosts: localhost\n  tasks: []\n")
+    outer = tmp_path / "outer.yml"
+    outer.write_text("---\n- import_playbook: inner.yml\n")
+
+    options = Options()
+    options.extra_vars = {}  # No extra_vars
+    app = App(options=options)
+    rules = RulesCollection(app=app)
+    handler = utils.HandleChildren(rules=rules, app=app)
+
+    monkeypatch.setattr(app.runtime, "has_playbook", lambda _: False)
+    # _recheck_playbook_with_extra_vars returns False when no extra_vars
+    recheck_called = []
+
+    def mock_recheck(_self: Any, _path: Path) -> bool:
+        recheck_called.append(True)
+        return False
+
+    monkeypatch.setattr(
+        utils.HandleChildren,
+        "_recheck_playbook_with_extra_vars",
+        mock_recheck,
+    )
+
+    lintable = Lintable(outer)
+    with caplog.at_level(logging.ERROR):
+        children = handler.import_playbook_children(
+            lintable, "import_playbook", "inner.yml", "playbook"
+        )
+
+    assert children == []
+    assert "Failed to load" in caplog.text
+    # recheck is called but returns False due to empty extra_vars
+    assert recheck_called
+
+
+def test_recheck_playbook_with_extra_vars_no_vars(
+    tmp_path: Path,
+) -> None:
+    """Verify _recheck_playbook_with_extra_vars returns False when no extra_vars."""
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
+
+    playbook = tmp_path / "test.yml"
+    playbook.write_text("---\n- hosts: localhost\n  tasks: []\n")
+
+    options = Options()
+    options.extra_vars = {}
+    app = App(options=options)
+    rules = RulesCollection(app=app)
+    handler = utils.HandleChildren(rules=rules, app=app)
+
+    result = handler._recheck_playbook_with_extra_vars(playbook)  # ruff:ignore[private-member-access]
+    assert result is False
+
+
+def test_resolve_playbook_path_not_exists(
+    tmp_path: Path,
+) -> None:
+    """Verify _resolve_playbook_path returns error when path doesn't exist."""
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
+
+    outer = tmp_path / "outer.yml"
+    outer.write_text("---\n- import_playbook: missing.yml\n")
+
+    options = Options()
+    app = App(options=options)
+    rules = RulesCollection(app=app)
+    handler = utils.HandleChildren(rules=rules, app=app)
+
+    missing = tmp_path / "missing.yml"
+    result = handler._resolve_playbook_path(missing, False, "playbook", "missing.yml")  # ruff:ignore[private-member-access]
+    assert isinstance(result, tuple)
+    assert result == ("not_found", "Failed to find missing.yml playbook.")
+
+
+def test_resolve_playbook_path_collection_success(
+    tmp_path: Path,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Verify _resolve_playbook_path returns empty list for valid collection playbook."""
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
+
+    playbook = tmp_path / "test.yml"
+    playbook.write_text("---\n- hosts: localhost\n  tasks: []\n")
+
+    options = Options()
+    app = App(options=options)
+    rules = RulesCollection(app=app)
+    handler = utils.HandleChildren(rules=rules, app=app)
+
+    monkeypatch.setattr(app.runtime, "has_playbook", lambda _: True)
+
+    result = handler._resolve_playbook_path(playbook, True, "playbook", "test.yml")  # ruff:ignore[private-member-access]
+    assert result == []
+
+
+def test_resolve_playbook_path_local_success(
+    tmp_path: Path,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Verify _resolve_playbook_path returns Lintable for valid local playbook."""
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
+
+    playbook = tmp_path / "test.yml"
+    playbook.write_text("---\n- hosts: localhost\n  tasks: []\n")
+
+    options = Options()
+    app = App(options=options)
+    rules = RulesCollection(app=app)
+    handler = utils.HandleChildren(rules=rules, app=app)
+
+    monkeypatch.setattr(app.runtime, "has_playbook", lambda _: True)
+
+    result = handler._resolve_playbook_path(playbook, False, "playbook", "test.yml")  # ruff:ignore[private-member-access]
+    assert isinstance(result, list)
+    assert len(result) == 1
+    assert result[0].path == playbook
+
+
+def test_get_playbook_paths_local(tmp_path: Path) -> None:
+    """Verify _get_playbook_paths returns local path for non-collection."""
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
+
+    outer = tmp_path / "outer.yml"
+    outer.write_text("---\n- import_playbook: inner.yml\n")
+
+    options = Options()
+    app = App(options=options)
+    rules = RulesCollection(app=app)
+    handler = utils.HandleChildren(rules=rules, app=app)
+
+    lintable = Lintable(outer)
+    paths = handler._get_playbook_paths(lintable, "inner.yml", "", "", [])  # ruff:ignore[private-member-access]
+    assert len(paths) == 1
+    assert paths[0] == tmp_path / "inner.yml"
+
+
+def test_import_playbook_children_non_string(tmp_path: Path) -> None:
+    """Verify import_playbook_children returns empty for non-string v."""
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
+
+    outer = tmp_path / "outer.yml"
+    outer.write_text("---\n- import_playbook: inner.yml\n")
+
+    options = Options()
+    app = App(options=options)
+    rules = RulesCollection(app=app)
+    handler = utils.HandleChildren(rules=rules, app=app)
+
+    lintable = Lintable(outer)
+    # Pass a dict instead of string
+    result = handler.import_playbook_children(
+        lintable, "import_playbook", {"name": "invalid"}, "playbook"
+    )
+    assert result == []
+
+
+def test_import_playbook_children_missing_playbook(
+    tmp_path: Path,
+    caplog: LogCaptureFixture,
+) -> None:
+    """Verify import_playbook_children logs error for missing playbook."""
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
+
+    outer = tmp_path / "outer.yml"
+    outer.write_text("---\n- import_playbook: missing.yml\n")
+
+    options = Options()
+    app = App(options=options)
+    rules = RulesCollection(app=app)
+    handler = utils.HandleChildren(rules=rules, app=app)
+
+    lintable = Lintable(outer)
+    with caplog.at_level(logging.ERROR):
+        result = handler.import_playbook_children(
+            lintable, "import_playbook", "missing.yml", "playbook"
+        )
+
+    assert result == []
+    assert "Failed to find missing.yml playbook" in caplog.text

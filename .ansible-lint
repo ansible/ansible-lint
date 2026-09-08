@@ -17,7 +17,9 @@ exclude_paths:
 # strict: true
 # verbosity: 1
 
-# Mock modules or roles in order to pass ansible-playbook --syntax-check
+# Mock modules or roles in order to pass ansible-playbook --syntax-check.
+# Stubs are written under {cache_dir}/ansible-lint-mocks/ and do not overwrite
+# installed collections. The args rule skips lint-generated stubs.
 mock_modules:
   - zuul_return
   # note the foo.bar is invalid as being neither a module or a collection
