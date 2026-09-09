@@ -836,11 +836,11 @@ def test_transformer_respects_yaml_comments_skip_list(
     result = get_matches(rules=default_rules_collection, options=options)
     transformer = Transformer(result, options)
     transformer.run()
-    
+
     fixed_content = playbook.read_text()
     # Should have added space after #
     assert "# test-comment" in fixed_content or "#test-comment" in fixed_content
-    
+
     # Reset file
     playbook.write_text(content)
 
