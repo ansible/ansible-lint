@@ -402,24 +402,39 @@ def _add_collections_path_if_needed(
     options: Options,
     collections_paths: list[str],
 ) -> None:
-    """Add mock collections path to collections_paths if collection mocks exist."""
+    """Append mock collections path as a fallback when collection mocks exist.
+
+    Mocks are appended (not prepended) so installed collections take precedence
+    over empty ansible-lint stubs during plugin resolution and args validation.
+    """
     if options.has_collection_mocks():
         mock_path = options.mock_collections_path
         if mock_path and str(mock_path) not in collections_paths:
-            collections_paths.insert(0, str(mock_path))
+            collections_paths.append(str(mock_path))
 
 
 def _add_module_path_if_needed(
     options: Options,
     module_paths: list[str],
 ) -> None:
-    """Add plain mock modules path to module_paths if module mocks exist."""
-    if options.cache_dir and any(
+    """Append plain mock modules path as a fallback when module mocks exist."""
+    if options.mock_modules_path and any(
         len(module_name.split(".")) < 3 for module_name in options.mock_modules
     ):
-        mock_path = options.cache_dir / "modules"
-        if str(mock_path) not in module_paths:
-            module_paths.insert(0, str(mock_path))
+        mock_path = str(options.mock_modules_path)
+        if mock_path not in module_paths:
+            module_paths.append(mock_path)
+
+
+def _add_roles_path_if_needed(
+    options: Options,
+    role_paths: list[str],
+) -> None:
+    """Append plain mock roles path as a fallback when standalone role mocks exist."""
+    if options.mock_roles_path and options.has_plain_role_mocks():
+        mock_path = str(options.mock_roles_path)
+        if mock_path not in role_paths:
+            role_paths.append(mock_path)
 
 
 def _update_path_env(
@@ -492,6 +507,12 @@ def get_app(*, offline: bool | None = None, cached: bool = False) -> App:
     _add_module_path_if_needed(app.options, module_paths)
     if module_paths != default_module_paths:
         _update_path_env(app.runtime.environ, "ANSIBLE_LIBRARY", module_paths)
+
+    default_role_paths = list(app.runtime.config.default_roles_path)
+    role_paths = default_role_paths.copy()
+    _add_roles_path_if_needed(app.options, role_paths)
+    if role_paths != default_role_paths:
+        _update_path_env(app.runtime.environ, "ANSIBLE_ROLES_PATH", role_paths)
 
     _ensure_cache_collections_first(app)
 
