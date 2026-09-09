@@ -4,7 +4,7 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible-lint-config.json"
   },
   "ansible-navigator-config": {
-    "etag": "5f454fdaeb3d92c4bb2cc15dcc48faa67925fecfbdb72efffeddee01860d6bcb",
+    "etag": "927d967723eafb64a0a46db6b2be4b92472fd443a0f315925e475fddfb1d1e09",
     "url": "https://raw.githubusercontent.com/ansible/ansible-navigator/main/src/ansible_navigator/data/ansible-navigator.json"
   },
   "changelog": {

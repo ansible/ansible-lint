@@ -37,7 +37,7 @@ dependencies = [
   "ansible-core>=2.16.19,!=2.17.*",
   "black>=25.2.0",
   "cffi>=1.15.1",  # indirect dependency of ruamel-yaml
-  "cryptography>=37",
+  "cryptography>=50.0.0",
   "distro>=1.9.0",
   "filelock>=3.8.2",
   "jsonschema>=4.10.0",
@@ -244,6 +244,8 @@ filterwarnings = [
   "ignore:'importlib.abc.TraversableResources' is deprecated and slated for removal in Python 3.14:DeprecationWarning",
   # https://github.com/ansible/ansible/pull/80968
   "ignore:Attribute s is deprecated and will be removed in Python 3.14; use value instead:DeprecationWarning",
+  # coverage thread tracing can race with daemon thread startup under pytest 9.x
+  "ignore:Exception ignored in thread:pytest.PytestUnraisableExceptionWarning",
 ]
 junit_family = "xunit2"
 markers = ["libyaml: tests that will pass only with pyyaml libyaml is present."]

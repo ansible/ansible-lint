@@ -351,23 +351,20 @@ def test_build_load_failure_match_empty_args(
     )
 
 
-def test_map_syntax_check_workers_threadpool_fallback(
+def test_map_syntax_check_workers(
     default_rules_collection: RulesCollection,
-    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """OSError during ThreadPool creation must fall back to ThreadPoolExecutor."""
-    import multiprocessing.pool
-
+    """Syntax check workers must map over all files."""
     runner = Runner(
         "examples/playbooks/become.yml",
         rules=default_rules_collection,
     )
-
-    def boom(*_args: Any, **_kwargs: Any) -> Any:
-        msg = "No space left on device"
-        raise OSError(msg)
-
-    monkeypatch.setattr(multiprocessing.pool, "ThreadPool", boom)
-    files = [Lintable("examples/playbooks/become.yml")]
-    results = runner._map_syntax_check_workers(lambda _f: [], files)  # ruff:ignore[private-member-access]
-    assert results == [[]]
+    files = [
+        Lintable("examples/playbooks/become.yml"),
+        Lintable("examples/playbooks/valid.yml"),
+    ]
+    results = runner._map_syntax_check_workers(  # ruff:ignore[private-member-access]
+        lambda lintable: [lintable.path.name],
+        files,
+    )
+    assert results == [["become.yml"], ["valid.yml"]]
