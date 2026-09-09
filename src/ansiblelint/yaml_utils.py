@@ -630,6 +630,7 @@ class FormattedEmitter(Emitter):
 
     def emit(self, event: Any) -> None:
         """Track whether a flow collection needs a separating blank line.
+
         A blank line between elements should survive when the previous real
         element ended a flow collection, even if one or more comment lines and
         intervening container-close events sit in between. A single one-step
@@ -651,7 +652,8 @@ class FormattedEmitter(Emitter):
             # line should be preserved before the next element, surviving any
             # intervening comment lines and container-close events.
             self._pending_flow_collection_separator = True
-        elif isinstance(
+
+        if isinstance(
             event,
             ruamel.yaml.events.ScalarEvent
             | ruamel.yaml.events.CollectionStartEvent,
