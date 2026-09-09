@@ -655,8 +655,7 @@ class FormattedEmitter(Emitter):
 
         if isinstance(
             event,
-            ruamel.yaml.events.ScalarEvent
-            | ruamel.yaml.events.CollectionStartEvent,
+            ruamel.yaml.events.ScalarEvent | ruamel.yaml.events.CollectionStartEvent,
         ):
             # A new real element begins. Expose the pending separator to the
             # comment writer for this element, then clear it so subsequent
