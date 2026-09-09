@@ -813,3 +813,54 @@ def test_transform_not_applied(
     log_2 = f"{transformer.DUMP_MSG} {TransformTests.rewrite_part()}"
     assert logs[2].message == log_2
     assert logs[2].levelname == "DEBUG"
+
+
+def test_transformer_respects_yaml_comments_skip_list(
+    tmp_path: Path,
+    default_rules_collection: RulesCollection,
+) -> None:
+    """Test that yaml[comments] in skip_list prevents comment reformatting.
+
+    When yaml[comments] is in skip_list, the Transformer should not
+    reformat comment spacing even when other fixes are applied.
+    """
+    # Create a file with comment spacing issue
+    playbook = tmp_path / "test.yml"
+    playbook.write_text(
+        "---\n"
+        "- name: Test\n"
+        "  hosts: localhost\n"
+        "  tasks:\n"
+        "    - name: Task 1\n"
+        "      debug:\n"
+        "        msg:test  # comment without space\n"
+    )
+
+    # First without skip_list - should fix comments
+    options = Options()
+    options.write_list = ["yaml[comments]"]
+    options.lintables = [str(playbook)]
+    result = get_matches(rules=default_rules_collection, options=options)
+
+    transformer = Transformer(result, options)
+    assert transformer.fix_comment_spaces is True
+
+    # Now with skip_list - should NOT fix comments
+    options2 = Options()
+    options2.write_list = ["yaml[comments]"]
+    options2.skip_list = ["yaml[comments]"]
+    options2.lintables = [str(playbook)]
+    result2 = get_matches(rules=default_rules_collection, options=options2)
+
+    transformer2 = Transformer(result2, options2)
+    assert transformer2.fix_comment_spaces is False
+
+    # Test with "yaml" in skip_list also disables comment fixing
+    options3 = Options()
+    options3.write_list = ["yaml[comments]"]
+    options3.skip_list = ["yaml"]
+    options3.lintables = [str(playbook)]
+    result3 = get_matches(rules=default_rules_collection, options=options3)
+
+    transformer3 = Transformer(result3, options3)
+    assert transformer3.fix_comment_spaces is False
