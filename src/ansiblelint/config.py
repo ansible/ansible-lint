@@ -213,17 +213,42 @@ class Options:  # pylint: disable=too-many-instance-attributes
         return sorted([*self._default_supported, *self.supported_ansible_also])
 
     @property
-    def mock_collections_path(self) -> Path | None:
-        """Return the mock collections path if cache_dir is set."""
+    def mock_root(self) -> Path | None:
+        """Return isolated root for ansible-lint mocks if cache_dir is set."""
         if self.cache_dir is None:
             return None
-        return self.cache_dir / "collections"
+        return self.cache_dir / "ansible-lint-mocks"
+
+    @property
+    def mock_collections_path(self) -> Path | None:
+        """Return the mock collections path if cache_dir is set."""
+        if self.mock_root is None:
+            return None
+        return self.mock_root / "collections"
+
+    @property
+    def mock_modules_path(self) -> Path | None:
+        """Return the plain mock modules path if cache_dir is set."""
+        if self.mock_root is None:
+            return None
+        return self.mock_root / "modules"
+
+    @property
+    def mock_roles_path(self) -> Path | None:
+        """Return the plain mock roles path if cache_dir is set."""
+        if self.mock_root is None:
+            return None
+        return self.mock_root / "roles"
 
     def has_collection_mocks(self) -> bool:
         """Check if any mock roles or modules use collection format (ns.coll.name)."""
         return any(len(r.split(".")) >= 3 for r in self.mock_roles) or any(
             len(m.split(".")) >= 3 for m in self.mock_modules
         )
+
+    def has_plain_role_mocks(self) -> bool:
+        """Check if any mock roles are standalone (non-collection) names."""
+        return any(len(r.split(".")) < 3 for r in self.mock_roles)
 
 
 options = Options()
@@ -302,7 +327,7 @@ def get_deps_versions() -> dict[str, Version | None]:
     """Return versions of most important dependencies."""
     result: dict[str, Version | None] = {}
 
-    for name in ["ansible-core", "ansible-compat", "ruamel-yaml", "ruamel-yaml-clib"]:
+    for name in ["ansible-core", "ansible-compat", "ruamel-yaml"]:
         try:
             result[name] = Version(version(name))
         except PackageNotFoundError:

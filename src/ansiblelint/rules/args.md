@@ -110,3 +110,10 @@ added `# noqa: args[module]` it will just pass.
   loop_control:
     loop_var: zj_item
 ```
+
+## mock_modules
+
+When a task uses a module listed in `mock_modules`, ansible-lint may resolve a
+generated stub (empty `argument_spec`) for offline syntax-check. The `args`
+rule skips those stubs so they do not produce false `args[module]` findings.
+Installed collection modules still take precedence over stubs when present.

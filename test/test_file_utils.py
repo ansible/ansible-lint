@@ -374,6 +374,25 @@ def test_lintable_updated(
     assert lintable.updated is updated
 
 
+def test_lintable_content_change_resets_yaml_state(tmp_path: Path) -> None:
+    """Changing content must invalidate cached YAML parse state."""
+    from ansiblelint.constants import States
+
+    task_file = tmp_path / "tasks.yml"
+    task_file.write_text("- name: first\n  debug: msg=hi\n", encoding="utf-8")
+    lintable = Lintable(task_file)
+
+    first_data = lintable.data
+    assert first_data[0]["name"] == "first"
+    assert lintable.state != States.NOT_LOADED
+
+    lintable.content = "- name: second\n  debug: msg=hi\n"
+    assert lintable.state == States.NOT_LOADED
+
+    second_data = lintable.data
+    assert second_data[0]["name"] == "second"
+
+
 @pytest.mark.parametrize(
     "updated_content",
     ((None,), (b"bytes",)),
