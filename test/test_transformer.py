@@ -850,3 +850,21 @@ def test_transformer_respects_yaml_comments_skip_list(
     result3 = get_matches(rules=default_rules_collection, options=options3)
     transformer3 = Transformer(result3, options3)
     assert transformer3.fix_comment_spaces is False
+
+    # With yaml[comments] in warn_list, fix_comment_spaces should be False
+    options4 = Options()
+    options4.write_list = ["yaml"]
+    options4.warn_list = ["yaml[comments]"]
+    options4.lintables = [str(tmp_path / "test.yml")]
+    result4 = get_matches(rules=default_rules_collection, options=options4)
+    transformer4 = Transformer(result4, options4)
+    assert transformer4.fix_comment_spaces is False
+
+    # With yaml in warn_list, fix_comment_spaces should also be False
+    options5 = Options()
+    options5.write_list = ["yaml"]
+    options5.warn_list = ["yaml"]
+    options5.lintables = [str(tmp_path / "test.yml")]
+    result5 = get_matches(rules=default_rules_collection, options=options5)
+    transformer5 = Transformer(result5, options5)
+    assert transformer5.fix_comment_spaces is False
