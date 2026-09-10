@@ -52,7 +52,8 @@ class Transformer:
         self.write_set = self.effective_write_set(options.write_list)
         self.write_exclude_set = self.effective_write_set(options.write_exclude_list)
         self.fix_comment_spaces = not any(
-            tag in (options.skip_list or []) for tag in ("yaml[comments]", "yaml")
+            tag in (options.skip_list or []) or tag in (options.warn_list or [])
+            for tag in ("yaml[comments]", "yaml")
         )
         self.warn_list = set(options.warn_list)
 

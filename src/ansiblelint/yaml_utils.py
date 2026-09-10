@@ -884,12 +884,12 @@ class FormattedEmitter(Emitter):
 
         if self.fix_comment_spaces:
             value = self._re_missing_comment_space.sub(r"\1 ", value)
-
-        comment.value = value
-
-        # make sure that the eol comment only has one space before it.
-        if comment.column > self.column + 1 and not pre:
-            comment.column = self.column + 1
+            comment.value = value
+            # make sure that the eol comment only has one space before it.
+            if comment.column > self.column + 1 and not pre:
+                comment.column = self.column + 1
+        else:
+            comment.value = value
 
         return super().write_comment(comment, pre)
 
