@@ -283,3 +283,24 @@ def test_offline_config_used_when_no_cli(base_arguments: list[str]) -> None:
         result = cli.merge_config(file_config, cli_config)
 
     assert result.offline is True
+
+
+@pytest.mark.parametrize(
+    ("from_file", "from_cli", "expected"),
+    (
+        pytest.param(["all"], ["none"], [], id="cli-none-beats-file-all"),
+        pytest.param(["all"], [], ["all"], id="file-used-when-no-cli"),
+        pytest.param(["yaml"], ["all"], ["all"], id="cli-all-beats-file-subset"),
+        pytest.param([], [], [], id="both-empty"),
+    ),
+)
+def test_merge_fix_list_config_cli_precedence(
+    from_file: list[str],
+    from_cli: list[str],
+    expected: list[str],
+) -> None:
+    """CLI --fix values must take precedence over write_list from the config file."""
+    assert (
+        cli.WriteArgAction.merge_fix_list_config(from_file=from_file, from_cli=from_cli)
+        == expected
+    )

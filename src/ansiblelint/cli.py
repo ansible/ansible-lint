@@ -258,7 +258,7 @@ class WriteArgAction(argparse.Action):
 
         When from_cli is not an empty list, we ignore the from_file value.
         """
-        if not from_file:
+        if from_cli:
             arguments = ["all"] if from_cli == [cls._default] else from_cli
         else:
             arguments = from_file
@@ -546,10 +546,10 @@ def merge_config(file_config: dict[Any, Any], cli_config: Options) -> Options:
         for entry, default in lists_map.items():
             if not getattr(cli_config, entry, None):
                 setattr(cli_config, entry, default)
-        if cli_config.write_list is None:
-            cli_config.write_list = []
-        elif cli_config.write_list == [WriteArgAction._default]:  # ruff:ignore[private-member-access] # pragma: no cover
-            cli_config.write_list = ["all"]
+        cli_config.write_list = WriteArgAction.merge_fix_list_config(
+            from_file=[],
+            from_cli=cli_config.write_list or [],
+        )
         return cli_config
 
     for entry in bools:
