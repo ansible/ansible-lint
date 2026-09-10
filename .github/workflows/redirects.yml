@@ -23,8 +23,10 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.0
-      - uses: actions/setup-python@11d48d784bee1c51dcf3fe1718cfab5191b50317 # v5.3.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4.2.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v5.3.0
 
       - name: Upgrade Python toolchain
         run: python3 -m pip install --upgrade pip setuptools wheel
