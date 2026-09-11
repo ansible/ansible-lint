@@ -1,0 +1,19 @@
+---
+# Ansible-native molecule configuration (molecule >= v25.9.0).
+# Proves the bundled schema accepts the top-level ansible: block.
+dependency:
+  name: galaxy
+ansible:
+  cfg:
+    defaults:
+      remote_tmp: /tmp
+  env:
+    ANSIBLE_STDOUT_CALLBACK: yaml
+  executor:
+    backend: ansible-playbook
+  playbooks:
+    converge: converge.yml
+scenario:
+  name: native
+  test_sequence:
+    - converge
