@@ -1128,3 +1128,33 @@ def test_formatted_yaml_anchor_indentation() -> None:
 
     assert "  name: my_name" in output_anchor
     assert "            name: my_name" not in output_anchor
+
+
+def test_formatted_yaml_fix_comment_spaces_enabled() -> None:
+    """Verify that comment spacing is fixed when fix_comment_spaces=True."""
+    yaml = ansiblelint.yaml_utils.FormattedYAML(fix_comment_spaces=True)
+
+    # EOL inline comments missing a space after '#' – valid YAML
+    input_with_bad_spacing = "---\nkey: value  #bad spacing\nother: nested  #also missing\n"
+    data = yaml.load(input_with_bad_spacing)
+    output = yaml.dumps(data)
+
+    # With fix_comment_spaces=True the leading '#' must be followed by a space
+    assert "#bad spacing" not in output
+    assert "# bad spacing" in output
+    assert "#also missing" not in output
+    assert "# also missing" in output
+
+
+def test_formatted_yaml_fix_comment_spaces_disabled() -> None:
+    """Verify that comment spacing is preserved when fix_comment_spaces=False."""
+    yaml = ansiblelint.yaml_utils.FormattedYAML(fix_comment_spaces=False)
+
+    # Same input – fix_comment_spaces=False means the '#' must NOT be touched
+    input_with_bad_spacing = "---\nkey: value  #bad spacing\nother: nested  #also missing\n"
+    data = yaml.load(input_with_bad_spacing)
+    output = yaml.dumps(data)
+
+    # With fix_comment_spaces=False the original spacing must be preserved
+    assert "#bad spacing" in output
+    assert "#also missing" in output

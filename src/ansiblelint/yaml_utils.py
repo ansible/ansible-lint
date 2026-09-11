@@ -624,6 +624,10 @@ class FormattedEmitter(Emitter):
 
     _in_empty_flow_map = False
 
+    # Set to False when yaml[comments] is in skip_list to avoid reformatting
+    # comments even while other fixes are applied. See github issue #5048.
+    fix_comment_spaces = True
+
     _flow_collection_styles: tuple[bool, ...] = ()
     _previous_event_ended_flow_collection = False
     _pending_flow_collection_separator = False
@@ -878,13 +882,14 @@ class FormattedEmitter(Emitter):
             # single blank lines in post comments
             value = self._re_repeat_blank_lines.sub("\n\n", value)
 
-        value = self._re_missing_comment_space.sub(r"\1 ", value)
-
-        comment.value = value
-
-        # make sure that the eol comment only has one space before it.
-        if comment.column > self.column + 1 and not pre:
-            comment.column = self.column + 1
+        if self.fix_comment_spaces:
+            value = self._re_missing_comment_space.sub(r"\1 ", value)
+            comment.value = value
+            # make sure that the eol comment only has one space before it.
+            if comment.column > self.column + 1 and not pre:
+                comment.column = self.column + 1
+        else:
+            comment.value = value
 
         return super().write_comment(comment, pre)
 
@@ -918,6 +923,7 @@ class FormattedYAML(YAML):
         plug_ins: list[str] | None = None,
         version: tuple[int, int] | None = None,
         config: dict[str, bool | int | str] | None = None,
+        fix_comment_spaces: bool = True,
     ):
         """Return a configured ``ruamel.yaml.YAML`` instance.
 
@@ -1011,6 +1017,16 @@ class FormattedYAML(YAML):
 
         # If someone doesn't want our FormattedEmitter, they can change it.
         self.Emitter = FormattedEmitter
+
+        # When yaml[comments] is in skip_list, disable the comment-space
+        # reformatting in the emitter so --fix doesn't touch comments even
+        # while applying other transforms (see github issue #5048).
+        if not fix_comment_spaces:
+
+            class _FormattedEmitterNoCommentFix(FormattedEmitter):
+                fix_comment_spaces = False
+
+            self.Emitter = _FormattedEmitterNoCommentFix
 
         # ignore invalid preferred_quote setting
         if preferred_quote in ['"', "'"]:
