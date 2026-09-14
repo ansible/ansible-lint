@@ -1,0 +1,44 @@
+---
+vmware.vmware.cluster_info:
+  query: >-
+    .clusters | select(. != null) | {
+      name: ("cluster_info:" + (.moid | tostring)),
+      canonical_facts: {
+        module: "cluster_info",
+        moid: .moid
+      },
+      facts: {
+        device_type: "cluster",
+        infra_type: "PrivateCloudVMWARE"
+      }
+    }
+
+example.nested.braces_module:
+  query: >-
+    .data | {
+      name: .hostname,
+      canonical_facts: {
+        guid: .guid
+      },
+      facts: {
+        device_type: "virtual_machine",
+        metadata: { platform: "aws", region: .region }
+      }
+    }
+
+microsoft.ad.computer:
+  query: >-
+    if ($data.object_guid // null) != null
+      and ($data.distinguished_name // null) != null
+    then {
+      name: $data.distinguished_name,
+      canonical_facts: {
+        object_guid: $data.object_guid,
+        sid: ($data.sid // null)
+      },
+      facts: {
+        device_type: "virtual_machine",
+        platform: "microsoft_ad"
+      }
+    }
+    else empty end

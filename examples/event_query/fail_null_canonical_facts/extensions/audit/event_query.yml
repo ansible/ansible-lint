@@ -1,0 +1,9 @@
+---
+example.collection.module_name:
+  query: >-
+    .data | {
+      name: .id,
+      canonical_facts: null,
+      facts: {},
+      device_type: "router"
+    }
