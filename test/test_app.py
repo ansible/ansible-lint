@@ -117,36 +117,38 @@ def test_add_module_path_for_plain_mock_modules(tmp_path: Path) -> None:
 
 
 def test_add_roles_path_for_plain_mock_roles(tmp_path: Path) -> None:
-    """Standalone role mocks are exposed through Ansible's roles path as fallback."""
+    """Plain role mocks are exposed through Ansible's roles path.
+
+    Regression test for https://github.com/ansible/ansible-lint/issues/5096: this
+    injection must not depend on Runtime.isolated (which --offline turns off), only
+    on whether _perform_mockings() actually created a plain-name role mock.
+    """
     from ansiblelint.app import _add_roles_path_if_needed
     from ansiblelint.config import Options
 
     options = Options()
     options.cache_dir = tmp_path / ".ansible"
-    options.mock_roles = ["plain_role", "ns.coll.role"]
-    role_paths = ["/usr/share/ansible/roles"]
+    options.mock_roles = ["my_role", "some.collection.role"]
+    roles_paths = ["/usr/share/ansible/roles"]
 
-    _add_roles_path_if_needed(options, role_paths)
+    _add_roles_path_if_needed(options, roles_paths)
 
-    assert role_paths == [
-        "/usr/share/ansible/roles",
-        str(options.cache_dir / "ansible-lint-mocks" / "roles"),
-    ]
+    assert roles_paths[0] == str(options.cache_dir / "roles")
 
 
 def test_add_roles_path_skips_collection_only_mocks(tmp_path: Path) -> None:
-    """Collection role mocks are exposed through collection paths instead."""
+    """Collection-style role mocks are exposed through collection paths instead."""
     from ansiblelint.app import _add_roles_path_if_needed
     from ansiblelint.config import Options
 
     options = Options()
     options.cache_dir = tmp_path / ".ansible"
-    options.mock_roles = ["ns.coll.role"]
-    role_paths = ["/usr/share/ansible/roles"]
+    options.mock_roles = ["some.collection.role"]
+    roles_paths = ["/usr/share/ansible/roles"]
 
-    _add_roles_path_if_needed(options, role_paths)
+    _add_roles_path_if_needed(options, roles_paths)
 
-    assert role_paths == ["/usr/share/ansible/roles"]
+    assert roles_paths == ["/usr/share/ansible/roles"]
 
 
 def test_add_module_path_skips_collection_only_mocks(tmp_path: Path) -> None:

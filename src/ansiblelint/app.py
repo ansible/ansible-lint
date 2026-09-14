@@ -428,13 +428,21 @@ def _add_module_path_if_needed(
 
 def _add_roles_path_if_needed(
     options: Options,
-    role_paths: list[str],
+    roles_paths: list[str],
 ) -> None:
-    """Append plain mock roles path as a fallback when standalone role mocks exist."""
-    if options.mock_roles_path and options.has_plain_role_mocks():
-        mock_path = str(options.mock_roles_path)
-        if mock_path not in role_paths:
-            role_paths.append(mock_path)
+    """Add plain mock roles path to roles_paths if plain-name role mocks exist.
+
+    Mirrors _add_module_path_if_needed / _add_collections_path_if_needed:
+    injecting the mock roles path into the search path must not depend on the
+    runtime's `isolated` setting (which --offline turns off), only on whether
+    _perform_mockings() actually materialized any plain-name role mocks there.
+    """
+    if options.cache_dir and any(
+        len(role_name.split(".")) < 3 for role_name in options.mock_roles
+    ):
+        mock_path = options.cache_dir / "roles"
+        if str(mock_path) not in roles_paths:
+            roles_paths.insert(0, str(mock_path))
 
 
 def _update_path_env(
