@@ -133,7 +133,7 @@ def test_add_roles_path_for_plain_mock_roles(tmp_path: Path) -> None:
 
     _add_roles_path_if_needed(options, roles_paths)
 
-    assert roles_paths[0] == str(options.cache_dir / "roles")
+    assert roles_paths[0] == str(options.mock_roles_path)
 
 
 def test_add_roles_path_skips_collection_only_mocks(tmp_path: Path) -> None:
