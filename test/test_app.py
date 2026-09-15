@@ -151,6 +151,21 @@ def test_add_roles_path_skips_collection_only_mocks(tmp_path: Path) -> None:
     assert roles_paths == ["/usr/share/ansible/roles"]
 
 
+def test_add_roles_path_idempotent(tmp_path: Path) -> None:
+    """Calling _add_roles_path_if_needed twice does not duplicate the path."""
+    from ansiblelint.app import _add_roles_path_if_needed
+    from ansiblelint.config import Options
+
+    options = Options()
+    options.cache_dir = tmp_path / ".ansible"
+    options.mock_roles = ["my_role"]
+    roles_paths = [str(options.mock_roles_path), "/usr/share/ansible/roles"]
+
+    _add_roles_path_if_needed(options, roles_paths)
+
+    assert roles_paths.count(str(options.mock_roles_path)) == 1
+
+
 def test_add_module_path_skips_collection_only_mocks(tmp_path: Path) -> None:
     """Collection module mocks are exposed through collection paths instead."""
     from ansiblelint.app import _add_module_path_if_needed
