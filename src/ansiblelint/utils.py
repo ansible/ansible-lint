@@ -235,7 +235,7 @@ def _include_search_basedirs(lintable: Lintable | None, basedir: str) -> list[st
     # Add the root playbook directory as a fallback for relative includes
     if lintable:
         playbook_dir = _playbook_dir(lintable)
-        if playbook_dir and playbook_dir not in basedirs:
+        if playbook_dir not in basedirs:
             basedirs.append(playbook_dir)
 
     return basedirs
@@ -1621,11 +1621,12 @@ def load_plugin(name: str) -> PluginLoadContext:
     return loaded_module
 
 
-def _playbook_dir(lintable: Lintable) -> str | None:
+def _playbook_dir(lintable: Lintable) -> str:
     """Get the playbook directory, climbing the parent chain with cycle detection.
 
-    Returns the directory of the root playbook, or None if it cannot be determined.
-    Uses a visited set to prevent infinite loops from circular parent references.
+    Returns the directory of the root playbook, or the lintable's own directory
+    if no playbook is found in the chain. Uses a visited set to prevent infinite
+    loops from circular parent references.
     """
     visited: set[str] = set()
     current: Lintable | None = lintable
