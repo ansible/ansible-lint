@@ -223,6 +223,13 @@ def _include_search_basedirs(lintable: Lintable | None, basedir: str) -> list[st
             if parent_basedir not in basedirs:
                 basedirs.append(parent_basedir)
         parent = parent.parent
+    
+    # Add the root playbook directory as a fallback for relative includes
+    if lintable:
+        playbook_dir = _playbook_dir(lintable)
+        if playbook_dir and playbook_dir not in basedirs:
+            basedirs.append(playbook_dir)
+    
     return basedirs
 
 
