@@ -1,8 +1,86 @@
 {
   "$defs": {
+    "AnsibleModel": {
+      "additionalProperties": false,
+      "properties": {
+        "cfg": {
+          "default": {},
+          "title": "Ansible Configuration",
+          "type": "object"
+        },
+        "env": {
+          "default": {},
+          "title": "Environment Variables",
+          "type": "object"
+        },
+        "executor": {
+          "additionalProperties": false,
+          "default": {},
+          "properties": {
+            "args": {
+              "additionalProperties": false,
+              "default": {},
+              "properties": {
+                "ansible_navigator": {
+                  "default": [],
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "Ansible Navigator Arguments",
+                  "type": "array"
+                },
+                "ansible_playbook": {
+                  "default": [],
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "Ansible Playbook Arguments",
+                  "type": "array"
+                }
+              },
+              "title": "Executor Arguments",
+              "type": "object"
+            },
+            "backend": {
+              "default": "ansible-playbook",
+              "enum": ["ansible-playbook", "ansible-navigator"],
+              "title": "Ansible Executor Backend",
+              "type": "string"
+            }
+          },
+          "title": "Ansible Executor Configuration",
+          "type": "object"
+        },
+        "playbooks": {
+          "default": {},
+          "title": "Playbooks",
+          "type": "object"
+        }
+      },
+      "title": "AnsibleModel",
+      "type": "object"
+    },
     "ContainerRegistryModel": {
       "additionalProperties": false,
       "properties": {
+        "credentials": {
+          "properties": {
+            "email": {
+              "title": "Email",
+              "type": "string"
+            },
+            "password": {
+              "title": "Password",
+              "type": "string"
+            },
+            "username": {
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          "title": "Credentials",
+          "type": "object"
+        },
         "url": {
           "title": "Url",
           "type": "string"
@@ -13,12 +91,13 @@
       "type": "object"
     },
     "MoleculeDependencyModel": {
-      "additionalProperties": false,
+      "else": {
+        "properties": { "command": { "title": "Command", "type": "string" } }
+      },
+      "if": {
+        "properties": { "name": { "const": "galaxy" } }
+      },
       "properties": {
-        "command": {
-          "title": "Command",
-          "type": ["string", "null"]
-        },
         "enabled": {
           "default": true,
           "title": "Enabled",
@@ -39,66 +118,52 @@
         }
       },
       "required": ["name"],
+      "then": {
+        "properties": {
+          "command": { "title": "Command", "type": ["string", "null"] }
+        }
+      },
       "title": "MoleculeDependencyModel",
-      "type": "object"
+      "type": "object",
+      "unevaluatedProperties": false
     },
     "MoleculeDriverModel": {
-      "additionalProperties": false,
+      "additionalProperties": true,
       "properties": {
-        "cachier": {
-          "title": "Cachier",
-          "type": "string"
-        },
-        "default_box": {
-          "title": "DefaultBox",
-          "type": "string"
-        },
         "name": {
-          "enum": [
-            "azure",
-            "ec2",
-            "delegated",
-            "docker",
-            "containers",
-            "openstack",
-            "podman",
-            "vagrant",
-            "digitalocean",
-            "gce",
-            "libvirt",
-            "lxd"
+          "anyOf": [
+            {
+              "enum": [
+                "azure",
+                "ec2",
+                "delegated",
+                "default",
+                "docker",
+                "containers",
+                "openstack",
+                "podman",
+                "vagrant",
+                "digitalocean",
+                "gce",
+                "libvirt",
+                "lxd",
+                "kubevirt"
+              ]
+            },
+            {
+              "pattern": "^molecule[_\\-][a-zA-Z0-9:_.\\-]+$",
+              "type": "string"
+            },
+            {
+              "pattern": "^custom[_\\-][a-zA-Z0-9:_.\\-]+$",
+              "type": "string"
+            }
           ],
+          "messages": {
+            "anyOf": "is not one of ['azure', 'ec2', 'delegated', 'docker', 'containers', 'openstack', 'podman', 'vagrant', 'digitalocean', 'gce', 'libvirt', 'lxd', 'molecule-*', 'molecule_*', 'custom-*', 'custom_*']"
+          },
           "title": "Name",
           "type": "string"
-        },
-        "options": {
-          "$ref": "#/$defs/MoleculeDriverOptionsModel"
-        },
-        "parallel": {
-          "title": "Parallel",
-          "type": "boolean"
-        },
-        "provider": {
-          "title": "Provider",
-          "type": "object"
-        },
-        "provision": {
-          "title": "Provision",
-          "type": "boolean"
-        },
-        "safe_files": {
-          "items": {
-            "type": "string"
-          },
-          "title": "SafeFiles",
-          "type": "array"
-        },
-        "ssh_connection_options": {
-          "items": {
-            "type": "string"
-          },
-          "title": "SshConnectionOptions",
-          "type": "array"
         }
       },
       "title": "MoleculeDriverModel",
@@ -133,8 +198,9 @@
           "title": "Box",
           "type": "string"
         },
-        "cgroupns": {
-          "title": "Cgroupns",
+        "cgroupns_mode": {
+          "enum": ["host", "private"],
+          "title": "Cgroup namespace mode",
           "type": "string"
         },
         "children": {
@@ -156,11 +222,11 @@
           "type": "string"
         },
         "env": {
-          "items": {
-            "type": "object"
+          "additionalProperties": {
+            "type": "string"
           },
           "title": "Platform Environment Variables",
-          "type": "array"
+          "type": "object"
         },
         "environment": {
           "additionalProperties": {
@@ -199,15 +265,10 @@
         "network_mode": {
           "anyOf": [
             {
-              "enum": ["bridge", "host", "none"],
+              "enum": ["bridge", "default", "host", "none"],
               "type": "string"
             },
             {
-              "pattern": "^service:[a-zA-Z0-9:_.\\\\-]+$",
-              "type": "string"
-            },
-            {
-              "pattern": "^container:[a-zA-Z0-9][a-zA-Z0-9_.-]+$",
               "type": "string"
             }
           ],
@@ -298,7 +359,8 @@
           "$ref": "#/$defs/ScenarioSequence"
         },
         "lint_sequence": {
-          "$ref": "#/$defs/ScenarioSequence"
+          "$ref": "#/$defs/ScenarioSequence",
+          "deprecated": true
         },
         "name": {
           "title": "Name",
@@ -326,11 +388,6 @@
     "ProvisionerConfigOptionsDefaultsModel": {
       "additionalProperties": true,
       "properties": {
-        "ansible_managed": {
-          "default": "Ansible managed: Do NOT edit this file manually!",
-          "title": "Ansible Managed",
-          "type": "string"
-        },
         "display_failed_stderr": {
           "default": true,
           "title": "Display Failed Stderr",
@@ -388,7 +445,7 @@
       "type": "object"
     },
     "ProvisionerConfigOptionsSshConnectionModel": {
-      "additionalProperties": false,
+      "additionalProperties": true,
       "properties": {
         "control_path": {
           "default": "%(directory)s/%%h-%%p-%%r",
@@ -407,6 +464,13 @@
     "ProvisionerModel": {
       "additionalProperties": true,
       "properties": {
+        "ansible_args": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Ansible Args",
+          "type": "array"
+        },
         "config_options": {
           "$ref": "#/$defs/ProvisionerConfigOptionsModel"
         },
@@ -435,25 +499,49 @@
       "title": "ProvisionerModel",
       "type": "object"
     },
+    "platform-network": {
+      "properties": {
+        "aliases": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "ipv4_address": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": ["name"],
+      "type": "object"
+    },
     "ScenarioSequence": {
-      "additionalProperties": false,
       "items": {
-        "enum": [
-          "check",
-          "cleanup",
-          "converge",
-          "create",
-          "dependency",
-          "destroy",
-          "idempotence",
-          "lint",
-          "prepare",
-          "side_effect",
-          "syntax",
-          "test",
-          "verify"
-        ],
-        "type": "string"
+        "anyOf": [
+          {
+            "enum": [
+              "check",
+              "cleanup",
+              "converge",
+              "create",
+              "dependency",
+              "destroy",
+              "idempotence",
+              "lint",
+              "prepare",
+              "side_effect",
+              "syntax",
+              "test",
+              "verify"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "string"
+          }
+        ]
       },
       "title": "ScenarioSequence",
       "type": "array"
@@ -467,6 +555,13 @@
           },
           "title": "AdditionalFilesOrDirs",
           "type": "array"
+        },
+        "directory": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Directory",
+          "type": "string"
         },
         "enabled": {
           "title": "Enabled",
@@ -489,39 +584,158 @@
       },
       "title": "VerifierModel",
       "type": "object"
-    },
-    "platform-network": {
-      "properties": {
-        "aliases": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "ipv4_address": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        }
-      },
-      "required": ["name"],
-      "type": "object"
     }
   },
-  "$id": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/molecule.json",
+  "$id": "https://raw.githubusercontent.com/ansible-community/molecule/main/src/molecule/data/molecule.json",
   "$schema": "http://json-schema.org/draft-07/schema",
   "additionalProperties": false,
-  "description": "https://docs.ansible.com/projects/molecule/configuration/",
+  "allOf": [
+    {
+      "else": {
+        "required": ["platforms"]
+      },
+      "if": {
+        "properties": {
+          "ansible": true
+        },
+        "required": ["ansible"]
+      },
+      "then": {
+        "required": []
+      }
+    },
+    {
+      "not": {
+        "allOf": [
+          {
+            "properties": {
+              "ansible": {
+                "properties": {
+                  "executor": {
+                    "properties": {
+                      "args": true
+                    },
+                    "required": ["args"]
+                  }
+                },
+                "required": ["executor"]
+              }
+            },
+            "required": ["ansible"]
+          },
+          {
+            "properties": {
+              "provisioner": {
+                "properties": {
+                  "ansible_args": true
+                },
+                "required": ["ansible_args"]
+              }
+            },
+            "required": ["provisioner"]
+          }
+        ]
+      }
+    },
+    {
+      "not": {
+        "allOf": [
+          {
+            "properties": {
+              "ansible": {
+                "properties": {
+                  "cfg": true
+                },
+                "required": ["cfg"]
+              }
+            },
+            "required": ["ansible"]
+          },
+          {
+            "properties": {
+              "provisioner": {
+                "properties": {
+                  "config_options": true
+                },
+                "required": ["config_options"]
+              }
+            },
+            "required": ["provisioner"]
+          }
+        ]
+      }
+    },
+    {
+      "not": {
+        "allOf": [
+          {
+            "properties": {
+              "ansible": {
+                "properties": {
+                  "env": true
+                },
+                "required": ["env"]
+              }
+            },
+            "required": ["ansible"]
+          },
+          {
+            "properties": {
+              "provisioner": {
+                "properties": {
+                  "env": true
+                },
+                "required": ["env"]
+              }
+            },
+            "required": ["provisioner"]
+          }
+        ]
+      }
+    },
+    {
+      "not": {
+        "allOf": [
+          {
+            "properties": {
+              "ansible": {
+                "properties": {
+                  "playbooks": true
+                },
+                "required": ["playbooks"]
+              }
+            },
+            "required": ["ansible"]
+          },
+          {
+            "properties": {
+              "provisioner": {
+                "properties": {
+                  "playbooks": true
+                },
+                "required": ["playbooks"]
+              }
+            },
+            "required": ["provisioner"]
+          }
+        ]
+      }
+    }
+  ],
   "examples": ["molecule/*/molecule.yml"],
   "properties": {
+    "ansible": {
+      "$ref": "#/$defs/AnsibleModel"
+    },
     "dependency": {
       "$ref": "#/$defs/MoleculeDependencyModel"
     },
     "driver": {
       "$ref": "#/$defs/MoleculeDriverModel"
     },
+
     "lint": {
+      "deprecated": true,
       "title": "Lint",
       "type": "string"
     },
@@ -532,7 +746,7 @@
     },
     "platforms": {
       "items": {
-        "$ref": "#/$defs/MoleculePlatformModel"
+        "type": "object"
       },
       "title": "Platforms",
       "type": "array"
@@ -552,11 +766,15 @@
     "scenario": {
       "$ref": "#/$defs/MoleculeScenarioModel"
     },
+    "shared_state": {
+      "default": false,
+      "title": "Shared State",
+      "type": "boolean"
+    },
     "verifier": {
       "$ref": "#/$defs/VerifierModel"
     }
   },
-  "required": ["driver", "platforms"],
   "title": "Molecule Scenario Schema",
   "type": "object"
 }

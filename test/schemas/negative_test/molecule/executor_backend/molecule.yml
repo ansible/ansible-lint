@@ -1,0 +1,5 @@
+---
+# Native ansible.executor.backend must be one of the known backends.
+ansible:
+  executor:
+    backend: not-a-real-backend # invalid, not in enum

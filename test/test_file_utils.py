@@ -142,10 +142,10 @@ def test_discover_lintables_umlaut(monkeypatch: MonkeyPatch) -> None:
             "test/schemas/test/molecule/cluster/base.yml",
             "yaml",
             id="5",
-        ),  # molecule scenario base config
+        ),  # molecule scenario base config fragment (merged, not standalone)
         pytest.param(
             "test/schemas/test/molecule/cluster/molecule.yml",
-            "yaml",
+            "molecule",
             id="6",
         ),  # molecule scenario config
         pytest.param(

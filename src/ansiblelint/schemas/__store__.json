@@ -32,8 +32,8 @@
     "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/meta-runtime.json"
   },
   "molecule": {
-    "etag": "c654d6e4f94ae56daa39f456d15d31c933977e2eb3f5031dca40533f25c32746",
-    "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/molecule.json"
+    "etag": "6e078a99da8422ed1282d3b2fdeae12e713e059b6790b4bf52b6c3a9d876793c",
+    "url": "https://raw.githubusercontent.com/ansible-community/molecule/main/src/molecule/data/molecule.json"
   },
   "play-argspec": {
     "etag": "699edbc9ddf026606d8cd79f71b10f9487f6acc37e8622143f76e5e8d0ae14bf",

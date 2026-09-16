@@ -383,6 +383,18 @@ if "pytest" in sys.modules:
                 ],
                 id="play_argspec_negative",
             ),
+            pytest.param(
+                "test/schemas/test/molecule/native/molecule.yml",
+                "molecule",
+                [],
+                id="molecule",
+            ),
+            pytest.param(
+                "test/schemas/negative_test/molecule/executor_backend/molecule.yml",
+                "molecule",
+                [r".*executor\.backend.*is not one of .*ansible-playbook.*"],
+                id="molecule-invalid",
+            ),
         ),
     )
     def test_schema(
