@@ -1293,3 +1293,27 @@ def test_include_search_basedirs_adds_playbook_dir(tmp_path: Path) -> None:
 
     # The playbook directory should appear as a fallback
     assert str(tmp_path) in basedirs
+
+
+def test_include_search_basedirs_no_lintable(tmp_path: Path) -> None:
+    """_include_search_basedirs returns only the basedir when lintable is None."""
+    from ansiblelint.utils import _include_search_basedirs
+
+    basedirs = _include_search_basedirs(None, str(tmp_path))
+    assert basedirs == [str(tmp_path)]
+
+
+def test_include_search_basedirs_cycle_detection(tmp_path: Path) -> None:
+    """_include_search_basedirs terminates when a cycle is present in parent chain."""
+    from ansiblelint.utils import _include_search_basedirs
+
+    tasks_file = tmp_path / "tasks" / "main.yml"
+    tasks_file.parent.mkdir(parents=True)
+    tasks_file.write_text("---\n")
+    lintable = Lintable(tasks_file, kind="tasks")
+    # Create a cycle: parent chain loops back to itself
+    lintable.parent = lintable  # intentional cycle for cycle-detection test
+
+    # Should terminate without infinite loop
+    basedirs = _include_search_basedirs(lintable, str(tasks_file.parent))
+    assert str(tasks_file.parent) in basedirs
