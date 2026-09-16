@@ -1606,6 +1606,33 @@ def load_plugin(name: str) -> PluginLoadContext:
     return loaded_module
 
 
+def _playbook_dir(lintable: Lintable) -> str | None:
+    """Get the playbook directory, climbing the parent chain with cycle detection.
+
+    Returns the directory of the root playbook, or None if it cannot be determined.
+    Uses a visited set to prevent infinite loops from circular parent references.
+    """
+    visited = set()
+    current = lintable
+
+    while current:
+        # Detect cycles by tracking visited lintable paths
+        if str(current.path) in visited:
+            # Circular reference detected, stop climbing
+            break
+        visited.add(str(current.path))
+
+        # Check if current is a playbook
+        if current.kind == "playbook":
+            return str(current.path.parent)
+
+        # Move to parent
+        current = current.parent
+
+    # Fallback: return directory of the original lintable
+    return str(lintable.path.parent)
+
+
 def parse_fqcn(name: str) -> tuple[str, ...]:
     """Parse name parameter into FQCN segments."""
     if not is_fqcn(name):
