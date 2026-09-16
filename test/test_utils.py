@@ -1268,7 +1268,7 @@ def test_playbook_dir_cycle_detection(tmp_path: Path) -> None:
     tasks_file.write_text("---\n")
     lintable = Lintable(tasks_file, kind="tasks")
     # Create a cycle: lintable points to itself as parent
-    lintable.parent = lintable  # type: ignore[assignment]
+    lintable.parent = lintable  # intentional cycle for cycle-detection test
 
     # Should terminate and fall back to the lintable's own dir
     result = _playbook_dir(lintable)
