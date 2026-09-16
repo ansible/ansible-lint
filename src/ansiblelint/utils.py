@@ -216,20 +216,28 @@ def path_dwim(basedir: str, given: str) -> str:
 def _include_search_basedirs(lintable: Lintable | None, basedir: str) -> list[str]:
     """Return basedirs to use while resolving nested task includes."""
     basedirs = [basedir]
+    visited: set[str] = set()
     parent = lintable.parent if lintable else None
+
     while parent:
+        # Cycle detection for parent chain traversal
+        path_key = str(parent.path)
+        if path_key in visited:
+            break
+        visited.add(path_key)
+
         if parent.path.is_absolute():
             parent_basedir = str(parent.path.parent)
             if parent_basedir not in basedirs:
                 basedirs.append(parent_basedir)
         parent = parent.parent
-    
+
     # Add the root playbook directory as a fallback for relative includes
     if lintable:
         playbook_dir = _playbook_dir(lintable)
         if playbook_dir and playbook_dir not in basedirs:
             basedirs.append(playbook_dir)
-    
+
     return basedirs
 
 
@@ -1619,8 +1627,8 @@ def _playbook_dir(lintable: Lintable) -> str | None:
     Returns the directory of the root playbook, or None if it cannot be determined.
     Uses a visited set to prevent infinite loops from circular parent references.
     """
-    visited = set()
-    current = lintable
+    visited: set[str] = set()
+    current: Lintable | None = lintable
 
     while current:
         # Detect cycles by tracking visited lintable paths
