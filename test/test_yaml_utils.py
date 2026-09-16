@@ -1135,7 +1135,9 @@ def test_formatted_yaml_fix_comment_spaces_enabled() -> None:
     yaml = ansiblelint.yaml_utils.FormattedYAML(fix_comment_spaces=True)
 
     # EOL inline comments missing a space after '#' - valid YAML
-    input_with_bad_spacing = "---\nkey: value  #bad spacing\nother: nested  #also missing\n"
+    input_with_bad_spacing = (
+        "---\nkey: value  #bad spacing\nother: nested  #also missing\n"
+    )
     data = yaml.load(input_with_bad_spacing)
     output = yaml.dumps(data)
 
@@ -1151,7 +1153,9 @@ def test_formatted_yaml_fix_comment_spaces_disabled() -> None:
     yaml = ansiblelint.yaml_utils.FormattedYAML(fix_comment_spaces=False)
 
     # Same input - fix_comment_spaces=False means the '#' must NOT be touched
-    input_with_bad_spacing = "---\nkey: value  #bad spacing\nother: nested  #also missing\n"
+    input_with_bad_spacing = (
+        "---\nkey: value  #bad spacing\nother: nested  #also missing\n"
+    )
     data = yaml.load(input_with_bad_spacing)
     output = yaml.dumps(data)
 
