@@ -813,3 +813,92 @@ def test_transform_not_applied(
     log_2 = f"{transformer.DUMP_MSG} {TransformTests.rewrite_part()}"
     assert logs[2].message == log_2
     assert logs[2].levelname == "DEBUG"
+
+
+def _run_transformer_on_content(
+    content: str,
+    tmp_path: Path,
+    rules: RulesCollection,
+    *,
+    skip_list: list[str] | None = None,
+    warn_list: list[str] | None = None,
+) -> str:
+    """Write content to a tmp playbook, run Transformer.run(), return output."""
+    tmp_path.mkdir(parents=True, exist_ok=True)
+    playbook = tmp_path / "test_comments.yml"
+    playbook.write_text(content)
+
+    opts = Options()
+    opts.write_list = ["yaml"]
+    opts.lintables = [str(playbook)]
+    if skip_list:
+        opts.skip_list = skip_list
+    if warn_list:
+        opts.warn_list = warn_list
+
+    result = get_matches(rules=rules, options=opts)
+    transformer = Transformer(result, opts)
+    transformer.run()
+    return playbook.read_text()
+
+
+# A minimal playbook with a mis-spaced inline comment (#test-comment)
+_PLAYBOOK_WITH_BAD_COMMENT = """\
+---
+- name: Play
+  hosts: localhost
+  tasks:
+    - name: Task #test-comment
+      ansible.builtin.debug:
+        msg: hello
+"""
+
+
+def test_transformer_respects_yaml_comments_skip_list(
+    tmp_path: Path,
+    default_rules_collection: RulesCollection,
+) -> None:
+    """End-to-end: yaml[comments] in skip_list/warn_list prevents comment reformatting.
+
+    When yaml[comments] is in skip_list or warn_list, Transformer.run() must not
+    add a space after '#' in inline comments.  Without any skip, it must fix them.
+    See https://github.com/ansible/ansible-lint/issues/5048.
+    """
+    # --- 1. Default (no skip/warn): fix_comment_spaces=True, comment IS fixed ---
+    out_default = _run_transformer_on_content(
+        _PLAYBOOK_WITH_BAD_COMMENT,
+        tmp_path / "default",
+        default_rules_collection,
+    )
+    assert "# test-comment" in out_default, "Default run must fix the comment spacing"
+    assert "#test-comment" not in out_default, "Default run must not leave unfixed form"
+
+    # --- 2. yaml[comments] in skip_list: comment must NOT be touched ---
+    out_skip = _run_transformer_on_content(
+        _PLAYBOOK_WITH_BAD_COMMENT,
+        tmp_path / "skip",
+        default_rules_collection,
+        skip_list=["yaml[comments]"],
+    )
+    assert "#test-comment" in out_skip, "skip_list run must leave comment unchanged"
+    assert "# test-comment" not in out_skip, "skip_list run must not add a space"
+
+    # --- 3. yaml in skip_list: same protection via parent tag ---
+    out_skip_yaml = _run_transformer_on_content(
+        _PLAYBOOK_WITH_BAD_COMMENT,
+        tmp_path / "skip_yaml",
+        default_rules_collection,
+        skip_list=["yaml"],
+    )
+    assert "#test-comment" in out_skip_yaml
+    assert "# test-comment" not in out_skip_yaml
+
+    # --- 4. yaml[comments] in warn_list: same protection ---
+    out_warn = _run_transformer_on_content(
+        _PLAYBOOK_WITH_BAD_COMMENT,
+        tmp_path / "warn",
+        default_rules_collection,
+        warn_list=["yaml[comments]"],
+    )
+    assert "#test-comment" in out_warn
+    assert "# test-comment" not in out_warn
