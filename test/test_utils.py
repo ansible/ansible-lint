@@ -1228,3 +1228,92 @@ def test_import_playbook_children_missing_playbook(
 
     assert result == []
     assert "Failed to find missing.yml playbook" in caplog.text
+
+
+def test_playbook_dir_returns_own_dir_when_no_parent(tmp_path: Path) -> None:
+    """_playbook_dir falls back to the lintable's own directory when no playbook found."""
+    from ansiblelint.utils import _playbook_dir
+
+    tasks_file = tmp_path / "tasks" / "main.yml"
+    tasks_file.parent.mkdir(parents=True)
+    tasks_file.write_text("---\n")
+    lintable = Lintable(tasks_file, kind="tasks")
+    # No parent set — should fall back to tasks_file's directory
+    assert _playbook_dir(lintable) == str(tasks_file.parent)
+
+
+def test_playbook_dir_climbs_to_playbook(tmp_path: Path) -> None:
+    """_playbook_dir returns the playbook's directory when found in parent chain."""
+    from ansiblelint.utils import _playbook_dir
+
+    playbook_file = tmp_path / "site.yml"
+    playbook_file.write_text("---\n")
+    tasks_file = tmp_path / "tasks" / "main.yml"
+    tasks_file.parent.mkdir(parents=True)
+    tasks_file.write_text("---\n")
+
+    playbook = Lintable(playbook_file, kind="playbook")
+    tasks = Lintable(tasks_file, kind="tasks")
+    tasks.parent = playbook
+
+    assert _playbook_dir(tasks) == str(tmp_path)
+
+
+def test_playbook_dir_cycle_detection(tmp_path: Path) -> None:
+    """_playbook_dir does not loop forever on a circular parent reference."""
+    from ansiblelint.utils import _playbook_dir
+
+    tasks_file = tmp_path / "tasks" / "main.yml"
+    tasks_file.parent.mkdir(parents=True)
+    tasks_file.write_text("---\n")
+    lintable = Lintable(tasks_file, kind="tasks")
+    # Create a cycle: lintable points to itself as parent
+    lintable.parent = lintable  # intentional cycle for cycle-detection test
+
+    # Should terminate and fall back to the lintable's own dir
+    result = _playbook_dir(lintable)
+    assert result == str(tasks_file.parent)
+
+
+def test_include_search_basedirs_adds_playbook_dir(tmp_path: Path) -> None:
+    """_include_search_basedirs appends the root playbook dir as a fallback."""
+    from ansiblelint.utils import _include_search_basedirs
+
+    playbook_file = tmp_path / "site.yml"
+    playbook_file.write_text("---\n")
+    tasks_file = tmp_path / "tasks" / "main.yml"
+    tasks_file.parent.mkdir(parents=True)
+    tasks_file.write_text("---\n")
+
+    playbook = Lintable(playbook_file, kind="playbook")
+    tasks = Lintable(tasks_file, kind="tasks")
+    tasks.parent = playbook
+
+    basedirs = _include_search_basedirs(tasks, str(tasks_file.parent))
+
+    # The playbook directory should appear as a fallback
+    assert str(tmp_path) in basedirs
+
+
+def test_include_search_basedirs_no_lintable(tmp_path: Path) -> None:
+    """_include_search_basedirs returns only the basedir when lintable is None."""
+    from ansiblelint.utils import _include_search_basedirs
+
+    basedirs = _include_search_basedirs(None, str(tmp_path))
+    assert basedirs == [str(tmp_path)]
+
+
+def test_include_search_basedirs_cycle_detection(tmp_path: Path) -> None:
+    """_include_search_basedirs terminates when a cycle is present in parent chain."""
+    from ansiblelint.utils import _include_search_basedirs
+
+    tasks_file = tmp_path / "tasks" / "main.yml"
+    tasks_file.parent.mkdir(parents=True)
+    tasks_file.write_text("---\n")
+    lintable = Lintable(tasks_file, kind="tasks")
+    # Create a cycle: parent chain loops back to itself
+    lintable.parent = lintable  # intentional cycle for cycle-detection test
+
+    # Should terminate without infinite loop
+    basedirs = _include_search_basedirs(lintable, str(tasks_file.parent))
+    assert str(tasks_file.parent) in basedirs

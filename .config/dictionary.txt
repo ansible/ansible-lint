@@ -94,6 +94,7 @@ libyaml
 licensedb
 lineinfile
 lintable
+lintable's
 lintables
 localectl
 machinectl
