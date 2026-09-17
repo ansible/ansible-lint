@@ -57,8 +57,16 @@ VALID_DEVICE_TYPES = frozenset({
 # Module key must be a fully qualified collection name: namespace.collection.module
 _FQCN_PATTERN = re.compile(r"^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*$")
 
+# Pre-compiled patterns for query field validation
+_CANONICAL_FACTS_NULL = re.compile(r"canonical_facts\s*:\s*null\b")
+_CANONICAL_FACTS_KEY = re.compile(r"canonical_facts\s*:")
+_DEVICE_TYPE_VALUE = re.compile(r'device_type\s*:\s*["\']([^"\']+)["\']')
+
 # Required keys in the jq query output object
-_REQUIRED_OUTPUT_KEYS = {"name", "canonical_facts", "facts"}
+_REQUIRED_OUTPUT_KEYS = ("name", "canonical_facts", "facts")
+_REQUIRED_FIELD_PATTERNS = {
+    field: re.compile(rf"\b{field}\s*:") for field in _REQUIRED_OUTPUT_KEYS
+}
 
 
 def _extract_braced_block(text: str, keyword: str) -> str | None:
@@ -101,6 +109,84 @@ class EventQueryRule(AnsibleLintRule):
         "event-query[canonical-facts-empty]": "canonical_facts must define at least one unique identifier field.",
     }
 
+    def _validate_device_type(
+        self,
+        module_key: str,
+        query: str,
+        file: Lintable,
+    ) -> list[MatchError]:
+        """Validate device_type field in facts section of query output."""
+        facts_content = _extract_braced_block(query, "facts")
+        if facts_content is None or "device_type" not in facts_content:
+            return [
+                self.create_matcherror(
+                    message=f"Module '{module_key}' query output should include 'device_type' in the facts section.",
+                    tag="event-query[device-type-missing]",
+                    filename=file,
+                ),
+            ]
+
+        dt_match = _DEVICE_TYPE_VALUE.search(facts_content)
+        if dt_match and dt_match.group(1) not in VALID_DEVICE_TYPES:
+            return [
+                self.create_matcherror(
+                    message=(
+                        f"Module '{module_key}' uses device_type '{dt_match.group(1)}' "
+                        f"which is not in the normalized taxonomy. "
+                        f"Valid types include: virtual_machine, bare_metal, container, "
+                        f"switch, router, firewall, cloud_instance, esxi_host, "
+                        f"vcenter_appliance, cluster, resource, endpoint. "
+                        f"See event_query.md for the full list."
+                    ),
+                    tag="event-query[device-type]",
+                    filename=file,
+                ),
+            ]
+
+        return []
+
+    def _validate_canonical_facts(
+        self,
+        module_key: str,
+        query: str,
+        file: Lintable,
+    ) -> list[MatchError]:
+        """Validate canonical_facts field in query output."""
+        if _CANONICAL_FACTS_NULL.search(query):
+            return [
+                self.create_matcherror(
+                    message=f"Module '{module_key}' canonical_facts must define at least one non-null unique identifier.",
+                    tag="event-query[canonical-facts-empty]",
+                    filename=file,
+                ),
+            ]
+
+        cf_content = _extract_braced_block(query, "canonical_facts")
+        if cf_content is not None:
+            non_null_fields = [
+                line.strip()
+                for line in cf_content.split(",")
+                if line.strip() and "null" not in line.split(":")[-1]
+            ]
+            if not non_null_fields:
+                return [
+                    self.create_matcherror(
+                        message=f"Module '{module_key}' canonical_facts must define at least one non-null unique identifier.",
+                        tag="event-query[canonical-facts-empty]",
+                        filename=file,
+                    ),
+                ]
+        elif _CANONICAL_FACTS_KEY.search(query):
+            return [
+                self.create_matcherror(
+                    message=f"Module '{module_key}' canonical_facts must be an object with at least one unique identifier field.",
+                    tag="event-query[canonical-facts-empty]",
+                    filename=file,
+                ),
+            ]
+
+        return []
+
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Validate event_query.yml files."""
         if file.path.name != "event_query.yml":
@@ -133,7 +219,6 @@ class EventQueryRule(AnsibleLintRule):
             if module_key.startswith("__"):
                 continue
 
-            # Check module key is valid FQCN
             if not _FQCN_PATTERN.match(module_key):
                 results.append(
                     self.create_matcherror(
@@ -146,7 +231,6 @@ class EventQueryRule(AnsibleLintRule):
             if not isinstance(entry, dict):
                 continue
 
-            # Check 'query' field exists
             query = entry.get("query")
             if not query:
                 results.append(
@@ -161,7 +245,6 @@ class EventQueryRule(AnsibleLintRule):
             if not isinstance(query, str):
                 continue
 
-            # Validate query output contains required fields
             results.extend(
                 self.create_matcherror(
                     message=f"Module '{module_key}' query output is missing required field '{field}'.",
@@ -169,82 +252,11 @@ class EventQueryRule(AnsibleLintRule):
                     filename=file,
                 )
                 for field in _REQUIRED_OUTPUT_KEYS
-                if not re.search(rf"\b{field}\s*:", query)
+                if not _REQUIRED_FIELD_PATTERNS[field].search(query)
             )
 
-            facts_content = _extract_braced_block(query, "facts")
-            if facts_content is not None:
-                if "device_type" not in facts_content:
-                    results.append(
-                        self.create_matcherror(
-                            message=f"Module '{module_key}' query output should include 'device_type' in the facts section.",
-                            tag="event-query[device-type-missing]",
-                            filename=file,
-                        ),
-                    )
-                else:
-                    dt_match = re.search(
-                        r'device_type\s*:\s*["\']([^"\']+)["\']',
-                        facts_content,
-                    )
-                    if dt_match:
-                        device_type = dt_match.group(1)
-                        if device_type not in VALID_DEVICE_TYPES:
-                            results.append(
-                                self.create_matcherror(
-                                    message=(
-                                        f"Module '{module_key}' uses device_type '{device_type}' "
-                                        f"which is not in the normalized taxonomy. "
-                                        f"Valid types include: virtual_machine, bare_metal, container, "
-                                        f"switch, router, firewall, cloud_instance, esxi_host, "
-                                        f"vcenter_appliance, cluster, resource, endpoint. "
-                                        f"See event_query.md for the full list."
-                                    ),
-                                    tag="event-query[device-type]",
-                                    filename=file,
-                                ),
-                            )
-            else:
-                results.append(
-                    self.create_matcherror(
-                        message=f"Module '{module_key}' query output should include 'device_type' in the facts section.",
-                        tag="event-query[device-type-missing]",
-                        filename=file,
-                    ),
-                )
-
-            if re.search(r"canonical_facts\s*:\s*null\b", query):
-                results.append(
-                    self.create_matcherror(
-                        message=f"Module '{module_key}' canonical_facts must define at least one non-null unique identifier.",
-                        tag="event-query[canonical-facts-empty]",
-                        filename=file,
-                    ),
-                )
-            else:
-                cf_content = _extract_braced_block(query, "canonical_facts")
-                if cf_content is not None:
-                    non_null_fields = [
-                        line.strip()
-                        for line in cf_content.split(",")
-                        if line.strip() and "null" not in line.split(":")[-1]
-                    ]
-                    if not non_null_fields:
-                        results.append(
-                            self.create_matcherror(
-                                message=f"Module '{module_key}' canonical_facts must define at least one non-null unique identifier.",
-                                tag="event-query[canonical-facts-empty]",
-                                filename=file,
-                            ),
-                        )
-                elif re.search(r"canonical_facts\s*:", query):
-                    results.append(
-                        self.create_matcherror(
-                            message=f"Module '{module_key}' canonical_facts must be an object with at least one unique identifier field.",
-                            tag="event-query[canonical-facts-empty]",
-                            filename=file,
-                        ),
-                    )
+            results.extend(self._validate_canonical_facts(module_key, query, file))
+            results.extend(self._validate_device_type(module_key, query, file))
 
         return results
 
@@ -300,6 +312,16 @@ if "pytest" in sys.modules:
                 "examples/event_query/fail_scalar_canonical_facts/extensions/audit/event_query.yml",
                 ["event-query[canonical-facts-empty]"],
                 id="scalar-canonical-facts",
+            ),
+            pytest.param(
+                "examples/event_query/fail_non_dict_entry/extensions/audit/event_query.yml",
+                [],
+                id="non-dict-entry",
+            ),
+            pytest.param(
+                "examples/event_query/fail_non_string_query/extensions/audit/event_query.yml",
+                [],
+                id="non-string-query",
             ),
         ),
     )

@@ -1,4 +1,8 @@
 ---
+# Metadata key — should be silently skipped (not validated as FQCN)
+__meta:
+  version: 1
+
 vmware.vmware.cluster_info:
   query: >-
     .clusters | select(. != null) | {
