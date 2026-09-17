@@ -815,56 +815,90 @@ def test_transform_not_applied(
     assert logs[2].levelname == "DEBUG"
 
 
+def _run_transformer_on_content(
+    content: str,
+    tmp_path: Path,
+    rules: RulesCollection,
+    *,
+    skip_list: list[str] | None = None,
+    warn_list: list[str] | None = None,
+) -> str:
+    """Write content to a tmp playbook, run Transformer.run(), return output."""
+    tmp_path.mkdir(parents=True, exist_ok=True)
+    playbook = tmp_path / "test_comments.yml"
+    playbook.write_text(content)
+
+    opts = Options()
+    opts.write_list = ["yaml"]
+    opts.lintables = [str(playbook)]
+    if skip_list:
+        opts.skip_list = skip_list
+    if warn_list:
+        opts.warn_list = warn_list
+
+    result = get_matches(rules=rules, options=opts)
+    transformer = Transformer(result, opts)
+    transformer.run()
+    return playbook.read_text()
+
+
+# A minimal playbook with a mis-spaced inline comment (#test-comment)
+_PLAYBOOK_WITH_BAD_COMMENT = """\
+---
+- name: Play
+  hosts: localhost
+  tasks:
+    - name: Task #test-comment
+      ansible.builtin.debug:
+        msg: hello
+"""
+
+
 def test_transformer_respects_yaml_comments_skip_list(
     tmp_path: Path,
     default_rules_collection: RulesCollection,
 ) -> None:
-    """Test that yaml[comments] in skip_list prevents comment reformatting.
+    """End-to-end: yaml[comments] in skip_list/warn_list prevents comment reformatting.
 
-    When yaml[comments] is in skip_list, the Transformer should not
-    reformat comment spacing even when other fixes are applied.
+    When yaml[comments] is in skip_list or warn_list, Transformer.run() must not
+    add a space after '#' in inline comments.  Without any skip, it must fix them.
+    See https://github.com/ansible/ansible-lint/issues/5048.
     """
-    # Test the fix_comment_spaces flag behavior
-    # Without skip_list, fix_comment_spaces should be True
-    options = Options()
-    options.write_list = ["yaml"]
-    options.lintables = [str(tmp_path / "test.yml")]
-    result = get_matches(rules=default_rules_collection, options=options)
-    transformer = Transformer(result, options)
-    assert transformer.fix_comment_spaces is True
+    # --- 1. Default (no skip/warn): fix_comment_spaces=True, comment IS fixed ---
+    out_default = _run_transformer_on_content(
+        _PLAYBOOK_WITH_BAD_COMMENT,
+        tmp_path / "default",
+        default_rules_collection,
+    )
+    assert "# test-comment" in out_default, "Default run must fix the comment spacing"
+    assert "#test-comment" not in out_default, "Default run must not leave unfixed form"
 
-    # With yaml[comments] in skip_list, fix_comment_spaces should be False
-    options2 = Options()
-    options2.write_list = ["yaml"]
-    options2.skip_list = ["yaml[comments]"]
-    options2.lintables = [str(tmp_path / "test.yml")]
-    result2 = get_matches(rules=default_rules_collection, options=options2)
-    transformer2 = Transformer(result2, options2)
-    assert transformer2.fix_comment_spaces is False
+    # --- 2. yaml[comments] in skip_list: comment must NOT be touched ---
+    out_skip = _run_transformer_on_content(
+        _PLAYBOOK_WITH_BAD_COMMENT,
+        tmp_path / "skip",
+        default_rules_collection,
+        skip_list=["yaml[comments]"],
+    )
+    assert "#test-comment" in out_skip, "skip_list run must leave comment unchanged"
+    assert "# test-comment" not in out_skip, "skip_list run must not add a space"
 
-    # With yaml in skip_list, fix_comment_spaces should also be False
-    options3 = Options()
-    options3.write_list = ["yaml"]
-    options3.skip_list = ["yaml"]
-    options3.lintables = [str(tmp_path / "test.yml")]
-    result3 = get_matches(rules=default_rules_collection, options=options3)
-    transformer3 = Transformer(result3, options3)
-    assert transformer3.fix_comment_spaces is False
+    # --- 3. yaml in skip_list: same protection via parent tag ---
+    out_skip_yaml = _run_transformer_on_content(
+        _PLAYBOOK_WITH_BAD_COMMENT,
+        tmp_path / "skip_yaml",
+        default_rules_collection,
+        skip_list=["yaml"],
+    )
+    assert "#test-comment" in out_skip_yaml
+    assert "# test-comment" not in out_skip_yaml
 
-    # With yaml[comments] in warn_list, fix_comment_spaces should be False
-    options4 = Options()
-    options4.write_list = ["yaml"]
-    options4.warn_list = ["yaml[comments]"]
-    options4.lintables = [str(tmp_path / "test.yml")]
-    result4 = get_matches(rules=default_rules_collection, options=options4)
-    transformer4 = Transformer(result4, options4)
-    assert transformer4.fix_comment_spaces is False
-
-    # With yaml in warn_list, fix_comment_spaces should also be False
-    options5 = Options()
-    options5.write_list = ["yaml"]
-    options5.warn_list = ["yaml"]
-    options5.lintables = [str(tmp_path / "test.yml")]
-    result5 = get_matches(rules=default_rules_collection, options=options5)
-    transformer5 = Transformer(result5, options5)
-    assert transformer5.fix_comment_spaces is False
+    # --- 4. yaml[comments] in warn_list: same protection ---
+    out_warn = _run_transformer_on_content(
+        _PLAYBOOK_WITH_BAD_COMMENT,
+        tmp_path / "warn",
+        default_rules_collection,
+        warn_list=["yaml[comments]"],
+    )
+    assert "#test-comment" in out_warn
+    assert "# test-comment" not in out_warn

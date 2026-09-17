@@ -1162,3 +1162,6 @@ def test_formatted_yaml_fix_comment_spaces_disabled() -> None:
     # With fix_comment_spaces=False the original spacing must be preserved
     assert "#bad spacing" in output
     assert "#also missing" in output
+    # Negative: the fixer must not have added spaces
+    assert "# bad spacing" not in output
+    assert "# also missing" not in output

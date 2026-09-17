@@ -868,17 +868,17 @@ class FormattedEmitter(Emitter):
             # Preserve a separating blank line after a flow collection. Pure
             # whitespace comments elsewhere remain removed by the formatter.
             value = "\n" if self._previous_event_ended_flow_collection else ""
-        elif (
+        elif self.fix_comment_spaces and (
             pre
             and not value.strip()
             and isinstance(self.event, ruamel.yaml.events.MappingStartEvent)
         ):
             value = self._re_repeat_blank_lines.sub("", value)
-        elif pre:
+        elif self.fix_comment_spaces and pre:
             # preserve content in pre comment, collapsing runs of blank lines
             # down to a single blank line.
             value = self._re_repeat_blank_lines.sub("\n\n", value)
-        else:
+        elif self.fix_comment_spaces:
             # single blank lines in post comments
             value = self._re_repeat_blank_lines.sub("\n\n", value)
 
