@@ -125,6 +125,45 @@ def test_runner_exclude_globs(
     assert len(matches) == 0
 
 
+def test_is_excluded_skips_runtime_cache_dir(
+    default_rules_collection: RulesCollection,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Files under the runtime cache dir must never be lint targets (#5186).
+
+    When running in isolated mode, the cache dir used to stage
+    galaxy-installed/expanded third-party roles and collections can live
+    inside the project directory (e.g. ``<project_dir>/.ansible``), so it is
+    not excluded by the "outside of project dir" check alone. Regression
+    test for https://github.com/ansible/ansible-lint/issues/5186 where such
+    third-party role files were incorrectly reported as lint violations.
+    """
+    cache_dir = tmp_path / ".ansible"
+    role_file = (
+        cache_dir
+        / "collections"
+        / "ansible_collections"
+        / "myns"
+        / "mycoll"
+        / "roles"
+        / "myrole"
+        / "tasks"
+        / "main.yml"
+    )
+    role_file.parent.mkdir(parents=True)
+    role_file.write_text("---\n- command: echo hello\n", encoding="utf-8")
+
+    own_file = tmp_path / "playbook.yml"
+    own_file.write_text("---\n- hosts: localhost\n  tasks: []\n", encoding="utf-8")
+
+    runner = Runner(rules=default_rules_collection)
+    monkeypatch.setattr(runner.app.options, "cache_dir", cache_dir)
+
+    assert runner.is_excluded(Lintable(role_file)) is True
+    assert runner.is_excluded(Lintable(own_file)) is False
+
+
 @pytest.mark.parametrize(
     ("formatter_cls"),
     (
