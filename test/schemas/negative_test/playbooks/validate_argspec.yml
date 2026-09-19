@@ -1,0 +1,7 @@
+---
+- hosts: localhost
+  gather_facts: false
+  validate_argspec: 42
+  tasks:
+    - ansible.builtin.debug:
+        msg: foo
