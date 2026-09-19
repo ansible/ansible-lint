@@ -157,11 +157,19 @@ def test_is_excluded_skips_runtime_cache_dir(
     own_file = tmp_path / "playbook.yml"
     own_file.write_text("---\n- hosts: localhost\n  tasks: []\n", encoding="utf-8")
 
+    # A sibling directory whose name happens to share the cache dir's string
+    # prefix (".ansible-backup" starts with ".ansible") must not be treated
+    # as part of the cache dir by a naive string-prefix check.
+    sibling_file = tmp_path / ".ansible-backup" / "role.yml"
+    sibling_file.parent.mkdir(parents=True)
+    sibling_file.write_text("---\n- hosts: localhost\n  tasks: []\n", encoding="utf-8")
+
     runner = Runner(rules=default_rules_collection)
     monkeypatch.setattr(runner.app.options, "cache_dir", cache_dir)
 
     assert runner.is_excluded(Lintable(role_file)) is True
     assert runner.is_excluded(Lintable(own_file)) is False
+    assert runner.is_excluded(Lintable(sibling_file)) is False
 
 
 @pytest.mark.parametrize(

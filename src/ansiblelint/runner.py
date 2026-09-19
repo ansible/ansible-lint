@@ -167,7 +167,7 @@ class Runner:
         # resolution) must never be treated as lint targets themselves.
         # https://github.com/ansible/ansible-lint/issues/5186
         cache_dir = self.app.options.cache_dir if self.app else None
-        if cache_dir and abs_path.startswith(str(cache_dir)):
+        if cache_dir and lintable.abspath.is_relative_to(cache_dir):
             _logger.debug(
                 "Skipping %s as it is inside the runtime cache directory.",
                 abs_path,
