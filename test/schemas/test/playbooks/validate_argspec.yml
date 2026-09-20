@@ -1,0 +1,25 @@
+---
+# Boolean form: selects the argument spec matching the play name.
+- name: Play validated against a spec named after the play
+  hosts: localhost
+  gather_facts: false
+  validate_argspec: true
+  tasks:
+    - ansible.builtin.debug:
+        msg: foo
+
+# String form: names the argument spec explicitly.
+- hosts: localhost
+  gather_facts: false
+  validate_argspec: my_argspec
+  tasks:
+    - ansible.builtin.debug:
+        msg: bar
+
+# Templated form, resolved at runtime.
+- hosts: localhost
+  gather_facts: false
+  validate_argspec: "{{ validate_argspec_var | default(false) }}"
+  tasks:
+    - ansible.builtin.debug:
+        msg: baz
