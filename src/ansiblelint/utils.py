@@ -747,6 +747,9 @@ class HandleChildren:
         if not (namespace_name and collection_name):
             return [lintable.path.parent / v]
 
+        if playbook_path[-1] in ("yml", "yaml"):
+            playbook_path = playbook_path[:-1]
+
         return [
             Path(
                 path_dwim(
