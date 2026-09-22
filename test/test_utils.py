@@ -620,6 +620,7 @@ def test_import_playbook_children() -> None:
         "Failed to load local.testcollection.foo playbook due to failing syntax check."
         not in result.stderr
     )
+    assert "Failed to find local.testcollection.foo.yml playbook." not in result.stderr
 
 
 def test_import_playbook_children_subdirs() -> None:
