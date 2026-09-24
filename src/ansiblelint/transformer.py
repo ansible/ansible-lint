@@ -192,7 +192,7 @@ class Transformer:
             # When yaml[comments] is in warn_list the emitter won't apply
             # comment-spacing fixes, so don't mark those matches as fixed —
             # doing so would silently hide the unresolved warning.
-            if match.tag in ("yaml[comments]",) and not self.fix_comment_spaces:
+            if match.tag == "yaml[comments]" and not self.fix_comment_spaces:
                 _logger.debug("%s %s (comment spacing disabled)", self.FIX_NA_MSG, match_id)
                 continue
 
