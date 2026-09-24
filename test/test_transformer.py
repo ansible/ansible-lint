@@ -902,3 +902,41 @@ def test_transformer_respects_yaml_comments_skip_list(
     )
     assert "#test-comment" in out_warn
     assert "# test-comment" not in out_warn
+
+
+def test_transformer_warn_list_yaml_comments_not_marked_fixed(
+    tmp_path: Path,
+    default_rules_collection: RulesCollection,
+) -> None:
+    """yaml[comments] matches in warn_list must not be silently marked fixed.
+
+    When fix_comment_spaces=False (yaml[comments] in warn_list), the emitter
+    does not apply the spacing fix, so Transformer._do_transforms must skip
+    the transform call entirely.  The match must remain unfixed so it is still
+    visible in the rendered output rather than silently disappearing.
+    See https://github.com/ansible/ansible-lint/issues/5048.
+    """
+    playbook = tmp_path / "test.yml"
+    playbook.write_text(_PLAYBOOK_WITH_BAD_COMMENT)
+
+    opts = Options()
+    opts.write_list = ["yaml"]
+    opts.warn_list = ["yaml[comments]"]
+    opts.lintables = [str(playbook)]
+
+    result = get_matches(rules=default_rules_collection, options=opts)
+    transformer = Transformer(result, opts)
+
+    # Capture the matches before running so we can inspect fixed state after
+    yaml_comment_matches = [m for m in result.matches if m.tag == "yaml[comments]"]
+
+    transformer.run()
+
+    # None of the yaml[comments] matches should have been marked as fixed —
+    # the spacing violation is still present on disk.
+    assert yaml_comment_matches, "Expected at least one yaml[comments] match"
+    for match in yaml_comment_matches:
+        assert not match.fixed, (
+            f"yaml[comments] match at {match.filename}:{match.lineno} was "
+            "incorrectly marked fixed while fix_comment_spaces=False"
+        )
