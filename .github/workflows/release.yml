@@ -37,7 +37,7 @@ jobs:
 
     steps:
       - name: Switch to using latest Python by default
-        uses: actions/setup-python@11d48d784bee1c51dcf3fe1718cfab5191b50317 # v5.3.0
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v5.3.0
         with:
           python-version: "3.14"
 
