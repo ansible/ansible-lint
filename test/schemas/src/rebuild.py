@@ -49,6 +49,7 @@ play_keywords = list(
             "tasks",
             "throttle",
             "timeout",
+            "validate_argspec",
             "vars",
             "vars_files",
             "vars_prompt",
