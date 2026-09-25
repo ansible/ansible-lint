@@ -1187,6 +1187,11 @@ def test_get_playbook_paths_local(tmp_path: Path) -> None:
     (
         ("local.testcollection.foo.yml", ["foo", "yml"], "foo.yml"),
         ("local.testcollection.foo.yaml", ["foo", "yaml"], "foo.yaml"),
+        (
+            "local.testcollection.sub.foo.yml",
+            ["sub", "foo", "yml"],
+            "sub/foo.yml",
+        ),
     ),
 )
 def test_get_playbook_paths_collection_extension(
