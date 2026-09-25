@@ -646,6 +646,18 @@
           "title": "Remote User",
           "type": "string"
         },
+        "validate_argspec": {
+          "markdownDescription": "Validate play variables against an argument spec declared in the playbook meta file. Use `true` to select the argument spec matching the play name, or a string to name a specific argument spec. See [Validating playbook variables](https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_variables_validation.html)",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Validate Argspec"
+        },
         "vars": {
           "title": "Vars",
           "type": "object"

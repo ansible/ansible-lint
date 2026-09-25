@@ -624,6 +624,53 @@ class FormattedEmitter(Emitter):
 
     _in_empty_flow_map = False
 
+    # Set to False when yaml[comments] is in skip_list to avoid reformatting
+    # comments even while other fixes are applied. See github issue #5048.
+    fix_comment_spaces = True
+
+    _flow_collection_styles: tuple[bool, ...] = ()
+    _previous_event_ended_flow_collection = False
+    _pending_flow_collection_separator = False
+
+    def emit(self, event: Any) -> None:
+        """Track whether a flow collection needs a separating blank line.
+
+        A blank line between elements should survive when the previous real
+        element ended a flow collection, even if one or more comment lines and
+        intervening container-close events sit in between. A single one-step
+        look-behind is insufficient because closing an enclosing block
+        collection (or emitting comments) happens between the flow collection
+        end and the next element. So instead of resetting the state on the very
+        next event, keep it "sticky" until the next real element (scalar or
+        collection start) is emitted and can consume it.
+        """
+        ended_flow_collection = False
+        if isinstance(event, ruamel.yaml.events.CollectionStartEvent):
+            self._flow_collection_styles += (bool(event.flow_style),)
+        elif isinstance(event, ruamel.yaml.events.CollectionEndEvent):
+            ended_flow_collection = self._flow_collection_styles[-1]
+            self._flow_collection_styles = self._flow_collection_styles[:-1]
+
+        if ended_flow_collection:
+            # A flow collection just closed. Remember that a separating blank
+            # line should be preserved before the next element, surviving any
+            # intervening comment lines and container-close events.
+            self._pending_flow_collection_separator = True
+
+        if isinstance(
+            event,
+            ruamel.yaml.events.ScalarEvent | ruamel.yaml.events.CollectionStartEvent,
+        ):
+            # A new real element begins. Expose the pending separator to the
+            # comment writer for this element, then clear it so subsequent
+            # elements do not inherit it.
+            self._previous_event_ended_flow_collection = (
+                self._pending_flow_collection_separator
+            )
+            self._pending_flow_collection_separator = False
+
+        super().emit(event)
+
     @property
     def _is_root_level_sequence(self) -> bool:
         """Return True if this is a sequence at the root level of the yaml document."""
@@ -818,30 +865,31 @@ class FormattedEmitter(Emitter):
                 | ruamel.yaml.events.MappingStartEvent,
             )
         ):
-            # drop pure whitespace pre comments
-            # does not apply to End events since they consume one of the newlines.
-            value = ""
-        elif (
+            # Preserve a separating blank line after a flow collection. Pure
+            # whitespace comments elsewhere remain removed by the formatter.
+            value = "\n" if self._previous_event_ended_flow_collection else ""
+        elif self.fix_comment_spaces and (
             pre
             and not value.strip()
             and isinstance(self.event, ruamel.yaml.events.MappingStartEvent)
         ):
             value = self._re_repeat_blank_lines.sub("", value)
-        elif pre:
-            # preserve content in pre comment with at least one newline,
-            # but no extra blank lines.
-            value = self._re_repeat_blank_lines.sub("\n", value)
-        else:
+        elif self.fix_comment_spaces and pre:
+            # preserve content in pre comment, collapsing runs of blank lines
+            # down to a single blank line.
+            value = self._re_repeat_blank_lines.sub("\n\n", value)
+        elif self.fix_comment_spaces:
             # single blank lines in post comments
             value = self._re_repeat_blank_lines.sub("\n\n", value)
 
-        value = self._re_missing_comment_space.sub(r"\1 ", value)
-
-        comment.value = value
-
-        # make sure that the eol comment only has one space before it.
-        if comment.column > self.column + 1 and not pre:
-            comment.column = self.column + 1
+        if self.fix_comment_spaces:
+            value = self._re_missing_comment_space.sub(r"\1 ", value)
+            comment.value = value
+            # make sure that the eol comment only has one space before it.
+            if comment.column > self.column + 1 and not pre:
+                comment.column = self.column + 1
+        else:
+            comment.value = value
 
         return super().write_comment(comment, pre)
 
@@ -875,6 +923,7 @@ class FormattedYAML(YAML):
         plug_ins: list[str] | None = None,
         version: tuple[int, int] | None = None,
         config: dict[str, bool | int | str] | None = None,
+        fix_comment_spaces: bool = True,
     ):
         """Return a configured ``ruamel.yaml.YAML`` instance.
 
@@ -968,6 +1017,16 @@ class FormattedYAML(YAML):
 
         # If someone doesn't want our FormattedEmitter, they can change it.
         self.Emitter = FormattedEmitter
+
+        # When yaml[comments] is in skip_list, disable the comment-space
+        # reformatting in the emitter so --fix doesn't touch comments even
+        # while applying other transforms (see github issue #5048).
+        if not fix_comment_spaces:
+
+            class _FormattedEmitterNoCommentFix(FormattedEmitter):
+                fix_comment_spaces = False
+
+            self.Emitter = _FormattedEmitterNoCommentFix
 
         # ignore invalid preferred_quote setting
         if preferred_quote in ['"', "'"]:
