@@ -276,6 +276,37 @@ def test_transformer(  # pylint: disable=too-many-arguments,too-many-positional-
 
 
 @pytest.mark.parametrize(
+    "playbook_str",
+    ("examples/roles/name_casing_handler/handlers/main.yml",),
+    ids=("name_casing_handler",),
+)
+@mock.patch.dict(os.environ, {"ANSIBLE_LINT_WRITE_TMP": "1"}, clear=True)
+def test_name_casing_does_not_rename_handlers(
+    config_options: Options,
+    playbook_str: str,
+    runner_result: LintResult,
+) -> None:
+    """Handlers are notified by name from other files, so they must keep their name."""
+    playbook = Path(playbook_str)
+    config_options.write_list = ["all"]
+
+    assert any(match.tag == "name[casing]" for match in runner_result.matches)
+
+    Transformer(result=runner_result, options=config_options).run()
+
+    # The transformer only writes a file when it changed.
+    written = playbook.with_suffix(f".tmp{playbook.suffix}")
+    try:
+        content = written.read_text(encoding="utf-8") if written.exists() else ""
+        assert "name: Restart apache" not in content
+        assert "- name: restart apache" in (
+            content or playbook.read_text(encoding="utf-8")
+        )
+    finally:
+        written.unlink(missing_ok=True)
+
+
+@pytest.mark.parametrize(
     ("write_list", "expected"),
     (
         # 1 item
