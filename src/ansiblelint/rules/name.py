@@ -269,6 +269,10 @@ class NameRule(AnsibleLintRule, TransformMixin):
         data: CommentedMap | CommentedSeq | str,
     ) -> None:
         if match.tag == "name[casing]":
+            if lintable.kind == "handlers":
+                # Handlers are notified by name, usually from tasks in other files,
+                # and those references cannot be updated from here.
+                return
 
             def update_task_name(task_name: str) -> str:
                 """Capitalize the first work of the task name."""
