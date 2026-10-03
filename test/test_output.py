@@ -101,17 +101,18 @@ def test_should_do_markup_redirected_stderr_with_xterm(
     assert should_do_markup(_FakeStream(tty=False))  # type: ignore[arg-type]
 
 
-def test_reconfigure_stderr_color_is_independent() -> None:
+def test_reconfigure_stderr_color_is_independent(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Stderr console can be configured separately from stdout."""
-    old = (console.colored, console_stderr.colored)
-    try:
-        reconfigure(colored=True, stderr_colored=False)
-        assert console.colored
-        assert not console_stderr.colored
-        reconfigure(colored=False)
-        assert not console_stderr.colored
-    finally:
-        console.colored, console_stderr.colored = old
+    # Register the current values so monkeypatch restores them on teardown.
+    monkeypatch.setattr(console, "colored", console.colored)
+    monkeypatch.setattr(console_stderr, "colored", console_stderr.colored)
+    reconfigure(colored=True, stderr_colored=False)
+    assert console.colored
+    assert not console_stderr.colored
+    reconfigure(colored=False)
+    assert not console_stderr.colored
 
 
 def test_redirected_stderr_has_no_ansi_with_xterm(
