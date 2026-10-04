@@ -564,7 +564,7 @@ def path_inject(own_location: str = "") -> None:
     # Build a resolved view of PATH so symlinked entries correctly match
     # against resolved candidate paths below (fixes false "PATH altered"
     # warnings when a venv is reached through a symlinked directory).
-    resolved_paths = {str(Path(p).resolve()) for p in paths}
+    resolved_paths = {str(Path(p).expanduser().resolve()) for p in paths}
 
     # Expand ~ in PATH as it known to break many tools
     expanded = False
