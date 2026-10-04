@@ -561,6 +561,11 @@ def path_inject(own_location: str = "") -> None:
     # does this as part of the ansible detection.
     paths = [x for x in os.environ.get("PATH", "").split(os.pathsep) if x]
 
+    # Build a resolved view of PATH so symlinked entries correctly match
+    # against resolved candidate paths below (fixes false "PATH altered"
+    # warnings when a venv is reached through a symlinked directory).
+    resolved_paths = {str(Path(p).resolve()) for p in paths}
+
     # Expand ~ in PATH as it known to break many tools
     expanded = False
     for idx, path in enumerate(paths):
@@ -587,6 +592,7 @@ def path_inject(own_location: str = "") -> None:
     pipx_path = os.environ.get("PIPX_HOME", "pipx")
     if (
         str(py_path) not in paths
+        and str(py_path) not in resolved_paths
         and (py_path / "ansible").exists()
         and pipx_path not in str(py_path)
     ):
@@ -596,7 +602,11 @@ def path_inject(own_location: str = "") -> None:
     if own_location:
         own_location = os.path.realpath(own_location)
         parent = Path(own_location).parent
-        if (parent / "ansible").exists() and str(parent) not in paths:
+        if (
+            (parent / "ansible").exists()
+            and str(parent) not in paths
+            and str(parent) not in resolved_paths
+        ):
             inject_paths.append(str(parent))
 
     if not os.environ.get("PYENV_VIRTUAL_ENV", None):
