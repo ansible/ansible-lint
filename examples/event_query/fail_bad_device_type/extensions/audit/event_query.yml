@@ -1,0 +1,13 @@
+---
+vmware.vmware.esxi_host:
+  query: >-
+    .host | select(. != null) | {
+      name: ("esxi_host:" + (.moid | tostring)),
+      canonical_facts: {
+        module: "esxi_host",
+        moid: .moid
+      },
+      facts: {
+        device_type: "My Custom Server Type"
+      }
+    }
