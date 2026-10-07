@@ -911,20 +911,13 @@ def _remove_task_internal_keys(
 
 
 def _copy_task_containers(value: Any) -> Any:
-    """Recursively copy mappings and lists, sharing all other values."""
-    if isinstance(value, MutableMapping):
-        mapping_copy = copy.copy(value)
-        for key, item in value.items():
-            if isinstance(item, MutableMapping | list):
-                mapping_copy[key] = _copy_task_containers(item)
-        return mapping_copy
-    if isinstance(value, list):
-        list_copy = copy.copy(value)
-        for index, item in enumerate(value):
-            if isinstance(item, MutableMapping | list):
-                list_copy[index] = _copy_task_containers(item)
-        return list_copy
-    return value
+    """Recursively copy a mapping or list, sharing all non-container values."""
+    result = copy.copy(value)
+    items = value.items() if isinstance(value, MutableMapping) else enumerate(value)
+    for key, item in items:
+        if isinstance(item, MutableMapping | list):
+            result[key] = _copy_task_containers(item)
+    return result
 
 
 def _sanitize_task(task: MutableMapping[str, Any]) -> MutableMapping[str, Any]:
