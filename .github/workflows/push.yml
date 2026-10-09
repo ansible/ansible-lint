@@ -8,6 +8,9 @@ name: push
       - "releases/**"
       - "stable/**"
 
+permissions:
+  contents: read
+
 jobs:
   ack:
     uses: ansible/team-devtools/.github/workflows/push.yml@main
