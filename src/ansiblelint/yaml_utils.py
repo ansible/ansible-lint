@@ -19,7 +19,7 @@ from ruamel.yaml.comments import CommentedMap, CommentedSeq, Format
 from ruamel.yaml.composer import ComposerError
 from ruamel.yaml.constructor import RoundTripConstructor
 from ruamel.yaml.docinfo import Version
-from ruamel.yaml.emitter import Emitter, ScalarAnalysis
+from ruamel.yaml.emitter import RoundTripEmitter, ScalarAnalysis
 
 # Module 'ruamel.yaml' does not explicitly export attribute 'YAML'; implicit reexport disabled
 # To make the type checkers happy, we import from ruamel.yaml.main instead.
@@ -598,7 +598,7 @@ CustomConstructor.add_constructor(
 )
 
 
-class FormattedEmitter(Emitter):
+class FormattedEmitter(RoundTripEmitter):
     """Emitter that applies custom formatting rules when dumping YAML.
 
     Differences from ruamel.yaml defaults:
