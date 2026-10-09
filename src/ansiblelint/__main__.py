@@ -129,6 +129,8 @@ def initialize_options(arguments: list[str] | None = None) -> BaseFileLock | Non
 
     if new_options.colored is None:
         new_options.colored = should_do_markup()
+        # stderr may be redirected independently of stdout
+        new_options.colored_stderr = should_do_markup(sys.stderr)
 
     # persist loaded configuration inside options module
     for k, v in new_options.__dict__.items():
@@ -406,7 +408,7 @@ def main(argv: list[str] | None = None) -> int:
 
         cache_dir_lock = initialize_options(argv[1:])
 
-        reconfigure(colored=options.colored)
+        reconfigure(colored=options.colored, stderr_colored=options.colored_stderr)
 
         if options.version:
             deps = get_deps_versions()
