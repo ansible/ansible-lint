@@ -616,6 +616,7 @@ def test_import_playbook_children() -> None:
         },
     )
     assert "Failed to find local.testcollection.foo playbook." not in result.stderr
+    assert "Failed to find local.testcollection.foo.yml playbook." not in result.stderr
     assert (
         "Failed to load local.testcollection.foo playbook due to failing syntax check."
         not in result.stderr
@@ -1179,6 +1180,54 @@ def test_get_playbook_paths_local(tmp_path: Path) -> None:
     paths = handler._get_playbook_paths(lintable, "inner.yml", "", "", [])  # ruff:ignore[private-member-access]
     assert len(paths) == 1
     assert paths[0] == tmp_path / "inner.yml"
+
+
+@pytest.mark.parametrize(
+    ("reference", "playbook_path", "filename"),
+    (
+        ("local.testcollection.foo.yml", ["foo", "yml"], "foo.yml"),
+        ("local.testcollection.foo.yaml", ["foo", "yaml"], "foo.yaml"),
+        (
+            "local.testcollection.sub.foo.yml",
+            ["sub", "foo", "yml"],
+            "sub/foo.yml",
+        ),
+    ),
+)
+def test_get_playbook_paths_collection_extension(
+    tmp_path: Path,
+    reference: str,
+    playbook_path: list[str],
+    filename: str,
+) -> None:
+    """Verify collection playbook paths preserve explicit YAML extensions."""
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
+
+    options = Options()
+    app = App(options=options)
+    app.runtime.config.collections_paths = [str(tmp_path)]
+    rules = RulesCollection(app=app)
+    handler = utils.HandleChildren(rules=rules, app=app)
+
+    lintable = Lintable(tmp_path / "outer.yml")
+    paths = handler._get_playbook_paths(  # ruff:ignore[private-member-access]
+        lintable,
+        reference,
+        "local",
+        "testcollection",
+        playbook_path,
+    )
+
+    assert paths == [
+        tmp_path
+        / "ansible_collections"
+        / "local"
+        / "testcollection"
+        / "playbooks"
+        / filename
+    ]
 
 
 def test_import_playbook_children_non_string(tmp_path: Path) -> None:
