@@ -494,7 +494,8 @@
               "standalone": {
                 "const": false
               }
-            }
+            },
+            "required": ["standalone"]
           },
           "then": {
             "$comment": "Collection roles do not use most galaxy fields.",
@@ -513,10 +514,6 @@
           }
         }
       ],
-      "else": {
-        "$comment": "If standalone is false, then we have a collection role and only description is required",
-        "required": ["description"]
-      },
       "properties": {
         "author": {
           "title": "Author",
@@ -1579,10 +1576,10 @@
   },
   "$id": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/meta.json",
   "$schema": "http://json-schema.org/draft-07/schema",
+  "additionalProperties": false,
   "description": "https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_reuse_roles.html#using-role-dependencies",
   "examples": ["meta/main.yml"],
   "properties": {
-    "additionalProperties": false,
     "allow_duplicates": {
       "title": "Allow Duplicates",
       "type": "boolean"
