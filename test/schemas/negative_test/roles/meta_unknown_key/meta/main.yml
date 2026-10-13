@@ -1,0 +1,6 @@
+---
+# unknown top-level keys are not valid in role meta
+galaxy_info:
+  standalone: false
+  description: foo
+foo: bar
