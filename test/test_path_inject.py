@@ -74,3 +74,21 @@ def test_path_inject_own_location_not_duplicated(
     assert os.environ["PATH"].split(os.pathsep).count(str(real_bin)) == 1
     err = capsys.readouterr().err
     assert f"PATH altered to include {real_bin} ::" in err
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="symlinks")
+def test_path_inject_own_location_only(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The own location is added when the interpreter directory has no ansible."""
+    real_bin, _ = _make_venv_with_symlink(tmp_path)
+    other_bin = tmp_path / "other" / "bin"
+    other_bin.mkdir(parents=True)
+    monkeypatch.setenv("PATH", "/usr/bin")
+    monkeypatch.delenv("PYENV_VIRTUAL_ENV", raising=False)
+    monkeypatch.setattr(sys, "executable", str(other_bin / "python"))
+
+    path_inject(str(real_bin / "ansible-lint"))
+
+    assert os.environ["PATH"].split(os.pathsep) == [str(real_bin), "/usr/bin"]
