@@ -606,6 +606,7 @@ def path_inject(own_location: str = "") -> None:
             (parent / "ansible").exists()
             and str(parent) not in paths
             and str(parent) not in resolved_paths
+            and str(parent) not in inject_paths
         ):
             inject_paths.append(str(parent))
 
