@@ -55,3 +55,22 @@ def test_path_inject_symlinked_tilde_path_entry(
 
     assert "PATH altered to include" not in capsys.readouterr().err
     assert os.environ["PATH"].split(os.pathsep).count(str(real_bin)) == 0
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="symlinks")
+def test_path_inject_own_location_not_duplicated(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """A venv bin that is both the interpreter and own location is added once."""
+    real_bin, _ = _make_venv_with_symlink(tmp_path)
+    monkeypatch.setenv("PATH", "/usr/bin")
+    monkeypatch.delenv("PYENV_VIRTUAL_ENV", raising=False)
+    monkeypatch.setattr(sys, "executable", str(real_bin / "python"))
+
+    path_inject(str(real_bin / "ansible-lint"))
+
+    assert os.environ["PATH"].split(os.pathsep).count(str(real_bin)) == 1
+    err = capsys.readouterr().err
+    assert f"PATH altered to include {real_bin} ::" in err
