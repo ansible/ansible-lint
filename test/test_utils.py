@@ -909,6 +909,8 @@ def test_sanitize_task_does_not_modify_original() -> None:
     assert cleaned["loop"][0] is not task["loop"][0]
     assert cleaned["loop"][2][1] is not task["loop"][2][1]
     assert cleaned["vars"]["outer"]["inner"] is not task["vars"]["outer"]["inner"]
+    copied = utils._copy_task_containers(task)  # ruff:ignore[private-member-access]
+    assert copied["__skipped_rules__"] is task["__skipped_rules__"]
 
 
 def test_sanitize_task_matches_deepcopy_on_loaded_yaml(
