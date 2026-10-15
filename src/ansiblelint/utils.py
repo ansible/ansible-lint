@@ -920,7 +920,7 @@ def _copy_task_containers(value: Any) -> Any:
     result = copy.copy(value)
     items = value.items() if isinstance(value, MutableMapping) else enumerate(value)
     for key, item in items:
-        if isinstance(item, MutableMapping | list):
+        if key not in _TASK_INTERNAL_KEYS and isinstance(item, MutableMapping | list):
             result[key] = _copy_task_containers(item)
     return result
 
