@@ -582,10 +582,7 @@ def path_inject(own_location: str = "") -> None:
 
     userbase_bin_path = Path(site.getuserbase()) / "bin"
 
-    if (
-        str(userbase_bin_path) not in paths
-        and (userbase_bin_path / "bin" / "ansible").exists()
-    ):
+    if str(userbase_bin_path) not in paths and (userbase_bin_path / "ansible").exists():
         inject_paths.append(userbase_bin_path.resolve().as_posix())
 
     py_path = Path(sys.executable).parent.resolve()
