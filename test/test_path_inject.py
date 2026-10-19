@@ -1,6 +1,7 @@
 """Tests for path_inject() handling of symlinked PATH entries."""
 
 import os
+import site
 import sys
 from pathlib import Path
 
@@ -55,3 +56,24 @@ def test_path_inject_symlinked_tilde_path_entry(
 
     assert "PATH altered to include" not in capsys.readouterr().err
     assert os.environ["PATH"].split(os.pathsep).count(str(real_bin)) == 0
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="POSIX user base layout")
+def test_path_inject_userbase(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Ansible installed with ``pip install --user`` is found in the user base."""
+    userbase_bin = tmp_path / "userbase" / "bin"
+    userbase_bin.mkdir(parents=True)
+    (userbase_bin / "ansible").touch(mode=0o755)
+    other_bin = tmp_path / "other" / "bin"
+    other_bin.mkdir(parents=True)
+    monkeypatch.setattr(site, "getuserbase", lambda: str(tmp_path / "userbase"))
+    monkeypatch.setenv("PATH", "/usr/bin")
+    monkeypatch.delenv("PYENV_VIRTUAL_ENV", raising=False)
+    monkeypatch.setattr(sys, "executable", str(other_bin / "python"))
+
+    path_inject()
+
+    assert os.environ["PATH"].split(os.pathsep)[0] == userbase_bin.resolve().as_posix()
