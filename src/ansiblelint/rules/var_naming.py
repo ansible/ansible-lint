@@ -15,7 +15,7 @@ from ansiblelint.constants import (
     PLAYBOOK_ROLE_KEYWORDS,
     RC,
 )
-from ansiblelint.file_utils import Lintable
+from ansiblelint.file_utils import Lintable, find_role_dir
 from ansiblelint.rules import AnsibleLintRule, RulesCollection
 from ansiblelint.runner import Runner
 from ansiblelint.skip_utils import get_rule_skips_from_line
@@ -33,6 +33,9 @@ class Prefix(NamedTuple):
 
     value: str = ""
     from_fqcn: bool = False
+    # Name for which no usable prefix could be derived, empty when the prefix
+    # was determined successfully.
+    unknown: str = ""
 
 
 class VariableNamingRule(AnsibleLintRule):
@@ -177,6 +180,19 @@ class VariableNamingRule(AnsibleLintRule):
                 data=ident,
             )
 
+        # A role prefix we could not determine must not silently skip the
+        # check, report the offending role name instead.
+        if prefix and prefix.unknown and not ident.lstrip("_").startswith("ansible_"):
+            return self.create_matcherror(
+                tag="var-naming[no-role-prefix]",
+                message=(
+                    "Variables names from within roles should use the role name "
+                    f"as a prefix, which could not be determined for '{prefix.unknown}'."
+                ),
+                filename=file,
+                data=ident,
+            )
+
         # Variables in the ansible_ namespace are owned by Ansible itself
         # (connection variables like ansible_ssh_common_args, ansible_port, ...)
         # and cannot be renamed to carry a role prefix.
@@ -255,8 +271,8 @@ class VariableNamingRule(AnsibleLintRule):
         results = []
         task_prefix = Prefix()
         role_prefix = Prefix()
-        if file and file.role:
-            role_prefix = Prefix(file.role)
+        if file:
+            role_prefix = self._get_role_prefix(file)
         ansible_module = task["action"]["__ansible_module__"]
         # If the task uses the 'vars' section to set variables
         # only check role prefix for include_role and import_role tasks 'vars'
@@ -327,8 +343,8 @@ class VariableNamingRule(AnsibleLintRule):
             if not isinstance(meta_data, dict):
                 msg = f"Content if vars file {file} is not a dictionary."
                 raise TypeError(msg)
+            prefix = self._get_role_prefix(file)
             for key in meta_data:
-                prefix = Prefix(file.role) if file.role else Prefix()
                 match_error = self.get_var_naming_matcherror(
                     key,
                     prefix=prefix,
@@ -351,8 +367,49 @@ class VariableNamingRule(AnsibleLintRule):
             results.extend(super().matchyaml(file))
         return results
 
+    @staticmethod
+    def _get_role_prefix(file: Lintable) -> Prefix:
+        """Return the variable prefix expected inside the role containing file."""
+        if not file.role:
+            return Prefix()
+        if "." not in file.role:
+            return Prefix(file.role)
+        # A dotted role directory is a Galaxy 'namespace.role' install: prefer
+        # the role_name declared in meta/main.yml, else use the part of the
+        # directory name after the last dot.
+        role_name = ""
+        role_path = find_role_dir(file.path)
+        if role_path is not None:
+            meta = role_path / "meta" / "main.yml"
+            if meta.is_file():
+                meta_data = parse_yaml_from_file(str(meta))
+                if isinstance(meta_data, dict):
+                    galaxy_info = meta_data.get("galaxy_info")
+                    if isinstance(galaxy_info, dict):
+                        value = galaxy_info.get("role_name")
+                        if isinstance(value, str) and value.isidentifier():
+                            role_name = value
+        if not role_name:
+            candidate = file.role.rsplit(".", 1)[-1]
+            if candidate.isidentifier():
+                role_name = candidate
+        if not role_name:
+            return Prefix(unknown=file.role)
+        return Prefix(role_name)
+
     def _parse_prefix(self, fqcn: str) -> Prefix:
-        return Prefix("" if "." in fqcn else fqcn.split("/")[-1], is_fqcn(fqcn))
+        name = fqcn.split("/")[-1]
+        unknown = ""
+        if name.count(".") == 1:
+            # A 'namespace.role' name from a Galaxy install: the prefix is the
+            # role part of the name. Longer dotted names are collection FQCNs,
+            # whose foreign variables stay exempted from this check.
+            name = name.rsplit(".", 1)[-1]
+            if not name.isidentifier():
+                name, unknown = "", fqcn
+        elif "." in name:
+            name = ""
+        return Prefix(name, is_fqcn(fqcn), unknown)
 
 
 # testing code to be loaded only with pytest or when executed the rule file
@@ -557,3 +614,75 @@ if "pytest" in sys.modules:
         for idx, result in enumerate(results):
             assert result.tag == expected_errors[idx][0]
             assert expected_errors[idx][1] in result.message
+
+    def test_var_naming_dotted_role_dir(
+        config_options: Options,
+        app: App,
+    ) -> None:
+        """Check prefix detection on a Galaxy 'namespace.role' directory.
+
+        The expected prefix comes from galaxy_info.role_name (dotted_role),
+        while include_role/import_role vars use the role part of the dotted
+        name (dotted_target).
+        See: https://github.com/ansible/ansible-lint/issues/5215
+        """
+        rules = RulesCollection(app=app, options=config_options)
+        rules.register(VariableNamingRule())
+        results = Runner(
+            Lintable("examples/roles/acme.var_naming_dotted"),
+            rules=rules,
+        ).run()
+        expected_messages = sorted(
+            f"Variables names from within roles should use {prefix} as a prefix. {suffix}"
+            for prefix, suffix in (
+                ("dotted_role_", "(vars: var_naming_dotted_decoy)"),
+                ("dotted_role_", "(vars: bad_default_var)"),
+                ("dotted_role_", "(set_fact: bad_set_fact_var)"),
+                ("dotted_target_", "(vars: bad_included_var)"),
+                ("dotted_target_", "(vars: bad_imported_var)"),
+            )
+        )
+        assert sorted(result.message for result in results) == expected_messages
+        for result in results:
+            assert result.tag == "var-naming[no-role-prefix]"
+
+    def test_var_naming_dotted_role_dir_fallback(
+        config_options: Options,
+        app: App,
+    ) -> None:
+        """Without meta/main.yml the prefix is the name after the last dot.
+
+        See: https://github.com/ansible/ansible-lint/issues/5215
+        """
+        rules = RulesCollection(app=app, options=config_options)
+        rules.register(VariableNamingRule())
+        results = Runner(
+            Lintable("examples/roles/acme.dotted_fallback"),
+            rules=rules,
+        ).run()
+        expected_messages = sorted(
+            f"Variables names from within roles should use dotted_fallback_ as a prefix. {suffix}"
+            for suffix in (
+                "(vars: bad_fallback_var)",
+                "(set_fact: bad_fallback_fact)",
+            )
+        )
+        assert sorted(result.message for result in results) == expected_messages
+        for result in results:
+            assert result.tag == "var-naming[no-role-prefix]"
+
+    def test_var_naming_undetermined_role_prefix() -> None:
+        """A role name that yields no usable prefix is reported, not skipped."""
+        rule = VariableNamingRule()
+        file = Lintable("examples/roles/var_naming_no_role_prefix/tasks/main.yml")
+        data = parse_yaml_from_file(str(file.path))
+        assert isinstance(data, list)
+        ident = next(iter(data[2]["ansible.builtin.set_fact"]))
+        match = rule.get_var_naming_matcherror(
+            ident,
+            prefix=Prefix(unknown="acme."),
+            file=file,
+        )
+        assert match is not None
+        assert match.tag == "var-naming[no-role-prefix]"
+        assert "'acme.'" in match.message

@@ -1,0 +1,3 @@
+---
+dotted_fallback_good_var: true
+bad_fallback_var: true
