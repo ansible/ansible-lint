@@ -30,6 +30,8 @@ if TYPE_CHECKING:
     from ansiblelint.errors import MatchError
     from ansiblelint.utils import Task
 
+MAIN_YML = "main.yml"
+
 
 class Prefix(NamedTuple):
     """Prefix."""
@@ -46,7 +48,7 @@ def _role_name_from_meta(path: Path, pattern: re.Pattern[str]) -> str:
     role_path = find_role_dir(path)
     if role_path is None:
         return ""
-    meta = role_path / "meta" / "main.yml"
+    meta = role_path / "meta" / MAIN_YML
     if not meta.is_file():
         return ""
     try:
@@ -737,8 +739,8 @@ if "pytest" in sys.modules:
         role = tmp_path / "roles" / "acme.broken_meta"
         (role / "meta").mkdir(parents=True)
         (role / "tasks").mkdir()
-        (role / "meta" / "main.yml").write_text(meta_content)
-        tasks = role / "tasks" / "main.yml"
+        (role / "meta" / MAIN_YML).write_text(meta_content)
+        tasks = role / "tasks" / MAIN_YML
         tasks.write_text(
             "---\n"
             "- name: Set fact without role prefix\n"
@@ -768,7 +770,7 @@ if "pytest" in sys.modules:
         """
         role = tmp_path / "roles" / "acme.my-role"
         (role / "tasks").mkdir(parents=True)
-        tasks = role / "tasks" / "main.yml"
+        tasks = role / "tasks" / MAIN_YML
         tasks.write_text(
             "---\n"
             "- name: Set fact without role prefix\n"
@@ -794,7 +796,7 @@ if "pytest" in sys.modules:
 
     def test_var_naming_dotted_role_dir_without_role_dir(tmp_path: Path) -> None:
         """A stale role attribute still falls back to the part after the dot."""
-        tasks = tmp_path / "tasks" / "main.yml"
+        tasks = tmp_path / "tasks" / MAIN_YML
         tasks.parent.mkdir(parents=True)
         tasks.write_text("---\n[]\n")
         file = Lintable(str(tasks))
