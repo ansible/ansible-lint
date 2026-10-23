@@ -321,9 +321,11 @@ class VariableNamingRule(AnsibleLintRule):
         results = []
         task_prefix = Prefix()
         role_prefix = Prefix()
-        if file:
-            role_prefix = _get_role_prefix(file, self.re_pattern)
         ansible_module = task["action"]["__ansible_module__"]
+        # The prefix is only needed for set_fact or register, defer the
+        # lookup so other tasks do not trigger the role metadata read.
+        if file and (ansible_module == "set_fact" or task.get("register")):
+            role_prefix = _get_role_prefix(file, self.re_pattern)
         # If the task uses the 'vars' section to set variables
         # only check role prefix for include_role and import_role tasks 'vars'
         our_vars = task.get("vars", {})
