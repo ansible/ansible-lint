@@ -41,7 +41,7 @@ class Prefix(NamedTuple):
     unknown: str = ""
 
 
-def _role_name_from_meta(path: Path) -> str:
+def _role_name_from_meta(path: Path, pattern: re.Pattern[str]) -> str:
     """Return a usable galaxy_info.role_name from the role's meta/main.yml."""
     role_path = find_role_dir(path)
     if role_path is None:
@@ -61,10 +61,12 @@ def _role_name_from_meta(path: Path) -> str:
     if not isinstance(galaxy_info, dict):
         return ""
     role_name = galaxy_info.get("role_name")
-    return role_name if isinstance(role_name, str) and role_name.isidentifier() else ""
+    if isinstance(role_name, str) and pattern.match(role_name):
+        return role_name
+    return ""
 
 
-def _get_role_prefix(file: Lintable) -> Prefix:
+def _get_role_prefix(file: Lintable, pattern: re.Pattern[str]) -> Prefix:
     """Return the variable prefix expected inside the role containing file."""
     if not file.role:
         return Prefix()
@@ -72,11 +74,12 @@ def _get_role_prefix(file: Lintable) -> Prefix:
         return Prefix(file.role)
     # A dotted role directory is a Galaxy 'namespace.role' install: prefer
     # the role_name declared in meta/main.yml, else use the part of the
-    # directory name after the last dot.
-    role_name = _role_name_from_meta(file.path)
+    # directory name after the last dot. Any candidate must match the
+    # configured naming pattern or it could never be a valid prefix.
+    role_name = _role_name_from_meta(file.path, pattern)
     if not role_name:
         candidate = file.role.rsplit(".", 1)[-1]
-        if candidate.isidentifier():
+        if pattern.match(candidate):
             role_name = candidate
     if not role_name:
         return Prefix(unknown=file.role)
@@ -317,7 +320,7 @@ class VariableNamingRule(AnsibleLintRule):
         task_prefix = Prefix()
         role_prefix = Prefix()
         if file:
-            role_prefix = _get_role_prefix(file)
+            role_prefix = _get_role_prefix(file, self.re_pattern)
         ansible_module = task["action"]["__ansible_module__"]
         # If the task uses the 'vars' section to set variables
         # only check role prefix for include_role and import_role tasks 'vars'
@@ -388,7 +391,7 @@ class VariableNamingRule(AnsibleLintRule):
             if not isinstance(meta_data, dict):
                 msg = f"Content if vars file {file} is not a dictionary."
                 raise TypeError(msg)
-            prefix = _get_role_prefix(file)
+            prefix = _get_role_prefix(file, self.re_pattern)
             for key in meta_data:
                 match_error = self.get_var_naming_matcherror(
                     key,
@@ -420,7 +423,7 @@ class VariableNamingRule(AnsibleLintRule):
             # role part of the name. Longer dotted names are collection FQCNs,
             # whose foreign variables stay exempted from this check.
             name = name.rsplit(".", 1)[-1]
-            if not name.isidentifier():
+            if not self.re_pattern.match(name):
                 name, unknown = "", fqcn
         elif "." in name:
             name = ""
@@ -714,6 +717,10 @@ if "pytest" in sys.modules:
             pytest.param("- just\n- a\n- list\n", id="meta-not-a-dict"),
             pytest.param("galaxy_info: not-a-dict\n", id="galaxy-info-not-a-dict"),
             pytest.param("galaxy_info:\n  role_name: 42\n", id="role-name-not-a-str"),
+            pytest.param(
+                "galaxy_info:\n  role_name: MyRole\n",
+                id="role-name-not-a-prefix",
+            ),
         ),
     )
     def test_var_naming_dotted_role_dir_meta_fallback(
@@ -792,4 +799,4 @@ if "pytest" in sys.modules:
         tasks.write_text("---\n[]\n")
         file = Lintable(str(tasks))
         file.role = "acme.stale"
-        assert _get_role_prefix(file) == Prefix("stale")
+        assert _get_role_prefix(file, VariableNamingRule.re_pattern) == Prefix("stale")
