@@ -6,7 +6,7 @@ attrs==26.1.0
     # via
     #   jsonschema
     #   referencing
-black==26.5.1
+black==26.10.1
     # via ansible-lint
 bracex==3.0.1
     # via wcmatch
@@ -22,7 +22,7 @@ cryptography==50.0.1
     #   ansible-lint
 distro==1.9.0
     # via ansible-lint
-filelock==3.32.5
+filelock==4.2.1
     # via ansible-lint
 jinja2==3.1.6
     # via ansible-core
