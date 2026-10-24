@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from ansiblelint.utils import Task
 
 RE_JINJA = re.compile(r"{{ (.*?) }}")
+RE_LOOP_CONDITION = re.compile(r"{{\s*[\w.]+\.when\s*}}")
 RE_QUOTED_STRING = re.compile(r'"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'')
 _WHEN_KEYS = ("when", "changed_when", "failed_when")
 
@@ -122,10 +123,24 @@ def _transform_when_keys(
 ) -> bool:
     """Return whether any value was actually changed."""
     changed = False
+    is_loop_task = "loop" in task or any(key.startswith("with_") for key in task)
     for key, value in task.items():
         if key == "roles" and isinstance(value, list):
             changed = transform_for_roles(value, key_to_check=key_to_check) or changed
         elif key in key_to_check:
+            values = value if isinstance(value, list) else [value]
+            if (
+                key == "when"
+                and is_loop_task
+                and any(
+                    isinstance(item, str) and RE_LOOP_CONDITION.search(item)
+                    for item in values
+                )
+            ):
+                # A loop item may hold another Ansible condition as text. Keeping
+                # the template wrapper preserves its evaluation before `when` is
+                # evaluated, while stripping it changes the condition's meaning.
+                continue
             new_value, value_changed = _transform_when_value(value)
             if value_changed:
                 task[key] = new_value
@@ -175,6 +190,14 @@ if "pytest" in sys.modules:
         """Autofix must leave non-string when list items untouched."""
         assert _transform_when_value([True, "{{ foo }}", 1]) == ([True, "foo", 1], True)
         assert _transform_when_value(True) == (True, False)
+
+    def test_transform_skips_loop_generated_conditions() -> None:
+        """Do not flatten condition text supplied by a loop item."""
+        for loop_key in ("loop", "with_items"):
+            for when in ("{{ row.when }}", ["{{ row.when }}", "{{ ready }}"]):
+                task = {"when": when, loop_key: ["synthetic condition"]}
+                assert _transform_when_keys(task, _WHEN_KEYS) is False
+                assert task["when"] == when
 
     def test_transform_for_roles_skips_shorthand_strings() -> None:
         """Shorthand role strings must not break transform iteration."""
