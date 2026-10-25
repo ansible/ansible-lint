@@ -283,3 +283,24 @@ def test_offline_config_used_when_no_cli(base_arguments: list[str]) -> None:
         result = cli.merge_config(file_config, cli_config)
 
     assert result.offline is True
+
+
+@pytest.mark.parametrize(
+    ("args", "expected"),
+    (
+        pytest.param(["--fix=none"], [], id="none"),
+        pytest.param(["--fix=all"], ["all"], id="all"),
+        pytest.param(["--fix"], ["rule-tag", "rule-id"], id="no-value"),
+    ),
+)
+def test_fix_cli_overrides_config(
+    base_arguments: list[str],
+    args: list[str],
+    expected: list[str],
+) -> None:
+    """Ensure a value passed to --fix overrides write_list from config (#5147)."""
+    config = cli.get_config(
+        [*base_arguments, *args, "-c", "test/fixtures/config-with-write-subset.yml"],
+    )
+
+    assert config.write_list == expected

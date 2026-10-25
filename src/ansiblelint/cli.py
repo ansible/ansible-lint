@@ -256,12 +256,15 @@ class WriteArgAction(argparse.Action):
         When --fix is not passed from command line the from_cli is an empty list,
         so we use the file.
 
-        When from_cli is not an empty list, we ignore the from_file value.
+        When --fix is passed without a value, we use the file value, or "all" if
+        the file does not have one.
+
+        When --fix is passed with a value, we ignore the from_file value.
         """
-        if not from_file:
-            arguments = ["all"] if from_cli == [cls._default] else from_cli
+        if from_cli == [cls._default]:
+            arguments = from_file or ["all"]
         else:
-            arguments = from_file
+            arguments = from_cli or from_file
         for magic_value in ("none", "all"):
             if magic_value in arguments and len(arguments) > 1:
                 msg = f"When passing '{magic_value}' to '--fix', you cannot pass other values."
