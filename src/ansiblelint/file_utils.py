@@ -318,22 +318,7 @@ class Lintable:
         self._content = self._original_content = content
         self.updated = False
 
-        # if the lintable is part of a role, we save:
-        # - the name specified in the role's meta.yaml, if it is found
-        # - the name of the most probable "roles" folder, if found in the path
-        self.role = ""
-        role_meta_config = find_role_meta(self.path)
-        if role_meta_config:
-            self.role = (
-                (yaml_from_file(role_meta_config) or {})
-                .get("galaxy_info", {})
-                .get("role_name", "")
-            )
-
-        if not role_meta_config or not self.role:
-            role_path = find_role_dir(self.path)
-            if role_path is not None:
-                self.role = role_path.name
+        self.role = self._determine_role_name()
 
         if str(self.path) in ["/dev/stdin", "-"]:
             # pylint: disable=consider-using-with
@@ -368,6 +353,27 @@ class Lintable:
 
         if self.kind == "yaml":
             _ = self.data
+
+    def _determine_role_name(self) -> str:
+        """Determine the name of the role a Lintable resides in, if any."""
+        # if the lintable is part of a role, we save:
+        # - the name specified in the role's meta.yaml, if it is found
+        # - the name of the most probable "roles" folder, if found in the path
+        role_name = ""
+        role_meta_config = find_role_meta(self.path)
+        if role_meta_config:
+            role_name = (
+                (yaml_from_file(role_meta_config) or {})
+                .get("galaxy_info", {})
+                .get("role_name", "")
+            )
+
+        if not role_meta_config or not role_name:
+            role_path = find_role_dir(self.path)
+            if role_path is not None:
+                role_name = role_path.name
+
+        return role_name
 
     def __del__(self) -> None:
         """Clean up temporary files when the instance is cleaned up."""
