@@ -19,6 +19,7 @@ from yaml.error import YAMLError
 
 from ansiblelint.config import ANSIBLE_OWNED_KINDS, BASE_KINDS, Options, options
 from ansiblelint.constants import CONFIG_FILENAMES, FileType, States
+from ansiblelint.loaders import yaml_from_file
 
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
@@ -34,6 +35,32 @@ ROLE_SUBDIRS = ("tasks", "meta", "vars", "defaults", "handlers")
 def _has_role_subdirs(path: Path) -> bool:
     """Return true if path is a directory with typical role subfolders."""
     return path.is_dir() and any((path / subdir).is_dir() for subdir in ROLE_SUBDIRS)
+
+
+def find_role_meta(path: Path) -> Path | None:
+    """Look for a meta/main.y(a)ml in the current path and return its path if found."""
+    current = path if path.is_dir() else path.parent
+    found: Path | None = None
+
+    while True:
+        if _has_role_subdirs(current):
+            meta = current / "meta"
+
+            if (meta / "main.yml").exists():
+                found = meta / "main.yml"
+            elif (meta / "main.yaml").exists():
+                found = meta / "main.yaml"
+
+        if not current.name:
+            # NOTE: Because "." has to be considered for role subdirs,
+            #       Path(".").name is None, and Path(".").parent is Path("."),
+            #       the condition needs to be checked inside the loop to work
+            #       as expected, and to avoid infinite recursion.
+            break
+
+        current = current.parent
+
+    return found
 
 
 def find_role_dir(path: Path) -> Path | None:
@@ -291,11 +318,22 @@ class Lintable:
         self._content = self._original_content = content
         self.updated = False
 
-        # if the lintable is part of a role, we save role folder name
+        # if the lintable is part of a role, we save:
+        # - the name specified in the role's meta.yaml, if it is found
+        # - the name of the most probable "roles" folder, if found in the path
         self.role = ""
-        role_path = find_role_dir(self.path)
-        if role_path is not None:
-            self.role = role_path.name
+        role_meta_config = find_role_meta(self.path)
+        if role_meta_config:
+            self.role = (
+                (yaml_from_file(role_meta_config) or {})
+                .get("galaxy_info", {})
+                .get("role_name", "")
+            )
+
+        if not role_meta_config or not self.role:
+            role_path = find_role_dir(self.path)
+            if role_path is not None:
+                self.role = role_path.name
 
         if str(self.path) in ["/dev/stdin", "-"]:
             # pylint: disable=consider-using-with
@@ -475,9 +513,7 @@ class Lintable:
 
     def _load_yaml_state(self) -> None:
         """Load and process YAML content, guessing kind and appending skip rules."""
-        from ansiblelint.utils import (  # pylint: disable=import-outside-toplevel
-            parse_yaml_linenumbers,
-        )
+        from ansiblelint.utils import parse_yaml_linenumbers  # pylint: disable=import-outside-toplevel
 
         self.state = parse_yaml_linenumbers(self)
         if self.kind == "yaml":
