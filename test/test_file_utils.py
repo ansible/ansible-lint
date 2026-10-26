@@ -21,6 +21,7 @@ from ansiblelint.file_utils import (
     expand_paths_vars,
     find_project_root,
     find_role_dir,
+    find_role_meta,
     kind_from_path,
     normpath,
     normpath_path,
@@ -707,3 +708,113 @@ def test_expand_dirs_in_lintables_warns_on_expansion(
         expand_dirs_in_lintables(lintables)
     assert "Directory expansion discovered" in caplog.text
     assert "exclude_paths" in caplog.text
+
+
+def test_find_role_meta_existing_meta_yml(tmp_path: Path) -> None:
+    """meta.yml file is found regardless of content."""
+    role_dir = tmp_path / "roles" / "my_namespace" / "some_role"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.touch()
+
+    meta_yaml_file = role_dir / "meta" / "main.yaml"
+    meta_yaml_file.touch()
+    assert find_role_meta(task_file) == meta_yaml_file
+    meta_yaml_file.unlink()
+
+    meta_yml_file = role_dir / "meta" / "main.yml"
+    meta_yml_file.touch()
+    assert find_role_meta(task_file) == meta_yml_file
+
+
+def test_find_role_meta_nonexisting_meta_yml(tmp_path: Path) -> None:
+    """Finding meta yaml must return None when no meta config is found."""
+    role_dir = tmp_path / "roles" / "my_namespace" / "some_role"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.touch()
+
+    assert find_role_meta(task_file) is None
+
+
+def test_lintable_role_name_from_meta_without_roles_nesting(tmp_path: Path) -> None:
+    """Role name is set on a Lintable even without nesting in 'roles' folder."""
+    role_dir = tmp_path / "role_not_nested_in_roles"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.write_text("---\n- debug: msg=hi\n", encoding="utf-8")
+
+    meta_file = role_dir / "meta" / "main.yml"
+    meta_file.write_text("""galaxy_info:
+      role_name: role_from_meta
+    """)
+
+    lintable = Lintable(task_file)
+
+    assert lintable.role == "role_from_meta"
+
+
+def test_lintable_role_name_from_meta_with_roles_nesting(tmp_path: Path) -> None:
+    """Role name from meta config takes precedence over folder name of role."""
+    role_dir = tmp_path / "roles" / "my_namespace" / "role_nested_in_roles"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.write_text("---\n- debug: msg=hi\n", encoding="utf-8")
+
+    meta_file = role_dir / "meta" / "main.yml"
+    meta_file.write_text("""galaxy_info:
+      role_name: role_from_meta
+    """)
+
+    lintable = Lintable(task_file)
+
+    assert lintable.role == "role_from_meta"
+
+
+def test_lintable_role_name_without_meta_yml(tmp_path: Path) -> None:
+    """A missing meta.yml must not fail the Lintable."""
+    role_dir = tmp_path / "some_role"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.write_text("---\n- debug: msg=hi\n", encoding="utf-8")
+
+    lintable = Lintable(task_file)
+
+    assert not lintable.role
+
+
+def test_lintable_role_name_without_role_name_in_meta(tmp_path: Path) -> None:
+    """A missing 'role_name' key in the meta config must not fail the Lintable."""
+    role_dir = tmp_path / "some_role"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.write_text("---\n- debug: msg=hi\n", encoding="utf-8")
+
+    meta_file = role_dir / "meta" / "main.yml"
+    meta_file.write_text("galaxy_info: {}")
+
+    lintable = Lintable(task_file)
+
+    assert not lintable.role
+
+
+def test_lintable_role_name_with_empty_meta_yml(tmp_path: Path) -> None:
+    """An empty meta config must not fail the Lintable."""
+    role_dir = tmp_path / "some_role"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.write_text("---\n- debug: msg=hi\n", encoding="utf-8")
+
+    meta_file = role_dir / "meta" / "main.yml"
+    meta_file.write_text("")
+
+    lintable = Lintable(task_file)
+
+    assert not lintable.role
