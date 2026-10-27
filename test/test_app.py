@@ -323,6 +323,35 @@ def test_fix_none_with_write_list_and_strict(tmp_path: Path) -> None:
     assert lintable.path.read_text(encoding="utf-8") == content
 
 
+def test_fix_none_with_write_list_on_a_clean_file(tmp_path: Path) -> None:
+    """Test that --fix=none passes a clean file and leaves it as is when write_list is set.
+
+    Without the fix, the transforms rewrote the file despite --fix=none and the
+    run exited with 8 although it reported no failure (#5147).
+    """
+    content = "---\nfoo: 'bar'\n"
+    lintable = Lintable(tmp_path / "vars.yml")
+    lintable.content = content
+    lintable.write(force=True)
+
+    # Create config file with write_list
+    config_file = tmp_path / ".ansible-lint"
+    config_file.write_text("write_list:\n  - all\n")
+
+    result = run_ansible_lint(
+        lintable.filename,
+        "--fix=none",
+        "--strict",
+        "--profile=production",
+        cwd=tmp_path,
+        env={"NO_COLOR": "1"},
+    )
+
+    assert result.returncode == RC.SUCCESS
+    assert "Passed: 0 failure(s), 0 warning(s)" in result.stderr
+    assert lintable.path.read_text(encoding="utf-8") == content
+
+
 def test_ensure_cache_collections_first_noop_without_cache_dir() -> None:
     """Ensure helper is a no-op when cache_dir is not set."""
     from unittest.mock import MagicMock
