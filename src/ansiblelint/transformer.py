@@ -51,6 +51,10 @@ class Transformer:
         """Initialize a Transformer instance."""
         self.write_set = self.effective_write_set(options.write_list)
         self.write_exclude_set = self.effective_write_set(options.write_exclude_list)
+        self.fix_comment_spaces = not any(
+            tag in (options.skip_list or []) or tag in (options.warn_list or [])
+            for tag in ("yaml[comments]", "yaml")
+        )
         self.warn_list = set(options.warn_list)
 
         self.matches: list[MatchError] = result.matches
@@ -118,6 +122,7 @@ class Transformer:
                 yaml = FormattedYAML(
                     # Ansible only uses YAML 1.1, but others files should use newer 1.2 (ruamel.yaml defaults to 1.2)
                     version=(1, 1) if file.is_owned_by_ansible() else None,
+                    fix_comment_spaces=self.fix_comment_spaces,
                 )
 
                 ruamel_data = yaml.load(data)
@@ -183,6 +188,15 @@ class Transformer:
                     "playbook",
                 ):
                     match.yaml_path = get_path_to_task(file, match.lineno, data)
+
+            # When yaml[comments] is in warn_list the emitter won't apply
+            # comment-spacing fixes, so don't mark those matches as fixed —
+            # doing so would silently hide the unresolved warning.
+            if match.tag == "yaml[comments]" and not self.fix_comment_spaces:
+                _logger.debug(
+                    "%s %s (comment spacing disabled)", self.FIX_NA_MSG, match_id
+                )
+                continue
 
             _logger.debug("%s %s", self.FIX_APPLY_MSG, match_id)
             try:
