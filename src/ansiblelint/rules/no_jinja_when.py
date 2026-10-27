@@ -96,7 +96,8 @@ class NoFormattingInWhenRule(AnsibleLintRule, TransformMixin):
             return
         task = self.seek(match.yaml_path, data)
         if isinstance(task, MutableMapping):
-            match.fixed = _transform_when_keys(task, _WHEN_KEYS)
+            _transform_when_keys(task, _WHEN_KEYS)
+            match.fixed = self._is_valid(task.get("when"))
 
 
 def _transform_when_value(
@@ -207,6 +208,16 @@ if "pytest" in sys.modules:
             }
             assert _transform_when_keys(mixed, _WHEN_KEYS) is True
             assert mixed["when"] == ["{{ row.when }}", "ready"]
+
+    def test_transform_keeps_partially_fixed_loop_condition_match_unfixed() -> None:
+        """A mixed list remains a lint match while a dynamic item is preserved."""
+        task = {
+            "when": ["{{ row.when }}", "{{ ready }}"],
+            "loop": ["synthetic condition"],
+        }
+        assert _transform_when_keys(task, _WHEN_KEYS) is True
+        assert task["when"] == ["{{ row.when }}", "ready"]
+        assert NoFormattingInWhenRule._is_valid(task["when"]) is False
 
     def test_transform_preserves_loop_conditions_in_all_condition_keys() -> None:
         """Preserve loop-item conditions in when, changed_when, and failed_when."""
