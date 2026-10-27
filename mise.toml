@@ -5,4 +5,4 @@
 UV_PROJECT_ENVIRONMENT = "{{ get_env(name='VIRTUAL_ENV', default='.venv') }}"
 
 [tools]
-python = "3.13"
+python = "3.15.1"
