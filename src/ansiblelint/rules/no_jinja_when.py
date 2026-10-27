@@ -143,7 +143,7 @@ def _transform_when_keys(
             # auto-fix, including when both forms occur in one list.
             new_value, value_changed = _transform_when_value(
                 value,
-                preserve_loop_conditions=key == "when" and is_loop_task,
+                preserve_loop_conditions=is_loop_task,
             )
             if value_changed:
                 task[key] = new_value
@@ -207,6 +207,32 @@ if "pytest" in sys.modules:
             }
             assert _transform_when_keys(mixed, _WHEN_KEYS) is True
             assert mixed["when"] == ["{{ row.when }}", "ready"]
+
+    def test_transform_preserves_loop_conditions_in_all_condition_keys() -> None:
+        """Preserve loop-item conditions in when, changed_when, and failed_when."""
+        for loop_key in ("loop", "with_items"):
+            task = {
+                "when": "{{ ready }}",
+                "changed_when": "{{ row.when }}",
+                "failed_when": ["{{ row['when'] }}", "{{ failure }}"],
+                loop_key: ["synthetic condition"],
+            }
+            assert _transform_when_keys(task, _WHEN_KEYS) is True
+            assert task["when"] == "ready"
+            assert task["changed_when"] == "{{ row.when }}"
+            assert task["failed_when"] == ["{{ row['when'] }}", "failure"]
+
+            non_loop_task = {
+                "when": "{{ ready }}",
+                "changed_when": "{{ changed }}",
+                "failed_when": "{{ failed }}",
+            }
+            assert _transform_when_keys(non_loop_task, _WHEN_KEYS) is True
+            assert non_loop_task == {
+                "when": "ready",
+                "changed_when": "changed",
+                "failed_when": "failed",
+            }
 
     def test_transform_preserves_bracket_loop_conditions() -> None:
         """Bracket access to a loop item's condition must keep its template."""
