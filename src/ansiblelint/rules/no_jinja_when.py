@@ -17,7 +17,9 @@ if TYPE_CHECKING:
     from ansiblelint.utils import Task
 
 RE_JINJA = re.compile(r"{{ (.*?) }}")
-RE_LOOP_CONDITION = re.compile(r"{{\s*[\w.]+\.when\s*}}")
+RE_LOOP_CONDITION = re.compile(
+    r"""{{\s*[\w.]+(?:\.when|\[\s*(['"])when\1\s*\])\s*}}""",
+)
 RE_QUOTED_STRING = re.compile(r'"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'')
 _WHEN_KEYS = ("when", "changed_when", "failed_when")
 
@@ -97,7 +99,11 @@ class NoFormattingInWhenRule(AnsibleLintRule, TransformMixin):
             match.fixed = _transform_when_keys(task, _WHEN_KEYS)
 
 
-def _transform_when_value(value: Any) -> tuple[Any, bool]:
+def _transform_when_value(
+    value: Any,
+    *,
+    preserve_loop_conditions: bool = False,
+) -> tuple[Any, bool]:
     """Return the transformed value and whether it changed.
 
     Lists are edited in place so that ruamel keeps their comments and blank lines.
@@ -106,12 +112,16 @@ def _transform_when_value(value: Any) -> tuple[Any, bool]:
         changed = False
         for index, item in enumerate(value):
             if isinstance(item, str):
+                if preserve_loop_conditions and RE_LOOP_CONDITION.search(item):
+                    continue
                 new_item = _strip_redundant_jinja(item)
                 if new_item != item:
                     value[index] = new_item
                     changed = True
         return value, changed
     if isinstance(value, str):
+        if preserve_loop_conditions and RE_LOOP_CONDITION.search(value):
+            return value, False
         new_value = _strip_redundant_jinja(value)
         return new_value, new_value != value
     return value, False
@@ -128,20 +138,13 @@ def _transform_when_keys(
         if key == "roles" and isinstance(value, list):
             changed = transform_for_roles(value, key_to_check=key_to_check) or changed
         elif key in key_to_check:
-            values = value if isinstance(value, list) else [value]
-            if (
-                key == "when"
-                and is_loop_task
-                and any(
-                    isinstance(item, str) and RE_LOOP_CONDITION.search(item)
-                    for item in values
-                )
-            ):
-                # A loop item may hold another Ansible condition as text. Keeping
-                # the template wrapper preserves its evaluation before `when` is
-                # evaluated, while stripping it changes the condition's meaning.
-                continue
-            new_value, value_changed = _transform_when_value(value)
+            # A loop item may hold another Ansible condition as text. Preserve
+            # only those dynamic entries; other conditions still need the normal
+            # auto-fix, including when both forms occur in one list.
+            new_value, value_changed = _transform_when_value(
+                value,
+                preserve_loop_conditions=key == "when" and is_loop_task,
+            )
             if value_changed:
                 task[key] = new_value
                 changed = True
@@ -191,13 +194,34 @@ if "pytest" in sys.modules:
         assert _transform_when_value([True, "{{ foo }}", 1]) == ([True, "foo", 1], True)
         assert _transform_when_value(True) == (True, False)
 
-    def test_transform_skips_loop_generated_conditions() -> None:
-        """Do not flatten condition text supplied by a loop item."""
+    def test_transform_preserves_loop_generated_conditions() -> None:
+        """Preserve dynamic loop conditions and fix other list entries."""
         for loop_key in ("loop", "with_items"):
-            for when in ("{{ row.when }}", ["{{ row.when }}", "{{ ready }}"]):
-                task = {"when": when, loop_key: ["synthetic condition"]}
+            task = {"when": "{{ row.when }}", loop_key: ["synthetic condition"]}
+            assert _transform_when_keys(task, _WHEN_KEYS) is False
+            assert task["when"] == "{{ row.when }}"
+
+            mixed = {
+                "when": ["{{ row.when }}", "{{ ready }}"],
+                loop_key: ["synthetic condition"],
+            }
+            assert _transform_when_keys(mixed, _WHEN_KEYS) is True
+            assert mixed["when"] == ["{{ row.when }}", "ready"]
+
+    def test_transform_preserves_bracket_loop_conditions() -> None:
+        """Bracket access to a loop item's condition must keep its template."""
+        for loop_key in ("loop", "with_items"):
+            for condition in ("{{ row['when'] }}", '{{ row["when"] }}'):
+                task = {"when": condition, loop_key: ["synthetic condition"]}
                 assert _transform_when_keys(task, _WHEN_KEYS) is False
-                assert task["when"] == when
+                assert task["when"] == condition
+
+                mixed = {
+                    "when": [condition, "{{ ready }}"],
+                    loop_key: ["synthetic condition"],
+                }
+                assert _transform_when_keys(mixed, _WHEN_KEYS) is True
+                assert mixed["when"] == [condition, "ready"]
 
     def test_transform_for_roles_skips_shorthand_strings() -> None:
         """Shorthand role strings must not break transform iteration."""
