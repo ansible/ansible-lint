@@ -166,6 +166,22 @@ def test_ensure_write_cli_does_not_consume_lintables(
     assert cli_value == expected
 
 
+@pytest.mark.parametrize("value", ("all", "none"))
+def test_fix_keyword_is_not_a_lintable(
+    monkeypatch: MonkeyPatch,
+    tmp_path: Path,
+    value: str,
+) -> None:
+    """Check that --fix=all and --fix=none stay values when such a path exists."""
+    (tmp_path / value).mkdir()
+    monkeypatch.chdir(tmp_path)
+
+    options = cli.get_cli_parser().parse_args([f"--fix={value}"])
+
+    assert options.write_list == [value]
+    assert options.lintables == []
+
+
 def test_config_can_be_overridden(base_arguments: list[str]) -> None:
     """Check that config can be overridden from CLI."""
     no_override = cli.get_config([*base_arguments, "-t", "bad_tag"])
@@ -291,6 +307,8 @@ def test_offline_config_used_when_no_cli(base_arguments: list[str]) -> None:
         pytest.param(["--fix=none"], [], id="none"),
         pytest.param(["--fix=all"], ["all"], id="all"),
         pytest.param(["--fix"], ["rule-tag", "rule-id"], id="no-value"),
+        pytest.param(["--fix=all", "--fix"], ["all"], id="all-and-no-value"),
+        pytest.param(["--fix=rule-id", "--fix"], ["rule-id"], id="id-and-no-value"),
     ),
 )
 def test_fix_cli_overrides_config(
@@ -302,5 +320,24 @@ def test_fix_cli_overrides_config(
     config = cli.get_config(
         [*base_arguments, *args, "-c", "test/fixtures/config-with-write-subset.yml"],
     )
+
+    assert config.write_list == expected
+
+
+@pytest.mark.parametrize(
+    ("args", "expected"),
+    (
+        pytest.param(["--fix"], ["all"], id="no-value"),
+        pytest.param(["--fix=all", "--fix"], ["all"], id="all-and-no-value"),
+        pytest.param(["--fix=rule-id", "--fix"], ["rule-id"], id="id-and-no-value"),
+    ),
+)
+def test_fix_cli_without_config(
+    base_arguments: list[str],
+    args: list[str],
+    expected: list[str],
+) -> None:
+    """Ensure a bare --fix after a value is ignored without a config file."""
+    config = cli.get_config([*base_arguments, *args, "-c", "/dev/null"])
 
     assert config.write_list == expected

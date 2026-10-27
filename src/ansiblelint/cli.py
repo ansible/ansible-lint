@@ -227,10 +227,11 @@ class WriteArgAction(argparse.Action):
         option_string: str | None = None,
     ) -> None:
         lintables = getattr(namespace, "lintables", None)
-        if not lintables and isinstance(values, str):
+        if not lintables and isinstance(values, str) and values not in {"all", "none"}:
             # args are processed in order.
             # If --fix is after lintables, then that is not ambiguous.
-            # But if --fix comes first, then it might actually be a lintable.
+            # But if --fix comes first, then it might actually be a lintable,
+            # unless it is one of the 'all' or 'none' keywords.
             maybe_lintable = Path(values)
             if maybe_lintable.exists():
                 namespace.lintables = [values]
@@ -239,7 +240,8 @@ class WriteArgAction(argparse.Action):
             values = values.split(",")
         default = [self.const] if isinstance(self.const, str) else self.const
         previous_values = getattr(namespace, self.dest, default) or default
-        if not values:
+        # A bare --fix keeps the values of an earlier --fix.
+        if not values or values == default:
             values = previous_values
         elif previous_values != default:
             values = previous_values + values  # type: ignore[operator]
