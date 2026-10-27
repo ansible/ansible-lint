@@ -166,11 +166,18 @@ def test_ensure_write_cli_does_not_consume_lintables(
     assert cli_value == expected
 
 
-@pytest.mark.parametrize("value", ("all", "none"))
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    (
+        pytest.param("all", ["all"], id="all"),
+        pytest.param("none", ["none"], id="none"),
+    ),
+)
 def test_fix_keyword_is_not_a_lintable(
     monkeypatch: MonkeyPatch,
     tmp_path: Path,
     value: str,
+    expected: list[str],
 ) -> None:
     """Check that --fix=all and --fix=none stay values when such a path exists."""
     (tmp_path / value).mkdir()
@@ -178,8 +185,8 @@ def test_fix_keyword_is_not_a_lintable(
 
     options = cli.get_cli_parser().parse_args([f"--fix={value}"])
 
-    assert options.write_list == [value]
-    assert options.lintables == []
+    assert options.write_list == expected
+    assert not options.lintables
 
 
 def test_config_can_be_overridden(base_arguments: list[str]) -> None:
