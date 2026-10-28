@@ -1165,3 +1165,24 @@ def test_formatted_yaml_fix_comment_spaces_disabled() -> None:
     # Negative: the fixer must not have added spaces
     assert "# bad spacing" not in output
     assert "# also missing" not in output
+
+
+def test_formatted_yaml_preserves_python_tags() -> None:
+    """Verify that explicit YAML tags survive a round-trip unchanged.
+
+    See https://github.com/ansible/ansible-lint/issues/4222
+    """
+    yaml = ansiblelint.yaml_utils.FormattedYAML()
+    text = (
+        "---\n"
+        "format: !!python/name:pymdownx.superfences.fence_code_format\n"
+        "other: !custom value\n"
+        "items: !!python/tuple [1, 2]\n"
+    )
+    data = yaml.load(text)
+    output = yaml.dumps(data)
+
+    assert "%20" not in output
+    assert "format: !!python/name:pymdownx.superfences.fence_code_format\n" in output
+    assert "other: !custom value\n" in output
+    assert "items: !!python/tuple [1, 2]\n" in output
