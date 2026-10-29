@@ -17,8 +17,7 @@ import pathspec
 import wcmatch.pathlib
 from yaml.error import YAMLError
 
-from ansiblelint.config import (ANSIBLE_OWNED_KINDS, BASE_KINDS, Options,
-                                options)
+from ansiblelint.config import ANSIBLE_OWNED_KINDS, BASE_KINDS, Options, options
 from ansiblelint.constants import CONFIG_FILENAMES, FileType, States
 from ansiblelint.loaders import yaml_from_file
 
@@ -364,7 +363,12 @@ class Lintable:
         role_name = ""
         role_meta_config = find_role_meta(self.path)
         if role_meta_config:
-            galaxy_info = (yaml_from_file(role_meta_config) or {}).get("galaxy_info", {})
+            try:
+                galaxy_info = (yaml_from_file(role_meta_config) or {}).get(
+                    "galaxy_info", {}
+                )
+            except (OSError, UnicodeDecodeError, YAMLError):
+                galaxy_info = None
 
             if isinstance(galaxy_info, dict):
                 role_name = galaxy_info.get("role_name", "")
@@ -523,8 +527,7 @@ class Lintable:
 
     def _load_yaml_state(self) -> None:
         """Load and process YAML content, guessing kind and appending skip rules."""
-        from ansiblelint.utils import \
-            parse_yaml_linenumbers  # pylint: disable=import-outside-toplevel
+        from ansiblelint.utils import parse_yaml_linenumbers  # pylint: disable=import-outside-toplevel
 
         self.state = parse_yaml_linenumbers(self)
         if self.kind == "yaml":
