@@ -551,6 +551,14 @@ def _run_cli_entrypoint() -> None:
         raise SystemExit(exc) from exc
 
 
+def _is_uv_tool_env(bin_path: str) -> bool:
+    """Return True when bin_path belongs to an environment made by uv tool."""
+    # uv writes a receipt at the root of every environment it creates for a
+    # tool, wherever that environment lives: the default tools directory,
+    # UV_TOOL_DIR or an explicit --install-dir (how mise installs pypi tools).
+    return (Path(bin_path).parent / "uv-receipt.toml").is_file()
+
+
 def path_inject(own_location: str = "") -> None:
     """Add python interpreter path to top of PATH to fix outside venv calling."""
     # This make it possible to call ansible-lint that was installed inside a
@@ -612,7 +620,7 @@ def path_inject(own_location: str = "") -> None:
     if not os.environ.get("PYENV_VIRTUAL_ENV", None):
         if inject_paths and not any((
             all("pipx" in p for p in inject_paths),
-            all("uv/tools" in p for p in inject_paths),
+            all(_is_uv_tool_env(p) for p in inject_paths),
         )):
             print(  # ruff:ignore[print]
                 f"WARNING: PATH altered to include {', '.join(inject_paths)} :: This is usually a sign of broken local setup, which can cause unexpected behaviors.",
