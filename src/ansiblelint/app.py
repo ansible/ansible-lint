@@ -337,7 +337,7 @@ class App:
             if 0 < rating < 6:
                 stars = f" Rating: {rating}/5 star"
 
-            console_stderr.print(table)
+            console_stderr.print(table, file=sys.stderr)
 
         msg = "[success]Passed[/]" if is_success else "[failed][bold]Failed[/][/]"
 
