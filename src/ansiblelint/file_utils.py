@@ -17,7 +17,8 @@ import pathspec
 import wcmatch.pathlib
 from yaml.error import YAMLError
 
-from ansiblelint.config import ANSIBLE_OWNED_KINDS, BASE_KINDS, Options, options
+from ansiblelint.config import (ANSIBLE_OWNED_KINDS, BASE_KINDS, Options,
+                                options)
 from ansiblelint.constants import CONFIG_FILENAMES, FileType, States
 from ansiblelint.loaders import yaml_from_file
 
@@ -318,8 +319,6 @@ class Lintable:
         self._content = self._original_content = content
         self.updated = False
 
-        self.role = self._determine_role_name()
-
         if str(self.path) in ["/dev/stdin", "-"]:
             # pylint: disable=consider-using-with
             self.file = NamedTemporaryFile(  # ruff:ignore[open-file-with-context-handler]
@@ -335,8 +334,11 @@ class Lintable:
             self.name = "stdin"
             self.kind = "playbook"
             self.dir = "/"
+            self.role = ""
         else:
             self.kind = kind or kind_from_path(self.path)
+            self.role = self._determine_role_name()
+
         # We store absolute directory in dir
         if not self.dir:
             if self.kind == "role":
@@ -519,7 +521,8 @@ class Lintable:
 
     def _load_yaml_state(self) -> None:
         """Load and process YAML content, guessing kind and appending skip rules."""
-        from ansiblelint.utils import parse_yaml_linenumbers  # pylint: disable=import-outside-toplevel
+        from ansiblelint.utils import \
+            parse_yaml_linenumbers  # pylint: disable=import-outside-toplevel
 
         self.state = parse_yaml_linenumbers(self)
         if self.kind == "yaml":
