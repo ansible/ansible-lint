@@ -364,11 +364,10 @@ class Lintable:
         role_name = ""
         role_meta_config = find_role_meta(self.path)
         if role_meta_config:
-            role_name = (
-                (yaml_from_file(role_meta_config) or {})
-                .get("galaxy_info", {})
-                .get("role_name", "")
-            )
+            galaxy_info = (yaml_from_file(role_meta_config) or {}).get("galaxy_info", {})
+
+            if isinstance(galaxy_info, dict):
+                role_name = galaxy_info.get("role_name", "")
 
         if not role_meta_config or not role_name:
             role_path = find_role_dir(self.path)
