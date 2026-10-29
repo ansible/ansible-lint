@@ -369,6 +369,9 @@ class Lintable:
             if isinstance(galaxy_info, dict):
                 role_name = galaxy_info.get("role_name", "")
 
+                if not isinstance(role_name, str):
+                    role_name = ""
+
         if not role_meta_config or not role_name:
             role_path = find_role_dir(self.path)
             if role_path is not None:
