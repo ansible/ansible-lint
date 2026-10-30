@@ -361,7 +361,25 @@ class Lintable:
         # - the name specified in the role's meta.yaml, if it is found
         # - the name of the most probable "roles" folder, if found in the path
         role_name = ""
-        role_meta_config = find_role_meta(self.path)
+
+        # Try finding the local role folder to load its meta.yml file
+        role_path = find_role_dir(self.path)
+        if role_path:
+            role_meta_config = next(
+                (
+                    meta
+                    for meta in (
+                        role_path / "meta" / "main.yml",
+                        role_path / "meta" / "main.yaml",
+                    )
+                    if meta.exists()
+                ),
+                None,
+            )
+        else:  # no role folder was found, try finding meta.yml directly
+            role_meta_config = find_role_meta(self.path)
+
+        # parse the found meta.yml to get the galaxy_info.role_name key
         if role_meta_config:
             try:
                 meta = yaml_from_file(role_meta_config) or {}
@@ -377,10 +395,9 @@ class Lintable:
                 if not isinstance(role_name, str):
                     role_name = ""
 
-        if not role_meta_config or not role_name:
-            role_path = find_role_dir(self.path)
-            if role_path is not None:
-                role_name = role_path.name
+        # no role name has been found yet, but role_path is set, use folder name
+        if not role_name and role_path:
+            role_name = role_path.name
 
         return role_name
 
