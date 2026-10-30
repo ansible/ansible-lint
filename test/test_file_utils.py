@@ -818,3 +818,54 @@ def test_lintable_role_name_with_empty_meta_yml(tmp_path: Path) -> None:
     lintable = Lintable(task_file)
 
     assert not lintable.role
+
+
+def test_lintable_role_name_with_non_string_role_name_in_meta(tmp_path: Path) -> None:
+    """A non-string role_name attribute in meta.yml is invalid and must not set Lintable.role."""
+    role_dir = tmp_path / "some_role"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.write_text("---\n- debug: msg=hi\n", encoding="utf-8")
+
+    meta_file = role_dir / "meta" / "main.yml"
+
+    for case in ("null", 1234):
+        meta_file.write_text(f"---\ngalaxy_info:\n  role_name: {case}")
+        lintable = Lintable(task_file)
+
+        assert not lintable.role
+        assert lintable.role is not None
+
+
+def test_lintable_role_name_with_non_dict_galaxy_info_in_meta(tmp_path: Path) -> None:
+    """Invalid non-dict values for meta.yml's galaxy_info key must not fail the Lintable."""
+    role_dir = tmp_path / "some_role"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.write_text("---\n- debug: msg=hi\n", encoding="utf-8")
+
+    meta_file = role_dir / "meta" / "main.yml"
+
+    for case in ("null", "[]"):
+        meta_file.write_text(f"---\ngalaxy_info: {case}")
+        lintable = Lintable(task_file)
+
+        assert not lintable.role
+
+
+def test_lintable_role_name_with_invalid_meta_yml(tmp_path: Path) -> None:
+    """Invalid YAML syntax in meta.yml must not fail the Lintable."""
+    role_dir = tmp_path / "some_role"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.write_text("---\n- debug: msg=hi\n", encoding="utf-8")
+
+    meta_file = role_dir / "meta" / "main.yml"
+    meta_file.write_text("---\ngalaxy_info: broken: true")
+
+    lintable = Lintable(task_file)
+
+    assert not lintable.role
