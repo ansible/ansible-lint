@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import copy
+import io
 import logging
 import os
+import sys
 import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -900,7 +902,8 @@ def test_lintable_role_name_with_invalid_meta_yml(tmp_path: Path) -> None:
     assert not lintable.role
 
 
-def test_lintable_role_name_empty_on_stdin() -> None:
+def test_lintable_role_name_empty_on_stdin(monkeypatch: MonkeyPatch) -> None:
     """When passing stdin as Lintable path the role name must be empty."""
-    lintable = Lintable(".")
+    monkeypatch.setattr(sys, "stdin", io.StringIO("---\n- debug: msg=hi\n"))
+    lintable = Lintable("-")
     assert not lintable.role
