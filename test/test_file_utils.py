@@ -775,6 +775,19 @@ def test_lintable_role_name_from_meta_with_roles_nesting(tmp_path: Path) -> None
     assert lintable.role == "role_from_meta"
 
 
+def test_lintable_role_name_from_folder_with_roles_nesting(tmp_path: Path) -> None:
+    """Role name is taken from folder name in case there is no meta.yml."""
+    role_dir = tmp_path / "roles" / "my_namespace" / "role_nested_in_roles"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.write_text("---\n- debug: msg=hi\n", encoding="utf-8")
+
+    lintable = Lintable(task_file)
+
+    assert lintable.role == "role_nested_in_roles"
+
+
 def test_lintable_role_name_without_meta_yml(tmp_path: Path) -> None:
     """A missing meta.yml must not fail the Lintable."""
     role_dir = tmp_path / "some_role"
@@ -884,4 +897,10 @@ def test_lintable_role_name_with_invalid_meta_yml(tmp_path: Path) -> None:
 
     lintable = Lintable(task_file)
 
+    assert not lintable.role
+
+
+def test_lintable_role_name_empty_on_stdin() -> None:
+    """When passing stdin as Lintable path the role name must be empty."""
+    lintable = Lintable(".")
     assert not lintable.role
