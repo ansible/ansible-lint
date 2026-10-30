@@ -364,8 +364,9 @@ class Lintable:
         role_meta_config = find_role_meta(self.path)
         if role_meta_config:
             try:
-                galaxy_info = (yaml_from_file(role_meta_config) or {}).get(
-                    "galaxy_info", {}
+                meta = yaml_from_file(role_meta_config) or {}
+                galaxy_info = (
+                    meta.get("galaxy_info", {}) if isinstance(meta, dict) else None
                 )
             except (OSError, UnicodeDecodeError, YAMLError):
                 galaxy_info = None

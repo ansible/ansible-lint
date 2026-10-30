@@ -855,6 +855,22 @@ def test_lintable_role_name_with_non_dict_galaxy_info_in_meta(tmp_path: Path) ->
         assert not lintable.role
 
 
+def test_lintable_role_name_with_non_dict_meta_yml(tmp_path: Path) -> None:
+    """A meta.yml with non-dict content must not fail Lintable."""
+    role_dir = tmp_path / "some_role"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.write_text("---\n- debug: msg=hi\n", encoding="utf-8")
+
+    meta_file = role_dir / "meta" / "main.yml"
+
+    meta_file.write_text("---\n- invalid_galaxy_info: true")
+    lintable = Lintable(task_file)
+
+    assert not lintable.role
+
+
 def test_lintable_role_name_with_invalid_meta_yml(tmp_path: Path) -> None:
     """Invalid YAML syntax in meta.yml must not fail the Lintable."""
     role_dir = tmp_path / "some_role"
