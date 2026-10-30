@@ -867,7 +867,12 @@ class FormattedEmitter(RoundTripEmitter):
         ):
             # Preserve a separating blank line after a flow collection. Pure
             # whitespace comments elsewhere remain removed by the formatter.
-            value = "\n" if self._previous_event_ended_flow_collection else ""
+            value = (
+                "\n"
+                if self._previous_event_ended_flow_collection
+                or isinstance(self.event, ruamel.yaml.events.SequenceStartEvent)
+                else ""
+            )
         elif self.fix_comment_spaces and (
             pre
             and not value.strip()
@@ -884,12 +889,10 @@ class FormattedEmitter(RoundTripEmitter):
 
         if self.fix_comment_spaces:
             value = self._re_missing_comment_space.sub(r"\1 ", value)
-            comment.value = value
             # make sure that the eol comment only has one space before it.
             if comment.column > self.column + 1 and not pre:
                 comment.column = self.column + 1
-        else:
-            comment.value = value
+        comment.value = value
 
         return super().write_comment(comment, pre)
 

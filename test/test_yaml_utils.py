@@ -269,6 +269,25 @@ def load_yaml_formatting_fixtures(fixture_filename: str) -> tuple[str, str, str]
             None,
             id="multi-hash-missing-space",
         ),
+        # blank line after a flow-style value must be preserved
+        pytest.param(
+            "---\nk1: [1]\n\nk2: 2\n",
+            "---\nk1: [1]\n\nk2: 2\n",
+            (1, 1),
+            id="blank-line-after-flow-value",
+        ),
+        pytest.param(
+            "---\nk1: [1]\n\n\nk2: 2\n",
+            "---\nk1: [1]\n\nk2: 2\n",
+            (1, 1),
+            id="blank-lines-after-flow-value-collapsed",
+        ),
+        pytest.param(
+            "---\nx:\n  - [1]\n\n  - [2]\n",
+            "---\nx:\n  - [1]\n\n  - [2]\n",
+            (1, 1),
+            id="blank-line-between-flow-seq-items",
+        ),
     ),
 )
 def test_fmt(before: str, after: str, version: tuple[int, int] | None) -> None:
