@@ -141,3 +141,26 @@ def test_path_inject_plain_venv_still_warns(
     path_inject()
 
     assert "PATH altered to include" in capsys.readouterr().err
+
+
+def test_path_inject_uv_tool_env_launcher_outside_env(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """A launcher copied to UV_TOOL_BIN_DIR must not be injected nor warn."""
+    bin_dir = _make_uv_tool_env(tmp_path)
+    launcher_dir = tmp_path / "uv-bin"
+    launcher_dir.mkdir()
+    for name in ("ansible-lint", "ansible"):
+        exe = launcher_dir / name
+        exe.touch()
+        exe.chmod(0o755)
+    monkeypatch.setenv("PATH", "/usr/bin")
+    monkeypatch.delenv("PYENV_VIRTUAL_ENV", raising=False)
+    monkeypatch.setattr(sys, "executable", str(bin_dir / "python"))
+
+    path_inject(str(launcher_dir / "ansible-lint"))
+
+    assert "PATH altered to include" not in capsys.readouterr().err
+    assert os.environ["PATH"].split(os.pathsep) == [bin_dir.as_posix(), "/usr/bin"]

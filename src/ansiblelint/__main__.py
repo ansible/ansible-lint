@@ -609,7 +609,12 @@ def path_inject(own_location: str = "") -> None:
         inject_paths.append(py_path.as_posix())
 
     # last option, if nothing else is found, just look next to ourselves...
-    if own_location:
+    # A uv tool launcher lives in UV_TOOL_BIN_DIR, outside the environment
+    # (on Windows it is a copy, not a symlink), so once the interpreter of a
+    # uv tool environment is injected the launcher directory adds nothing.
+    if own_location and not (
+        py_path.as_posix() in inject_paths and _is_uv_tool_env(str(py_path))
+    ):
         own_location = os.path.realpath(own_location)
         parent = Path(own_location).parent
         if (
