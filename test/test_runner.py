@@ -171,6 +171,24 @@ def test_is_excluded_skips_runtime_cache_dir(
     assert runner.is_excluded(Lintable(own_file)) is False
     assert runner.is_excluded(Lintable(sibling_file)) is False
 
+    explicit = Lintable(role_file)
+    explicit.explicit = True
+    assert runner.is_excluded(explicit) is False
+
+    cache_link = tmp_path / "cache-link"
+    cache_link.symlink_to(cache_dir, target_is_directory=True)
+    monkeypatch.setattr(runner.app.options, "cache_dir", cache_link)
+    assert runner.is_excluded(Lintable(role_file)) is True
+
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(runner.app.options, "cache_dir", Path(".ansible"))
+    assert runner.is_excluded(Lintable(role_file)) is True
+    assert (
+        runner.is_excluded(Lintable(cache_link / role_file.relative_to(cache_dir)))
+        is True
+    )
+    assert runner.is_excluded(Lintable(sibling_file)) is False
+
 
 @pytest.mark.parametrize(
     ("formatter_cls"),

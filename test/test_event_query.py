@@ -19,7 +19,7 @@ from ansiblelint.rules.event_query import EventQueryRule
         pytest.param(
             "extensions/audit/event_query.yml",
             "example.collection.module:\n  query: \"{name: .name, canonical_facts: {}, facts: {device_type: 'router'}}\"\n",
-            ["event-query[canonical-facts-empty]"],
+            ["event-query[canonical-facts-empty]", "event-query[device-type]"],
             id="empty-canonical-facts",
         ),
         pytest.param(

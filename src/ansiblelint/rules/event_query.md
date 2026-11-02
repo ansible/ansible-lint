@@ -1,12 +1,25 @@
 # event-query
 
-This rule validates `extensions/audit/event_query.yml` files used for indirect
+This rule performs static pattern checks on `extensions/audit/event_query.yml` files used for indirect
 node counting in Ansible Automation Platform 2.6+.
 
 These files define jq queries that extract managed node identity from Ansible
 module return data. Each Ansible collection that manages infrastructure (cloud
 instances, network devices, virtual machines, etc.) should include an
 `event_query.yml` file so AAP can accurately count the nodes being automated.
+
+These checks do not parse or execute jq and do not guarantee valid jq syntax,
+runtime output shape, or non-null identifiers. Required output keys are detected
+by text patterns, so keys inside strings or nested objects can satisfy a check,
+and quoted or computed keys may not be recognized. Test queries against real
+module return data before using them in AAP.
+
+The static checks require `facts.device_type` to be a direct double-quoted
+literal from the taxonomy; dynamic and parenthesized expressions are rejected.
+Canonical identifier expressions such as `($data.sid // null)` are allowed,
+but their runtime values are not checked. Invalid module entry types report
+`event-query[invalid-entry]`; non-string queries (including null) report
+`event-query[invalid-query-type]`.
 
 ## Required file location
 
@@ -19,7 +32,7 @@ instances, network devices, virtual machines, etc.) should include an
 Each top-level key must be a fully qualified collection name (FQCN) for the
 module whose return data the query processes. Keys beginning with `__` (double
 underscore) are reserved for metadata and are exempt from FQCN validation.
-The value must contain a `query` field with a jq expression that produces an
+The value must be a mapping containing a string `query` field with a jq expression that produces an
 object with these required fields:
 
 | Field | Description |

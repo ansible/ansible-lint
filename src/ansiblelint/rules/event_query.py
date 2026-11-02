@@ -57,36 +57,57 @@ VALID_DEVICE_TYPES = frozenset({
 # Module key must be a fully qualified collection name: namespace.collection.module
 _FQCN_PATTERN = re.compile(r"^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*$")
 
-# Pre-compiled patterns for query field validation
-_CANONICAL_FACTS_NULL = re.compile(r"canonical_facts\s*:\s*null\b")
-_CANONICAL_FACTS_KEY = re.compile(r"canonical_facts\s*:")
-_DEVICE_TYPE_VALUE = re.compile(r'device_type\s*:\s*["\']([^"\']+)["\']')
+# Tokenize strings and comments together with structural punctuation so braces
+# and commas inside strings do not affect the static object checks.
+_JQ_TOKENS = re.compile(r'"(?:\\.|[^"\\])*"|\#[^\n]*|[{}\[\](),:]|[^\s{}\[\](),:]+')
 _MODULE_KEY_FORMAT = "event-query[module-key-format]"
 _CANONICAL_FACTS_EMPTY = "event-query[canonical-facts-empty]"
-
-# Required keys in the jq query output object
 _REQUIRED_OUTPUT_KEYS = ("name", "canonical_facts", "facts")
 _REQUIRED_FIELD_PATTERNS = {
     field: re.compile(rf"\b{field}\s*:") for field in _REQUIRED_OUTPUT_KEYS
 }
 
 
+def _jq_tokens(text: str) -> list[str]:
+    """Return static jq tokens, omitting comments."""
+    return [token for token in _JQ_TOKENS.findall(text) if not token.startswith("#")]
+
+
 def _extract_braced_block(text: str, keyword: str) -> str | None:
-    """Extract content between braces after 'keyword: {', handling nesting."""
-    pattern = re.compile(rf"\b{keyword}\s*:\s*\{{")
-    m = pattern.search(text)
-    if not m:
-        return None
-    depth = 1
-    start = m.end()
-    for i in range(start, len(text)):
-        if text[i] == "{":
-            depth += 1
-        elif text[i] == "}":
-            depth -= 1
-            if depth == 0:
-                return text[start:i]
+    """Extract a literal object, ignoring punctuation in strings and comments."""
+    tokens = _jq_tokens(text)
+    for index in range(len(tokens) - 2):
+        if tokens[index : index + 3] != [keyword, ":", "{"]:
+            continue
+        depth = 1
+        start = index + 3
+        for end in range(start, len(tokens)):
+            if tokens[end] == "{":
+                depth += 1
+            elif tokens[end] == "}":
+                depth -= 1
+                if depth == 0:
+                    return " ".join(tokens[start:end])
     return None
+
+
+def _object_fields(content: str) -> dict[str, str]:
+    """Read top-level literal object fields without evaluating jq expressions."""
+    fields = {}
+    entry: list[str] = []
+    depth = 0
+    for token in [*_jq_tokens(content), ","]:
+        if token == "," and depth == 0:
+            if len(entry) >= 3 and entry[1] == ":":
+                fields[entry[0].strip('"')] = " ".join(entry[2:])
+            entry = []
+            continue
+        entry.append(token)
+        if token in ("{", "[", "("):
+            depth += 1
+        elif token in ("}", "]", ")"):
+            depth -= 1
+    return fields
 
 
 class EventQueryRule(AnsibleLintRule):
@@ -94,8 +115,8 @@ class EventQueryRule(AnsibleLintRule):
 
     id = "event-query"
     description = (
-        "Validates that extensions/audit/event_query.yml files follow the "
-        "required schema for AAP indirect node counting. Checks module key "
+        "Performs static pattern checks on extensions/audit/event_query.yml "
+        "for AAP indirect node counting. Checks module key "
         "format (FQCN), required output fields (name, canonical_facts, facts), "
         "and normalized device_type taxonomy."
     )
@@ -104,6 +125,8 @@ class EventQueryRule(AnsibleLintRule):
     version_changed = "26.9.0"
     _ids = {
         _MODULE_KEY_FORMAT: "Module key must be a fully qualified collection name (namespace.collection.module).",
+        "event-query[invalid-entry]": "Each module entry must be a mapping.",
+        "event-query[invalid-query-type]": "The query field must be a string.",
         "event-query[missing-query]": "Each module entry must have a 'query' field.",
         "event-query[query-missing-field]": "Query output must produce 'name', 'canonical_facts', and 'facts' fields.",
         "event-query[device-type]": "facts.device_type should use a value from the normalized taxonomy.",
@@ -119,7 +142,8 @@ class EventQueryRule(AnsibleLintRule):
     ) -> list[MatchError]:
         """Validate device_type field in facts section of query output."""
         facts_content = _extract_braced_block(query, "facts")
-        if facts_content is None or "device_type" not in facts_content:
+        fields = _object_fields(facts_content) if facts_content is not None else {}
+        if "device_type" not in fields:
             return [
                 self.create_matcherror(
                     message=f"Module '{module_key}' query output should include 'device_type' in the facts section.",
@@ -128,13 +152,13 @@ class EventQueryRule(AnsibleLintRule):
                 ),
             ]
 
-        dt_match = _DEVICE_TYPE_VALUE.search(facts_content)
-        if dt_match and dt_match.group(1) not in VALID_DEVICE_TYPES:
+        device_type = fields["device_type"]
+        if device_type not in {f'"{value}"' for value in VALID_DEVICE_TYPES}:
             return [
                 self.create_matcherror(
                     message=(
-                        f"Module '{module_key}' uses device_type '{dt_match.group(1)}' "
-                        f"which is not in the normalized taxonomy. "
+                        f"Module '{module_key}' uses device_type '{device_type}' "
+                        f"which must be a quoted literal from the normalized taxonomy. "
                         f"Valid types include: virtual_machine, bare_metal, container, "
                         f"switch, router, firewall, cloud_instance, esxi_host, "
                         f"vcenter_appliance, cluster, resource, endpoint. "
@@ -154,21 +178,12 @@ class EventQueryRule(AnsibleLintRule):
         file: Lintable,
     ) -> list[MatchError]:
         """Validate canonical_facts field in query output."""
-        if _CANONICAL_FACTS_NULL.search(query):
-            return [
-                self.create_matcherror(
-                    message=f"Module '{module_key}' canonical_facts must define at least one non-null unique identifier.",
-                    tag=_CANONICAL_FACTS_EMPTY,
-                    filename=file,
-                ),
-            ]
-
         cf_content = _extract_braced_block(query, "canonical_facts")
         if cf_content is not None:
             non_null_fields = [
-                line.strip()
-                for line in cf_content.split(",")
-                if line.strip() and "null" not in line.split(":")[-1]
+                value
+                for value in _object_fields(cf_content).values()
+                if value != "null"
             ]
             if not non_null_fields:
                 return [
@@ -178,7 +193,7 @@ class EventQueryRule(AnsibleLintRule):
                         filename=file,
                     ),
                 ]
-        elif _CANONICAL_FACTS_KEY.search(query):
+        elif _REQUIRED_FIELD_PATTERNS["canonical_facts"].search(query):
             return [
                 self.create_matcherror(
                     message=f"Module '{module_key}' canonical_facts must be an object with at least one unique identifier field.",
@@ -235,10 +250,17 @@ class EventQueryRule(AnsibleLintRule):
                 )
 
             if not isinstance(entry, dict):
+                results.append(
+                    self.create_matcherror(
+                        message=f"Module '{module_key}' entry must be a mapping.",
+                        tag="event-query[invalid-entry]",
+                        filename=file,
+                    )
+                )
                 continue
 
             query = entry.get("query")
-            if not query:
+            if "query" not in entry or (isinstance(query, str) and not query):
                 results.append(
                     self.create_matcherror(
                         message=f"Module '{module_key}' is missing required 'query' field.",
@@ -249,6 +271,13 @@ class EventQueryRule(AnsibleLintRule):
                 continue
 
             if not isinstance(query, str):
+                results.append(
+                    self.create_matcherror(
+                        message=f"Module '{module_key}' query must be a string.",
+                        tag="event-query[invalid-query-type]",
+                        filename=file,
+                    )
+                )
                 continue
 
             results.extend(
@@ -321,12 +350,12 @@ if "pytest" in sys.modules:
             ),
             pytest.param(
                 "examples/event_query/fail_non_dict_entry/extensions/audit/event_query.yml",
-                [],
+                ["event-query[invalid-entry]"] * 2,
                 id="non-dict-entry",
             ),
             pytest.param(
                 "examples/event_query/fail_non_string_query/extensions/audit/event_query.yml",
-                [],
+                ["event-query[invalid-query-type]"],
                 id="non-string-query",
             ),
         ),
@@ -343,3 +372,60 @@ if "pytest" in sys.modules:
         assert len(event_query_results) == len(expected)
         for index, result in enumerate(event_query_results):
             assert result.tag == expected[index]
+
+    @pytest.mark.parametrize("query", (None, [], {}, 0, False, ["jq"]))
+    def test_invalid_query_type(query: object) -> None:
+        """Reject non-string queries, including empty containers, zero, and False."""
+        import json
+
+        from ansiblelint.file_utils import Lintable
+
+        lintable = Lintable(
+            "extensions/audit/event_query.yml",
+            content=json.dumps({"example.collection.module": {"query": query}}),
+        )
+        assert [match.tag for match in EventQueryRule().matchyaml(lintable)] == [
+            "event-query[invalid-query-type]",
+        ]
+
+    @pytest.mark.parametrize(
+        ("value", "valid"),
+        (
+            ('"cluster"', True),
+            ('("cluster")', False),
+            ("$data.type", False),
+            ("cluster", False),
+            ('"cluster" + "invalid"', False),
+        ),
+    )
+    def test_device_type_literal(value: str, valid: bool) -> None:
+        """Only a complete taxonomy literal satisfies static validation."""
+        from ansiblelint.file_utils import Lintable
+
+        matches = EventQueryRule()._validate_device_type(  # ruff: ignore[private-member-access]
+            "example.collection.module",
+            f"facts: {{ device_type: {value} }}",
+            Lintable("extensions/audit/event_query.yml", content="---\n"),
+        )
+        assert (not matches) == valid
+
+    @pytest.mark.parametrize(
+        ("content", "valid"),
+        (
+            ("sid: ($data.sid // null)", True),
+            ('sid: "null,}:value"', True),
+            ('sid: {value: "a,b"}', True),
+            ("sid: null, guid: null", False),
+            ("", False),
+        ),
+    )
+    def test_canonical_fact_expressions(content: str, valid: bool) -> None:
+        """Nested expressions and string punctuation do not split fields."""
+        from ansiblelint.file_utils import Lintable
+
+        matches = EventQueryRule()._validate_canonical_facts(  # ruff: ignore[private-member-access]
+            "example.collection.module",
+            f"canonical_facts: {{ {content} }}",
+            Lintable("extensions/audit/event_query.yml", content="---\n"),
+        )
+        assert (not matches) == valid
