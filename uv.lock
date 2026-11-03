@@ -13,6 +13,7 @@ resolution-markers = [
 
 [manifest]
 overrides = [
+    { name = "black", specifier = ">=26.10.1" },
     { name = "cairosvg", specifier = ">=2.9.0" },
     { name = "filelock", marker = "python_full_version < '3.11'", specifier = ">=3.20.3" },
     { name = "filelock", marker = "python_full_version >= '3.11'", specifier = ">=4.2.1" },
@@ -227,12 +228,12 @@ schemas = [
 requires-dist = [
     { name = "ansible-compat", specifier = ">=26.3.0" },
     { name = "ansible-core", specifier = ">=2.16.19,!=2.17.*" },
-    { name = "black", specifier = ">=26.10.1" },
+    { name = "black", specifier = ">=25.2.0" },
     { name = "cffi", specifier = ">=1.15.1" },
     { name = "cryptography", specifier = ">=46.0.7" },
     { name = "distro", specifier = ">=1.9.0" },
     { name = "filelock", marker = "python_full_version < '3.11'", specifier = ">=3.20.3" },
-    { name = "filelock", marker = "python_full_version >= '3.11'", specifier = ">=4.2.1" },
+    { name = "filelock", marker = "python_full_version >= '3.11'", specifier = ">=3.20.3" },
     { name = "jsonschema", specifier = ">=4.10.0" },
     { name = "packaging", specifier = ">=22.0" },
     { name = "pathspec", specifier = ">=1.0.3,<1.2.0" },
@@ -249,7 +250,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "ansible-creator", specifier = ">=25.8.0" },
-    { name = "black", specifier = ">=26.10.1" },
+    { name = "black", specifier = ">=25.2.0" },
     { name = "coverage", extras = ["toml"], specifier = ">=7.2.0" },
     { name = "coverage-enable-subprocess", specifier = ">=1.0" },
     { name = "decorator", specifier = ">=5.1.1" },
