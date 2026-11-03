@@ -39,8 +39,8 @@ dependencies = [
   "cffi>=1.15.1",  # indirect dependency of ruamel-yaml
   "cryptography>=46.0.7",
   "distro>=1.9.0",
+  "filelock>=3.20.3 ; python_version < '3.11'",
   "filelock>=4.2.1 ; python_version >= '3.11'",
-  "filelock>=3.8.2 ; python_version < '3.11'",
   "jsonschema>=4.10.0",
   "packaging>=22.0",
   "pathspec>=1.0.3,<1.2.0",
@@ -646,6 +646,7 @@ package = true
 default-groups = "all"
 override-dependencies = [
   "cairosvg>=2.9.0",
+  "filelock>=3.20.3; python_version < '3.11'",
   "filelock>=4.2.1; python_version >= '3.11'",
   "pillow>=13.0.0; python_version >= '3.11'",
 ]

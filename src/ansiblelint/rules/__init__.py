@@ -356,7 +356,7 @@ def load_plugins(
 
     def all_subclasses(cls: type) -> set[type]:
         result: set[type] = set()
-        work = list(cls.__subclasses__())
+        work: list[type] = list(cls.__subclasses__())
         while work:
             current = work.pop()
             if current not in result:
