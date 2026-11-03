@@ -1,0 +1,10 @@
+---
+example.collection.module_name:
+  query: >-
+    .data | {
+      name: .hostname,
+      canonical_facts: .id,
+      facts: {
+        device_type: "virtual_machine"
+      }
+    }
