@@ -915,13 +915,30 @@ def _remove_task_internal_keys(
     return obj
 
 
+def _copy_task_containers(value: Any) -> Any:
+    """Recursively copy a mapping or list, sharing all non-container values."""
+    result = copy.copy(value)
+    items = value.items() if isinstance(value, MutableMapping) else enumerate(value)
+    for key, item in items:
+        if key not in _TASK_INTERNAL_KEYS and isinstance(item, MutableMapping | list):
+            result[key] = _copy_task_containers(item)
+    return result
+
+
 def _sanitize_task(task: MutableMapping[str, Any]) -> MutableMapping[str, Any]:
     """Return a stripped-off task structure compatible with new Ansible.
 
     This helper takes a copy of the incoming task and drops
     any internally used keys from it.
+
+    Only the containers visited by the key stripping (mappings and lists)
+    are copied, so the original task is never modified. Leaf values are
+    shared instead of using ``copy.deepcopy``, which is very slow with
+    ansible-core 2.19+ because every loaded value is a tagged object that
+    has to be reconstructed individually, and this runs for every task
+    normalization.
     """
-    result = copy.deepcopy(task)
+    result = _copy_task_containers(task)
     # task is an AnsibleMapping which inherits from OrderedDict, so we need
     # to use `del` to remove unwanted keys.
     return _remove_task_internal_keys(result)
