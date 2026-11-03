@@ -747,6 +747,11 @@ class HandleChildren:
         if not (namespace_name and collection_name):
             return [lintable.path.parent / v]
 
+        extensions: tuple[str, ...] = (".yml", ".yaml")
+        if v.endswith(extensions) and len(playbook_path) > 1:
+            playbook_path = playbook_path[:-1]
+            extensions = (Path(v).suffix,)
+
         return [
             Path(
                 path_dwim(
@@ -762,7 +767,7 @@ class HandleChildren:
                 ),
             )
             for loc in self.app.runtime.config.collections_paths
-            for ext in (".yml", ".yaml")
+            for ext in extensions
         ]
 
     def _look_for_role_files(self, basedir: str, role: str) -> list[Lintable]:

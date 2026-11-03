@@ -1,0 +1,9 @@
+---
+vmware.vmware.guest_info:
+  query: >-
+    .guests[] | {
+      name: ("guest_info:" + (.moid | tostring)),
+      facts: {
+        device_type: "virtual_machine"
+      }
+    }

@@ -147,6 +147,7 @@ class Options:  # pylint: disable=too-many-instance-attributes
     # Public attributes
     cache_dir: Path | None = None
     colored: bool = True
+    colored_stderr: bool | None = None
     configured: bool = False
     cwd: Path = Path()
     display_relative_path: bool = True

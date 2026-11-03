@@ -67,7 +67,7 @@
         "versions": {
           "default": "all",
           "items": {
-            "enum": ["all", "1", "2", "2023"],
+            "enum": ["all", "1", "2", "2023", "2027"],
             "type": "string"
           },
           "type": "array"

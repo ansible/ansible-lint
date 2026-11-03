@@ -269,6 +269,25 @@ def load_yaml_formatting_fixtures(fixture_filename: str) -> tuple[str, str, str]
             None,
             id="multi-hash-missing-space",
         ),
+        # blank line after a flow-style value must be preserved
+        pytest.param(
+            "---\nk1: [1]\n\nk2: 2\n",
+            "---\nk1: [1]\n\nk2: 2\n",
+            (1, 1),
+            id="blank-line-after-flow-value",
+        ),
+        pytest.param(
+            "---\nk1: [1]\n\n\nk2: 2\n",
+            "---\nk1: [1]\n\nk2: 2\n",
+            (1, 1),
+            id="blank-lines-after-flow-value-collapsed",
+        ),
+        pytest.param(
+            "---\nx:\n  - [1]\n\n  - [2]\n",
+            "---\nx:\n  - [1]\n\n  - [2]\n",
+            (1, 1),
+            id="blank-line-between-flow-seq-items",
+        ),
     ),
 )
 def test_fmt(before: str, after: str, version: tuple[int, int] | None) -> None:
@@ -1165,3 +1184,24 @@ def test_formatted_yaml_fix_comment_spaces_disabled() -> None:
     # Negative: the fixer must not have added spaces
     assert "# bad spacing" not in output
     assert "# also missing" not in output
+
+
+def test_formatted_yaml_preserves_python_tags() -> None:
+    """Verify that explicit YAML tags survive a round-trip unchanged.
+
+    See https://github.com/ansible/ansible-lint/issues/4222
+    """
+    yaml = ansiblelint.yaml_utils.FormattedYAML()
+    text = (
+        "---\n"
+        "format: !!python/name:pymdownx.superfences.fence_code_format\n"
+        "other: !custom value\n"
+        "items: !!python/tuple [1, 2]\n"
+    )
+    data = yaml.load(text)
+    output = yaml.dumps(data)
+
+    assert "%20" not in output
+    assert "format: !!python/name:pymdownx.superfences.fence_code_format\n" in output
+    assert "other: !custom value\n" in output
+    assert "items: !!python/tuple [1, 2]\n" in output
