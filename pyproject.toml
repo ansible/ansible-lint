@@ -35,11 +35,12 @@ classifiers = [
 dependencies = [
   "ansible-compat>=26.3.0",
   "ansible-core>=2.16.19,!=2.17.*",
-  "black>=25.2.0",
+  "black>=26.10.1",
   "cffi>=1.15.1",  # indirect dependency of ruamel-yaml
   "cryptography>=46.0.7",
   "distro>=1.9.0",
-  "filelock>=3.8.2",
+  "filelock>=4.2.1 ; python_version >= '3.11'",
+  "filelock>=3.8.2 ; python_version < '3.11'",
   "jsonschema>=4.10.0",
   "packaging>=22.0",
   "pathspec>=1.0.3,<1.2.0",
@@ -66,7 +67,7 @@ ansible-lint = "ansiblelint.__main__:_run_cli_entrypoint"
 [dependency-groups]
 dev = [
   "ansible-creator>=25.8.0",  # indirect dependency of ipython
-  "black>=25.2.0",  # indirect dependency of ipython
+  "black>=26.10.1",  # indirect dependency of ipython
   "coverage-enable-subprocess>=1.0",  # indirect dependency
   "coverage[toml]>=7.2.0",
   "decorator>=5.1.1",
@@ -643,7 +644,11 @@ PRE_COMMIT_COLOR = "always"
 [tool.uv]
 package = true
 default-groups = "all"
-override-dependencies = ["cairosvg>=2.9.0"]
+override-dependencies = [
+  "cairosvg>=2.9.0",
+  "filelock>=4.2.1; python_version >= '3.11'",
+  "pillow>=13.0.0; python_version >= '3.11'",
+]
 
 [tool.vulture]
 exclude = [
