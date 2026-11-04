@@ -103,3 +103,9 @@
         counter: "{{ result is skipped | ternary(1, 2) }}"
       ansible.builtin.debug:
         msg: "Hello, world {{ counter }}!"
+
+    - name: Bug https://github.com/ansible/ansible-lint/issues/5232
+      ansible.builtin.set_fact:
+        result: "{{ dict(_pairs | map('split', '=', 1)) }}"
+      vars:
+        _pairs: "{{ ['a=b'] }}"
