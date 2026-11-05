@@ -29,6 +29,17 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__package__)
 
 ROLE_SUBDIRS = ("tasks", "meta", "vars", "defaults", "handlers")
+# Kinds whose content is not YAML, all other kinds are expected to be YAML.
+NON_YAML_KINDS = {
+    "",
+    "jinja2",
+    "pattern",
+    "plugin",
+    "python",
+    "role",
+    "sanity-ignore-file",
+    "text",
+}
 
 
 def _has_role_subdirs(path: Path) -> bool:
@@ -323,6 +334,10 @@ class Lintable:
 
         # determine base file kind (yaml, xml, ini, ...)
         self.base_kind = base_kind or kind_from_path(self.path, base=True)
+        if not self.base_kind and self.kind not in NON_YAML_KINDS:
+            # Files without a YAML extension, like host_vars/web1/vars, can
+            # still be assigned a YAML kind using the `kinds` option.
+            self.base_kind = "text/yaml"
         self.abspath = self.path.expanduser().absolute()
 
         if self.kind == "tasks" and self.parent is None:

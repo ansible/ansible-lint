@@ -569,6 +569,33 @@ def test_bug_2513(
         assert results[0].rule.id == "name"
 
 
+def test_custom_kind_without_yaml_extension(
+    tmp_path: Path,
+    monkeypatch: MonkeyPatch,
+    default_rules_collection: RulesCollection,
+) -> None:
+    """Check that a file given a YAML kind via `kinds` is loaded as YAML.
+
+    See: https://github.com/ansible/ansible-lint/issues/5049
+    """
+    (tmp_path / ".git").mkdir()
+    filename = tmp_path / "inventory" / "host_vars" / "web1" / "vars"
+    filename.parent.mkdir(parents=True)
+    filename.write_text("---\nBadName: 1\n", encoding="utf-8")
+    monkeypatch.setattr(
+        options,
+        "kinds",
+        [{"vars": "**/inventory/*_vars/*/vars"}, *options.kinds],
+    )
+    with cwd(tmp_path):
+        lintable = Lintable(filename)
+        assert str(lintable.kind) == "vars"
+        assert lintable.base_kind == "text/yaml"
+        assert lintable.data["BadName"] == 1
+        results = Runner(filename, rules=default_rules_collection).run()
+    assert [match.tag for match in results] == ["var-naming[pattern]"]
+
+
 def test_kind_from_path_parent_collision(tmp_path: Path) -> None:
     """Verify that a parent directory named 'tasks' doesn't cause false positives.
 
