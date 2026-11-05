@@ -9,6 +9,8 @@ version can report:
 - `jinja[invalid]` when the jinja2 template is invalid, like `{{ {{ '1' }} }}`,
   which would result in a runtime error if you try to use it with Ansible, even
   if it does pass the Ansible syntax check.
+- `jinja[duplicate-filter]` when the same filter is applied consecutively with
+  the same arguments, like `{{ users | list | list }}`.
 
 As jinja2 syntax is closely following Python one we aim to follow
 [black](https://black.readthedocs.io/en/stable/) formatting rules. If you are
@@ -42,6 +44,30 @@ rule will suggest the removal of the braces for these fields.
     bar: "{{ '&' }}"
   when: foo | bool
 ```
+
+Consecutive duplicate filters are also reported:
+
+```yaml
+---
+- name: Filter users
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Find users starting with a
+      vars:
+        users:
+          - alice
+          - bob
+        a_users: "{{ users | select('match', '^a') | list | list }}" # <-- jinja[duplicate-filter]
+      ansible.builtin.debug:
+        var: a_users
+```
+
+This check only reports repeated filters with matching arguments. It does not
+report filters that are not known to be idempotent, such as `batch`, because
+repeating them can change the result. It also does not warn about a single
+`list` filter, as whether it is needed can depend on the supported Ansible
+version.
 
 ## Current limitations
 
