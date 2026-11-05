@@ -288,8 +288,34 @@ def ansible_templar(basedir: Path, templatevars: Any) -> Templar:
 
     dataloader = _make_dataloader()
     dataloader.set_basedir(str(basedir))
-    templar = Templar(dataloader, variables=templatevars)
+    templar = Templar(dataloader, variables=_trust_templatevars(templatevars))
     return templar
+
+
+def _trust_templatevars(data: Any) -> Any:
+    """Mark string values inside variables as trusted templates.
+
+    Since ansible-core 2.19, only strings tagged as trusted are rendered as
+    templates. Variables loaded by ansible from playbooks are trusted, so a
+    variable like ``foo: "{{ ['a'] }}"`` is rendered lazily when referenced.
+    The variables we pass to the templar are plain strings, so without
+    trusting them they would reach filters as raw template text.
+
+    Strings calling lookups are left untrusted, as we avoid running lookups.
+    """
+    if not TrustedAsTemplate:
+        return data
+    if isinstance(data, Mapping):
+        return {key: _trust_templatevars(value) for key, value in data.items()}
+    if isinstance(data, list):
+        return [_trust_templatevars(item) for item in data]
+    if (
+        isinstance(data, str)
+        and not TrustedAsTemplate.is_tagged_on(data)
+        and not has_lookup_function_calls(data)
+    ):
+        return TrustedAsTemplate().tag(data)
+    return data
 
 
 def mock_filter(left: Any, *args: Any, **kwargs: Any) -> Any:  # ruff:ignore[unused-function-argument]

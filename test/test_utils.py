@@ -43,6 +43,7 @@ from ansiblelint.testing import run_ansible_lint
 from ansiblelint.types import (  # pyright: ignore[reportAttributeAccessIssue]
     AnsibleMapping,  # pyright: ignore[reportAttributeAccessIssue]
     AnsibleSequence,  # pyright: ignore[reportAttributeAccessIssue]
+    TrustedAsTemplate,
 )
 
 if TYPE_CHECKING:
@@ -1476,3 +1477,80 @@ def test_include_search_basedirs_cycle_detection(tmp_path: Path) -> None:
     # Should terminate without infinite loop
     basedirs = _include_search_basedirs(lintable, str(tasks_file.parent))
     assert str(tasks_file.parent) in basedirs
+
+
+@pytest.mark.skipif(
+    TrustedAsTemplate is None,
+    reason="Requires ansible-core 2.19+ trusted templates.",
+)
+def test_trust_templatevars() -> None:
+    """_trust_templatevars tags nested strings except those calling lookups."""
+    from ansiblelint.utils import _trust_templatevars
+
+    trusted = TrustedAsTemplate
+    assert trusted is not None
+    already = trusted().tag("{{ bar }}")
+    data = {
+        "foo": "{{ ['a=b'] }}",
+        "items": ["{{ x }}", 1, {"nested": "plain"}],
+        "lookup": "{{ lookup('env', 'HOME') }}",
+        "query": "{{ query('fileglob', '*') }}",
+        "already": already,
+        "number": 42,
+        "empty": None,
+    }
+
+    result = _trust_templatevars(data)
+
+    assert trusted.is_tagged_on(result["foo"])
+    assert isinstance(result["items"], list)
+    assert trusted.is_tagged_on(result["items"][0])
+    assert result["items"][1] == 1
+    assert trusted.is_tagged_on(result["items"][2]["nested"])
+    assert not trusted.is_tagged_on(result["lookup"])
+    assert not trusted.is_tagged_on(result["query"])
+    assert result["already"] is already
+    assert result["number"] == 42
+    assert result["empty"] is None
+
+
+def test_trust_templatevars_without_trusted_as_template(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """_trust_templatevars returns data unchanged on ansible-core < 2.19."""
+    from ansiblelint.utils import _trust_templatevars
+
+    monkeypatch.setattr("ansiblelint.utils.TrustedAsTemplate", None)
+    data = {"foo": "{{ bar }}"}
+    assert _trust_templatevars(data) is data
+
+
+class _FakeTrusted(str):
+    """Stand-in for TrustedAsTemplate, usable with any ansible-core version."""
+
+    __slots__ = ()
+
+    @staticmethod
+    def is_tagged_on(value: object) -> bool:
+        return isinstance(value, _FakeTrusted)
+
+    def tag(self, value: str) -> str:
+        return _FakeTrusted(value)
+
+
+def test_trust_templatevars_traversal(monkeypatch: pytest.MonkeyPatch) -> None:
+    """_trust_templatevars walks mappings and lists regardless of ansible-core."""
+    from ansiblelint.utils import _trust_templatevars
+
+    monkeypatch.setattr("ansiblelint.utils.TrustedAsTemplate", _FakeTrusted)
+    result = _trust_templatevars(
+        {
+            "foo": "{{ x }}",
+            "items": ["{{ y }}", 1],
+            "lookup": "{{ lookup('env', 'HOME') }}",
+        },
+    )
+    assert isinstance(result["foo"], _FakeTrusted)
+    assert isinstance(result["items"][0], _FakeTrusted)
+    assert result["items"][1] == 1
+    assert not isinstance(result["lookup"], _FakeTrusted)
