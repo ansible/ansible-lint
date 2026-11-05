@@ -1523,3 +1523,34 @@ def test_trust_templatevars_without_trusted_as_template(
     monkeypatch.setattr("ansiblelint.utils.TrustedAsTemplate", None)
     data = {"foo": "{{ bar }}"}
     assert _trust_templatevars(data) is data
+
+
+class _FakeTrusted(str):
+    """Stand-in for TrustedAsTemplate, usable with any ansible-core version."""
+
+    __slots__ = ()
+
+    @staticmethod
+    def is_tagged_on(value: object) -> bool:
+        return isinstance(value, _FakeTrusted)
+
+    def tag(self, value: str) -> str:
+        return _FakeTrusted(value)
+
+
+def test_trust_templatevars_traversal(monkeypatch: pytest.MonkeyPatch) -> None:
+    """_trust_templatevars walks mappings and lists regardless of ansible-core."""
+    from ansiblelint.utils import _trust_templatevars
+
+    monkeypatch.setattr("ansiblelint.utils.TrustedAsTemplate", _FakeTrusted)
+    result = _trust_templatevars(
+        {
+            "foo": "{{ x }}",
+            "items": ["{{ y }}", 1],
+            "lookup": "{{ lookup('env', 'HOME') }}",
+        },
+    )
+    assert isinstance(result["foo"], _FakeTrusted)
+    assert isinstance(result["items"][0], _FakeTrusted)
+    assert result["items"][1] == 1
+    assert not isinstance(result["lookup"], _FakeTrusted)
