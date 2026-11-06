@@ -98,6 +98,12 @@ if "pytest" in sys.modules:
                 id="pass0",
             ),
             pytest.param(
+                "examples/meta_runtime_version_checks/pass_2/meta/runtime.yml",
+                0,
+                "meta-runtime[unsupported-version]",
+                id="pass2",
+            ),
+            pytest.param(
                 "examples/meta_runtime_version_checks/fail_0/meta/runtime.yml",
                 1,
                 "meta-runtime[unsupported-version]",
@@ -114,6 +120,12 @@ if "pytest" in sys.modules:
                 1,
                 "meta-runtime[invalid-version]",
                 id="fail2",
+            ),
+            pytest.param(
+                "examples/meta_runtime_version_checks/fail_3/meta/runtime.yml",
+                1,
+                "meta-runtime[unsupported-version]",
+                id="fail3",
             ),
         ),
     )
