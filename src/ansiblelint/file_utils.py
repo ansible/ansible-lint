@@ -30,6 +30,8 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__package__)
 
 ROLE_SUBDIRS = ("tasks", "meta", "vars", "defaults", "handlers")
+ROLE_META_YML = Path("meta/main.yml")
+ROLE_META_YAML = Path("meta/main.yaml")
 
 
 def _has_role_subdirs(path: Path) -> bool:
@@ -44,12 +46,10 @@ def find_role_meta(path: Path) -> Path | None:
 
     while True:
         if _has_role_subdirs(current):
-            meta = current / "meta"
-
-            if (meta / "main.yml").exists():
-                found = meta / "main.yml"
-            elif (meta / "main.yaml").exists():
-                found = meta / "main.yaml"
+            if (current / ROLE_META_YML).exists():
+                found = current / ROLE_META_YML
+            elif (current / ROLE_META_YAML).exists():
+                found = current / ROLE_META_YAML
 
         if not current.name:
             # NOTE: Because "." has to be considered for role subdirs,
@@ -369,8 +369,8 @@ class Lintable:
                 (
                     meta
                     for meta in (
-                        role_path / "meta" / "main.yml",
-                        role_path / "meta" / "main.yaml",
+                        role_path / ROLE_META_YML,
+                        role_path / ROLE_META_YAML,
                     )
                     if meta.exists()
                 ),
