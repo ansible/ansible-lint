@@ -6,7 +6,8 @@ currently supported versions of ansible-core.
 This rule can produce messages such as:
 
 - `meta-runtime[unsupported-version]` - `requires_ansible` key must refer to a
-  currently supported version such as: >=2.15.0, >=2.16.0, >=2.17.0, >=2.18.0
+  currently supported version such as: >=2.15.0, >=2.16.0, >=2.17.0, >=2.18.0,
+  >=2.19.0, >=2.20.0, >=2.21.0, >=2.22.0
 - `meta-runtime[invalid-version]` - `requires_ansible` is not a valid
   requirement specification
 
@@ -36,7 +37,7 @@ requires_ansible: "2.17"
 ```yaml
 # runtime.yml
 ---
-requires_ansible: ">=2.17.0"
+requires_ansible: ">=2.20.0"
 ```
 
 ## Configuration
