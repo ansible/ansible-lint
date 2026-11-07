@@ -211,7 +211,8 @@ def test_validate_sarif_schema(
         pytest.param("playbook.yml", 2, id="1"),
     ),
 )
-def test_sarif_file(file: str, return_code: int) -> None:
+@pytest.mark.parametrize("output_format", ("full", "codeclimate", "sarif"))
+def test_sarif_file(file: str, return_code: int, output_format: str) -> None:
     """Test ability to dump sarif file (--sarif-file)."""
     with NamedTemporaryFile(
         mode="w", suffix=".sarif", prefix="output", encoding="utf-8"
@@ -220,6 +221,8 @@ def test_sarif_file(file: str, return_code: int) -> None:
             sys.executable,
             "-m",
             "ansiblelint",
+            "-f",
+            output_format,
             "--sarif-file",
             str(output_file.name),
         ]

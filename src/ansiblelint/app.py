@@ -78,6 +78,17 @@ class App:
         """Display given matches (if they are not fixed)."""
         matches = [match for match in matches if not match.fixed]
 
+        # If sarif_file is set, we also dump the results to a sarif file.
+        if self.options.sarif_file:
+            sarif = formatters.SarifFormatter(self.options.cwd, True)
+            json = sarif.format_result(matches)
+            # Somehow, this gets set as an AnsibleUnicode under unclear circumstances. Force it to be a Path
+            sarif_file = Path(self.options.sarif_file)
+            sarif_file.write_text(
+                json,
+                encoding="utf-8",
+            )
+
         if isinstance(
             self.formatter,
             formatters.CodeclimateJSONFormatter | formatters.SarifFormatter,
@@ -123,17 +134,6 @@ class App:
                 console_stderr.print(
                     formatter.apply(match),
                 )
-
-        # If sarif_file is set, we also dump the results to a sarif file.
-        if self.options.sarif_file:
-            sarif = formatters.SarifFormatter(self.options.cwd, True)
-            json = sarif.format_result(matches)
-            # Somehow, this gets set as an AnsibleUnicode under unclear circumstances. Force it to be a Path
-            sarif_file = Path(self.options.sarif_file)
-            sarif_file.write_text(
-                json,
-                encoding="utf-8",
-            )
 
     def count_results(self, matches: list[MatchError]) -> SummarizedResults:
         """Count failures and warnings in matches."""
