@@ -29,6 +29,17 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__package__)
 
 ROLE_SUBDIRS = ("tasks", "meta", "vars", "defaults", "handlers")
+# Kinds whose content is not YAML, all other kinds are expected to be YAML.
+NON_YAML_KINDS = {
+    "",
+    "jinja2",
+    "pattern",
+    "plugin",
+    "python",
+    "role",
+    "sanity-ignore-file",
+    "text",
+}
 
 
 def _has_role_subdirs(path: Path) -> bool:
@@ -252,6 +263,16 @@ class Lintable:
     When symlinks are given, they will always be resolved to their target.
     """
 
+    @staticmethod
+    def _base_kind_from_kind(path: Path, kind: FileType | None) -> str:
+        """Return the base kind of a file, using its kind as a fallback."""
+        result: str = kind_from_path(path, base=True)
+        if not result and kind not in NON_YAML_KINDS:
+            # Files without a YAML extension, like host_vars/web1/vars, can
+            # still be assigned a YAML kind using the `kinds` option.
+            result = "text/yaml"
+        return result
+
     # pylint: disable=too-many-arguments,too-many-positional-arguments
     def __init__(
         self,
@@ -322,7 +343,7 @@ class Lintable:
                 self.dir = str(self.path.parent.resolve())
 
         # determine base file kind (yaml, xml, ini, ...)
-        self.base_kind = base_kind or kind_from_path(self.path, base=True)
+        self.base_kind = base_kind or self._base_kind_from_kind(self.path, self.kind)
         self.abspath = self.path.expanduser().absolute()
 
         if self.kind == "tasks" and self.parent is None:
