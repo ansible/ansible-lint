@@ -82,12 +82,17 @@ class App:
         formatter_factory = choose_formatter_factory(options)
         self.formatter = formatter_factory(options.cwd, options.display_relative_path)
 
+        # Capture the environment before muting config-load deprecation
+        # warnings, otherwise the temporary value would leak into the
+        # environment used by later Runtime subprocesses
+        runtime_environ = os.environ.copy()
         with _suppress_config_load_deprecations():
             self.runtime = Runtime(
                 project_dir=Path(options.project_dir),
                 isolated=not options.offline and not has_custom_ansible_env(),
                 require_module=True,
                 verbosity=options.verbosity,
+                environ=runtime_environ,
             )
         self.reqs = Reqs("ansible-lint")
         package = "ansible-core"

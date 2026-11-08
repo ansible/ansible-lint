@@ -77,9 +77,33 @@ def test_config_load_deprecation_suppression_restores_environment(
         raise RuntimeError
     assert "ANSIBLE_DEPRECATION_WARNINGS" not in os.environ
 
+    with _suppress_config_load_deprecations():
+        monkeypatch.setenv("ANSIBLE_DEPRECATION_WARNINGS", "True")
+    assert os.environ["ANSIBLE_DEPRECATION_WARNINGS"] == "True"
+
     monkeypatch.setenv("ANSIBLE_DEPRECATION_WARNINGS", "True")
     with _suppress_config_load_deprecations():
         assert os.environ["ANSIBLE_DEPRECATION_WARNINGS"] == "True"
+    assert os.environ["ANSIBLE_DEPRECATION_WARNINGS"] == "True"
+
+
+def test_config_load_deprecation_suppression_does_not_reach_runtime(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Later Runtime subprocesses must keep the user's warning setting."""
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+
+    monkeypatch.delenv("ANSIBLE_DEPRECATION_WARNINGS", raising=False)
+    options = Options()
+    options.project_dir = str(tmp_path)
+    options.cache_dir = tmp_path / ".cache"
+    options.cache_dir.mkdir()
+
+    app = App(options)
+
+    assert "ANSIBLE_DEPRECATION_WARNINGS" not in app.runtime.environ
 
 
 def test_with_inventory_concurrent_syntax_checks(tmp_path: Path) -> None:
