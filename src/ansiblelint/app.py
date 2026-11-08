@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import copy
 import itertools
 import logging
@@ -28,6 +29,8 @@ from ansiblelint.requirements import Reqs
 from ansiblelint.stats import SummarizedResults, TagStats
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
     from ansiblelint._internal.rules import BaseRule
     from ansiblelint.errors import MatchError
     from ansiblelint.file_utils import Lintable
@@ -36,6 +39,30 @@ if TYPE_CHECKING:
 
 _logger = logging.getLogger(__package__)
 _CACHED_APP: App | None = None
+
+
+@contextlib.contextmanager
+def _suppress_config_load_deprecations() -> Generator[None, None, None]:
+    """Mute Ansible deprecation warnings emitted while the runtime loads config.
+
+    ansible-compat runs ``ansible-config dump`` while creating the runtime.
+    Starting with ansible-core 2.22 that command inspects the metadata of every
+    builtin plugin and reports deprecation warnings for plugins that
+    ansible-lint never uses, such as the ``oneline`` and ``tree`` callbacks.
+    Users can still enable those warnings by setting
+    ``ANSIBLE_DEPRECATION_WARNINGS`` themselves.
+
+    https://github.com/ansible/ansible-lint/issues/5239
+    """
+    env_var = "ANSIBLE_DEPRECATION_WARNINGS"
+    if env_var in os.environ:
+        yield
+        return
+    os.environ[env_var] = "False"
+    try:
+        yield
+    finally:
+        del os.environ[env_var]
 
 
 class App:
@@ -53,12 +80,13 @@ class App:
         formatter_factory = choose_formatter_factory(options)
         self.formatter = formatter_factory(options.cwd, options.display_relative_path)
 
-        self.runtime = Runtime(
-            project_dir=Path(options.project_dir),
-            isolated=not options.offline and not has_custom_ansible_env(),
-            require_module=True,
-            verbosity=options.verbosity,
-        )
+        with _suppress_config_load_deprecations():
+            self.runtime = Runtime(
+                project_dir=Path(options.project_dir),
+                isolated=not options.offline and not has_custom_ansible_env(),
+                require_module=True,
+                verbosity=options.verbosity,
+            )
         self.reqs = Reqs("ansible-lint")
         package = "ansible-core"
         if not self.reqs.matches(

@@ -35,6 +35,32 @@ def test_app_no_matches(tmp_path: Path) -> None:
     assert result.returncode == RC.NO_FILES_MATCHED
 
 
+def test_config_load_does_not_leak_deprecation_warnings(tmp_path: Path) -> None:
+    """Deprecations from ansible-config dump must not reach the user.
+
+    ansible-core 2.22 reports the deprecated oneline and tree callbacks while
+    ansible-compat loads the configuration, even though the linter never uses
+    them. See https://github.com/ansible/ansible-lint/issues/5239
+    """
+    playbook = tmp_path / "playbook.yml"
+    playbook.write_text(
+        "---\n"
+        "- name: Do the thing\n"
+        "  hosts: all\n"
+        "  tasks:\n"
+        "    - name: Say hello\n"
+        "      ansible.builtin.debug:\n"
+        "        msg: Hello!\n",
+        encoding="utf-8",
+    )
+
+    result = run_ansible_lint(playbook, cwd=tmp_path)
+
+    assert result.returncode == RC.SUCCESS, result
+    assert "oneline has been deprecated" not in result.stderr
+    assert "tree has been deprecated" not in result.stderr
+
+
 def test_with_inventory_concurrent_syntax_checks(tmp_path: Path) -> None:
     """Validate using inventory file with concurrent syntax checks aren't faulty."""
     (tmp_path / "ansible.cfg").write_text("[defaults]\ninventory = foo\n")
