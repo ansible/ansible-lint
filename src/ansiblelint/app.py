@@ -62,7 +62,9 @@ def _suppress_config_load_deprecations() -> Generator[None, None, None]:
     try:
         yield
     finally:
-        del os.environ[env_var]
+        # Do not undo a value that something else set while we were running
+        if os.environ.get(env_var) == "False":
+            del os.environ[env_var]
 
 
 class App:

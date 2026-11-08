@@ -1,10 +1,12 @@
 """Test for app module."""
 
+import os
 from pathlib import Path
 
 import pytest
 
 from ansiblelint.__main__ import _rule_is_skipped
+from ansiblelint.app import _suppress_config_load_deprecations
 from ansiblelint.constants import RC
 from ansiblelint.file_utils import Lintable
 from ansiblelint.loaders import IgnoreRule, IgnoreRuleQualifier
@@ -59,6 +61,25 @@ def test_config_load_does_not_leak_deprecation_warnings(tmp_path: Path) -> None:
     assert result.returncode == RC.SUCCESS, result
     assert "oneline has been deprecated" not in result.stderr
     assert "tree has been deprecated" not in result.stderr
+
+
+def test_config_load_deprecation_suppression_restores_environment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The temporary warning setting must not leak or override a user value."""
+    monkeypatch.delenv("ANSIBLE_DEPRECATION_WARNINGS", raising=False)
+
+    with _suppress_config_load_deprecations():
+        assert os.environ["ANSIBLE_DEPRECATION_WARNINGS"] == "False"
+    assert "ANSIBLE_DEPRECATION_WARNINGS" not in os.environ
+
+    with pytest.raises(RuntimeError), _suppress_config_load_deprecations():
+        raise RuntimeError
+    assert "ANSIBLE_DEPRECATION_WARNINGS" not in os.environ
+
+    monkeypatch.setenv("ANSIBLE_DEPRECATION_WARNINGS", "True")
+    with _suppress_config_load_deprecations():
+        assert os.environ["ANSIBLE_DEPRECATION_WARNINGS"] == "True"
 
 
 def test_with_inventory_concurrent_syntax_checks(tmp_path: Path) -> None:
