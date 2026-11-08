@@ -1,10 +1,12 @@
 """Test for app module."""
 
+import os
 from pathlib import Path
 
 import pytest
 
 from ansiblelint.__main__ import _rule_is_skipped
+from ansiblelint.app import _suppress_config_load_deprecations
 from ansiblelint.constants import RC
 from ansiblelint.file_utils import Lintable
 from ansiblelint.loaders import IgnoreRule, IgnoreRuleQualifier
@@ -33,6 +35,75 @@ def test_app_no_matches(tmp_path: Path) -> None:
     """Validate that linter returns special exit code if no files are analyzed."""
     result = run_ansible_lint(cwd=tmp_path)
     assert result.returncode == RC.NO_FILES_MATCHED
+
+
+def test_config_load_does_not_leak_deprecation_warnings(tmp_path: Path) -> None:
+    """Deprecations from ansible-config dump must not reach the user.
+
+    ansible-core 2.22 reports the deprecated oneline and tree callbacks while
+    ansible-compat loads the configuration, even though the linter never uses
+    them. See https://github.com/ansible/ansible-lint/issues/5239
+    """
+    playbook = tmp_path / "playbook.yml"
+    playbook.write_text(
+        "---\n"
+        "- name: Do the thing\n"
+        "  hosts: all\n"
+        "  tasks:\n"
+        "    - name: Say hello\n"
+        "      ansible.builtin.debug:\n"
+        "        msg: Hello!\n",
+        encoding="utf-8",
+    )
+
+    result = run_ansible_lint(playbook, cwd=tmp_path)
+
+    assert result.returncode == RC.SUCCESS, result
+    assert "oneline has been deprecated" not in result.stderr
+    assert "tree has been deprecated" not in result.stderr
+
+
+def test_config_load_deprecation_suppression_restores_environment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The temporary warning setting must not leak or override a user value."""
+    monkeypatch.delenv("ANSIBLE_DEPRECATION_WARNINGS", raising=False)
+
+    with _suppress_config_load_deprecations():
+        assert os.environ["ANSIBLE_DEPRECATION_WARNINGS"] == "False"
+    assert "ANSIBLE_DEPRECATION_WARNINGS" not in os.environ
+
+    with pytest.raises(RuntimeError), _suppress_config_load_deprecations():
+        raise RuntimeError
+    assert "ANSIBLE_DEPRECATION_WARNINGS" not in os.environ
+
+    with _suppress_config_load_deprecations():
+        monkeypatch.setenv("ANSIBLE_DEPRECATION_WARNINGS", "True")
+    assert os.environ["ANSIBLE_DEPRECATION_WARNINGS"] == "True"
+
+    monkeypatch.setenv("ANSIBLE_DEPRECATION_WARNINGS", "True")
+    with _suppress_config_load_deprecations():
+        assert os.environ["ANSIBLE_DEPRECATION_WARNINGS"] == "True"
+    assert os.environ["ANSIBLE_DEPRECATION_WARNINGS"] == "True"
+
+
+def test_config_load_deprecation_suppression_does_not_reach_runtime(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Later Runtime subprocesses must keep the user's warning setting."""
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+
+    monkeypatch.delenv("ANSIBLE_DEPRECATION_WARNINGS", raising=False)
+    options = Options()
+    options.project_dir = str(tmp_path)
+    options.cache_dir = tmp_path / ".cache"
+    options.cache_dir.mkdir()
+
+    app = App(options)
+
+    assert "ANSIBLE_DEPRECATION_WARNINGS" not in app.runtime.environ
 
 
 def test_with_inventory_concurrent_syntax_checks(tmp_path: Path) -> None:
