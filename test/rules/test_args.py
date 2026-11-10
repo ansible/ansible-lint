@@ -150,3 +150,44 @@ def test_args_rule_skips_when_resolved_path_is_lint_mock(
         file=Lintable("test.yml", kind="tasks"),
     )
     assert results == []
+
+
+def test_args_nested_templated_value_does_not_raise_key_error() -> None:
+    """A nested module option is not a top-level action key."""
+
+    class MockTask:
+        action: dict[str, Any] = {
+            "__ansible_module_original__": "community.general.nmcli",
+            "macvlan": {"parent": "eth0", "mode": "{{ 2 }}"},
+        }
+        line = 1
+
+        def __getitem__(self, key: str) -> object:
+            return getattr(self, key)
+
+    rule = ArgsRule()
+    task = cast("Task", MockTask())
+    failed_msg = '{"msg": "argument \'mode\' is of type str and we were unable to convert to int"}'
+    assert rule._parse_failed_msg(failed_msg, task, "community.general.nmcli") == []  # ruff: ignore[private-member-access]
+
+
+def test_args_nested_non_string_option_is_reported_without_crashing() -> None:
+    """A nested mapping is not a Jinja string and must not hide a module error."""
+
+    class MockTask:
+        action: dict[str, Any] = {
+            "__ansible_module_original__": "example.module",
+            "outer": {"mode": {"value": 2}},
+        }
+        line = 1
+
+        def __getitem__(self, key: str) -> object:
+            return getattr(self, key)
+
+    results = ArgsRule()._parse_failed_msg(  # ruff: ignore[private-member-access]
+        '{"msg": "argument \'mode\' is of type dict"}',
+        cast("Task", MockTask()),
+        "example.module",
+    )
+    assert len(results) == 1
+    assert "mode" in results[0].message

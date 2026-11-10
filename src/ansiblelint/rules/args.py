@@ -88,6 +88,24 @@ class ValidationPassedError(Exception):
     """Exception to be raised when validation passes."""
 
 
+def _has_templated_option(options: dict[str, Any], name: str) -> bool:
+    """Find a named option in nested module arguments without masking static errors."""
+    matches: list[Any] = []
+    pending: list[Any] = [options]
+    while pending:
+        current = pending.pop()
+        if isinstance(current, dict):
+            for key, value in current.items():
+                if key == name:
+                    matches.append(value)
+                pending.append(value)
+        elif isinstance(current, list):
+            pending.extend(current)
+    return bool(matches) and all(
+        isinstance(value, str) and has_jinja(value) for value in matches
+    )
+
+
 class CustomAnsibleModule(basic.AnsibleModule):
     """Mock AnsibleModule class."""
 
@@ -290,8 +308,7 @@ class ArgsRule(AnsibleLintRule):
         if option_type_check_error:
             # ignore options with templated variable value with type check errors
             option_key = option_type_check_error.group("name")
-            option_value = task["action"][option_key]
-            if has_jinja(option_value):
+            if _has_templated_option(task["action"], option_key):
                 _logger.debug(
                     "Type checking ignored for '%s' option in task '%s' at line %s.",
                     option_key,
@@ -306,8 +323,7 @@ class ArgsRule(AnsibleLintRule):
         if value_not_in_choices_error:
             # ignore templated value not in allowed choices
             choice_key = value_not_in_choices_error.group("name")
-            choice_value = task["action"].get(choice_key)
-            if has_jinja(choice_value):
+            if _has_templated_option(task["action"], choice_key):
                 _logger.debug(
                     "Value checking ignored for '%s' option in task '%s' at line %s.",
                     choice_key,
