@@ -21,7 +21,7 @@ from ansiblelint.config import ANSIBLE_OWNED_KINDS, BASE_KINDS, Options, options
 from ansiblelint.constants import CONFIG_FILENAMES, FileType, States
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator, Sequence
+    from collections.abc import Generator, Sequence
 
     from ansiblelint.errors import MatchError
 
@@ -125,7 +125,7 @@ def normpath_path(path: str | Path) -> Path:
 
 
 @contextmanager
-def cwd(path: Path) -> Iterator[None]:
+def cwd(path: Path) -> Generator[None, None, None]:
     """Context manager for temporary changing current working directory."""
     old_pwd = Path.cwd()
     os.chdir(path)
