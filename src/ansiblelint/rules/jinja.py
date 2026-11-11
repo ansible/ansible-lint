@@ -133,6 +133,24 @@ def _is_broken_rewrite(
         return False
 
 
+def _for_display(output_text: str, original: str, lintable: Lintable | None) -> str:
+    r"""Return ``output_text`` escaped the way the YAML source escapes ``original``.
+
+    ``original`` is the decoded value we linted. A double-quoted ``"\\1"`` in the
+    file arrives as ``\1``. If the file contains only the escaped form of
+    ``original``, escape ``output_text`` the same way, so the message matches
+    what the user can see. ``output_text`` is either the value itself or its
+    rewrite, which is why the check runs against ``original``: the rewrite is
+    not in the file yet.
+    """
+    if lintable is None or not ("\\" in original or '"' in original):
+        return output_text
+    escaped = original.replace("\\", "\\\\").replace('"', '\\"')
+    if original in lintable.content or escaped not in lintable.content:
+        return output_text
+    return output_text.replace("\\", "\\\\").replace('"', '\\"')
+
+
 def _cook(value: str, *, implicit: bool = False) -> str:
     """Prepare an implicit string for jinja parsing when needed."""
     if not implicit:
@@ -350,8 +368,8 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                             self.create_matcherror(
                                 message=self._msg(
                                     tag=tag,
-                                    value=v,
-                                    reformatted=reformatted,
+                                    value=_for_display(v, v, file),
+                                    reformatted=_for_display(reformatted, v, file),
                                 ),
                                 lineno=lineno,
                                 data=v,
@@ -392,8 +410,8 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                             self.create_matcherror(
                                 message=self._msg(
                                     tag=tag,
-                                    value=v,
-                                    reformatted=reformatted,
+                                    value=_for_display(v, v, file),
+                                    reformatted=_for_display(reformatted, v, file),
                                 ),
                                 data=v,
                                 details=details,
@@ -475,6 +493,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
             original_line_ending = "\r\n"
 
         implicit = False
+        source_text = text
 
         # implicit templates do not have the {{ }} wrapping
         if (
@@ -522,7 +541,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
 
         reformatted = _uncook(reformatted, implicit=implicit)
         details = (
-            f"Jinja2 template rewrite recommendation: `{reformatted}`."
+            f"Jinja2 template rewrite recommendation: `{_for_display(reformatted, source_text, lintable)}`."
             if failed
             else ""
         )
@@ -954,6 +973,41 @@ if "pytest" in sys.modules:
             assert isinstance(err, JinjaRule)
             assert errs[0].tag == "jinja[invalid]"
             assert errs[0].rule.id == "jinja"
+
+    @pytest.mark.parametrize(
+        ("quoted", "shown"),
+        (
+            pytest.param(
+                "\"{{ x|regex_replace('a','\\\\1' ) }}\"", r"'\\1'", id="double"
+            ),
+            pytest.param(
+                r"""'{{ x|regex_replace("a","\1" ) }}'""", r'"\1"', id="single"
+            ),
+        ),
+    )
+    def test_jinja_spacing_message_matches_yaml_source(
+        quoted: str,
+        shown: str,
+        tmp_path: Path,
+        empty_rule_collection: RulesCollection,
+    ) -> None:
+        """Message and details show the value as the YAML source spells it.
+
+        https://github.com/ansible/ansible-lint/issues/4330
+        """
+        play = tmp_path / "play.yml"
+        play.write_text(
+            "---\n- hosts: localhost\n  tasks:\n    - name: t\n"
+            f"      ansible.builtin.debug:\n        msg: {quoted}\n",
+            encoding="utf-8",
+        )
+        empty_rule_collection.register(JinjaRule())
+        results = Runner(Lintable(play), rules=empty_rule_collection).run()
+        assert len(results) == 1
+        assert results[0].tag == "jinja[spacing]"
+        assert f"{shown} )" in results[0].message
+        assert f"{shown})" in results[0].message.split(" -> ")[1]
+        assert f"{shown})" in results[0].details
 
     def test_jinja_invalid(empty_rule_collection: RulesCollection) -> None:
         """Tests our ability to spot spacing errors inside jinja2 templates."""
