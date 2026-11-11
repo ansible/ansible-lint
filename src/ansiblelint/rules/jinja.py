@@ -30,7 +30,7 @@ from ansiblelint.utils import (  # type: ignore[attr-defined]
     parse_yaml_from_file,
     template,
 )
-from ansiblelint.yaml_utils import deannotate, nested_items_path
+from ansiblelint.yaml_utils import deannotate, get_line_column, nested_items_path
 
 if TYPE_CHECKING:
     from ruamel.yaml.comments import CommentedMap, CommentedSeq
@@ -137,16 +137,24 @@ def _for_display(output_text: str, original: str, lintable: Lintable | None) -> 
     r"""Return ``output_text`` escaped the way the YAML source escapes ``original``.
 
     ``original`` is the decoded value we linted. A double-quoted ``"\\1"`` in the
-    file arrives as ``\1``. If the file contains only the escaped form of
-    ``original``, escape ``output_text`` the same way, so the message matches
-    what the user can see. ``output_text`` is either the value itself or its
-    rewrite, which is why the check runs against ``original``: the rewrite is
-    not in the file yet.
+    file arrives as ``\1``. The scalar remembers where it starts in the file, so
+    we read its opening character there: only a double-quoted scalar escapes
+    ``\`` and ``"``. ``output_text`` is either the value itself or its rewrite,
+    which is why the position comes from ``original``: the rewrite is not in the
+    file and has no position.
     """
-    if lintable is None or not ("\\" in original or '"' in original):
+    if lintable is None or not ("\\" in output_text or '"' in output_text):
         return output_text
-    escaped = original.replace("\\", "\\\\").replace('"', '\\"')
-    if original in lintable.content or escaped not in lintable.content:
+    try:
+        line, column = get_line_column(original, default_line=0)
+    except AttributeError:  # plain str, it never came from a file
+        return output_text
+    if not line or not column:
+        return output_text
+    lines = lintable.content.splitlines()
+    if line > len(lines) or column > len(lines[line - 1]):
+        return output_text
+    if lines[line - 1][column - 1] != '"':
         return output_text
     return output_text.replace("\\", "\\\\").replace('"', '\\"')
 
@@ -982,6 +990,12 @@ if "pytest" in sys.modules:
             ),
             pytest.param(
                 r"""'{{ x|regex_replace("a","\1" ) }}'""", r'"\1"', id="single"
+            ),
+            # The decoded form in a comment must not decide how this scalar is shown.
+            pytest.param(
+                "\"{{ x|regex_replace('a','\\\\1' ) }}\"  # {{ x|regex_replace('a','\\1' ) }}",
+                r"'\\1'",
+                id="double-decoded-form-in-comment",
             ),
         ),
     )
