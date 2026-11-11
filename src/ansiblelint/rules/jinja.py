@@ -30,7 +30,7 @@ from ansiblelint.utils import (  # type: ignore[attr-defined]
     parse_yaml_from_file,
     template,
 )
-from ansiblelint.yaml_utils import deannotate, nested_items_path
+from ansiblelint.yaml_utils import deannotate, get_line_column, nested_items_path
 
 if TYPE_CHECKING:
     from ruamel.yaml.comments import CommentedMap, CommentedSeq
@@ -131,6 +131,32 @@ def _is_broken_rewrite(
             return True
     else:
         return False
+
+
+def _for_display(output_text: str, original: str, lintable: Lintable | None) -> str:
+    r"""Return ``output_text`` escaped the way the YAML source escapes ``original``.
+
+    ``original`` is the decoded value we linted. A double-quoted ``"\\1"`` in the
+    file arrives as ``\1``. The scalar remembers where it starts in the file, so
+    we read its opening character there: only a double-quoted scalar escapes
+    ``\`` and ``"``. ``output_text`` is either the value itself or its rewrite,
+    which is why the position comes from ``original``: the rewrite is not in the
+    file and has no position.
+    """
+    if lintable is None or not ("\\" in output_text or '"' in output_text):
+        return output_text
+    try:
+        line, column = get_line_column(original, default_line=0)
+    except AttributeError:  # plain str, it never came from a file
+        return output_text
+    if not line or not column:
+        return output_text
+    lines = lintable.content.splitlines()
+    if line > len(lines) or column > len(lines[line - 1]):
+        return output_text
+    if lines[line - 1][column - 1] != '"':
+        return output_text
+    return output_text.replace("\\", "\\\\").replace('"', '\\"')
 
 
 def _cook(value: str, *, implicit: bool = False) -> str:
@@ -350,8 +376,8 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                             self.create_matcherror(
                                 message=self._msg(
                                     tag=tag,
-                                    value=v,
-                                    reformatted=reformatted,
+                                    value=_for_display(v, v, file),
+                                    reformatted=_for_display(reformatted, v, file),
                                 ),
                                 lineno=lineno,
                                 data=v,
@@ -392,8 +418,8 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                             self.create_matcherror(
                                 message=self._msg(
                                     tag=tag,
-                                    value=v,
-                                    reformatted=reformatted,
+                                    value=_for_display(v, v, file),
+                                    reformatted=_for_display(reformatted, v, file),
                                 ),
                                 data=v,
                                 details=details,
@@ -475,6 +501,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
             original_line_ending = "\r\n"
 
         implicit = False
+        source_text = text
 
         # implicit templates do not have the {{ }} wrapping
         if (
@@ -522,7 +549,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
 
         reformatted = _uncook(reformatted, implicit=implicit)
         details = (
-            f"Jinja2 template rewrite recommendation: `{reformatted}`."
+            f"Jinja2 template rewrite recommendation: `{_for_display(reformatted, source_text, lintable)}`."
             if failed
             else ""
         )
@@ -954,6 +981,47 @@ if "pytest" in sys.modules:
             assert isinstance(err, JinjaRule)
             assert errs[0].tag == "jinja[invalid]"
             assert errs[0].rule.id == "jinja"
+
+    @pytest.mark.parametrize(
+        ("quoted", "shown"),
+        (
+            pytest.param(
+                "\"{{ x|regex_replace('a','\\\\1' ) }}\"", r"'\\1'", id="double"
+            ),
+            pytest.param(
+                r"""'{{ x|regex_replace("a","\1" ) }}'""", r'"\1"', id="single"
+            ),
+            # The decoded form in a comment must not decide how this scalar is shown.
+            pytest.param(
+                "\"{{ x|regex_replace('a','\\\\1' ) }}\"  # {{ x|regex_replace('a','\\1' ) }}",
+                r"'\\1'",
+                id="double-decoded-form-in-comment",
+            ),
+        ),
+    )
+    def test_jinja_spacing_message_matches_yaml_source(
+        quoted: str,
+        shown: str,
+        tmp_path: Path,
+        empty_rule_collection: RulesCollection,
+    ) -> None:
+        """Message and details show the value as the YAML source spells it.
+
+        https://github.com/ansible/ansible-lint/issues/4330
+        """
+        play = tmp_path / "play.yml"
+        play.write_text(
+            "---\n- hosts: localhost\n  tasks:\n    - name: t\n"
+            f"      ansible.builtin.debug:\n        msg: {quoted}\n",
+            encoding="utf-8",
+        )
+        empty_rule_collection.register(JinjaRule())
+        results = Runner(Lintable(play), rules=empty_rule_collection).run()
+        assert len(results) == 1
+        assert results[0].tag == "jinja[spacing]"
+        assert f"{shown} )" in results[0].message
+        assert f"{shown})" in results[0].message.split(" -> ")[1]
+        assert f"{shown})" in results[0].details
 
     def test_jinja_invalid(empty_rule_collection: RulesCollection) -> None:
         """Tests our ability to spot spacing errors inside jinja2 templates."""
