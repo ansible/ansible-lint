@@ -1,0 +1,5 @@
+---
+dotted_role_default_var: true
+# This one matches the directory name suffix but not galaxy_info.role_name:
+var_naming_dotted_decoy: true
+bad_default_var: true

@@ -36,6 +36,10 @@ Possible errors messages:
     In all other task types variable names defined in `vars` are considered
     task-scoped and do not require the role prefix.
 
+    For roles installed from Galaxy in a `namespace.role` directory, the
+    expected prefix is the `role_name` declared in `meta/main.yml`, or the
+    part of the directory name after the dot when it is not declared.
+
 ## Settings
 
 This rule behavior can be changed by altering the below settings:
