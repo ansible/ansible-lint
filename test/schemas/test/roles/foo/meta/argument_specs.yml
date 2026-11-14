@@ -69,6 +69,28 @@ argument_specs:
           foo: "bar"
           bar: ["foo", "baz"]
 
+    return:
+      my_app_result:
+        description: The result computed by the role.
+        type: str
+        returned: always
+        sample: done
+      my_app_facts:
+        description: Facts gathered by the role.
+        type: list
+        elements: dict
+        returned: When O(my_app_int) is set.
+        contains:
+          name:
+            description: The name of the entry.
+            type: str
+          value:
+            description: The value of the entry.
+            type: int
+        sample:
+          - name: example
+            value: 42
+
     seealso:
       - module: community.foo.bar
       - module: community.foo.baz
