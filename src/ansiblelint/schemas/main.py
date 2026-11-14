@@ -100,7 +100,7 @@ def validate_file_schema(file: Lintable) -> list[str]:
         return [f"Unable to find JSON Schema '{file.kind}' for '{file.path}' file."]
     try:
         yaml_data = yaml_load_safe(file.content)
-        json_data = json.loads(json.dumps(yaml_data))
+        json_data = json.loads(json.dumps(yaml_data, default=str))
         schema = _schema_cache[file.kind]
         message = _validate_json_data(json_data, schema)
         if message is None:
