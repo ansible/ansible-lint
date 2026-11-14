@@ -77,6 +77,25 @@ def test_validate_file_schema() -> None:
     assert "Unable to find JSON Schema" in result[0]
 
 
+@pytest.mark.parametrize(
+    "value",
+    (
+        pytest.param("2026-11-10", id="date"),
+        pytest.param("2026-11-10 10:00:00", id="datetime"),
+    ),
+)
+def test_validate_file_schema_date(value: str) -> None:
+    """Test that an unquoted date does not prevent file schema validation."""
+    lintable = Lintable(
+        "date.yml",
+        content=f"- hosts: localhost\n  order: random\n  vars:\n    checked: {value}\n",
+        kind="playbook",
+    )
+    result = validate_file_schema(lintable)
+    assert len(result) == 1, result
+    assert "'random' is not one of" in result[0]
+
+
 @pytest.mark.skipif(
     not RE_SPDX_SAFE_TOX_ENV_NAME.match(os.environ.get("TOX_ENV_NAME", "")),
     reason="Skipping SPDX license test due to constraints not being used by current job.",
