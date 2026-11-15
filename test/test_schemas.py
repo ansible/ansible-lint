@@ -82,6 +82,7 @@ def test_validate_file_schema() -> None:
     (
         pytest.param("2026-11-10", id="date"),
         pytest.param("2026-11-10 10:00:00", id="datetime"),
+        pytest.param("!!binary aGVsbG8=", id="binary"),
     ),
 )
 def test_validate_file_schema_date(value: str) -> None:
@@ -94,6 +95,45 @@ def test_validate_file_schema_date(value: str) -> None:
     result = validate_file_schema(lintable)
     assert len(result) == 1, result
     assert "'random' is not one of" in result[0]
+
+
+@pytest.mark.parametrize(
+    ("path", "content", "expected"),
+    (
+        pytest.param(
+            "playbooks/date.yml",
+            "- hosts: localhost\n  gather_facts: 2026-11-10\n",
+            "'2026-11-10' is not of type 'boolean'",
+            id="value",
+        ),
+        pytest.param(
+            "group_vars/all.yml",
+            "true: kept\n2026-11-10: released\n",
+            "'2026-11-10' does not match any of the regexes",
+            id="key-after-bool-key",
+        ),
+        pytest.param(
+            "playbooks/date.yml",
+            "- hosts: localhost\n  order: random\n  vars:\n    releases:\n      2026-11-10: first\n",
+            "'random' is not one of",
+            id="nested-key",
+        ),
+        pytest.param(
+            "playbooks/date.yml",
+            "- hosts: localhost\n  order: random\n  vars:\n    releases: !!omap\n      - first:\n          2026-11-10: done\n",
+            "'random' is not one of",
+            id="key-in-omap",
+        ),
+    ),
+)
+def test_validate_file_schema_date_as_string(
+    path: str, content: str, expected: str
+) -> None:
+    """Test that an unquoted date is validated as a string, as a value and as a key."""
+    lintable = Lintable(path, content=content)
+    result = validate_file_schema(lintable)
+    assert len(result) == 1, result
+    assert expected in result[0]
 
 
 @pytest.mark.skipif(

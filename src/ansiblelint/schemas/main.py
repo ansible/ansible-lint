@@ -93,6 +93,21 @@ def _validate_json_data(
     return _format_validation_message(error, schema)
 
 
+def _stringify_keys(data: Any) -> Any:
+    """Return data with the mapping keys that json.dumps() rejects as strings."""
+    if isinstance(data, dict):
+        return {
+            key
+            if isinstance(key, str | int | float | bool | None)
+            else str(key): _stringify_keys(value)
+            for key, value in data.items()
+        }
+    # PyYAML builds !!omap and !!pairs as lists of tuples.
+    if isinstance(data, list | tuple):
+        return [_stringify_keys(item) for item in data]
+    return data
+
+
 def validate_file_schema(file: Lintable) -> list[str]:
     """Return list of JSON validation errors found."""
     schema: dict[Any, Any] = {}
@@ -100,7 +115,7 @@ def validate_file_schema(file: Lintable) -> list[str]:
         return [f"Unable to find JSON Schema '{file.kind}' for '{file.path}' file."]
     try:
         yaml_data = yaml_load_safe(file.content)
-        json_data = json.loads(json.dumps(yaml_data, default=str))
+        json_data = json.loads(json.dumps(_stringify_keys(yaml_data), default=str))
         schema = _schema_cache[file.kind]
         message = _validate_json_data(json_data, schema)
         if message is None:
