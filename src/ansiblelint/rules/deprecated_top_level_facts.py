@@ -199,6 +199,15 @@ def _is_hostvars_entry(node: nodes.Node) -> bool:
     )
 
 
+def _short_filter_name(name: Any) -> Any:
+    """Drop the ``ansible.builtin.`` or ``ansible.legacy.`` prefix of a filter."""
+    if isinstance(name, str):
+        for prefix in ("ansible.builtin.", "ansible.legacy."):
+            if name.startswith(prefix):
+                return name[len(prefix) :]
+    return name
+
+
 def _extracted_fact(node: nodes.Filter) -> str | None:
     """Return the fact read by ``extract`` from ``hostvars``.
 
@@ -206,11 +215,12 @@ def _extracted_fact(node: nodes.Filter) -> str | None:
     ``hosts | map('extract', hostvars, ['ansible_default_ipv4', 'address'])``.
     """
     args = node.args
-    if node.name == "map" and args and isinstance(args[0], nodes.Const):
-        if args[0].value != "extract":
+    name = _short_filter_name(node.name)
+    if name == "map" and args and isinstance(args[0], nodes.Const):
+        if _short_filter_name(args[0].value) != "extract":
             return None
         args = args[1:]
-    elif node.name != "extract":
+    elif name != "extract":
         return None
     if len(args) < 2 or not (
         isinstance(args[0], nodes.Name) and args[0].name == "hostvars"
@@ -445,6 +455,14 @@ if "pytest" in sys.modules:
                 False,
                 [("default_ipv4", 1), ("hostname", 1)],
                 id="extract",
+            ),
+            pytest.param(
+                "{{ host | ansible.builtin.extract(hostvars, 'ansible_kernel') }}"
+                " {{ hosts | ansible.builtin.map('extract', hostvars, 'ansible_fqdn') }}"
+                " {{ hosts | map('ansible.legacy.extract', hostvars, 'ansible_system') }}",
+                False,
+                [("fqdn", 1), ("kernel", 1), ("system", 1)],
+                id="extract-fqcn",
             ),
             pytest.param(
                 "{{ groups['all'] | map('extract', hostvars, 'main_ip') }}"
