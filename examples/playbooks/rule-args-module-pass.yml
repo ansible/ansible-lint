@@ -75,7 +75,7 @@
         name: "jenkins"
         state: started
         # 'use' is dropped by preprocessing ...
-        use: "{{ ansible_service_mgr }}"
+        use: "{{ ansible_facts['service_mgr'] }}"
       changed_when: false
 
     - name: "Bug 3152"

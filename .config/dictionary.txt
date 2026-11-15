@@ -76,6 +76,7 @@ getmatches
 globmatch
 gplv
 hostkey
+hostnqn
 hostvars
 htmlproofer
 indentless
@@ -158,6 +159,8 @@ subschemas
 substrs
 sudosu
 supervisorctl
+swapfree
+swaptotal
 swdepot
 switchport
 sysvinit

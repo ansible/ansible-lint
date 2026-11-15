@@ -1,0 +1,30 @@
+---
+- name: Fixture for deprecated-top-level-facts
+  hosts: all
+  vars:
+    is_debian: "{{ ansible_facts['os_family'] == 'Debian' }}"
+  tasks:
+    - name: Show the hostname
+      ansible.builtin.debug:
+        msg: "{{ ansible_facts['hostname'] }}"
+
+    - name: Bare expression in when
+      ansible.builtin.debug:
+        msg: Fedora
+      when: ansible_facts['distribution'] == 'Fedora'
+
+    - name: Fact read through hostvars
+      ansible.builtin.debug:
+        msg: "{{ hostvars[inventory_hostname]['ansible_facts']['fqdn'] }}"
+
+    - name: Connection and magic variables are not facts
+      ansible.builtin.debug:
+        msg: "{{ ansible_host }} {{ ansible_user }} {{ ansible_check_mode }} {{ ansible_local }}"
+
+    - name: Interface facts are not reported
+      ansible.builtin.debug:
+        msg: "{{ ansible_eth0 }}"
+
+    - name: Skipped with noqa
+      ansible.builtin.debug:
+        msg: "{{ ansible_hostname }}" # noqa: deprecated-top-level-facts
