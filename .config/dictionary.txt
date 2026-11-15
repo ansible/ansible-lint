@@ -91,6 +91,7 @@ keepends
 keypair
 kubevirt
 languageservice
+lastboot
 libyaml
 licensedb
 lineinfile
@@ -98,6 +99,7 @@ lintable
 lintable's
 lintables
 localectl
+loopcontrols
 machinectl
 matchdir
 matcherror
@@ -106,6 +108,7 @@ matchtask
 matchtasks
 matchvar
 matchyaml
+memtotal
 mockings
 modifyitems
 moid
@@ -118,6 +121,8 @@ nomatchestest
 norole
 nxos
 octals
+pagefilefree
+pagefiletotal
 pathex
 pathing
 pathspecs
@@ -194,6 +199,7 @@ varnotset
 varset
 varsfile
 varstring
+vcpus
 virtnet
 willthames
 workerinput
