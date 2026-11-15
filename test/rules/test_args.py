@@ -60,6 +60,34 @@ def test_args_builtin_relative_import(
     assert [result.tag for result in results if result.rule.id == "args"] == expected
 
 
+def test_args_local_module_short_name(
+    default_rules_collection: RulesCollection,
+    caplog: pytest.LogCaptureFixture,
+    tmp_path: Path,
+) -> None:
+    """Validate args check of a module from a library folder next to the tasks."""
+    module_path = tmp_path / "library" / "local_module.py"
+    module_path.parent.mkdir()
+    module_path.write_text(
+        "from ansible.module_utils.basic import AnsibleModule\n"
+        "def main():\n"
+        "    AnsibleModule(argument_spec={}).exit_json()\n",
+        encoding="utf-8",
+    )
+    tasks_path = tmp_path / "tasks.yml"
+    tasks_path.write_text(
+        "- name: Example\n  local_module:\n    foo: true\n",
+        encoding="utf-8",
+    )
+    lintable = Lintable(tasks_path, kind="tasks")
+    with caplog.at_level(logging.WARNING):
+        results = Runner(lintable, rules=default_rules_collection).run()
+    assert "Ignored exception" not in caplog.text
+    assert [result.tag for result in results if result.rule.id == "args"] == [
+        "args[module]"
+    ]
+
+
 def test_args_module_import_keeps_module_registered(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
