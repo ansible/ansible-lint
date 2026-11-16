@@ -11,4 +11,10 @@ permissions: {}
 jobs:
   ack:
     uses: ansible/team-devtools/.github/workflows/ack.yml@main
+    # The called workflow cannot have more than this job grants, and the
+    # top-level permissions above grant nothing.
+    permissions:
+      checks: write
+      contents: write
+      pull-requests: write
     secrets: inherit
