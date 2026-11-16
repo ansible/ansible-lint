@@ -172,7 +172,10 @@ _DEBUG_MODULES = ("ansible.builtin.debug", "ansible.legacy.debug", "debug")
 _NESTED_TASK_KEYS = ("block", "ansible.builtin.block", "ansible.legacy.block")
 _PLAY_TASK_KEYS = ("tasks", "pre_tasks", "post_tasks", "handlers")
 
-_env = Environment(extensions=["jinja2.ext.do", "jinja2.ext.loopcontrols"])
+# Only used to parse templates, never to render them.
+_env = Environment(
+    autoescape=True, extensions=["jinja2.ext.do", "jinja2.ext.loopcontrols"]
+)
 
 
 def _fact_name(name: Any) -> str | None:
@@ -232,6 +235,37 @@ def _extracted_fact(node: nodes.Filter) -> str | None:
     return _fact_name(key.value) if isinstance(key, nodes.Const) else None
 
 
+def _variable_reads(ast: nodes.Template) -> list[tuple[str, int]]:
+    """Return the facts read as top-level variables in ``ast``."""
+    # names set or looped over inside the template are not facts
+    assigned = {node.name for node in ast.find_all(nodes.Name) if node.ctx != "load"}
+    found = []
+    for node in ast.find_all(nodes.Name):
+        fact = _fact_name(node.name)
+        if fact and node.ctx == "load" and node.name not in assigned:
+            found.append((fact, node.lineno))
+    return found
+
+
+def _hostvars_reads(ast: nodes.Template) -> list[tuple[str, int]]:
+    """Return the facts read through ``hostvars`` in ``ast``."""
+    found = []
+    for attr_node in ast.find_all(nodes.Getattr):
+        fact = _fact_name(attr_node.attr)
+        if fact and _is_hostvars_entry(attr_node.node):
+            found.append((fact, attr_node.lineno))
+    for item_node in ast.find_all(nodes.Getitem):
+        key = item_node.arg.value if isinstance(item_node.arg, nodes.Const) else None
+        fact = _fact_name(key)
+        if fact and _is_hostvars_entry(item_node.node):
+            found.append((fact, item_node.lineno))
+    for filter_node in ast.find_all(nodes.Filter):
+        fact = _extracted_fact(filter_node)
+        if fact:
+            found.append((fact, filter_node.lineno))
+    return found
+
+
 def find_top_level_facts(
     text: str, *, expression: bool = False
 ) -> list[tuple[str, int]]:
@@ -249,27 +283,7 @@ def find_top_level_facts(
     except TemplateSyntaxError:
         return []
 
-    found: list[tuple[str, int]] = []
-    # names set or looped over inside the template are not facts
-    assigned = {node.name for node in ast.find_all(nodes.Name) if node.ctx != "load"}
-    for name_node in ast.find_all(nodes.Name):
-        fact = _fact_name(name_node.name)
-        if fact and name_node.ctx == "load" and name_node.name not in assigned:
-            found.append((fact, name_node.lineno))
-    for attr_node in ast.find_all(nodes.Getattr):
-        fact = _fact_name(attr_node.attr)
-        if fact and _is_hostvars_entry(attr_node.node):
-            found.append((fact, attr_node.lineno))
-    for item_node in ast.find_all(nodes.Getitem):
-        if not isinstance(item_node.arg, nodes.Const):
-            continue
-        fact = _fact_name(item_node.arg.value)
-        if fact and _is_hostvars_entry(item_node.node):
-            found.append((fact, item_node.lineno))
-    for filter_node in ast.find_all(nodes.Filter):
-        fact = _extracted_fact(filter_node)
-        if fact:
-            found.append((fact, filter_node.lineno))
+    found = _variable_reads(ast) + _hostvars_reads(ast)
     return sorted(set(found), key=lambda item: (item[1], item[0]))
 
 
