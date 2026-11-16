@@ -355,8 +355,9 @@ def load_plugins(
     """Yield a rule class."""
 
     def all_subclasses(cls: type) -> set[type]:
+        """Return all direct and indirect subclasses of ``cls``."""
         result: set[type] = set()
-        work = list(cls.__subclasses__())
+        work: list[type] = list(cls.__subclasses__())
         while work:
             current = work.pop()
             if current not in result:
