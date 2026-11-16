@@ -58,19 +58,19 @@ Maintained in the
 
 ## schema[meta]
 
-For `meta/main.yml` files, Ansible-lint requires a `galaxy_info.standalone`
-property that clarifies if a role is an old standalone one or a new one,
-collection based:
+For `meta/main.yml` files, the `galaxy_info.standalone` property clarifies if a
+role is an old standalone one or a new one, collection based:
 
 ```yaml
 galaxy_info:
   standalone: true # <-- this is a standalone role (not part of a collection)
 ```
 
-Ansible-lint requires the `standalone` key to avoid confusion and provide more
-specific error messages. For example, the `meta` schema will require some
-properties only for standalone roles or prevent the use of some properties that
-are not supported by collections.
+If `standalone` is omitted, the role is treated as a standalone role. Set it to
+`false` for collection roles to avoid confusion and get more specific error
+messages. For example, the `meta` schema will require some properties only for
+standalone roles or prevent the use of some properties that are not supported
+by collections.
 
 You cannot use an empty `meta/main.yml` file or use only comments in the
 `meta/main.yml` file.
