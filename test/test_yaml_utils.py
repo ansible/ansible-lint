@@ -1154,6 +1154,15 @@ def test_formatted_yaml_anchor_indentation() -> None:
     (
         pytest.param(
             """---
+- &my_anchor
+  name: my_name
+- <<: *my_anchor
+  name: other_name
+""",
+            id="root-sequence",
+        ),
+        pytest.param(
+            """---
 - name: Play
   tasks:
     - &TASK
