@@ -1,0 +1,16 @@
+---
+# standalone is omitted, so it defaults to a standalone role and all galaxy fields are allowed
+galaxy_info:
+  role_name: foo
+  namespace: bar
+  author: foo
+  description: foo
+  license: MIT
+  min_ansible_version: "2.9"
+  cloud_platforms: []
+  galaxy_tags: [foo]
+  video_links: []
+  platforms:
+    - name: Alpine
+      versions:
+        - all
