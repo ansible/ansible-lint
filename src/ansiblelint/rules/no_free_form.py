@@ -26,6 +26,32 @@ _TAG_RAW = "no-free-form[raw]"
 _MODULE_COMMAND = "ansible.builtin.command"
 _MODULE_SHELL = "ansible.builtin.shell"
 _MODULE_DNF = "ansible.builtin.dnf"
+# Modules whose free-form string is a command line. For these, ansible-core
+# (parse_kv with check_raw=True) only extracts the keys below as module
+# options; any other key=value token stays part of the command line.
+_FREE_FORM_MODULES = frozenset(
+    (
+        *(
+            f"{prefix}{name}"
+            for prefix in ("", "ansible.builtin.", "ansible.legacy.")
+            for name in ("command", "shell", "script", "win_command", "win_shell")
+        ),
+        "ansible.windows.win_command",
+        "ansible.windows.win_shell",
+    ),
+)
+_FREE_FORM_OPTION_KEYS = frozenset(
+    (
+        "chdir",
+        "creates",
+        "executable",
+        "removes",
+        "stdin",
+        "stdin_add_newline",
+        "strip_empty_ends",
+        "warn",
+    ),
+)
 
 
 class NoFreeFormRule(AnsibleLintRule, TransformMixin):
@@ -66,8 +92,17 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
         return val
 
     @classmethod
-    def _parse_module_opts(cls, value: str) -> dict[str, Any]:
-        """Parse module opts, falling back to cmd on unbalanced quotes."""
+    def _parse_module_opts(
+        cls,
+        value: str,
+        *,
+        command_line: bool = False,
+    ) -> dict[str, Any]:
+        """Parse module opts, falling back to cmd on unbalanced quotes.
+
+        With ``command_line``, key=value tokens that are not module options
+        (such as ``PREFIX=/usr`` or ``if=/dev/zero``) stay in ``cmd``.
+        """
         try:
             parts = split_args(value)  # type: ignore[no-untyped-call]
         except AnsibleParserError:
@@ -79,6 +114,9 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
                 key, raw_value = part.split("=", 1)
                 if cls._has_unmatched_quote(raw_value):
                     return {"cmd": value}
+                if command_line and key not in _FREE_FORM_OPTION_KEYS:
+                    cmd_parts.append(part)
+                    continue
                 module_opts[key] = cls._normalize_value(raw_value)
             else:
                 cmd_parts.append(part)
@@ -188,7 +226,10 @@ class NoFreeFormRule(AnsibleLintRule, TransformMixin):
                     k, v = task.popitem(False)
                     # identify module as key and process its value
                     if k == target_module and isinstance(v, str):
-                        module_opts = self._parse_module_opts(v)
+                        module_opts = self._parse_module_opts(
+                            v,
+                            command_line=k in _FREE_FORM_MODULES,
+                        )
                         task[k] = self._sorted_module_opts(module_opts)
                     else:
                         task[k] = v
@@ -294,6 +335,64 @@ if "pytest" in sys.modules:
         assert task[_MODULE_COMMAND] == {
             "cmd": 'name="foo"bar chdir=/tmp',
         }
+
+    @pytest.mark.parametrize(
+        ("module", "value", "expected"),
+        (
+            pytest.param(
+                _MODULE_COMMAND,
+                "dd if=/dev/zero of=/var/swap bs=1M count=1024 creates=/var/swap",
+                {
+                    "creates": "/var/swap",
+                    "cmd": "dd if=/dev/zero of=/var/swap bs=1M count=1024",
+                },
+                id="command-dd",
+            ),
+            pytest.param(
+                _MODULE_SHELL,
+                "chdir=/usr/local/src/nginx make install PREFIX=/opt/nginx",
+                {
+                    "chdir": "/usr/local/src/nginx",
+                    "cmd": "make install PREFIX=/opt/nginx",
+                },
+                id="shell-make",
+            ),
+            pytest.param(
+                "command",
+                "chdir=/srv/app git -c user.name=deploy commit -m release",
+                {
+                    "chdir": "/srv/app",
+                    "cmd": "git -c user.name=deploy commit -m release",
+                },
+                id="command-short-name",
+            ),
+            pytest.param(
+                "ansible.builtin.script",
+                "chdir=/tmp files/run.sh NAME=world",
+                {"chdir": "/tmp", "cmd": "files/run.sh NAME=world"},
+                id="script",
+            ),
+        ),
+    )
+    def test_no_free_form_transform_command_line_key_value(
+        module: str,
+        value: str,
+        expected: dict[str, str],
+    ) -> None:
+        """Test that key=value words of a command line stay in cmd."""
+        from ruamel.yaml.comments import CommentedMap
+
+        rule = NoFreeFormRule()
+        task = CommentedMap({module: value})
+        match = MatchError(
+            message="test",
+            rule=rule,
+            details=module,
+            tag="no-free-form",
+        )
+
+        rule.transform(match, _LINTABLE, task)
+        assert dict(task[module]) == expected
 
     def test_no_free_form_transform_raw_unbalanced_executable() -> None:
         """Test raw transform fallback when executable value is unbalanced."""
