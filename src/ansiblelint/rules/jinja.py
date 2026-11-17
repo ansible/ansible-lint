@@ -997,6 +997,11 @@ if "pytest" in sys.modules:
                 r"'\\1'",
                 id="double-decoded-form-in-comment",
             ),
+            pytest.param(
+                r'"{{ x|replace(\"a\",\"b\" ) }}"',
+                r"\"b\"",
+                id="double-escaped-quotes",
+            ),
         ),
     )
     def test_jinja_spacing_message_matches_yaml_source(
