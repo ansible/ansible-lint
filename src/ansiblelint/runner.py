@@ -160,6 +160,21 @@ class Runner:
             )
             return True
 
+        # The runtime cache dir (e.g. `<project_dir>/.ansible` when running in
+        # isolated mode) can live inside the project directory, so it is not
+        # caught by the check above. Files under it (installed/expanded
+        # third-party roles and collections used only for role/module
+        # resolution) are excluded from discovered lint targets. Explicit paths
+        # intentionally bypass all exclusions, including this cache skip.
+        # https://github.com/ansible/ansible-lint/issues/5186
+        cache_dir = self.app.options.cache_dir if self.app else None
+        if cache_dir and lintable.abspath.resolve().is_relative_to(cache_dir.resolve()):
+            _logger.debug(
+                "Skipping %s as it is inside the runtime cache directory.",
+                abs_path,
+            )
+            return True
+
         return any(
             abs_path.startswith(path)
             or lintable.path.match(path)

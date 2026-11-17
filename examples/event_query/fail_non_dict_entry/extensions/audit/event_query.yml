@@ -1,0 +1,8 @@
+---
+# Valid FQCN but entry is a scalar string, not a dict
+example.collection.scalar_entry: "not a dictionary"
+
+# Valid FQCN with a list instead of dict
+example.collection.list_entry:
+  - item1
+  - item2

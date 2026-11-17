@@ -21,6 +21,7 @@
 
 from __future__ import annotations
 
+import copy
 import logging
 import subprocess
 import sys
@@ -616,6 +617,7 @@ def test_import_playbook_children() -> None:
         },
     )
     assert "Failed to find local.testcollection.foo playbook." not in result.stderr
+    assert "Failed to find local.testcollection.foo.yml playbook." not in result.stderr
     assert (
         "Failed to load local.testcollection.foo playbook due to failing syntax check."
         not in result.stderr
@@ -860,6 +862,115 @@ def test_remove_task_internal_keys_nested_lists() -> None:
     utils._strip_internal_keys_from_value(double_nested)  # ruff:ignore[private-member-access]
     assert "__line__" not in double_nested[0][0]
     assert utils._remove_task_internal_keys({"__line__": 3}) == {}  # ruff:ignore[private-member-access]
+
+
+def test_sanitize_task_does_not_modify_original() -> None:
+    """Sanitizing must strip internal keys from a copy, never from the input."""
+    task: dict[str, Any] = {
+        "name": "loop over dicts",
+        "__line__": 1,
+        "__file__": "tasks.yml",
+        "__skipped_rules__": ["fqcn"],
+        "ansible.builtin.user": {
+            "name": "{{ item.name }}",
+            "groups": ["wheel", "adm"],
+            "__line__": 4,
+        },
+        "loop": [
+            {"name": "alice", "__line__": 8, "extra": {"__line__": 9, "a": 1}},
+            {"name": "bob", "__line__": 10},
+            ["nested", {"__line__": 12, "b": 2}],
+            "plain",
+        ],
+        "vars": {"outer": {"inner": {"__line__": 14, "c": 3}}},
+    }
+    original = copy.deepcopy(task)
+
+    cleaned = utils._sanitize_task(task)  # ruff:ignore[private-member-access]
+
+    assert cleaned == {
+        "name": "loop over dicts",
+        "ansible.builtin.user": {"name": "{{ item.name }}", "groups": ["wheel", "adm"]},
+        "loop": [
+            {"name": "alice", "extra": {"a": 1}},
+            {"name": "bob"},
+            ["nested", {"b": 2}],
+            "plain",
+        ],
+        "vars": {"outer": {"inner": {"c": 3}}},
+    }
+    assert task == original
+    # Containers must not be shared, so later changes cannot leak back.
+    assert cleaned["ansible.builtin.user"] is not task["ansible.builtin.user"]
+    assert (
+        cleaned["ansible.builtin.user"]["groups"]
+        is not task["ansible.builtin.user"]["groups"]
+    )
+    assert cleaned["loop"] is not task["loop"]
+    assert cleaned["loop"][0] is not task["loop"][0]
+    assert cleaned["loop"][2][1] is not task["loop"][2][1]
+    assert cleaned["vars"]["outer"]["inner"] is not task["vars"]["outer"]["inner"]
+    copied = utils._copy_task_containers(task)  # ruff:ignore[private-member-access]
+    assert copied["__skipped_rules__"] is task["__skipped_rules__"]
+
+
+def test_sanitize_task_matches_deepcopy_on_loaded_yaml(
+    tmp_path: Path,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Sanitizing loaded tasks must behave as the former deepcopy approach."""
+    task_file = tmp_path / "tasks.yml"
+    task_file.write_text(
+        """\
+- name: Create users
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    groups: "{{ item.groups }}"
+  loop:
+    - name: alice
+      groups: [wheel, adm]
+    - name: bob
+      groups: []
+  loop_control:
+    label: "{{ item.name }}"
+- name: Run command  # noqa: no-changed-when
+  ansible.builtin.command:
+    argv: [echo, hello]
+  args:
+    chdir: /tmp
+  when:
+    - true
+    - foo is defined
+- name: Old style
+  action: shell echo hi
+  with_items: [[1, 2], {a: b}]
+""",
+        encoding="utf-8",
+    )
+    tasks = utils.parse_yaml_linenumbers(Lintable(task_file))
+    assert isinstance(tasks, list)
+
+    def sanitize_with_deepcopy(task: Any) -> Any:
+        return utils._remove_task_internal_keys(copy.deepcopy(task))  # ruff:ignore[private-member-access]
+
+    expected_normalized = []
+    for raw_task in tasks:
+        original = copy.deepcopy(raw_task)
+        cleaned = utils._sanitize_task(raw_task)  # ruff:ignore[private-member-access]
+        assert cleaned == sanitize_with_deepcopy(raw_task)
+        assert type(cleaned) is type(raw_task)
+        assert raw_task == original
+        expected_normalized.append(
+            utils.normalize_task_v2(utils.Task(raw_task, filename=str(task_file)))
+        )
+        assert raw_task == original
+
+    monkeypatch.setattr(utils, "_sanitize_task", sanitize_with_deepcopy)
+    for raw_task, expected in zip(tasks, expected_normalized, strict=True):
+        assert (
+            utils.normalize_task_v2(utils.Task(raw_task, filename=str(task_file)))
+            == expected
+        )
 
 
 def test_set_normalized_action_copies_line() -> None:
@@ -1179,6 +1290,54 @@ def test_get_playbook_paths_local(tmp_path: Path) -> None:
     paths = handler._get_playbook_paths(lintable, "inner.yml", "", "", [])  # ruff:ignore[private-member-access]
     assert len(paths) == 1
     assert paths[0] == tmp_path / "inner.yml"
+
+
+@pytest.mark.parametrize(
+    ("reference", "playbook_path", "filename"),
+    (
+        ("local.testcollection.foo.yml", ["foo", "yml"], "foo.yml"),
+        ("local.testcollection.foo.yaml", ["foo", "yaml"], "foo.yaml"),
+        (
+            "local.testcollection.sub.foo.yml",
+            ["sub", "foo", "yml"],
+            "sub/foo.yml",
+        ),
+    ),
+)
+def test_get_playbook_paths_collection_extension(
+    tmp_path: Path,
+    reference: str,
+    playbook_path: list[str],
+    filename: str,
+) -> None:
+    """Verify collection playbook paths preserve explicit YAML extensions."""
+    from ansiblelint.app import App
+    from ansiblelint.config import Options
+    from ansiblelint.rules import RulesCollection
+
+    options = Options()
+    app = App(options=options)
+    app.runtime.config.collections_paths = [str(tmp_path)]
+    rules = RulesCollection(app=app)
+    handler = utils.HandleChildren(rules=rules, app=app)
+
+    lintable = Lintable(tmp_path / "outer.yml")
+    paths = handler._get_playbook_paths(  # ruff:ignore[private-member-access]
+        lintable,
+        reference,
+        "local",
+        "testcollection",
+        playbook_path,
+    )
+
+    assert paths == [
+        tmp_path
+        / "ansible_collections"
+        / "local"
+        / "testcollection"
+        / "playbooks"
+        / filename
+    ]
 
 
 def test_import_playbook_children_non_string(tmp_path: Path) -> None:

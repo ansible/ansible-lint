@@ -1,0 +1,12 @@
+---
+1:
+  query: >-
+    .data | {
+      name: .id,
+      canonical_facts: {
+        id: .id
+      },
+      facts: {
+        device_type: "router"
+      }
+    }

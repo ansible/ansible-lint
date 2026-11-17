@@ -118,7 +118,9 @@ def should_do_markup(stream: TextIO = sys.stdout) -> bool:  # pragma: no cover
         return to_bool(py_colors)
 
     term = os.environ.get("TERM", "")
-    if "xterm" in term:
+    # TERM only describes the terminal attached to the process, so it cannot
+    # tell whether an individual stream (like stderr) was redirected away.
+    if "xterm" in term and (stream is sys.stdout or stream.isatty()):
         return True
 
     if term == "dumb":
@@ -402,11 +404,19 @@ console = Console()
 console_stderr = Console(file=sys.stderr)
 
 
-def reconfigure(colored: bool | None = None) -> None:
-    """Reconfigure console options."""
+def reconfigure(
+    colored: bool | None = None,
+    stderr_colored: bool | None = None,
+) -> None:
+    """Reconfigure console options.
+
+    The stderr console follows ``colored`` unless ``stderr_colored`` is given.
+    """
     if colored is not None:
         console.colored = colored
         console_stderr.colored = colored
+    if stderr_colored is not None:
+        console_stderr.colored = stderr_colored
 
 
 def render_yaml(text: str) -> str:

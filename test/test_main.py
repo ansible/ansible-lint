@@ -1,6 +1,7 @@
 """Tests related to ansiblelint.__main__ module."""
 
 import os
+import shlex
 import shutil
 import subprocess
 import sys
@@ -345,7 +346,7 @@ def test_ro_venv(tmp_path: Path) -> None:
         f"mkdir -p {venv_path}",
         f"chmod -R a+w {venv_path}",
         f"rm -rf {venv_path}",
-        f"uv venv --seed --no-project {venv_path}",
+        f"uv venv --seed --no-project --python {shlex.quote(sys.executable)} {venv_path}",
         f"VIRTUAL_ENV={venv_path} uv pip install -q -e .",
         f"chmod -R a-w {venv_path}",
         # running with a ro venv and default cwd

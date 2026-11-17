@@ -1,0 +1,4 @@
+---
+example.collection.module_name:
+  query:
+    nested: "query should be a string, not a mapping"
