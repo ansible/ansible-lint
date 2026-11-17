@@ -43,6 +43,19 @@ class Prefix(NamedTuple):
     unknown: str = ""
 
 
+# var_naming_pattern describes whole variable names, so a bare role name is
+# probed as '{name}_<tail>': patterns requiring an affix (a "__" separator,
+# a literal prefix, ...) reject the bare name even when it is usable.
+_PREFIX_PROBE_TAILS = ("a", "0", "a0", "_a0", "a_b0")
+
+
+def _usable_var_prefix(candidate: str, pattern: re.Pattern[str]) -> bool:
+    """Return True if '{candidate}_<tail>' can satisfy the naming pattern."""
+    return bool(candidate) and any(
+        pattern.match(f"{candidate}_{tail}") for tail in _PREFIX_PROBE_TAILS
+    )
+
+
 def _role_name_from_meta(path: Path, pattern: re.Pattern[str]) -> str:
     """Return a usable galaxy_info.role_name from the role's meta/main.yml."""
     role_path = find_role_dir(path)
@@ -63,7 +76,7 @@ def _role_name_from_meta(path: Path, pattern: re.Pattern[str]) -> str:
     if not isinstance(galaxy_info, dict):
         return ""
     role_name = galaxy_info.get("role_name")
-    if isinstance(role_name, str) and pattern.match(role_name):
+    if isinstance(role_name, str) and _usable_var_prefix(role_name, pattern):
         return role_name
     return ""
 
@@ -76,12 +89,14 @@ def _get_role_prefix(file: Lintable, pattern: re.Pattern[str]) -> Prefix:
         return Prefix(file.role)
     # A dotted role directory is a Galaxy 'namespace.role' install: prefer
     # the role_name declared in meta/main.yml, else use the part of the
-    # directory name after the last dot. Any candidate must match the
-    # configured naming pattern or it could never be a valid prefix.
+    # directory name after the last dot. A candidate is usable only when it
+    # can head a variable name matching the configured naming pattern.
     role_name = _role_name_from_meta(file.path, pattern)
     if not role_name:
         candidate = file.role.rsplit(".", 1)[-1]
-        if pattern.match(candidate):
+        if has_jinja(candidate):
+            return Prefix()
+        if _usable_var_prefix(candidate, pattern):
             role_name = candidate
     if not role_name:
         return Prefix(unknown=file.role)
@@ -427,7 +442,9 @@ class VariableNamingRule(AnsibleLintRule):
             # role part of the name. Longer dotted names are collection FQCNs,
             # whose foreign variables stay exempted from this check.
             name = name.rsplit(".", 1)[-1]
-            if not self.re_pattern.match(name):
+            if has_jinja(name):
+                name = ""
+            elif not _usable_var_prefix(name, self.re_pattern):
                 name, unknown = "", fqcn
         elif "." in name:
             name = ""
@@ -804,3 +821,44 @@ if "pytest" in sys.modules:
         file = Lintable(str(tasks))
         file.role = "acme.stale"
         assert _get_role_prefix(file, VariableNamingRule.re_pattern) == Prefix("stale")
+
+    def test_var_naming_templated_role_name(
+        config_options: Options,
+        app: App,
+        tmp_path: Path,
+    ) -> None:
+        """Roles named through Jinja stay exempt from the prefix check."""
+        playbook = tmp_path / "playbook.yml"
+        playbook.write_text(
+            "---\n"
+            "- hosts: localhost\n"
+            "  roles:\n"
+            '    - role: "{{ namespace }}.{{ role }}"\n'
+            "      vars:\n"
+            "        templated_var: true\n"
+        )
+        rules = RulesCollection(app=app, options=config_options)
+        rules.register(VariableNamingRule())
+        results = Runner(Lintable(str(playbook)), rules=rules).run()
+        assert not results
+
+    def test_usable_var_prefix_affix_pattern() -> None:
+        """Role names stay usable when the pattern requires an affix."""
+        pattern = re.compile(r"^myrole_[a-z]+$")
+        assert _usable_var_prefix("myrole", pattern)
+        assert not _usable_var_prefix("other", pattern)
+        assert _usable_var_prefix("myrole", VariableNamingRule.re_pattern)
+        assert not _usable_var_prefix("my-role", VariableNamingRule.re_pattern)
+        assert not _usable_var_prefix("MyRole", VariableNamingRule.re_pattern)
+
+    def test_get_role_prefix_affix_and_templated(tmp_path: Path) -> None:
+        """Dotted dir candidates follow the same usability and jinja rules."""
+        tasks = tmp_path / "tasks" / MAIN_YML
+        tasks.parent.mkdir(parents=True)
+        tasks.write_text("---\n[]\n")
+        file = Lintable(str(tasks))
+        pattern = re.compile(r"^myrole_[a-z]+$")
+        file.role = "acme.myrole"
+        assert _get_role_prefix(file, pattern) == Prefix("myrole")
+        file.role = "acme.{{ role }}"
+        assert _get_role_prefix(file, pattern) == Prefix()
