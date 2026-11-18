@@ -298,6 +298,15 @@ def _continue_skip_next_lines(
             )
 
 
+def _block_scalar_comment_line(obj: Any, key: Any, slot: int) -> int | None:
+    """Return 1-based line number for a block-scalar header comment."""
+    lc_entry = obj.lc.data.get(key) if obj.lc.data else None
+    if lc_entry is None:
+        return None
+    lc_index = 0 if isinstance(obj, list) or slot < 2 else 2
+    return int(lc_entry[lc_index]) + 1
+
+
 def _get_rule_skips_from_yaml(
     yaml_input: Sequence[Any],
     lintable: Lintable,
@@ -309,7 +318,6 @@ def _get_rule_skips_from_yaml(
         return []
 
     def traverse_yaml(obj: Any) -> None:
-        obj_lc = obj.lc
         traversable: list[tuple[bool, Any, Any]] = [
             (True, k, v) for k, v in obj.ca.items.items()
         ]
@@ -330,17 +338,7 @@ def _get_rule_skips_from_yaml(
                     line = v.start_mark.line + 1  # ruamel line numbers start at 0
                 elif isinstance(v, str) and is_item:
                     comment_str = v
-                    lc_entry = obj_lc.data.get(key) if obj_lc.data else None
-                    line = (
-                        (
-                            lc_entry[0]
-                            if isinstance(obj, list) or slot < 2
-                            else lc_entry[2]
-                        )
-                        + 1
-                        if lc_entry is not None
-                        else None
-                    )
+                    line = _block_scalar_comment_line(obj, key, slot)
                 else:  # pragma: no cover
                     continue
                 if is_item:
