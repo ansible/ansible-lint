@@ -220,3 +220,41 @@ def test_args_module_vault_value_is_not_type_checked(
     assert [(r.tag, r.message) for r in results] == [
         ("args[module]", "missing required arguments: dest, url"),
     ]
+
+
+def test_args_module_vault_value_in_list_is_not_type_checked(
+    empty_rule_collection: RulesCollection,
+    tmp_path: Path,
+) -> None:
+    """A list holding a vault or templated item is unknown until runtime, so it is not type checked."""
+    results = _lint_tasks(
+        empty_rule_collection,
+        tmp_path,
+        """\
+    - name: Download with a vaulted header list
+      ansible.builtin.get_url:
+        url: https://example.com/file
+        dest: /tmp/file
+        mode: "0644"
+        headers:
+          - !vault |
+            $ANSIBLE_VAULT;1.1;AES256
+            00000000
+
+    - name: Download with a templated header list
+      ansible.builtin.get_url:
+        url: https://example.com/file
+        dest: /tmp/file
+        mode: "0644"
+        headers:
+          - "{{ header }}"
+
+    - name: Download without the required options
+      ansible.builtin.get_url:
+        mode: "0644"
+""",
+    )
+    # the single result comes from the last task, which proves the whole file was checked
+    assert [(r.tag, r.message) for r in results] == [
+        ("args[module]", "missing required arguments: dest, url"),
+    ]
