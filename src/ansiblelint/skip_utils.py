@@ -368,7 +368,8 @@ def _get_rule_skips_from_yaml(
     rule_id_list = []
     for comment_str in comment_strings:
         for line in comment_str.splitlines():
-            rule_id_list.extend(get_rule_skips_from_line(line, lintable=lintable))
+            if _noqa_comment_re.match(line):
+                rule_id_list.extend(get_rule_skips_from_line(line, lintable=lintable))
     _continue_skip_next_lines(lintable)
 
     return [normalize_tag(tag) for tag in rule_id_list]

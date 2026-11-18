@@ -1,5 +1,6 @@
 """Tests related to use of inline noqa."""
 
+# cspell: ignore omap
 from pathlib import Path
 
 import pytest
@@ -56,14 +57,16 @@ def test_vars_block_scalar_noqa_4596(
     vars_file.parent.mkdir(parents=True)
 
     vars_file.write_text(
-        "---\nsomevar: >- # noqa: jinja[spacing] var-naming[no-role-prefix]\n  {{foo}}\n",
+        "---\n"
+        "some_var: >- # noqa: jinja[spacing] var-naming[no-role-prefix]\n"
+        "  {{foo}}\n",
         encoding="utf-8",
     )
     assert Runner(vars_file, rules=default_rules_collection).run() == []
 
     vars_file.write_text(
         "---\n"
-        "somevar: >- # noqa: jinja[spacing] var-naming[no-role-prefix]\n"
+        "some_var: >- # noqa: jinja[spacing] var-naming[no-role-prefix]\n"
         "  {{foo}}\n"
         "test_role_unignored: >-\n"
         "  {{bar}}\n",
@@ -144,6 +147,15 @@ def test_playbook_task_block_scalar_noqa(
     )
     assert Runner(playbook, rules=default_rules_collection).run() == []
 
+    playbook.write_text(
+        template.format(comment=" # note about # noqa: command-instead-of-shell"),
+        encoding="utf-8",
+    )
+    non_directive_tags = {
+        match.tag for match in Runner(playbook, rules=default_rules_collection).run()
+    }
+    assert non_directive_tags == {"command-instead-of-shell", "jinja[spacing]"}
+
 
 def test_block_scalar_noqa_edge_cases(
     tmp_path: Path,
@@ -155,7 +167,8 @@ def test_block_scalar_noqa_edge_cases(
 
     # 1. YAML null (`~`) key with block-scalar noqa must not collide with sentinel.
     vars_file.write_text(
-        "---\n~: |- # noqa: jinja[spacing]\n  {{foo}}\n", encoding="utf-8"
+        "---\n~: |- # noqa: jinja[spacing]\n  {{foo}}\n",
+        encoding="utf-8",
     )
     null_lintable = Lintable(vars_file)
     null_data = append_skipped_rules({}, null_lintable)
@@ -204,7 +217,7 @@ def test_block_scalar_noqa_fix_preserves_file(tmp_path: Path) -> None:
     vars_file.parent.mkdir(parents=True)
     original = (
         "---\n"
-        "somevar: >- # noqa: jinja[spacing] var-naming[no-role-prefix]\n"
+        "some_var: >- # noqa: jinja[spacing] var-naming[no-role-prefix]\n"
         "  {{foo}}\n"
     )
     vars_file.write_text(original, encoding="utf-8")
