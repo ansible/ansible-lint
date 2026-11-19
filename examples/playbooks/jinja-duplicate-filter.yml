@@ -1,0 +1,14 @@
+---
+- name: Check for duplicate Jinja filters
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Find users starting with a
+      vars:
+        users:
+          - alice
+          - bob
+          - charlie
+        a_users: "{{ users | select('match', '^a') | list | list }}"
+      ansible.builtin.debug:
+        var: a_users

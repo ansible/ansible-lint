@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import contextlib
 import logging
 import os
 import re
 import sys
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
+from json import JSONDecodeError, loads
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, NamedTuple
 
@@ -15,8 +17,11 @@ import black
 import jinja2
 from ansible.errors import AnsibleError, AnsibleFilterError, AnsibleParserError
 from ansible_compat.config import ansible_version
+from jinja2 import nodes
 from jinja2.exceptions import TemplateSyntaxError
 from packaging.version import Version
+from ruamel.yaml import YAML
+from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
 from ansiblelint.errors import RuleMatchTransformMeta
 from ansiblelint.file_utils import Lintable
@@ -33,8 +38,6 @@ from ansiblelint.utils import (  # type: ignore[attr-defined]
 from ansiblelint.yaml_utils import deannotate, nested_items_path
 
 if TYPE_CHECKING:
-    from ruamel.yaml.comments import CommentedMap, CommentedSeq
-
     from ansiblelint.config import Options
     from ansiblelint.errors import MatchError
     from ansiblelint.utils import Task
@@ -42,6 +45,9 @@ if TYPE_CHECKING:
 
 _logger = logging.getLogger(__package__)
 KEYWORDS_WITH_IMPLICIT_TEMPLATE = ("changed_when", "failed_when", "until", "when")
+IDEMPOTENT_FILTERS = frozenset({"default", "list"})
+JINJA_DUPLICATE_FILTER_TAG = "jinja[duplicate-filter]"
+PLAYBOOK_NAME = "playbook.yml"
 
 
 class Token(NamedTuple):
@@ -171,6 +177,48 @@ def _format_expression(expr_str: str, last_token: Any) -> str:
     return expr_str
 
 
+def _filter_signature(
+    filter_node: nodes.Filter,
+) -> tuple[str, tuple[str, ...], tuple[str, ...], str | None, str | None]:
+    """Return a filter signature without its input expression or source location."""
+    return (
+        filter_node.name,
+        tuple(argument.dump() for argument in filter_node.args),
+        tuple(keyword.dump() for keyword in filter_node.kwargs),
+        filter_node.dyn_args.dump() if filter_node.dyn_args else None,
+        filter_node.dyn_kwargs.dump() if filter_node.dyn_kwargs else None,
+    )
+
+
+def _source_parent(data: Any, path: list[str | int]) -> Any | None:
+    """Return the parent of a value addressed by a nested mapping/list path."""
+    for key in path:
+        if isinstance(data, list) and isinstance(key, int):
+            try:
+                data = data[key]
+            except IndexError:
+                return None
+        elif isinstance(data, Mapping) and isinstance(key, str) and key in data:
+            data = data[key]
+        else:
+            return None
+    return data
+
+
+def _source_line(data: Any, path: list[str | int]) -> int | None:
+    """Return a value's source line from a ruamel round-trip parsed document."""
+    if not path:
+        return None
+    parent = _source_parent(data, path[:-1])
+    if isinstance(parent, CommentedMap) and isinstance(path[-1], str):
+        line, _ = parent.lc.value(path[-1])
+    elif isinstance(parent, CommentedSeq) and isinstance(path[-1], int):
+        line, _ = parent.lc.item(path[-1])
+    else:
+        return None
+    return line + 1 if line is not None else None
+
+
 def _process_jinja_tokens(lex: Callable[[str], Any], text: str) -> list[Token]:
     tokens: list[Token] = []
     begin_types = ("variable_begin", "comment_begin", "block_begin")
@@ -231,6 +279,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
     _ids = {
         "jinja[invalid]": "Invalid jinja2 syntax",
         "jinja[spacing]": "Jinja2 spacing could be improved",
+        JINJA_DUPLICATE_FILTER_TAG: "Avoid consecutive duplicate filters",
     }
 
     def _msg(self, tag: str, value: str, reformatted: str) -> str:
@@ -243,6 +292,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
         task: Task,
         file: Lintable | None = None,
     ) -> list[MatchError]:
+        """Check task strings for invalid Jinja and formatting issues."""
         result = []
         try:  # ruff:ignore[too-many-statements-in-try-clause]
             for key, v, path in nested_items_path(
@@ -339,6 +389,23 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                                 ),
                             )
                             continue
+                    duplicate_filters = self.find_duplicate_filters(
+                        v,
+                        key=key,
+                        lintable=file,
+                    )
+                    if duplicate_filters:
+                        names = ", ".join(f"`{name}`" for name in duplicate_filters)
+                        lineno = task.get_error_line([*path, key])
+                        result.append(
+                            self.create_matcherror(
+                                message=f"Consecutive duplicate filters found: {names}.",
+                                filename=file,
+                                data=v,
+                                tag=JINJA_DUPLICATE_FILTER_TAG,
+                                lineno=lineno,
+                            ),
+                        )
                     reformatted, details, tag = self.check_whitespace(
                         v,
                         key=key,
@@ -371,17 +438,71 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
             raise
         return result
 
+    def find_duplicate_filters(
+        self,
+        text: str,
+        key: str,
+        lintable: Lintable | None,
+    ) -> list[str]:
+        """Return names of adjacent filters applied with identical arguments."""
+        implicit = (
+            key in KEYWORDS_WITH_IMPLICIT_TEMPLATE
+            and lintable
+            and lintable.kind in ("playbook", "task", "tasks")
+        )
+        text = _cook(text, implicit=bool(implicit))
+        if not has_jinja(text):
+            return []
+
+        try:
+            parsed = self.env.parse(text)
+        except jinja2.exceptions.TemplateSyntaxError:
+            return []
+
+        return [
+            filter_node.name
+            for filter_node in parsed.find_all(nodes.Filter)
+            if filter_node.name in IDEMPOTENT_FILTERS
+            and isinstance(filter_node.node, nodes.Filter)
+            and _filter_signature(filter_node) == _filter_signature(filter_node.node)
+        ]
+
     def matchyaml(self, file: Lintable) -> list[MatchError]:
         """Return matches for variables defined in vars files."""
         raw_results: list[MatchError] = []
         results: list[MatchError] = []
 
         if str(file.kind) == "vars":
+            json_source: Any = None
+            try:
+                loads(file.content)
+            except JSONDecodeError:
+                pass
+            else:
+                with contextlib.suppress(Exception):
+                    json_source = YAML(typ="rt").load(file.content)
+
             data = parse_yaml_from_file(str(file.path))
             if not isinstance(data, Mapping):
                 return results
-            for key, v, _path in nested_items_path(data):
+            for key, v, path in nested_items_path(data):
                 if isinstance(v, str):
+                    duplicate_filters = self.find_duplicate_filters(
+                        v,
+                        key=key,
+                        lintable=file,
+                    )
+                    if duplicate_filters:
+                        names = ", ".join(f"`{name}`" for name in duplicate_filters)
+                        results.append(
+                            self.create_matcherror(
+                                message=f"Consecutive duplicate filters found: {names}.",
+                                lineno=_source_line(json_source, [*path, key]) or 1,
+                                filename=file,
+                                data=v,
+                                tag=JINJA_DUPLICATE_FILTER_TAG,
+                            ),
+                        )
                     reformatted, details, tag = self.check_whitespace(
                         v,
                         key=key,
@@ -395,6 +516,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
                                     value=v,
                                     reformatted=reformatted,
                                 ),
+                                lineno=_source_line(json_source, [*path, key]) or 1,
                                 data=v,
                                 details=details,
                                 filename=file,
@@ -484,6 +606,7 @@ class JinjaRule(AnsibleLintRule, TransformMixin):
             in (
                 "playbook",
                 "task",
+                "tasks",
             )
         ):
             implicit = True
@@ -901,7 +1024,7 @@ if "pytest" in sys.modules:
         reformatted, details, returned_tag = rule.check_whitespace(
             text,
             key="name",
-            lintable=Lintable("playbook.yml"),
+            lintable=Lintable(PLAYBOOK_NAME),
         )
         assert tag == returned_tag, details
         assert expected == reformatted
@@ -930,7 +1053,7 @@ if "pytest" in sys.modules:
         """Tests our ability to spot spacing errors implicit jinja2 templates."""
         rule = JinjaRule()
         # implicit jinja2 are working only inside playbooks and tasks
-        lintable = Lintable(name="playbook.yml", kind="playbook")
+        lintable = Lintable(name=PLAYBOOK_NAME, kind="playbook")
         reformatted, details, returned_tag = rule.check_whitespace(
             text,
             key="when",
@@ -938,6 +1061,131 @@ if "pytest" in sys.modules:
         )
         assert tag == returned_tag, details
         assert expected == reformatted
+
+    @pytest.mark.parametrize(
+        ("text", "key", "expected"),
+        (
+            pytest.param("{{ users | list | list }}", "name", ["list"], id="no-args"),
+            pytest.param("{{ users | list }}", "name", [], id="single-filter"),
+            pytest.param(
+                "{{ value | default('x') | default('x') }}",
+                "name",
+                ["default"],
+                id="same-args",
+            ),
+            pytest.param(
+                "{{ value | default('x') | default('y') }}",
+                "name",
+                [],
+                id="different-args",
+            ),
+            pytest.param(
+                "{{ value | default(default_value='x') | default(default_value='x') }}",
+                "name",
+                ["default"],
+                id="same-kwargs",
+            ),
+            pytest.param(
+                "{{ value | default(default_value='x') | default(default_value='y') }}",
+                "name",
+                [],
+                id="different-kwargs",
+            ),
+            pytest.param(
+                "{{ value | list | string | list }}",
+                "name",
+                [],
+                id="not-consecutive",
+            ),
+            pytest.param(
+                "{{ value | batch(2) | batch(2) }}",
+                "name",
+                [],
+                id="meaningful-duplicate",
+            ),
+            pytest.param(
+                "users | list | list",
+                "when",
+                ["list"],
+                id="implicit",
+            ),
+        ),
+    )
+    def test_jinja_duplicate_filter_detection(
+        text: str,
+        key: str,
+        expected: list[str],
+    ) -> None:
+        """Only report identical filters that are applied consecutively."""
+        rule = JinjaRule()
+        lintable = Lintable(name=PLAYBOOK_NAME, kind="playbook")
+        assert rule.find_duplicate_filters(text, key, lintable) == expected
+
+    def test_jinja_duplicate_filter_in_task_file() -> None:
+        """Check implicit expressions in standalone task files."""
+        rule = JinjaRule()
+        lintable = Lintable(name="tasks/main.yml", kind="tasks")
+        text = "users | list | list"
+        assert rule.find_duplicate_filters(text, "when", lintable) == ["list"]
+        reformatted, _, _ = rule.check_whitespace(
+            text,
+            key="when",
+            lintable=lintable,
+        )
+        assert reformatted == text
+
+    def test_jinja_duplicate_filter_json_vars_line(tmp_path: Path) -> None:
+        """Report the source line for a duplicate filter in JSON-formatted vars."""
+        vars_file = tmp_path / "group_vars" / "all.yml"
+        vars_file.parent.mkdir()
+        vars_file.write_text(
+            '{\n  "plain": "value",\n  "nested": {\n'
+            '    "a_users": "{{ users | list | list }}"\n  }\n}\n',
+            encoding="utf-8",
+        )
+        lintable = Lintable(vars_file, kind="vars")  # type: ignore[arg-type]
+        matches = JinjaRule().matchyaml(lintable)
+        assert len(matches) == 1
+        assert matches[0].tag == JINJA_DUPLICATE_FILTER_TAG
+        assert matches[0].lineno == 4
+
+    @pytest.mark.parametrize(
+        ("content", "line"),
+        (
+            pytest.param(
+                '{"users": [\n  "{{ users | list | list }}"\n]}\n',
+                2,
+                id="sequence-value",
+            ),
+            pytest.param(
+                '{"nested": [\n  {"users": "{{ users | list | list }}"}\n]}\n',
+                2,
+                id="nested-mapping-value",
+            ),
+        ),
+    )
+    def test_jinja_duplicate_filter_json_vars_list_line(
+        tmp_path: Path,
+        content: str,
+        line: int,
+    ) -> None:
+        """Report source lines for duplicate filters nested in JSON lists."""
+        vars_file = tmp_path / "group_vars" / "all.yml"
+        vars_file.parent.mkdir()
+        vars_file.write_text(content, encoding="utf-8")
+        lintable = Lintable(vars_file, kind="vars")  # type: ignore[arg-type]
+        matches = JinjaRule().matchyaml(lintable)
+        assert len(matches) == 1
+        assert matches[0].tag == JINJA_DUPLICATE_FILTER_TAG
+        assert matches[0].lineno == line
+
+    def test_jinja_source_line_missing_location() -> None:
+        """Return no location when a value path cannot be resolved."""
+        data = YAML(typ="rt").load("items: []")
+        assert _source_line(data, []) is None
+        assert _source_line(data, ["items", 0, "missing"]) is None
+        assert _source_line(data, ["items", "missing"]) is None
+        assert _source_line(data, ["missing", "value"]) is None
 
     @pytest.mark.parametrize(
         ("lintable", "matches"),
@@ -974,6 +1222,17 @@ if "pytest" in sys.modules:
         success = "examples/playbooks/rule-jinja-pass.yml"
         errs = Runner(success, rules=empty_rule_collection).run()
         assert len(errs) == 0
+
+    def test_jinja_duplicate_filter_rule(
+        empty_rule_collection: RulesCollection,
+    ) -> None:
+        """Ensure duplicate filters are reported by the Jinja rule."""
+        empty_rule_collection.register(JinjaRule())
+        lintable = "examples/playbooks/jinja-duplicate-filter.yml"
+        errs = Runner(lintable, rules=empty_rule_collection).run()
+        assert len(errs) == 1
+        assert errs[0].tag == JINJA_DUPLICATE_FILTER_TAG
+        assert "Consecutive duplicate filters found: `list`." in errs[0].message
 
     @mock.patch.dict(os.environ, {"ANSIBLE_LINT_WRITE_TMP": "1"}, clear=True)
     def test_jinja_transform(
