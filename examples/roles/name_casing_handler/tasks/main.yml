@@ -1,0 +1,6 @@
+---
+- name: Install Apache
+  ansible.builtin.package:
+    name: httpd
+    state: present
+  notify: restart apache
