@@ -79,6 +79,28 @@ def test_path_inject_userbase(
     assert os.environ["PATH"].split(os.pathsep)[0] == userbase_bin.resolve().as_posix()
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="POSIX user base layout")
+def test_path_inject_userbase_does_not_shadow_interpreter(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The user base must not be put ahead of an active environment's ansible."""
+    userbase_bin = tmp_path / "userbase" / "bin"
+    userbase_bin.mkdir(parents=True)
+    (userbase_bin / "ansible").touch(mode=0o755)
+    venv_bin = tmp_path / "venv" / "bin"
+    venv_bin.mkdir(parents=True)
+    (venv_bin / "ansible").touch(mode=0o755)
+    monkeypatch.setattr(site, "getuserbase", lambda: str(tmp_path / "userbase"))
+    monkeypatch.setenv("PATH", f"{venv_bin}{os.pathsep}/usr/bin")
+    monkeypatch.delenv("PYENV_VIRTUAL_ENV", raising=False)
+    monkeypatch.setattr(sys, "executable", str(venv_bin / "python"))
+
+    path_inject()
+
+    assert os.environ["PATH"] == f"{venv_bin}{os.pathsep}/usr/bin"
+
+
 @pytest.mark.skipif(sys.platform == "win32", reason="symlinks")
 def test_path_inject_own_location_not_duplicated(
     tmp_path: Path,

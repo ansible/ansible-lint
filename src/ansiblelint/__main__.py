@@ -582,11 +582,6 @@ def path_inject(own_location: str = "") -> None:
 
     inject_paths = []
 
-    userbase_bin_path = Path(site.getuserbase()) / "bin"
-
-    if str(userbase_bin_path) not in paths and (userbase_bin_path / "ansible").exists():
-        inject_paths.append(userbase_bin_path.resolve().as_posix())
-
     py_path = Path(sys.executable).parent.resolve()
     pipx_path = os.environ.get("PIPX_HOME", "pipx")
     if (
@@ -596,6 +591,15 @@ def path_inject(own_location: str = "") -> None:
         and pipx_path not in str(py_path)
     ):
         inject_paths.append(py_path.as_posix())
+
+    # The user base is only a fallback: an ansible next to the interpreter wins.
+    userbase_bin_path = Path(site.getuserbase()) / "bin"
+    if (
+        not (py_path / "ansible").exists()
+        and str(userbase_bin_path) not in paths
+        and (userbase_bin_path / "ansible").exists()
+    ):
+        inject_paths.append(userbase_bin_path.resolve().as_posix())
 
     # last option, if nothing else is found, just look next to ourselves...
     if own_location:
