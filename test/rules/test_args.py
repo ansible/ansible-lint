@@ -10,7 +10,7 @@ import pytest
 from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import RulesCollection
-from ansiblelint.rules.args import ArgsRule
+from ansiblelint.rules.args import ArgsRule, _json_default
 from ansiblelint.runner import Runner
 
 if TYPE_CHECKING:
@@ -258,3 +258,40 @@ def test_args_module_vault_value_in_list_is_not_type_checked(
     assert [(r.tag, r.message) for r in results] == [
         ("args[module]", "missing required arguments: dest, url"),
     ]
+
+
+def test_args_module_vault_value_in_dict_is_not_type_checked(
+    empty_rule_collection: RulesCollection,
+    tmp_path: Path,
+) -> None:
+    """A dict holding a vault item is unknown until runtime, so it is not type checked."""
+    results = _lint_tasks(
+        empty_rule_collection,
+        tmp_path,
+        """    - name: Download with a vaulted value inside a dict timeout
+      ansible.builtin.get_url:
+        url: https://example.com/file
+        dest: /tmp/file
+        mode: "0644"
+        timeout:
+          seconds: !vault |
+            $ANSIBLE_VAULT;1.1;AES256
+            00000000
+
+    - name: Download without the required options
+      ansible.builtin.get_url:
+        mode: "0644"
+""",
+    )
+    # the single result comes from the last task, which proves the whole file was checked
+    assert [(r.tag, r.message) for r in results] == [
+        ("args[module]", "missing required arguments: dest, url"),
+    ]
+
+
+def test_json_default_rejects_unsupported_types() -> None:
+    """Only vault values get a placeholder, anything else keeps json's own error."""
+    with pytest.raises(
+        TypeError, match="Object of type object is not JSON serializable"
+    ):
+        _json_default(object())
