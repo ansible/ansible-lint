@@ -1,5 +1,6 @@
 """Tests for args rule."""
 
+import logging
 import sys
 from pathlib import Path
 from types import ModuleType, SimpleNamespace
@@ -28,6 +29,63 @@ def test_args_module_relative_import(default_rules_collection: RulesCollection) 
     assert result[0].filename == "examples/playbooks/module_relative_import.yml"
     assert result[0].tag == "args[module]"
     assert result[0].message == "missing required arguments: name"
+
+
+@pytest.mark.parametrize(
+    ("module_name", "expected"),
+    (
+        pytest.param("setup", ["args[module]"], id="module"),
+        pytest.param("ansible.legacy.setup", ["args[module]"], id="legacy-module"),
+        pytest.param("set_fact", [], id="action"),
+        pytest.param("tempfile", ["args[module]"], id="standard-library-name"),
+    ),
+)
+def test_args_builtin_relative_import(
+    default_rules_collection: RulesCollection,
+    caplog: pytest.LogCaptureFixture,
+    tmp_path: Path,
+    module_name: str,
+    expected: list[str],
+) -> None:
+    """Validate args check of a builtin plugin that a task names without ansible.builtin."""
+    tasks_path = tmp_path / "tasks.yml"
+    tasks_path.write_text(
+        f"- name: Example\n  {module_name}:\n    foo: true\n",
+        encoding="utf-8",
+    )
+    lintable = Lintable(tasks_path, kind="tasks")
+    with caplog.at_level(logging.WARNING):
+        results = Runner(lintable, rules=default_rules_collection).run()
+    assert "Ignored exception" not in caplog.text
+    assert [result.tag for result in results if result.rule.id == "args"] == expected
+
+
+def test_args_local_module_short_name(
+    default_rules_collection: RulesCollection,
+    caplog: pytest.LogCaptureFixture,
+    tmp_path: Path,
+) -> None:
+    """Validate args check of a module from a library folder next to the tasks."""
+    module_path = tmp_path / "library" / "local_module.py"
+    module_path.parent.mkdir()
+    module_path.write_text(
+        "from ansible.module_utils.basic import AnsibleModule\n"
+        "def main():\n"
+        "    AnsibleModule(argument_spec={}).exit_json()\n",
+        encoding="utf-8",
+    )
+    tasks_path = tmp_path / "tasks.yml"
+    tasks_path.write_text(
+        "- name: Example\n  local_module:\n    foo: true\n",
+        encoding="utf-8",
+    )
+    lintable = Lintable(tasks_path, kind="tasks")
+    with caplog.at_level(logging.WARNING):
+        results = Runner(lintable, rules=default_rules_collection).run()
+    assert "Ignored exception" not in caplog.text
+    assert [result.tag for result in results if result.rule.id == "args"] == [
+        "args[module]"
+    ]
 
 
 def test_args_module_import_keeps_module_registered(
