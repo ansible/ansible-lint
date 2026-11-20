@@ -1,0 +1,11 @@
+---
+# This role has no meta/main.yml: the expected prefix is the part of the
+# 'namespace.role' directory name after the dot (dotted_fallback).
+
+- name: Set fact with role prefix (should pass)
+  ansible.builtin.set_fact:
+    dotted_fallback_fact: "test"
+
+- name: Set fact without role prefix (should fail)
+  ansible.builtin.set_fact:
+    bad_fallback_fact: "test"
