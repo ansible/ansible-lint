@@ -72,6 +72,17 @@ messages. For example, the `meta` schema will require some properties only for
 standalone roles or prevent the use of some properties that are not supported
 by collections.
 
+For standalone roles, `galaxy_info.platforms[].versions` contains version identifiers
+defined per platform in the
+[role metadata schema](https://github.com/ansible/ansible-lint/blob/main/src/ansiblelint/schemas/meta.json).
+Choose the fact to compare based on the distribution.
+
+- Ubuntu and Debian use release codenames such as `jammy` and `bookworm`.
+  Compare these with `ansible_facts['distribution_release']`.
+- AlmaLinux uses major versions such as `"9"` and `"10"`.
+  Quote these values in YAML to keep them as strings and compare them with
+  `ansible_facts['distribution_major_version']`.
+
 You cannot use an empty `meta/main.yml` file or use only comments in the
 `meta/main.yml` file.
 
