@@ -147,6 +147,13 @@
           },
           "type": "object"
         },
+        "return": {
+          "additionalProperties": {
+            "$ref": "#/$defs/return_value"
+          },
+          "markdownDescription": "Document the variables the role sets, using the same format as module return values.\nSee [specification format](https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_reuse_roles.html#specification-format)",
+          "type": "object"
+        },
         "seealso": {
           "items": {
             "oneOf": [
@@ -388,6 +395,51 @@
         "type": "string"
       },
       "title": "Option"
+    },
+    "return_value": {
+      "additionalProperties": false,
+      "markdownDescription": "See [specification format](https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_reuse_roles.html#specification-format)",
+      "properties": {
+        "choices": {
+          "type": "array"
+        },
+        "contains": {
+          "additionalProperties": {
+            "$ref": "#/$defs/return_value"
+          },
+          "type": "object"
+        },
+        "description": {
+          "description": "Detailed explanation of what this value represents. It should be written in full sentences.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "elements": {
+          "$ref": "#/$defs/datatype"
+        },
+        "returned": {
+          "description": "When this value is returned (for example V(always) or V(on success)).",
+          "type": "string"
+        },
+        "sample": {},
+        "type": {
+          "$ref": "#/$defs/datatype"
+        },
+        "version_added": {
+          "type": "string"
+        }
+      },
+      "title": "Return Value",
+      "type": "object"
     }
   },
   "$id": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/role-arg-spec.json",
