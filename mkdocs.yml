@@ -81,6 +81,7 @@ nav:
       - rules/deprecated-bare-vars.md
       - rules/deprecated-local-action.md
       - rules/deprecated-module.md
+      - rules/deprecated-top-level-facts.md
       - rules/empty-string-compare.md
       - rules/fqcn.md
       - rules/galaxy-version-incorrect.md
