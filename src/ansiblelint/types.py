@@ -43,6 +43,15 @@ except ImportError:  # pragma: no cover
         Sequence | Mapping | str | None
     )
     ansible_error_format = 2
+
+try:
+    # core 2.19 replaced AnsibleVaultEncryptedUnicode with EncryptedString
+    from ansible.parsing.vault import (  # type: ignore[attr-defined,unused-ignore]
+        EncryptedString,  # pyright: ignore[reportAttributeAccessIssue]
+    )
+except ImportError:
+    EncryptedString = AnsibleVaultEncryptedUnicode  # type: ignore[misc,assignment,unused-ignore] # pyright: ignore[reportAssignmentType,reportRedeclaration]
+
 # temporary ignoring the type parameters for Sequence and Mapping because once
 # add them we can no longer use isinstance() to check for them and we will
 # need to implement a more complex runtime type checking.
@@ -57,6 +66,7 @@ __all__ = [
     "AnsibleTemplateSyntaxError",
     "AnsibleUnicode",
     "AnsibleVaultEncryptedUnicode",
+    "EncryptedString",
     "TrustedAsTemplate",
     "ansible_error_format",
 ]

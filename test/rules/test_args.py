@@ -7,9 +7,10 @@ from typing import TYPE_CHECKING, Any, cast
 
 import pytest
 
+from ansiblelint.errors import MatchError
 from ansiblelint.file_utils import Lintable
 from ansiblelint.rules import RulesCollection
-from ansiblelint.rules.args import ArgsRule
+from ansiblelint.rules.args import ArgsRule, _json_default
 from ansiblelint.runner import Runner
 
 if TYPE_CHECKING:
@@ -150,3 +151,147 @@ def test_args_rule_skips_when_resolved_path_is_lint_mock(
         file=Lintable("test.yml", kind="tasks"),
     )
     assert results == []
+
+
+def _lint_tasks(rules: RulesCollection, tmp_path: Path, tasks: str) -> list[MatchError]:
+    """Lint the given tasks, as a playbook, with the args rule only."""
+    rules.register(ArgsRule())
+    playbook = tmp_path / "playbook.yml"
+    playbook.write_text(
+        f"---\n- name: Vault test\n  hosts: localhost\n  tasks:\n{tasks}",
+        encoding="utf-8",
+    )
+    return Runner(Lintable(playbook, kind="playbook"), rules=rules).run()
+
+
+def test_args_module_vault_value_does_not_skip_validation(
+    empty_rule_collection: RulesCollection,
+    tmp_path: Path,
+) -> None:
+    """An inline !vault value must not stop the rule from validating the task."""
+    results = _lint_tasks(
+        empty_rule_collection,
+        tmp_path,
+        """\
+    - name: Download with a vaulted password
+      ansible.builtin.get_url:
+        url_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          00000000
+        mode: "0644"
+""",
+    )
+    assert [(r.tag, r.message) for r in results] == [
+        ("args[module]", "missing required arguments: dest, url"),
+    ]
+
+
+def test_args_module_vault_value_is_not_type_checked(
+    empty_rule_collection: RulesCollection,
+    tmp_path: Path,
+) -> None:
+    """A vault value is only known once decrypted, so its type and choices are not checked."""
+    results = _lint_tasks(
+        empty_rule_collection,
+        tmp_path,
+        """\
+    - name: Download with a vaulted timeout
+      ansible.builtin.get_url:
+        url: https://example.com/file
+        dest: /tmp/file
+        mode: "0644"
+        timeout: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          00000000
+
+    - name: Start a service with a vaulted state
+      ansible.builtin.service:
+        name: sshd
+        state: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          00000000
+
+    - name: Download without the required options
+      ansible.builtin.get_url:
+        mode: "0644"
+""",
+    )
+    # the single result comes from the last task, which proves the whole file was checked
+    assert [(r.tag, r.message) for r in results] == [
+        ("args[module]", "missing required arguments: dest, url"),
+    ]
+
+
+def test_args_module_vault_value_in_list_is_not_type_checked(
+    empty_rule_collection: RulesCollection,
+    tmp_path: Path,
+) -> None:
+    """A list holding a vault or templated item is unknown until runtime, so it is not type checked."""
+    results = _lint_tasks(
+        empty_rule_collection,
+        tmp_path,
+        """\
+    - name: Download with a vaulted header list
+      ansible.builtin.get_url:
+        url: https://example.com/file
+        dest: /tmp/file
+        mode: "0644"
+        headers:
+          - !vault |
+            $ANSIBLE_VAULT;1.1;AES256
+            00000000
+
+    - name: Download with a templated header list
+      ansible.builtin.get_url:
+        url: https://example.com/file
+        dest: /tmp/file
+        mode: "0644"
+        headers:
+          - "{{ header }}"
+
+    - name: Download without the required options
+      ansible.builtin.get_url:
+        mode: "0644"
+""",
+    )
+    # the single result comes from the last task, which proves the whole file was checked
+    assert [(r.tag, r.message) for r in results] == [
+        ("args[module]", "missing required arguments: dest, url"),
+    ]
+
+
+def test_args_module_vault_value_in_dict_is_not_type_checked(
+    empty_rule_collection: RulesCollection,
+    tmp_path: Path,
+) -> None:
+    """A dict holding a vault item is unknown until runtime, so it is not type checked."""
+    results = _lint_tasks(
+        empty_rule_collection,
+        tmp_path,
+        """    - name: Download with a vaulted value inside a dict timeout
+      ansible.builtin.get_url:
+        url: https://example.com/file
+        dest: /tmp/file
+        mode: "0644"
+        timeout:
+          seconds: !vault |
+            $ANSIBLE_VAULT;1.1;AES256
+            00000000
+
+    - name: Download without the required options
+      ansible.builtin.get_url:
+        mode: "0644"
+""",
+    )
+    # the single result comes from the last task, which proves the whole file was checked
+    assert [(r.tag, r.message) for r in results] == [
+        ("args[module]", "missing required arguments: dest, url"),
+    ]
+
+
+def test_json_default_rejects_unsupported_types() -> None:
+    """Only vault values get a placeholder, anything else keeps json's own error."""
+    with pytest.raises(
+        TypeError, match="Object of type object is not JSON serializable"
+    ):
+        _json_default(object())
