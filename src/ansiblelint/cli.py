@@ -227,10 +227,11 @@ class WriteArgAction(argparse.Action):
         option_string: str | None = None,
     ) -> None:
         lintables = getattr(namespace, "lintables", None)
-        if not lintables and isinstance(values, str):
+        if not lintables and isinstance(values, str) and values not in {"all", "none"}:
             # args are processed in order.
             # If --fix is after lintables, then that is not ambiguous.
-            # But if --fix comes first, then it might actually be a lintable.
+            # But if --fix comes first, then it might actually be a lintable,
+            # unless it is one of the 'all' or 'none' keywords.
             maybe_lintable = Path(values)
             if maybe_lintable.exists():
                 namespace.lintables = [values]
@@ -239,7 +240,8 @@ class WriteArgAction(argparse.Action):
             values = values.split(",")
         default = [self.const] if isinstance(self.const, str) else self.const
         previous_values = getattr(namespace, self.dest, default) or default
-        if not values:
+        # A bare --fix keeps the values of an earlier --fix.
+        if not values or values == default:
             values = previous_values
         elif previous_values != default:
             values = previous_values + values  # type: ignore[operator]
@@ -256,12 +258,15 @@ class WriteArgAction(argparse.Action):
         When --fix is not passed from command line the from_cli is an empty list,
         so we use the file.
 
-        When from_cli is not an empty list, we ignore the from_file value.
+        When --fix is passed without a value, we use the file value, or "all" if
+        the file does not have one.
+
+        When --fix is passed with a value, we ignore the from_file value.
         """
-        if not from_file:
-            arguments = ["all"] if from_cli == [cls._default] else from_cli
+        if from_cli == [cls._default]:
+            arguments = from_file or ["all"]
         else:
-            arguments = from_file
+            arguments = from_cli or from_file
         for magic_value in ("none", "all"):
             if magic_value in arguments and len(arguments) > 1:
                 msg = f"When passing '{magic_value}' to '--fix', you cannot pass other values."
