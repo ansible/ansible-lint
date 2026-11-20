@@ -298,41 +298,59 @@ def _continue_skip_next_lines(
             )
 
 
+def _block_scalar_comment_line(obj: Any, key: Any, slot: int) -> int | None:
+    """Return 1-based line number for a block-scalar header comment."""
+    lc_entry = obj.lc.data.get(key) if obj.lc.data else None
+    if lc_entry is None:
+        return None
+    lc_index = 0 if isinstance(obj, list) or slot < 2 else 2
+    return int(lc_entry[lc_index]) + 1
+
+
 def _get_rule_skips_from_yaml(
     yaml_input: Sequence[Any],
     lintable: Lintable,
 ) -> Sequence[Any]:
     """Traverse yaml for comments with rule skips and return list of rules."""
-    yaml_comment_obj_strings = []
+    comment_strings: list[str] = []
 
     if isinstance(yaml_input, str):
         return []
 
     def traverse_yaml(obj: Any) -> None:
-        traversable = list(obj.ca.items.values())
+        traversable: list[tuple[bool, Any, Any]] = [
+            (True, k, v) for k, v in obj.ca.items.items()
+        ]
         if obj.ca.comment:
-            traversable.append(obj.ca.comment)
-        for entry in traversable:
+            traversable.append((False, None, obj.ca.comment))
+        for is_item, key, entry in traversable:
             # flatten all lists we might have in entries. Some arcane ruamel CommentedMap magic
-            entry = [
-                item
-                for sublist in entry
+            flat_entry = [
+                (slot, item)
+                for slot, sublist in enumerate(entry)
                 if sublist is not None
                 for item in (sublist if isinstance(sublist, list) else [sublist])
             ]
-            for v in entry:
+            for slot, v in flat_entry:
+                line: int | None
                 if isinstance(v, CommentToken):
                     comment_str = v.value
-                    if _noqa_comment_re.match(comment_str):
-                        line = v.start_mark.line + 1  # ruamel line numbers start at 0
-                        lintable.line_skips[line].update(
-                            get_rule_skips_from_line(
-                                comment_str.strip(),
-                                lintable=lintable,
-                                lineno=line,
-                            ),
-                        )
-        yaml_comment_obj_strings.append(str(obj.ca.items))
+                    line = v.start_mark.line + 1  # ruamel line numbers start at 0
+                elif isinstance(v, str) and is_item:
+                    comment_str = v
+                    line = _block_scalar_comment_line(obj, key, slot)
+                else:  # pragma: no cover
+                    continue
+                if is_item:
+                    comment_strings.append(comment_str)
+                if line is not None and _noqa_comment_re.match(comment_str):
+                    lintable.line_skips[line].update(
+                        get_rule_skips_from_line(
+                            comment_str.strip(),
+                            lintable=lintable,
+                            lineno=line,
+                        ),
+                    )
         if isinstance(obj, dict):
             for val in obj.values():
                 if isinstance(val, dict | list):
@@ -346,9 +364,10 @@ def _get_rule_skips_from_yaml(
         traverse_yaml(yaml_input)
 
     rule_id_list = []
-    for comment_obj_str in yaml_comment_obj_strings:
-        for line in comment_obj_str.split(r"\n"):
-            rule_id_list.extend(get_rule_skips_from_line(line, lintable=lintable))
+    for comment_str in comment_strings:
+        for line in comment_str.splitlines():
+            if _noqa_comment_re.match(line):
+                rule_id_list.extend(get_rule_skips_from_line(line, lintable=lintable))
     _continue_skip_next_lines(lintable)
 
     return [normalize_tag(tag) for tag in rule_id_list]
