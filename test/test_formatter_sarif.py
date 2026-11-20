@@ -232,6 +232,26 @@ def test_sarif_file(file: str, return_code: int, output_format: str) -> None:
         assert pathlib.Path(output_file.name).stat().st_size > 0
 
 
+@pytest.mark.parametrize("output_format", ("full", "codeclimate"))
+def test_sarif_file_write_error_keeps_output(
+    tmp_path: pathlib.Path, output_format: str
+) -> None:
+    """Test that results still print when the --sarif-file write fails."""
+    cmd = [
+        sys.executable,
+        "-m",
+        "ansiblelint",
+        "-f",
+        output_format,
+        "--sarif-file",
+        str(tmp_path / "missing" / "output.sarif"),
+        "playbook.yml",
+    ]
+    result = subprocess.run(cmd, check=False, capture_output=True, text=True)
+    assert result.returncode != 0
+    assert result.stdout.strip()
+
+
 @pytest.mark.parametrize(
     ("file", "return_code"),
     (pytest.param("examples/playbooks/valid.yml", 0, id="0"),),
