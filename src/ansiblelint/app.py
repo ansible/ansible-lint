@@ -87,6 +87,7 @@ class App:
             console.print(
                 self.formatter.format_result(matches),
             )
+            self._write_sarif_file(matches)
             return
 
         ignored_matches = [match for match in matches if match.ignored]
@@ -124,16 +125,23 @@ class App:
                     formatter.apply(match),
                 )
 
-        # If sarif_file is set, we also dump the results to a sarif file.
-        if self.options.sarif_file:
-            sarif = formatters.SarifFormatter(self.options.cwd, True)
-            json = sarif.format_result(matches)
-            # Somehow, this gets set as an AnsibleUnicode under unclear circumstances. Force it to be a Path
-            sarif_file = Path(self.options.sarif_file)
-            sarif_file.write_text(
-                json,
-                encoding="utf-8",
-            )
+        self._write_sarif_file(matches)
+
+    def _write_sarif_file(self, matches: list[MatchError]) -> None:
+        """Dump the results to a sarif file, if sarif_file is set.
+
+        Called after the results are printed, so a failed write does not hide them.
+        """
+        if not self.options.sarif_file:
+            return
+        sarif = formatters.SarifFormatter(self.options.cwd, True)
+        json = sarif.format_result(matches)
+        # Somehow, this gets set as an AnsibleUnicode under unclear circumstances. Force it to be a Path
+        sarif_file = Path(self.options.sarif_file)
+        sarif_file.write_text(
+            json,
+            encoding="utf-8",
+        )
 
     def count_results(self, matches: list[MatchError]) -> SummarizedResults:
         """Count failures and warnings in matches."""
