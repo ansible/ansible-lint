@@ -24,7 +24,7 @@ cryptography==50.0.2
     #   ansible-lint
 distro==1.9.0
     # via ansible-lint
-filelock==4.1.0 ; python_full_version < '3.11'
+filelock==4.2.1 ; python_full_version < '3.11'
     # via ansible-lint
 filelock==4.2.7 ; python_full_version >= '3.11'
     # via ansible-lint
@@ -86,7 +86,7 @@ subprocess-tee==0.4.2
     # via
     #   ansible-compat
     #   ansible-lint
-wcmatch==11.1 ; python_full_version < '3.11'
+wcmatch==11.2 ; python_full_version < '3.11'
     # via ansible-lint
 wcmatch==11.2 ; python_full_version >= '3.11'
     # via ansible-lint
