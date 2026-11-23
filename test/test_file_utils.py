@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import copy
+import io
 import logging
 import os
+import sys
 import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -21,6 +23,7 @@ from ansiblelint.file_utils import (
     expand_paths_vars,
     find_project_root,
     find_role_dir,
+    find_role_meta,
     kind_from_path,
     normpath,
     normpath_path,
@@ -707,3 +710,200 @@ def test_expand_dirs_in_lintables_warns_on_expansion(
         expand_dirs_in_lintables(lintables)
     assert "Directory expansion discovered" in caplog.text
     assert "exclude_paths" in caplog.text
+
+
+def test_find_role_meta_existing_meta_yml(tmp_path: Path) -> None:
+    """meta.yml file is found regardless of content."""
+    role_dir = tmp_path / "roles" / "my_namespace" / "some_role"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.touch()
+
+    meta_yaml_file = role_dir / "meta" / "main.yaml"
+    meta_yaml_file.touch()
+    assert find_role_meta(task_file) == meta_yaml_file
+    meta_yaml_file.unlink()
+
+    meta_yml_file = role_dir / "meta" / "main.yml"
+    meta_yml_file.touch()
+    assert find_role_meta(task_file) == meta_yml_file
+
+
+def test_find_role_meta_nonexisting_meta_yml(tmp_path: Path) -> None:
+    """Finding meta yaml must return None when no meta config is found."""
+    role_dir = tmp_path / "roles" / "my_namespace" / "some_role"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.touch()
+
+    assert find_role_meta(task_file) is None
+
+
+def test_lintable_role_name_from_meta_without_roles_nesting(tmp_path: Path) -> None:
+    """Role name is set on a Lintable even without nesting in 'roles' folder."""
+    role_dir = tmp_path / "role_not_nested_in_roles"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.write_text("---\n- debug: msg=hi\n", encoding="utf-8")
+
+    meta_file = role_dir / "meta" / "main.yml"
+    meta_file.write_text("""galaxy_info:
+      role_name: role_from_meta
+    """)
+
+    lintable = Lintable(task_file)
+
+    assert lintable.role == "role_from_meta"
+
+
+def test_lintable_role_name_from_meta_with_roles_nesting(tmp_path: Path) -> None:
+    """Role name from meta config takes precedence over folder name of role."""
+    role_dir = tmp_path / "roles" / "my_namespace" / "role_nested_in_roles"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.write_text("---\n- debug: msg=hi\n", encoding="utf-8")
+
+    meta_file = role_dir / "meta" / "main.yml"
+    meta_file.write_text("""galaxy_info:
+      role_name: role_from_meta
+    """)
+
+    lintable = Lintable(task_file)
+
+    assert lintable.role == "role_from_meta"
+
+
+def test_lintable_role_name_from_folder_with_roles_nesting(tmp_path: Path) -> None:
+    """Role name is taken from folder name in case there is no meta.yml."""
+    role_dir = tmp_path / "roles" / "my_namespace" / "role_nested_in_roles"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.write_text("---\n- debug: msg=hi\n", encoding="utf-8")
+
+    lintable = Lintable(task_file)
+
+    assert lintable.role == "role_nested_in_roles"
+
+
+def test_lintable_role_name_without_meta_yml(tmp_path: Path) -> None:
+    """A missing meta.yml must not fail the Lintable."""
+    role_dir = tmp_path / "some_role"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.write_text("---\n- debug: msg=hi\n", encoding="utf-8")
+
+    lintable = Lintable(task_file)
+
+    assert not lintable.role
+
+
+def test_lintable_role_name_without_role_name_in_meta(tmp_path: Path) -> None:
+    """A missing 'role_name' key in the meta config must not fail the Lintable."""
+    role_dir = tmp_path / "some_role"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.write_text("---\n- debug: msg=hi\n", encoding="utf-8")
+
+    meta_file = role_dir / "meta" / "main.yml"
+    meta_file.write_text("galaxy_info: {}")
+
+    lintable = Lintable(task_file)
+
+    assert not lintable.role
+
+
+def test_lintable_role_name_with_empty_meta_yml(tmp_path: Path) -> None:
+    """An empty meta config must not fail the Lintable."""
+    role_dir = tmp_path / "some_role"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.write_text("---\n- debug: msg=hi\n", encoding="utf-8")
+
+    meta_file = role_dir / "meta" / "main.yml"
+    meta_file.write_text("")
+
+    lintable = Lintable(task_file)
+
+    assert not lintable.role
+
+
+def test_lintable_role_name_with_non_string_role_name_in_meta(tmp_path: Path) -> None:
+    """A non-string role_name attribute in meta.yml is invalid and must not set Lintable.role."""
+    role_dir = tmp_path / "some_role"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.write_text("---\n- debug: msg=hi\n", encoding="utf-8")
+
+    meta_file = role_dir / "meta" / "main.yml"
+
+    for case in ("null", 1234):
+        meta_file.write_text(f"---\ngalaxy_info:\n  role_name: {case}")
+        lintable = Lintable(task_file)
+
+        assert not lintable.role
+        assert lintable.role is not None
+
+
+def test_lintable_role_name_with_non_dict_galaxy_info_in_meta(tmp_path: Path) -> None:
+    """Invalid non-dict values for meta.yml's galaxy_info key must not fail the Lintable."""
+    role_dir = tmp_path / "some_role"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.write_text("---\n- debug: msg=hi\n", encoding="utf-8")
+
+    meta_file = role_dir / "meta" / "main.yml"
+
+    for case in ("null", "[]"):
+        meta_file.write_text(f"---\ngalaxy_info: {case}")
+        lintable = Lintable(task_file)
+
+        assert not lintable.role
+
+
+def test_lintable_role_name_with_non_dict_meta_yml(tmp_path: Path) -> None:
+    """A meta.yml with non-dict content must not fail Lintable."""
+    role_dir = tmp_path / "some_role"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.write_text("---\n- debug: msg=hi\n", encoding="utf-8")
+
+    meta_file = role_dir / "meta" / "main.yml"
+
+    meta_file.write_text("---\n- invalid_galaxy_info: true")
+    lintable = Lintable(task_file)
+
+    assert not lintable.role
+
+
+def test_lintable_role_name_with_invalid_meta_yml(tmp_path: Path) -> None:
+    """Invalid YAML syntax in meta.yml must not fail the Lintable."""
+    role_dir = tmp_path / "some_role"
+    (role_dir / "tasks").mkdir(parents=True)
+    (role_dir / "meta").mkdir()
+    task_file = role_dir / "tasks" / "main.yml"
+    task_file.write_text("---\n- debug: msg=hi\n", encoding="utf-8")
+
+    meta_file = role_dir / "meta" / "main.yml"
+    meta_file.write_text("---\ngalaxy_info: broken: true")
+
+    lintable = Lintable(task_file)
+
+    assert not lintable.role
+
+
+def test_lintable_role_name_empty_on_stdin(monkeypatch: MonkeyPatch) -> None:
+    """When passing stdin as Lintable path the role name must be empty."""
+    monkeypatch.setattr(sys, "stdin", io.StringIO("---\n- debug: msg=hi\n"))
+    lintable = Lintable("-")
+    assert not lintable.role
