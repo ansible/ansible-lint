@@ -375,6 +375,24 @@ def test_with_full_path(default_rules_collection: RulesCollection) -> None:
     assert result[0].tag == "name[casing]"
 
 
+def test_build_load_failure_match_without_cause(
+    default_rules_collection: RulesCollection,
+) -> None:
+    """A load failure with no cause must not render 'None' as its details."""
+    runner = Runner(
+        "examples/playbooks/become.yml",
+        rules=default_rules_collection,
+    )
+    lintable = Lintable("missing.yml")
+    lintable.exc = FileNotFoundError(2, "No such file or directory", "missing.yml")
+
+    match = runner._build_load_failure_match(lintable)  # ruff:ignore[private-member-access]
+
+    assert match.tag == "load-failure[filenotfounderror]"
+    assert match.message == "[Errno 2] No such file or directory: 'missing.yml'"
+    assert match.details == ""
+
+
 def test_build_load_failure_match_empty_args(
     default_rules_collection: RulesCollection,
 ) -> None:

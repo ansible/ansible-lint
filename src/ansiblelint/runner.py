@@ -264,7 +264,7 @@ class Runner:
         return MatchError(
             lintable=lintable,
             message=message or str(exc),
-            details=detail or str(cause),
+            details=detail or (str(cause) if cause else ""),
             rule=self.rules["load-failure"],
             lineno=line,
             column=column,
