@@ -105,11 +105,17 @@ class MatchError(ValueError):
     @functools.cached_property
     def level(self) -> str:
         """Return the level of the rule: error, warning or notice."""
+        options = self.rule.options
+        collection = self.rule._collection  # ruff:ignore[private-member-access]
+        if options is None and collection is not None:
+            # Unloadable internal rules do not expose options of their own, so
+            # we read the warn_list from the collection that registered them.
+            options = collection.options
         if (
             not self.ignored
-            and self.rule.options
+            and options
             and {self.tag, self.rule.id, *self.rule.tags}.isdisjoint(
-                self.rule.options.warn_list,
+                options.warn_list,
             )
         ):
             return "error"
