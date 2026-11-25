@@ -1,0 +1,30 @@
+---
+# Test cases for var-naming[no-role-prefix] on a Galaxy 'namespace.role' dir
+# - the expected prefix comes from galaxy_info.role_name (dotted_role)
+# - include_role/import_role vars use the name after the dot
+
+- name: Set fact with declared role prefix (should pass)
+  ansible.builtin.set_fact:
+    dotted_role_fact: "test"
+
+- name: Set fact without declared role prefix (should fail)
+  ansible.builtin.set_fact:
+    bad_set_fact_var: "test"
+
+- name: Include dotted role vars without prefix (should fail)
+  ansible.builtin.include_role:
+    name: acme.dotted_target
+  vars:
+    bad_included_var: "test"
+
+- name: Include dotted role vars with prefix (should pass)
+  ansible.builtin.include_role:
+    name: acme.dotted_target
+  vars:
+    dotted_target_included_var: "test"
+
+- name: Import dotted role vars without prefix (should fail)
+  ansible.builtin.import_role:
+    name: acme.dotted_target
+  vars:
+    bad_imported_var: "test"
