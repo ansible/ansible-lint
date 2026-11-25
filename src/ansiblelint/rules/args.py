@@ -25,6 +25,7 @@ from ansible.module_utils import basic
 from ansiblelint._mockings import is_lint_mock_module
 from ansiblelint.rules import AnsibleLintRule, RulesCollection
 from ansiblelint.text import has_jinja
+from ansiblelint.types import EncryptedString
 from ansiblelint.utils import load_plugin
 from ansiblelint.yaml_utils import clean_json
 
@@ -86,6 +87,29 @@ workarounds_mutex_args_map = {
 
 class ValidationPassedError(Exception):
     """Exception to be raised when validation passes."""
+
+
+def _is_vault(value: Any) -> bool:
+    """Tell if a value is an inline !vault string, which is never decrypted."""
+    return isinstance(value, EncryptedString)
+
+
+def _is_unknown(value: Any) -> bool:
+    """Tell if an option value is only known at runtime: templated, vault or holding one."""
+    if isinstance(value, dict):
+        value = list(value.values())
+    if isinstance(value, list | tuple):
+        # has_jinja() is cached and cannot take unhashable values such as lists
+        return any(_is_unknown(item) for item in value)
+    return _is_vault(value) or (isinstance(value, str) and has_jinja(value))
+
+
+def _json_default(value: Any) -> str:
+    """Serialize vault values to a placeholder, so other options still get checked."""
+    if _is_vault(value):
+        return "vault-encrypted value"
+    msg = f"Object of type {type(value).__name__} is not JSON serializable"
+    raise TypeError(msg)
 
 
 class CustomAnsibleModule(basic.AnsibleModule):
@@ -222,9 +246,10 @@ class ArgsRule(AnsibleLintRule):
                     return []
 
                 buffer = io.BytesIO(
-                    json.dumps({
-                        "ANSIBLE_MODULE_ARGS": clean_json(module_args)
-                    }).encode()
+                    json.dumps(
+                        {"ANSIBLE_MODULE_ARGS": clean_json(module_args)},
+                        default=_json_default,
+                    ).encode()
                 )
                 with (
                     patch.object(
@@ -291,7 +316,7 @@ class ArgsRule(AnsibleLintRule):
             # ignore options with templated variable value with type check errors
             option_key = option_type_check_error.group("name")
             option_value = task["action"][option_key]
-            if has_jinja(option_value):
+            if _is_unknown(option_value):
                 _logger.debug(
                     "Type checking ignored for '%s' option in task '%s' at line %s.",
                     option_key,
@@ -307,7 +332,7 @@ class ArgsRule(AnsibleLintRule):
             # ignore templated value not in allowed choices
             choice_key = value_not_in_choices_error.group("name")
             choice_value = task["action"].get(choice_key)
-            if has_jinja(choice_value):
+            if _is_unknown(choice_value):
                 _logger.debug(
                     "Value checking ignored for '%s' option in task '%s' at line %s.",
                     choice_key,
