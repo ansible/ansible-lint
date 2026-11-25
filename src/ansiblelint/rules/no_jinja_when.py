@@ -81,7 +81,11 @@ class NoFormattingInWhenRule(AnsibleLintRule, TransformMixin):
         task: Task,
         file: Lintable | None = None,
     ) -> bool | str:
-        return "when" in task.raw_task and not self._is_valid(task.raw_task["when"])
+        return any(
+            not self._is_valid(task.raw_task[key])
+            for key in _WHEN_KEYS
+            if key in task.raw_task
+        )
 
     def transform(
         self,
@@ -153,8 +157,31 @@ def transform_for_roles(v: list[Any], key_to_check: tuple[str, ...]) -> bool:
 
 if "pytest" in sys.modules:
     # Tests for no-jinja-when rule.
+    import pytest
+
     from ansiblelint.rules import RulesCollection
     from ansiblelint.runner import Runner
+    from ansiblelint.utils import Task
+
+    @pytest.mark.parametrize("keyword", ["when", "changed_when", "failed_when"])
+    @pytest.mark.parametrize(
+        ("conditional", "expected"),
+        [
+            ("{{ is_ready }}", True),
+            (["is_enabled", "{{ is_ready }}"], True),
+            (["is_enabled", "is_ready"], False),
+        ],
+    )
+    def test_jinja_task_conditional(
+        keyword: str,
+        conditional: str | list[str],
+        expected: bool,
+    ) -> None:
+        """Detect Jinja delimiters in any task conditional."""
+        task = Task(
+            raw_task={"ansible.builtin.debug": {"msg": "text"}, keyword: conditional},
+        )
+        assert NoFormattingInWhenRule().matchtask(task) is expected
 
     def test_jinja_file_positive(empty_rule_collection: RulesCollection) -> None:
         """Positive test for no-jinja-when."""
