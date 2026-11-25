@@ -1,2 +1,2 @@
 ---
-requires_ansible: ">=2.9.0,<2.20"
+requires_ansible: ">=2.9.0,<2.14"
