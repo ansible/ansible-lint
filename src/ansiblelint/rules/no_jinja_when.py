@@ -163,14 +163,14 @@ if "pytest" in sys.modules:
     from ansiblelint.runner import Runner
     from ansiblelint.utils import Task
 
-    @pytest.mark.parametrize("keyword", ["when", "changed_when", "failed_when"])
+    @pytest.mark.parametrize("keyword", ("when", "changed_when", "failed_when"))
     @pytest.mark.parametrize(
         ("conditional", "expected"),
-        [
+        (
             ("{{ is_ready }}", True),
             (["is_enabled", "{{ is_ready }}"], True),
             (["is_enabled", "is_ready"], False),
-        ],
+        ),
     )
     def test_jinja_task_conditional(
         keyword: str,
