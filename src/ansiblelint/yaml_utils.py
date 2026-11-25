@@ -756,7 +756,13 @@ class FormattedEmitter(RoundTripEmitter):
         # If our previous node was a sequence and we are still trying to indent, don't
         if self.indents.last_seq():
             if self.event and getattr(self.event, "anchor", None):
-                self.indent = self.best_sequence_indent - self.sequence_dash_offset
+                # The anchor is already written, so self.column is not usable here.
+                # Nested sequences keep the indent that ruamel.yaml computed relative
+                # to the enclosing sequence. The root-level sequence cannot be
+                # detected through self.column anymore, so set its indent explicitly.
+                # len(self.indents) == 2 means a direct child of the document root.
+                if self._root_is_sequence and len(self.indents) == 2:
+                    self.indent = self.best_sequence_indent - self.sequence_dash_offset
             else:
                 self.indent = self.column + 1
 
