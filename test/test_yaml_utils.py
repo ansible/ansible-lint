@@ -1149,6 +1149,82 @@ def test_formatted_yaml_anchor_indentation() -> None:
     assert "            name: my_name" not in output_anchor
 
 
+@pytest.mark.parametrize(
+    "yaml_text",
+    (
+        pytest.param(
+            """---
+- &my_anchor
+  name: my_name
+- <<: *my_anchor
+  name: other_name
+""",
+            id="root-sequence",
+        ),
+        pytest.param(
+            """---
+- name: Play
+  tasks:
+    - &TASK
+      name: Record
+      ansible.builtin.debug:
+        msg: x
+    - *TASK
+""",
+            id="sequence-in-mapping-in-root-sequence",
+        ),
+        pytest.param(
+            """---
+key:
+  - &anchor
+    x: 1
+    y: 2
+  - *anchor
+""",
+            id="sequence-in-root-mapping",
+        ),
+        pytest.param(
+            """---
+key:
+  - &anchor
+    - 1
+    - 2
+  - *anchor
+""",
+            id="anchored-sequence",
+        ),
+        pytest.param(
+            """---
+key:
+  - &anchor |
+    line1
+    line2
+  - *anchor
+""",
+            id="anchored-block-scalar",
+        ),
+        pytest.param(
+            """---
+- name: Play
+  tasks:
+    - block:
+        - &TASK
+          name: Record
+          ansible.builtin.debug:
+            msg: x
+        - *TASK
+""",
+            id="deeply-nested-sequence",
+        ),
+    ),
+)
+def test_formatted_yaml_anchor_in_nested_sequence_indentation(yaml_text: str) -> None:
+    """Verify that anchored mappings in nested sequences keep their indentation (#5254)."""
+    yaml = ansiblelint.yaml_utils.FormattedYAML()
+
+    assert yaml.dumps(yaml.load(yaml_text)) == yaml_text
+
+
 def test_formatted_yaml_fix_comment_spaces_enabled() -> None:
     """Verify that comment spacing is fixed when fix_comment_spaces=True."""
     yaml = ansiblelint.yaml_utils.FormattedYAML(fix_comment_spaces=True)
