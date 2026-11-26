@@ -1,0 +1,4 @@
+---
+motd_host: "{{ ansible_hostname }}"
+motd_os: "{{ ansible_facts['distribution'] }}"
+motd_skip: "{{ ansible_kernel }}" # noqa: deprecated-top-level-facts

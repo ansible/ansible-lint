@@ -1,0 +1,43 @@
+---
+- name: Fixture for deprecated-top-level-facts
+  hosts: all
+  vars:
+    is_debian: >-
+      {{ ansible_os_family == 'Debian' }}
+  tasks:
+    - name: Show the hostname
+      ansible.builtin.debug:
+        msg: "{{ ansible_hostname }}"
+
+    - name: Bare expression in when
+      ansible.builtin.debug:
+        msg: Fedora
+      when: ansible_distribution == 'Fedora'
+
+    - name: Expression in assert
+      ansible.builtin.assert:
+        that:
+          - ansible_memtotal_mb > 1024
+
+    - name: Fact read through hostvars
+      ansible.builtin.debug:
+        msg: "{{ hostvars[inventory_hostname]['ansible_fqdn'] }}"
+
+    - name: Debug var
+      ansible.builtin.debug:
+        var: ansible_kernel
+
+    - name: Inside a block
+      block:
+        - name: Package manager
+          ansible.builtin.debug:
+            msg: "{{ ansible_pkg_mgr }}"
+  handlers:
+    - name: Default address
+      ansible.builtin.debug:
+        msg: "{{ ansible_default_ipv4.address }}"
+
+    - name: Same fact twice in one task
+      ansible.builtin.debug:
+        msg: "{{ ansible_hostname }}"
+      when: ansible_hostname != 'localhost'

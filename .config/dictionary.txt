@@ -76,6 +76,7 @@ getmatches
 globmatch
 gplv
 hostkey
+hostnqn
 hostvars
 htmlproofer
 indentless
@@ -90,6 +91,7 @@ keepends
 keypair
 kubevirt
 languageservice
+lastboot
 libyaml
 licensedb
 lineinfile
@@ -97,6 +99,7 @@ lintable
 lintable's
 lintables
 localectl
+loopcontrols
 machinectl
 matchdir
 matcherror
@@ -105,6 +108,7 @@ matchtask
 matchtasks
 matchvar
 matchyaml
+memtotal
 mockings
 modifyitems
 moid
@@ -117,6 +121,8 @@ nomatchestest
 norole
 nxos
 octals
+pagefilefree
+pagefiletotal
 pathex
 pathing
 pathspecs
@@ -158,6 +164,8 @@ subschemas
 substrs
 sudosu
 supervisorctl
+swapfree
+swaptotal
 swdepot
 switchport
 sysvinit
@@ -191,6 +199,7 @@ varnotset
 varset
 varsfile
 varstring
+vcpus
 virtnet
 willthames
 workerinput

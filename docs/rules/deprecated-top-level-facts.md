@@ -1,0 +1,1 @@
+../../src/ansiblelint/rules/deprecated_top_level_facts.md
