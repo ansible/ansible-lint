@@ -23,3 +23,14 @@
       args:
         executable: /bin/bash
       changed_when: false
+
+    - name: Print uptime
+      changed_when: false
+      shell: uptime # Include the load averages.
+
+    # Print the kernel release separately.
+    - name: Print kernel release
+      ansible.builtin.shell: |-
+        uname -r
+      # The kernel version check is read-only.
+      changed_when: false

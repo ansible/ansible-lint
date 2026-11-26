@@ -88,7 +88,11 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule, TransformMixin):
             target_task = self.seek(match.yaml_path, data)
             for _ in range(len(target_task)):
                 k, v = target_task.popitem(False)
-                target_task["ansible.builtin.command" if "shell" in k else k] = v
+                new_key = "ansible.builtin.command" if "shell" in k else k
+                target_task[new_key] = v
+                # ruamel.yaml stores trailing comments under the original key.
+                if new_key != k and k in target_task.ca.items:
+                    target_task.ca.items[new_key] = target_task.ca.items.pop(k)
             match.fixed = True
 
 

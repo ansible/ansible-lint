@@ -103,7 +103,7 @@ def fixture_runner_result(
         ),
         pytest.param(
             "examples/playbooks/transform_command_instead_of_shell.yml",
-            3,
+            6,
             True,
             True,
             id="cmd_instead_of_shell",
