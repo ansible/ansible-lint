@@ -153,7 +153,7 @@ class Runner:
             return False
 
         abs_path = str(lintable.abspath)
-        if self.project_dir and not abs_path.startswith(self.project_dir):
+        if self.project_dir and not lintable.abspath.is_relative_to(self.project_dir):
             _logger.debug(
                 "Skipping %s as it is outside of the project directory.",
                 abs_path,

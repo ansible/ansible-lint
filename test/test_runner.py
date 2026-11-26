@@ -125,6 +125,54 @@ def test_runner_exclude_globs(
     assert len(matches) == 0
 
 
+@pytest.mark.parametrize(
+    ("task_directory", "explicit", "expected_matches"),
+    (
+        pytest.param("project/tasks", False, 1, id="inside-project"),
+        pytest.param("project-shared/tasks", False, 0, id="sibling-with-prefix"),
+        pytest.param("shared/tasks", False, 0, id="other-sibling"),
+        pytest.param("project-shared/tasks", True, 1, id="explicit-sibling"),
+    ),
+)
+def test_runner_project_directory_boundary(
+    default_rules_collection: RulesCollection,
+    tmp_path: Path,
+    task_directory: str,
+    explicit: bool,
+    expected_matches: int,
+) -> None:
+    """Only lint discovered tasks inside the project, or explicit targets."""
+    project_dir = tmp_path / "project"
+    project_dir.mkdir()
+    task_file = tmp_path / task_directory / "main.yml"
+    task_file.parent.mkdir(parents=True)
+    task_file.write_text(
+        "---\n- ansible.builtin.debug:\n    msg: hello\n",
+        encoding="utf-8",
+    )
+    playbook = project_dir / "playbook.yml"
+    playbook.write_text(
+        "---\n"
+        "- name: Test project directory boundary\n"
+        "  hosts: localhost\n"
+        "  gather_facts: false\n"
+        "  tasks:\n"
+        "    - name: Import tasks\n"
+        "      ansible.builtin.import_tasks: "
+        f"../{task_file.relative_to(tmp_path).as_posix()}\n",
+        encoding="utf-8",
+    )
+
+    runner = Runner(
+        task_file if explicit else playbook,
+        rules=default_rules_collection,
+        project_dir=str(project_dir),
+    )
+    matches = runner.run()
+
+    assert [match.tag for match in matches] == ["name[missing]"] * expected_matches
+
+
 def test_is_excluded_skips_runtime_cache_dir(
     default_rules_collection: RulesCollection,
     tmp_path: Path,
