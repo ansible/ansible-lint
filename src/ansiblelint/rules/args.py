@@ -12,6 +12,7 @@ import re
 import shutil
 import sys
 import tempfile
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 # pylint: disable=preferred-module
@@ -19,6 +20,7 @@ from unittest import mock
 from unittest.mock import patch
 
 # pylint: disable=reimported
+import ansible
 import ansible.module_utils.basic as mock_ansible_module
 from ansible.module_utils import basic
 
@@ -86,6 +88,22 @@ workarounds_mutex_args_map = {
 
 class ValidationPassedError(Exception):
     """Exception to be raised when validation passes."""
+
+
+def _python_module_name(loaded_module: PluginLoadContext) -> str:
+    """Return the Python module name to use when the plugin file is loaded."""
+    name = str(loaded_module.plugin_resolved_name)
+    if (
+        "." not in name
+        and loaded_module.plugin_resolved_collection == "ansible.builtin"
+    ):
+        # ansible-core returns the short name for a builtin plugin that the task
+        # does not address as ansible.builtin.*, and a module without a parent
+        # package cannot do relative imports. Use the real name of the file,
+        # for example ansible.modules.setup.
+        path = Path(str(loaded_module.plugin_resolved_path)).with_suffix("")
+        name = ".".join(path.relative_to(Path(ansible.__file__).parents[1]).parts)
+    return name
 
 
 class CustomAnsibleModule(basic.AnsibleModule):
@@ -190,7 +208,7 @@ class ArgsRule(AnsibleLintRule):
                 )
                 return []
             spec = importlib.util.spec_from_file_location(
-                name=loaded_module.plugin_resolved_name,
+                name=_python_module_name(loaded_module),
                 location=loaded_module.plugin_resolved_path,
             )
             if not spec:
