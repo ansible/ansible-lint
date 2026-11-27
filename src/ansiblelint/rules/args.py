@@ -37,6 +37,24 @@ if TYPE_CHECKING:
 
 _logger = logging.getLogger(__name__)
 
+
+def _find_option(options: Any, key: str) -> Any:
+    """Return an option value, looking inside nested option dictionaries too.
+
+    Module failure messages name the failing option only by its own name, and
+    that option can be nested, like ``mode`` inside ``macvlan`` for nmcli.
+    """
+    if not isinstance(options, dict):
+        return None
+    if key in options:
+        return options[key]
+    for value in options.values():
+        found = _find_option(value, key)
+        if found is not None:
+            return found
+    return None
+
+
 ignored_re = re.compile(
     "|".join(  # ruff:ignore[static-join-to-f-string]
         [
@@ -290,8 +308,8 @@ class ArgsRule(AnsibleLintRule):
         if option_type_check_error:
             # ignore options with templated variable value with type check errors
             option_key = option_type_check_error.group("name")
-            option_value = task["action"][option_key]
-            if has_jinja(option_value):
+            option_value = _find_option(task["action"], option_key)
+            if isinstance(option_value, str) and has_jinja(option_value):
                 _logger.debug(
                     "Type checking ignored for '%s' option in task '%s' at line %s.",
                     option_key,
@@ -306,8 +324,8 @@ class ArgsRule(AnsibleLintRule):
         if value_not_in_choices_error:
             # ignore templated value not in allowed choices
             choice_key = value_not_in_choices_error.group("name")
-            choice_value = task["action"].get(choice_key)
-            if has_jinja(choice_value):
+            choice_value = _find_option(task["action"], choice_key)
+            if isinstance(choice_value, str) and has_jinja(choice_value):
                 _logger.debug(
                     "Value checking ignored for '%s' option in task '%s' at line %s.",
                     choice_key,
@@ -385,6 +403,118 @@ if "pytest" in sys.modules:
         ]
         log_string = "\n".join(record.getMessage() for record in records)
         assert len(records) == 0, log_string
+
+    def test_args_parse_failed_msg_nested_templated_option() -> None:
+        """Test that a templated nested option is ignored instead of crashing."""
+
+        class MockTask:
+            def __init__(self) -> None:
+                self.action = {
+                    "conn_name": "lint-repro",
+                    "macvlan": {"parent": "eth0", "mode": "{{ 2 }}"},
+                }
+                self.line = 1
+
+            def __getitem__(self, key: str) -> Any:
+                return getattr(self, key)
+
+        rule = ArgsRule()
+        task = cast("Task", MockTask())
+        failed_msg = (
+            '{"msg": "argument \'mode\' is of type str and we were unable to convert '
+            'to int: invalid literal"}'
+        )
+
+        # pylint: disable=protected-access
+        results = rule._parse_failed_msg(  # ruff:ignore[private-member-access]
+            failed_msg,
+            task,
+            "community.general.nmcli",
+        )
+
+        assert not results
+
+    def test_args_parse_failed_msg_option_with_mapping_value() -> None:
+        """Test that an option holding a mapping does not crash the lookup."""
+
+        class MockTask:
+            def __init__(self) -> None:
+                self.action = {"conn_name": "lint-repro", "mode": {"nested": "{{ 2 }}"}}
+                self.line = 1
+
+            def __getitem__(self, key: str) -> Any:
+                return getattr(self, key)
+
+        rule = ArgsRule()
+        task = cast("Task", MockTask())
+        failed_msg = (
+            '{"msg": "argument \'mode\' is of type str and we were unable to convert '
+            'to int: invalid literal"}'
+        )
+
+        # pylint: disable=protected-access
+        results = rule._parse_failed_msg(  # ruff:ignore[private-member-access]
+            failed_msg,
+            task,
+            "community.general.nmcli",
+        )
+
+        assert len(results) == 1
+
+    def test_args_parse_failed_msg_nested_plain_option() -> None:
+        """Test that a nested option without templating is still reported."""
+
+        class MockTask:
+            def __init__(self) -> None:
+                self.action = {
+                    "conn_name": "lint-repro",
+                    "macvlan": {"parent": "eth0", "mode": "bogus"},
+                }
+                self.line = 1
+
+            def __getitem__(self, key: str) -> Any:
+                return getattr(self, key)
+
+        rule = ArgsRule()
+        task = cast("Task", MockTask())
+        failed_msg = (
+            '{"msg": "argument \'mode\' is of type str and we were unable to convert '
+            'to int: invalid literal"}'
+        )
+
+        # pylint: disable=protected-access
+        results = rule._parse_failed_msg(  # ruff:ignore[private-member-access]
+            failed_msg,
+            task,
+            "community.general.nmcli",
+        )
+
+        assert len(results) == 1
+        assert results[0].tag == "args[module]"
+
+    def test_args_parse_failed_msg_nested_templated_choice() -> None:
+        """Test that a templated nested value outside its choices is ignored."""
+
+        class MockTask:
+            def __init__(self) -> None:
+                self.action = {"macvlan": {"mode": "{{ chosen }}"}}
+                self.line = 1
+
+            def __getitem__(self, key: str) -> Any:
+                return getattr(self, key)
+
+        rule = ArgsRule()
+        task = cast("Task", MockTask())
+        failed_msg = '{"msg": "value of mode must be one of: a, b, got: {{ chosen }}"}'
+
+        # pylint: disable=protected-access
+        results = rule._parse_failed_msg(  # ruff:ignore[private-member-access]
+            failed_msg,
+            task,
+            "community.general.nmcli",
+        )
+
+        assert not results
 
     def test_args_parse_failed_msg_no_key() -> None:
         """Test that _parse_failed_msg does not crash if key is missing in task."""
