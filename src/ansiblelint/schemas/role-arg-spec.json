@@ -85,6 +85,17 @@
       ],
       "type": "string"
     },
+    "deprecated": {
+      "description": "Description of why this attribute was deprecated.",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "object"
+        }
+      ]
+    },
     "deprecated_alias": {
       "properties": {
         "collection_name": {
