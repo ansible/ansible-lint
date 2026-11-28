@@ -638,7 +638,21 @@ def get_config(arguments: list[str]) -> Options:
     file_config, options.config_file = load_config(
         options.config_file, project_path=options.project_dir
     )
+    # merge_config may also set use_default_rules from the config file
+    cli_use_default_rules = options.use_default_rules
     config = merge_config(file_config, options)
+
+    if options.rulesdir and not options.use_default_rules:
+        log_entries.append(
+            (
+                logging.WARNING,
+                "Embedded rules are disabled because '-r/--rules-dir' or 'rulesdir' is used. Add '-R' or 'use_default_rules: true' to keep them.",
+            ),
+        )
+    elif cli_use_default_rules and not options.rulesdir:
+        log_entries.append(
+            (logging.WARNING, "'-R' has no effect without '-r/--rules-dir'."),
+        )
 
     options.rulesdirs = get_rules_dirs(
         options.rulesdir,
