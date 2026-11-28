@@ -111,7 +111,7 @@ class ArgsRule(AnsibleLintRule):
         "args[module]": description,
     }
     RE_PATTERN = re.compile(r"(argument|option) '(?P<name>.*)' is of type")
-    RE_VALUE_OF = re.compile(r"value of (?P<name>.*) must be one of:")
+    RE_VALUE_OF = re.compile(r"value of (?P<name>.*) must be one (?:or more )?of:")
 
     def matchtask(
         self,
@@ -307,7 +307,7 @@ class ArgsRule(AnsibleLintRule):
             # ignore templated value not in allowed choices
             choice_key = value_not_in_choices_error.group("name")
             choice_value = task["action"].get(choice_key)
-            if has_jinja(choice_value):
+            if isinstance(choice_value, str) and has_jinja(choice_value):
                 _logger.debug(
                     "Value checking ignored for '%s' option in task '%s' at line %s.",
                     choice_key,

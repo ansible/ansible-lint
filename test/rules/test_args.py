@@ -30,6 +30,20 @@ def test_args_module_relative_import(default_rules_collection: RulesCollection) 
     assert result[0].message == "missing required arguments: name"
 
 
+def test_args_module_list_choices(default_rules_collection: RulesCollection) -> None:
+    """Validate choices of a list option, ignoring a templated value."""
+    lintable = Lintable(
+        "examples/playbooks/rule-args-module-list-choices.yml",
+        kind="playbook",
+    )
+    result = Runner(lintable, rules=default_rules_collection).run()
+    assert len(result) == 1, result
+    assert result[0].tag == "args[module]"
+    assert result[0].message == (
+        "value of types must be one or more of: deb, deb-src. Got no match for: rpm"
+    )
+
+
 def test_args_module_import_keeps_module_registered(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
