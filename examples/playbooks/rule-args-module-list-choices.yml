@@ -1,0 +1,16 @@
+---
+- name: Fixture to validate choices of list module options
+  hosts: localhost
+  tasks:
+    - name: Templated value of a list option with choices
+      ansible.builtin.deb822_repository:
+        name: example
+        types: "{{ repo_types | default(['deb']) }}"
+
+    - name: Invalid item of a list option with choices
+      # module should produce: 'value of types must be one or more of: deb, deb-src. Got no match for: rpm'
+      ansible.builtin.deb822_repository:
+        name: example
+        types:
+          - deb
+          - rpm
