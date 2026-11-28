@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import sys
 from pathlib import Path
@@ -283,3 +284,55 @@ def test_offline_config_used_when_no_cli(base_arguments: list[str]) -> None:
         result = cli.merge_config(file_config, cli_config)
 
     assert result.offline is True
+
+
+_EMBEDDED_RULES_DISABLED = "Embedded rules are disabled because '-r/--rules-dir' or 'rulesdir' is used. Add '-R' or 'use_default_rules: true' to keep them."
+_DEFAULT_RULES_NO_EFFECT = "'-R' has no effect without '-r/--rules-dir'."
+
+
+@pytest.mark.parametrize(
+    ("args", "expected"),
+    (
+        pytest.param(
+            ["-c", "/dev/null", "-r", "test/rules/fixtures"],
+            [_EMBEDDED_RULES_DISABLED],
+            id="r",
+        ),
+        pytest.param(
+            ["-c", "/dev/null", "-R", "-r", "test/rules/fixtures"],
+            [],
+            id="r-and-R",
+        ),
+        pytest.param(["-c", "/dev/null", "-R"], [_DEFAULT_RULES_NO_EFFECT], id="R"),
+        pytest.param(["-c", "/dev/null"], [], id="none"),
+        pytest.param(
+            ["-c", "test/fixtures/rulesdir.yml"],
+            [_EMBEDDED_RULES_DISABLED],
+            id="config-rulesdir",
+        ),
+        pytest.param(
+            ["-c", "test/fixtures/rulesdir.yml", "-R"],
+            [],
+            id="config-rulesdir-and-R",
+        ),
+        # .ansible-lint has use_default_rules: true and no rulesdir
+        pytest.param(
+            ["-c", ".ansible-lint", "-r", "test/rules/fixtures"],
+            [],
+            id="config-use-default-rules-and-r",
+        ),
+        pytest.param(["-c", ".ansible-lint"], [], id="config-use-default-rules"),
+    ),
+)
+def test_rulesdir_warnings(
+    base_arguments: list[str],
+    args: list[str],
+    expected: list[str],
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Warn when embedded rules are disabled or -R has no effect (#4747)."""
+    entries: list[tuple[int, str]] = []
+    monkeypatch.setattr(cli, "log_entries", entries)
+    cli.get_config([*base_arguments, *args])
+
+    assert [msg for level, msg in entries if level == logging.WARNING] == expected
